@@ -1,0 +1,10 @@
+// SD Mod Manager
+
+// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Licensed under the MIT License <http://opensource.org/licenses/MIT>.
+
+MainMMIcon ICON "../icons/main-icon.ico"
+
+#define wxUSE_NO_MANIFEST 0
+
+#include <wx/msw/wx.rc>

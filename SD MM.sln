@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "src\main.vcxproj", "{D022CE6F-72CB-437C-8242-34EE53F96812}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|Win32 = debug|Win32
+		debug|x64 = debug|x64
+		release|Win32 = release|Win32
+		release|x64 = release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.debug|Win32.ActiveCfg = Debug|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.debug|Win32.Build.0 = Debug|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.debug|x64.ActiveCfg = Debug|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.debug|x64.Build.0 = Debug|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.release|Win32.ActiveCfg = Release|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.release|Win32.Build.0 = Release|Win32
+		{D022CE6F-72CB-437C-8242-34EE53F96812}.release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E1076249-0E62-4B15-91D0-705108378CBC}
+	EndGlobalSection
+	GlobalSection(HgVSProperties) = preSolution
+		SolutionIsControlled = True
+		SolutionBindings = <Solution Location In Database>
+	EndGlobalSection
+	GlobalSection(HgVSProperties) = preSolution
+		SolutionIsControlled = True
+		SolutionBindings = <Solution Location In Database>
+	EndGlobalSection
+EndGlobal

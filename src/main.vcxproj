@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="base\mod_conflict_resolver.cpp" />
+    <ClCompile Include="domain\mod_list.cpp" />
+    <ClCompile Include="era2\era2_mod_data_provider.cpp" />
+    <ClCompile Include="era2\era2_mod_loader.cpp" />
+    <ClCompile Include="impl\base\base_mod_platform.cpp" />
+    <ClCompile Include="era2\era2_launch_helper.cpp" />
+    <ClCompile Include="era2\era2_mod_manager.cpp" />
+    <ClCompile Include="era2\era2_preset_manager.cpp" />
+    <ClCompile Include="impl\service\app_config.cpp" />
+    <ClCompile Include="impl\service\i18n_service.cpp" />
+    <ClCompile Include="impl\service\icon_storage.cpp" />
+    <ClCompile Include="mod_manager_app.cpp" />
+    <ClCompile Include="era2\era2_config.cpp" />
+    <ClCompile Include="era2\era2_platform.cpp" />
+    <ClCompile Include="era2\era2_platform_descriptor.cpp" />
+    <ClCompile Include="impl\service\platform_service.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
+    <ClCompile Include="ui\error_view.cpp" />
+    <ClCompile Include="ui\main_frame.cpp" />
+    <ClCompile Include="ui\manage_preset_list_view.cpp" />
+    <ClCompile Include="ui\mod_list_model.cpp" />
+    <ClCompile Include="ui\resolve_mod_conflicts_view.cpp" />
+    <ClCompile Include="ui\select_directory_view.cpp" />
+    <ClCompile Include="ui\select_exe.cpp" />
+    <ClCompile Include="ui\select_mods_dialog.cpp" />
+    <ClCompile Include="ui\select_mod_pairs_dialog.cpp" />
+    <ClCompile Include="ui\select_platform_view.cpp" />
+    <ClCompile Include="ui\mod_list_view.cpp" />
+    <ClCompile Include="ui\show_file_list_dialog.cpp" />
+    <ClCompile Include="ui\show_file_list_helper.cpp" />
+    <ClCompile Include="utility\fs_util.cpp" />
+    <ClCompile Include="utility\json_util.cpp" />
+    <ClCompile Include="utility\shell_util.cpp" />
+    <ClCompile Include="utility\string_util.cpp" />
+    <ClCompile Include="wx\data_view_multiple_icons_renderer.cpp" />
+    <ClCompile Include="wx\priority_data_renderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="application.h" />
+    <ClInclude Include="base\mod_conflict_resolver.hpp" />
+    <ClInclude Include="domain\imod_data_provider.hpp" />
+    <ClInclude Include="domain\mod_list.hpp" />
+    <ClInclude Include="domain\mod_metadata.hpp" />
+    <ClInclude Include="era2\era2_mod_data_provider.hpp" />
+    <ClInclude Include="era2\era2_mod_loader.hpp" />
+    <ClInclude Include="impl\base\base_mod_platform.h" />
+    <ClInclude Include="era2\era2_directory_structure.hpp" />
+    <ClInclude Include="era2\era2_launch_helper.h" />
+    <ClInclude Include="era2\era2_mod_manager.h" />
+    <ClInclude Include="era2\era2_preset_manager.h" />
+    <ClInclude Include="impl\service\app_config.h" />
+    <ClInclude Include="impl\service\i18n_service.h" />
+    <ClInclude Include="impl\service\icon_storage.h" />
+    <ClInclude Include="interface\domain\ilaunch_helper.h" />
+    <ClInclude Include="domain\imod_manager.hpp" />
+    <ClInclude Include="interface\service\iapp_config.h" />
+    <ClInclude Include="service\ii18n_service.hpp" />
+    <ClInclude Include="interface\service\iicon_storage.h" />
+    <ClInclude Include="mod_manager_app.h" />
+    <ClInclude Include="era2\era2_config.h" />
+    <ClInclude Include="era2\era2_platform.h" />
+    <ClInclude Include="era2\era2_platform_descriptor.h" />
+    <ClInclude Include="impl\service\platform_service.h" />
+    <ClInclude Include="interface\domain\ilocal_config.h" />
+    <ClInclude Include="domain\mod_data.hpp" />
+    <ClInclude Include="domain\imod_platform.hpp" />
+    <ClInclude Include="interface\domain\iplatform_descriptor.h" />
+    <ClInclude Include="domain\ipreset_manager.hpp" />
+    <ClInclude Include="interface\service\iplatform_service.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="system_info.hpp" />
+    <ClInclude Include="types\conflict_resolve_mode.hpp" />
+    <ClInclude Include="types\embedded_icon.h" />
+    <ClInclude Include="types\main_window_properties.h" />
+    <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
+    <ClInclude Include="ui\error_view.h" />
+    <ClInclude Include="ui\main_frame.h" />
+    <ClInclude Include="ui\manage_preset_list_view.hpp" />
+    <ClInclude Include="ui\mod_list_model.h" />
+    <ClInclude Include="ui\resolve_mod_conflicts_view.hpp" />
+    <ClInclude Include="ui\select_directory_view.h" />
+    <ClInclude Include="ui\select_exe.h" />
+    <ClInclude Include="ui\select_mods_dialog.hpp" />
+    <ClInclude Include="ui\select_mod_pairs_dialog.hpp" />
+    <ClInclude Include="ui\select_platform_view.h" />
+    <ClInclude Include="ui\mod_list_view.h" />
+    <ClInclude Include="ui\show_file_list_dialog.hpp" />
+    <ClInclude Include="ui\show_file_list_helper.hpp" />
+    <ClInclude Include="utility\non_owning_ptr.hpp" />
+    <ClInclude Include="utility\sdlexcept.h" />
+    <ClInclude Include="utility\wx_widgets_ptr.hpp" />
+    <ClInclude Include="utility\fs_util.h" />
+    <ClInclude Include="utility\json_util.h" />
+    <ClInclude Include="utility\macro.h" />
+    <ClInclude Include="utility\shell_util.h" />
+    <ClInclude Include="utility\string_util.h" />
+    <ClInclude Include="wx\data_view_multiple_icons_renderer.h" />
+    <ClInclude Include="wx\priority_data_renderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="main.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName />
+    <SccLocalPath />
+    <ProjectGuid>{D022CE6F-72CB-437C-8242-34EE53F96812}</ProjectGuid>
+    <ProjectName>main</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+    <EnableCppCoreCheck>true</EnableCppCoreCheck>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</IntDir>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level4</WarningLevel>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;wxNO_UNSAFE_WXSTRING_CONV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <ShowIncludes>false</ShowIncludes>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessToFile>false</PreprocessToFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(ProjectName)\</AssemblerListingLocation>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>WIN32;_DEBUG;__WXMSW__;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\vc_mswud\main.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;__WXMSW__;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\vc_mswud\main.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxbase31ud.lib;wxmsw31ud_aui.lib;wxbase31ud_net.lib;wxmsw31ud_html.lib;wxmsw31ud_adv.lib;wxmsw31ud_core.lib;wxmsw31ud_media.lib;wxmsw31ud_stc.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level4</WarningLevel>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;wxUSE_GUI;__WXMSW__;NDEBUG;_WINDOWS;CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;wxNO_UNSAFE_WXSTRING_CONV;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(ProjectName)\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>
+      </AdditionalOptions>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ShowIncludes>false</ShowIncludes>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Midl>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>WIN32;__WXMSW__;NDEBUG;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TypeLibraryName>.\vc_mswu\main.tlb</TypeLibraryName>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>__WXMSW__;NDEBUG;_UNICODE;_WINDOWS;NOPCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\vc_mswu\main.bsc</OutputFile>
+    </Bscmake>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>wxmsw31u_adv.lib;wxmsw31u_core.lib;wxbase31u.lib;wxmsw31u_media.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;wininet.lib;comdlg32.lib;ws2_32.lib;wldap32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

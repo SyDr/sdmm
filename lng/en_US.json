@@ -1,0 +1,14 @@
+{
+	"category" : {
+		"gameplay" : "Gameplay",
+		"graphics" : "Graphics",
+		"scenarios" : "Scenarios",
+		"cheats" : "Cheats",
+		"interface" : "Interface",
+		"towns" : "Towns",
+		"other" : "Other",
+		"platforms" : "Platforms",
+		"personal mods" : "My personal mods",
+		"utilities" : "Utilities"
+	}
+}

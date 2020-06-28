@@ -1,0 +1,11 @@
+/.vs/
+/Debug/
+/Release/
+/repository/
+/sdmm-cppcheck-build-dir/
+/src/main.aps
+/src/main.vcxproj.user
+/setup/Output/mm_setup.exe
+/setup/log.txt
+/SD MM.sdf
+/SD MM.VC.db
