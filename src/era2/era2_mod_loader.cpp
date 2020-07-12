@@ -14,20 +14,59 @@
 
 using namespace mm;
 
+namespace
+{
+	ModData supplyWithDefaults(ModData what, std::set<wxString> const& defaultIncompatible,
+							   std::set<wxString> const& defaultRequires,
+							   std::set<wxString> const& defaultLoadAfter, bool useIncompatbile,
+							   bool useRequires, bool useLoadAfter)
+	{
+		if (!useRequires)
+		{
+			what.requires = defaultRequires;
+			if (what.id != "WoG")
+				what.requires.emplace("WoG");
+		}
+
+		if (!useLoadAfter)
+		{
+			what.load_after = defaultLoadAfter;
+			if (what.id != "WoG")
+				what.load_after.emplace("WoG");
+		}
+
+		if (!useIncompatbile)
+		{
+			what.incompatible = defaultIncompatible;
+		}
+
+		return what;
+	}
+}
+
 ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxString const& preferredLng,
 								  std::set<wxString> const& defaultIncompatible,
 								  std::set<wxString> const& defaultRequires,
 								  std::set<wxString> const& defaultLoadAfter)
 {
+	bool hasRequires     = false;
+	bool hasLoadAfter    = false;
+	bool hasIncompatible = false;
+
 	ModData result;
 	result.data_path   = loadFrom;
 	result.id          = wxString::FromUTF8(loadFrom.filename().u8string());
 	result.virtual_mod = !std::filesystem::is_directory(loadFrom);
 
+	auto supplyResultWithDefaults = [&] {
+		return supplyWithDefaults(std::move(result), defaultIncompatible, defaultRequires, defaultLoadAfter,
+								  hasIncompatible, hasRequires, hasLoadAfter);
+	};
+
 	if (result.virtual_mod)
 	{
 		result.caption = result.id;
-		return result;
+		return supplyResultWithDefaults();
 	}
 
 	auto const path = loadFrom / mm::constant::mod_info_filename;
@@ -37,7 +76,7 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 	if (!datafile)
 	{
 		result.caption = result.id;
-		return result;
+		return supplyResultWithDefaults();
 	}
 
 	nlohmann::json data;
@@ -55,18 +94,18 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 	if (!data.is_object())
 	{
 		result.caption = result.id;
-		return result;
+		return supplyResultWithDefaults();
 	}
 
 	if (const auto ver = find_object_value(&data, "version"))
 	{
-		result.mod_platfrom = get_string_value(ver, "platfrom");
+		result.mod_platform = get_string_value(ver, "platform");
 		result.mod_version  = get_string_value(ver, "mod");
 		result.info_version = get_string_value(ver, "info");
 	}
 	else
 	{
-		result.mod_platfrom = get_string_value(&data, "platfrom");
+		result.mod_platform = get_string_value(&data, "platform");
 		result.mod_version  = get_string_value(&data, "mod_version");
 		result.info_version = get_string_value(&data, "info_version");
 	}
@@ -184,12 +223,8 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 			for (auto const item : *req)
 				if (item.is_string())
 					result.requires.emplace(item.get<std::string>());
-		}
-		else
-		{
-			result.requires = defaultRequires;
-			if (result.id != "WoG")
-				result.requires.emplace("WoG");
+
+			hasRequires = true;
 		}
 
 		if (auto const after = compat->find("load_after"); after != compat->end() && after->is_array())
@@ -197,12 +232,8 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 			for (auto const item : *after)
 				if (item.is_string())
 					result.load_after.emplace(item.get<std::string>());
-		}
-		else
-		{
-			result.load_after = defaultLoadAfter;
-			if (result.id != "WoG")
-				result.load_after.emplace("WoG");
+
+			hasLoadAfter = true;
 		}
 
 		if (auto const inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())
@@ -210,12 +241,10 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 			for (auto const item : *inc)
 				if (item.is_string())
 					result.incompatible.emplace(item.get<std::string>());
-		}
-		else
-		{
-			result.incompatible = defaultIncompatible;
+
+			hasIncompatible = true;
 		}
 	}
 
-	return result;
+	return supplyResultWithDefaults();
 }

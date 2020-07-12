@@ -29,7 +29,7 @@ namespace mm
 
 		wxString category;
 
-		wxString mod_platfrom;  // era?
+		wxString mod_platform;  // era?
 		wxString mod_version;
 		wxString info_version;
 
