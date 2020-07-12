@@ -86,10 +86,10 @@ void SelectModPairsDialog::createListControl()
 								   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	_list->AppendToggleColumn("", wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE);
-	_list->AppendIconTextColumn("Mod 1"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
+	_list->AppendIconTextColumn("Mod"_lng + " 1", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
 								wxALIGN_LEFT,
 								wxDATAVIEW_COL_SORTABLE)->SetSortOrder(true);
-	_list->AppendIconTextColumn("Mod 2"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
+	_list->AppendIconTextColumn("Mod"_lng + " 2", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
 								wxALIGN_LEFT, wxDATAVIEW_COL_SORTABLE);
 }
 

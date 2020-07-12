@@ -62,7 +62,7 @@ void ShowFileListDialog::createControls()
 	_fileList = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 									   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 	_fileList->AppendTextColumn(
-		"Path", wxDATAVIEW_CELL_INERT,
+		"Path"_lng, wxDATAVIEW_CELL_INERT,
 		std::max(200l, 400l - static_cast<long>(40l * _data.modList.size())));
 
 	for (size_t i = 0; i < _data.modList.size(); ++i)

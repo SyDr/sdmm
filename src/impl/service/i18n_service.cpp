@@ -18,7 +18,6 @@
 using namespace mm;
 
 I18nService::I18nService(const IAppConfig& config)
-	//: _assertAboutMissingEntries(config.currentLanguageCode() != "en_US")
 {
 	std::ifstream datafile((config.programPath() / "lng" / (config.currentLanguageCode() + ".json")).u8string());
 
@@ -62,7 +61,7 @@ wxString I18nService::get(wxString const& key) const
 	if (auto const it = _data.find(key); it != _data.cend())
 		return it->second;
 
-	wxASSERT_MSG(!_assertAboutMissingEntries, "Translation string is not found");
+	wxLogDebug("Translation string not found \"%s\"", key);
 
 	return key;
 }

@@ -411,8 +411,8 @@ void ModListView::onSwitchSelectedModStateRequested()
 			{
 				auto const message = fmt::format(
 					"Mod \"{0}\" is incompatible with {1}.\r\n"
-					"Do you really want to enable this mod?"_lng.ToStdString(),
-					_selectedMod.ToStdString(), boost::algorithm::join(incompatible, ", "));
+					"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
+					_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
 
 				auto const answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
 												 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);

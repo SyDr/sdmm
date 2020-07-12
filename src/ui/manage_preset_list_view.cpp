@@ -144,7 +144,7 @@ void ManagePresetListView::updateLayout()
 
 void ManagePresetListView::bindEvents()
 {
-	_new->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(); });
+	_new->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(getSelection()); });
 	_load->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLoadPresetRequested(); });
 	//_rename->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onRenamePreset(); });
 	//_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
@@ -156,36 +156,34 @@ void ManagePresetListView::bindEvents()
 	_connections += _platform.getPresetManager()->onListChanged().connect([=] { refreshListContent(); });
 }
 
-void ManagePresetListView::onSavePresetRequested()
+void ManagePresetListView::onSavePresetRequested(wxString baseName)
 {
 	try_handle_exceptions(this, [&] {
-		wxString selected = getSelection();
-
-		if (selected.empty())
+		if (baseName.empty())
 		{
-			wxTextEntryDialog ted(this, "Enter profile name"_lng, "Create"_lng, selected);
+			wxTextEntryDialog ted(this, "Enter profile name"_lng, "Create"_lng, baseName);
 			ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
 			ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
 
 			if (ted.ShowModal() != wxID_OK)
 				return;
 
-			selected = ted.GetValue();
+			baseName = ted.GetValue();
 		}
 
-		if (_platform.getPresetManager()->exists(selected))
+		if (_platform.getPresetManager()->exists(baseName))
 		{
 			int const answer =
-				wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), selected),
+				wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
 								wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 			if (answer != wxYES)
 				return;
 		}
 
-		_platform.getPresetManager()->savePreset(selected, _platform.getModManager()->mods());
-		_platform.localConfig()->setActivePreset(selected);
-		_selected = selected;
+		_platform.getPresetManager()->savePreset(baseName, _platform.getModManager()->mods());
+		_platform.localConfig()->setActivePreset(baseName);
+		_selected = baseName;
 
 		refreshListContent();
 		// EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);

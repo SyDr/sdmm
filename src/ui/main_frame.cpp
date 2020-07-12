@@ -86,9 +86,9 @@ void MainFrame::createMenuBar()
 {
 	auto profileMenu = new wxMenu();
 	auto manageProfiles =
-		profileMenu->Append(wxID_ANY, "Manage"_lng, nullptr, "Manage mod list profiles"_lng);
+		profileMenu->Append(wxID_ANY, "Manage"_lng, nullptr, "Manage profiles"_lng);
 	auto saveProfile =
-		profileMenu->Append(wxID_ANY, "Save as"_lng, nullptr, "Save current mod list as preset"_lng);
+		profileMenu->Append(wxID_ANY, "Save as"_lng, nullptr, "Save current mod list as profile"_lng);
 	_menuItems[manageProfiles->GetId()] = [&] { OnMenuManageProfilesRequested(false); };
 	_menuItems[saveProfile->GetId()]    = [&] { OnMenuManageProfilesRequested(true); };
 
@@ -142,7 +142,7 @@ void MainFrame::OnMenuManageProfilesRequested(bool saveAs)
 	try_handle_exceptions(this, [&] {
 		ManagePresetListView mplv(this, *_currentPlatform, _app.iconStorage());
 		if (saveAs)
-			mplv.CallAfter(&ManagePresetListView::onSavePresetRequested);
+			mplv.CallAfter(&ManagePresetListView::onSavePresetRequested, wxEmptyString);
 
 		mplv.ShowWindowModal();
 	});

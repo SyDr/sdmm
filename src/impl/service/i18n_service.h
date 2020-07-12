@@ -27,8 +27,6 @@ namespace mm
 		void build_cache(nlohmann::json const& data, wxString const& prefix);
 
 	private:
-		const bool _assertAboutMissingEntries = false;
-
 		std::map<wxString, wxString> _data;
 	};
 }

@@ -32,7 +32,7 @@ namespace mm
 	{
 	public:
 		explicit ManagePresetListView(wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage);
-		void onSavePresetRequested();
+		void onSavePresetRequested(wxString baseName);
 
 	private:
 		void createControls();
