@@ -5,20 +5,31 @@
 
 #pragma once
 
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 
 #include <nlohmann/json.hpp>
 
+#include <variant>
+
 namespace mm
 {
-	class AppConfig : public IAppConfig
+	struct PortableMode
 	{
-	public:
+		fspath managedPath;
+	};
+
+	struct MainMode
+	{
+		fspath programDataPath;
+	};
+
+	struct AppConfig : IAppConfig
+	{
 		AppConfig();
 
 		bool portableMode() const override;
-		std::filesystem::path dataPath() const override;
-		std::filesystem::path programPath() const override;
+		fspath dataPath() const override;
+		fspath programPath() const override;
 
 		void save() override;
 
@@ -28,28 +39,25 @@ namespace mm
 		wxString selectedPlatform() const override;
 		void setSelectedPlatformCode(const wxString& newPlatform) override;
 
-		std::filesystem::path getDataPath() const override;
-		void setDataPath(const std::filesystem::path& path) override;
-		void forgetDataPath(const std::filesystem::path& path) override;
+		fspath getDataPath() const override;
+		void setDataPath(const fspath& path) override;
+		void forgetDataPath(const fspath& path) override;
 
-		std::vector<std::filesystem::path> getKnownDataPathList() const override;
+		std::vector<fspath> getKnownDataPathList() const override;
 
 		void setMainWindowProperties(const MainWindowProperties& props) override;
 		MainWindowProperties mainWindow() const override;
 
-		bool dataPathHasStar(const std::filesystem::path& path) const override;
-		void starDataPath(const std::filesystem::path& path, bool star = true) override;
-		void unstarDataPath(const std::filesystem::path& path) override;
+		bool dataPathHasStar(const fspath& path) const override;
+		void starDataPath(const fspath& path, bool star = true) override;
+		void unstarDataPath(const fspath& path) override;
 
 	private:
-		std::filesystem::path configFilePath() const;
+		fspath configFilePath() const;
 		void validate();
 
 	private:
-		const std::filesystem::path _portableDataPath;
-		const std::filesystem::path _userDataPath;
-
-		const bool _portableMode = false;
+		std::variant<PortableMode, MainMode> _mode;
 
 		nlohmann::json _data;
 	};

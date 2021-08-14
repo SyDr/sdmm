@@ -9,7 +9,7 @@
 
 namespace mm
 {
-	class Application;
+	struct Application;
 
 	class PlatformService : public IPlatformService
 	{

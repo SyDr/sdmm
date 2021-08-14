@@ -7,55 +7,83 @@
 
 #include "app_config.h"
 
-#include <unordered_set>
 #include <fstream>
 #include <sstream>
+#include <unordered_set>
 
-#include <wx/stdpaths.h>
 #include <wx/log.h>
+#include <wx/stdpaths.h>
 
-#include "utility/string_util.h"
-#include "utility/sdlexcept.h"
 #include "types/main_window_properties.h"
+#include "utility/sdlexcept.h"
+#include "utility/string_util.h"
 
 using namespace mm;
 
 namespace
 {
-	std::filesystem::path constructPortableDataPath()
+	std::variant<PortableMode, MainMode> constructProgramMode()
 	{
-		std::filesystem::path result(wxStandardPaths::Get().GetDataDir().ToStdString());
-		result = result.parent_path();
-		result /= "_MM_Data";
+		fspath result(wxStandardPaths::Get().GetDataDir().ToStdString());
+		result = result.parent_path().parent_path() / "_MM_Data";
+		if (std::filesystem::exists(result) && std::filesystem::is_directory(result))
+			return PortableMode(result.make_preferred());
 
-		return result.make_preferred();
+		result = wxStandardPaths::Get().GetUserDataDir().ToStdString();
+
+		return MainMode(result.make_preferred());
 	}
 
-	std::filesystem::path constructUserDataPath()
+	struct IsPortable
 	{
-		std::filesystem::path result(wxStandardPaths::Get().GetUserDataDir().ToStdString());
+		bool operator()(const PortableMode&)
+		{
+			return true;
+		}
 
-		return result.make_preferred();
-	}
+		bool operator()(const MainMode&)
+		{
+			return false;
+		}
+	};
+
+	struct DataPath
+	{
+		fspath operator()(const PortableMode& pm)
+		{
+			return pm.managedPath;
+		}
+
+		fspath operator()(const MainMode& mm)
+		{
+			return mm.programDataPath;
+		}
+	};
+
+	struct ValidateMode
+	{
+		void operator()(const PortableMode&)
+		{
+		}
+
+		void operator()(const MainMode& mm)
+		{
+			if (!std::filesystem::exists(mm.programDataPath))
+				std::filesystem::create_directories(mm.programDataPath);
+		}
+	};
 }
 
 AppConfig::AppConfig()
-	: _portableDataPath(constructPortableDataPath())
-	, _userDataPath(constructUserDataPath())
-	, _portableMode(std::filesystem::exists(_portableDataPath) && std::filesystem::is_directory(_portableDataPath))
+	: _mode(constructProgramMode())
 {
-	if (!portableMode() && !std::filesystem::exists(_userDataPath))
-		std::filesystem::create_directories(_userDataPath);
+	std::visit(ValidateMode(), _mode);
 
 	std::ifstream datafile(configFilePath().string());
 
 	if (datafile)
 	{
-		std::stringstream stream;
-		stream << datafile.rdbuf();
-		datafile.close();
-
-		_data = nlohmann::json::parse(stream, nullptr, false);
+		_data = nlohmann::json::parse(datafile, nullptr, false);
 
 		if (_data.is_discarded())
 		{
@@ -73,30 +101,30 @@ AppConfig::AppConfig()
 
 bool AppConfig::portableMode() const
 {
-	return _portableMode;
+	return std::visit(IsPortable(), _mode);
 }
 
-std::filesystem::path AppConfig::dataPath() const
+fspath AppConfig::dataPath() const
 {
-	return portableMode() ? _portableDataPath : _userDataPath;
+	return std::visit(DataPath(), _mode);
 }
 
-std::filesystem::path AppConfig::programPath() const
+fspath AppConfig::programPath() const
 {
-	return std::filesystem::path(wxStandardPaths::Get().GetDataDir().ToStdString());
+	return fspath(wxStandardPaths::Get().GetDataDir().ToStdString());
 }
 
 #define SD_LNG_CODE "language"
-#define SD_GAME "game"
-#define SD_KNOWN "directories"
-#define SD_FAVS "stars"
-#define SD_PLATFORM "platform"
-#define SD_SELECTED "selected"
-#define SD_WINDOW "window"
-#define SD_WIDTH "width"
-#define SD_HEIGHT "height"
-#define SD_LEFT "left"
-#define SD_TOP "top"
+constexpr auto sd_game = "game";
+#define SD_KNOWN     "directories"
+#define SD_FAVS      "stars"
+#define SD_PLATFORM  "platform"
+#define SD_SELECTED  "selected"
+#define SD_WINDOW    "window"
+#define SD_WIDTH     "width"
+#define SD_HEIGHT    "height"
+#define SD_LEFT      "left"
+#define SD_TOP       "top"
 #define SD_MAXIMIZED "maximized"
 
 auto AppConfig::currentLanguageCode() const -> std::string
@@ -115,12 +143,13 @@ void AppConfig::save()
 	datafile << _data.dump(2);
 }
 
-std::vector<std::filesystem::path> AppConfig::getKnownDataPathList() const
+std::vector<fspath> AppConfig::getKnownDataPathList() const
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	std::vector<std::filesystem::path> result;
-	for (auto path : _data[SD_GAME][selectedPlatform().ToStdString()][SD_KNOWN].get<std::vector<std::string>>())
+	std::vector<fspath> result;
+	for (const auto& path :
+		 _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN].get<std::vector<std::string>>())
 		result.emplace_back(path);
 
 	return result;
@@ -128,40 +157,40 @@ std::vector<std::filesystem::path> AppConfig::getKnownDataPathList() const
 
 wxString AppConfig::selectedPlatform() const
 {
-	//expects(!portableMode());
+	// expects(!portableMode());
 
-	return _data[SD_GAME][SD_PLATFORM].get<std::string>();
+	return _data[sd_game][SD_PLATFORM].get<std::string>();
 }
 
-std::filesystem::path AppConfig::getDataPath() const
+fspath AppConfig::getDataPath() const
 {
 	if (!portableMode())
-		return _data[SD_GAME][selectedPlatform().ToStdString()][SD_SELECTED].get<std::string>();
-	else
-		return _portableDataPath.parent_path();
+		return _data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED].get<std::string>();
+
+	return dataPath().parent_path();
 }
 
-void AppConfig::setDataPath(const std::filesystem::path& path)
+void AppConfig::setDataPath(const fspath& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto newPath = path.string();
-	auto& knownPaths = _data[SD_GAME][selectedPlatform().ToStdString()][SD_KNOWN];
+	const auto newPath    = path.string();
+	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN];
 
-	if (std::find(knownPaths.cbegin(), knownPaths.cend(), newPath) == knownPaths.end())
-		_data[SD_GAME][selectedPlatform().ToStdString()][SD_KNOWN].emplace_back(newPath);
+	if (std::find(knownPaths.begin(), knownPaths.end(), newPath) == knownPaths.end())
+		_data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN].emplace_back(newPath);
 
-	_data[SD_GAME][selectedPlatform().ToStdString()][SD_SELECTED] = newPath;
+	_data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED] = newPath;
 }
 
-void AppConfig::forgetDataPath(const std::filesystem::path& path)
+void AppConfig::forgetDataPath(const fspath& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto toRemove = path.string();
-	auto& knownPaths = _data[SD_GAME][selectedPlatform().ToStdString()][SD_KNOWN];
+	const auto toRemove   = path.string();
+	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN];
 
-	auto it = std::find(knownPaths.cbegin(), knownPaths.cend(), toRemove);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), toRemove);
 
 	if (it != knownPaths.end())
 		knownPaths.erase(it);
@@ -171,7 +200,7 @@ void AppConfig::setSelectedPlatformCode(const wxString& newPlatform)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	_data[SD_GAME][SD_PLATFORM] = newPlatform.ToStdString();
+	_data[sd_game][SD_PLATFORM] = newPlatform.ToStdString();
 }
 
 #define SD_MM_DEFAULT_LNG_CODE "en_US"
@@ -185,10 +214,12 @@ void AppConfig::validate()
 	if (!_data.count(SD_WINDOW) || !_data[SD_WINDOW].is_object())
 		_data[SD_WINDOW] = {};
 
-	if (!_data[SD_WINDOW].count(SD_WIDTH) || !_data[SD_WINDOW][SD_WIDTH].is_number_unsigned() || _data[SD_WINDOW][SD_WIDTH].get<unsigned>() < 600u)
+	if (!_data[SD_WINDOW].count(SD_WIDTH) || !_data[SD_WINDOW][SD_WIDTH].is_number_unsigned() ||
+		_data[SD_WINDOW][SD_WIDTH].get<unsigned>() < 600u)
 		_data[SD_WINDOW][SD_WIDTH] = 600u;
 
-	if (!_data[SD_WINDOW].count(SD_HEIGHT) || !_data[SD_WINDOW][SD_HEIGHT].is_number_unsigned() || _data[SD_WINDOW][SD_HEIGHT].get<unsigned>() < 560u)
+	if (!_data[SD_WINDOW].count(SD_HEIGHT) || !_data[SD_WINDOW][SD_HEIGHT].is_number_unsigned() ||
+		_data[SD_WINDOW][SD_HEIGHT].get<unsigned>() < 560u)
 		_data[SD_WINDOW][SD_HEIGHT] = 560u;
 
 	if (!_data[SD_WINDOW].count(SD_LEFT) || !_data[SD_WINDOW][SD_LEFT].is_number_integer())
@@ -200,22 +231,25 @@ void AppConfig::validate()
 	if (!_data[SD_WINDOW].count(SD_MAXIMIZED) || !_data[SD_WINDOW][SD_MAXIMIZED].is_boolean())
 		_data[SD_WINDOW][SD_MAXIMIZED] = false;
 
-	if (!_data.count(SD_GAME) || !_data[SD_GAME].is_object())
-		_data[SD_GAME] = {};
+	if (!_data.count(sd_game) || !_data[sd_game].is_object())
+		_data[sd_game] = {};
 
-	if (!_data[SD_GAME].count(SD_PLATFORM) || !_data[SD_GAME][SD_PLATFORM].is_string())
-		_data[SD_GAME][SD_PLATFORM] = SD_MM_DEFAULT_PLATFORM;
+	if (!_data[sd_game].count(SD_PLATFORM) || !_data[sd_game][SD_PLATFORM].is_string())
+		_data[sd_game][SD_PLATFORM] = SD_MM_DEFAULT_PLATFORM;
 
-	const std::string selectedPlatform = _data[SD_GAME][SD_PLATFORM];
+	const std::string selectedPlatform = _data[sd_game][SD_PLATFORM];
 
-	if (!_data[SD_GAME][selectedPlatform].count(SD_SELECTED) || !_data[SD_GAME][selectedPlatform][SD_SELECTED].is_string())
-		_data[SD_GAME][selectedPlatform][SD_SELECTED] = std::string();
+	if (!_data[sd_game][selectedPlatform].count(SD_SELECTED) ||
+		!_data[sd_game][selectedPlatform][SD_SELECTED].is_string())
+		_data[sd_game][selectedPlatform][SD_SELECTED] = std::string();
 
-	if (!_data[SD_GAME][selectedPlatform].count(SD_KNOWN) || !_data[SD_GAME][selectedPlatform][SD_KNOWN].is_array())
-		_data[SD_GAME][selectedPlatform][SD_KNOWN] = nlohmann::json::array({});
+	if (!_data[sd_game][selectedPlatform].count(SD_KNOWN) ||
+		!_data[sd_game][selectedPlatform][SD_KNOWN].is_array())
+		_data[sd_game][selectedPlatform][SD_KNOWN] = nlohmann::json::array({});
 
-	if (!_data[SD_GAME][selectedPlatform].count(SD_FAVS) || !_data[SD_GAME][selectedPlatform][SD_FAVS].is_array())
-		_data[SD_GAME][selectedPlatform][SD_FAVS] = nlohmann::json::array({});
+	if (!_data[sd_game][selectedPlatform].count(SD_FAVS) ||
+		!_data[sd_game][selectedPlatform][SD_FAVS].is_array())
+		_data[sd_game][selectedPlatform][SD_FAVS] = nlohmann::json::array({});
 }
 
 void AppConfig::setMainWindowProperties(const MainWindowProperties& props)
@@ -223,10 +257,10 @@ void AppConfig::setMainWindowProperties(const MainWindowProperties& props)
 	_data[SD_WINDOW][SD_MAXIMIZED] = props.maximized;
 	if (!props.maximized)
 	{
-		_data[SD_WINDOW][SD_WIDTH] = props.size.GetWidth();
+		_data[SD_WINDOW][SD_WIDTH]  = props.size.GetWidth();
 		_data[SD_WINDOW][SD_HEIGHT] = props.size.GetHeight();
-		_data[SD_WINDOW][SD_LEFT] = props.position.x;
-		_data[SD_WINDOW][SD_TOP] = props.position.y;
+		_data[SD_WINDOW][SD_LEFT]   = props.position.x;
+		_data[SD_WINDOW][SD_TOP]    = props.position.y;
 	}
 }
 
@@ -243,25 +277,26 @@ MainWindowProperties AppConfig::mainWindow() const
 	return result;
 }
 
-bool AppConfig::dataPathHasStar(const std::filesystem::path& path) const
+bool AppConfig::dataPathHasStar(const fspath& path) const
 {
-	const auto toStar = path.string();
-	auto& knownPaths = _data[SD_GAME][selectedPlatform().ToStdString()][SD_FAVS];
+	const auto toStar     = path.string();
+	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_FAVS];
 
-	auto it = std::find(knownPaths.cbegin(), knownPaths.cend(), toStar);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
 	return it != knownPaths.end();
 }
 
-void AppConfig::starDataPath(const std::filesystem::path& path, bool star /*= true*/)
+void AppConfig::starDataPath(const fspath& path, bool star /*= true*/)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto toStar = path.string();
-	auto& knownPaths = _data[SD_GAME][selectedPlatform().ToStdString()][SD_FAVS];
+	const auto toStar     = path.string();
+	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_FAVS];
 
-	auto it = std::find(knownPaths.cbegin(), knownPaths.cend(), toStar);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
 
-	MM_EXPECTS(star == (it == knownPaths.end()), unexpected_error); // either star non-starred on remove star from starred
+	MM_EXPECTS(star == (it == knownPaths.end()),
+			   unexpected_error);  // either star non-starred on remove star from starred
 
 	if (star)
 		knownPaths.emplace_back(toStar);
@@ -269,12 +304,12 @@ void AppConfig::starDataPath(const std::filesystem::path& path, bool star /*= tr
 		knownPaths.erase(it);
 }
 
-void AppConfig::unstarDataPath(const std::filesystem::path& path)
+void AppConfig::unstarDataPath(const fspath& path)
 {
 	starDataPath(path, false);
 }
 
-std::filesystem::path AppConfig::configFilePath() const
+fspath AppConfig::configFilePath() const
 {
 	return dataPath() / "settings.json";
 }

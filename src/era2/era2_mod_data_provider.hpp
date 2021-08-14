@@ -15,7 +15,7 @@
 
 namespace mm
 {
-	class Application;
+	struct Application;
 
 	struct Era2ModDataProvider : IModDataProvider
 	{

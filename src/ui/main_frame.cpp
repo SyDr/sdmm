@@ -9,14 +9,19 @@
 
 #include "application.h"
 #include "choose_conflict_resolve_mode_view.hpp"
-#include "domain/imod_manager.hpp"
-#include "domain/imod_platform.hpp"
 #include "interface/domain/ilocal_config.h"
-#include "interface/service/iapp_config.h"
+#include "interface/ilaunch_helper.h"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
+#include "interface/inon_auto_applicable_platform.hpp"
+#include "interface/iapp_config.h"
+#include "interface/service/iicon_storage.h"
 #include "interface/service/iplatform_service.h"
+#include "license.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
 #include "mod_manager_app.h"
+#include "plugin_list_view.hpp"
 #include "resolve_mod_conflicts_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
@@ -25,8 +30,10 @@
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
 #include "system_info.hpp"
+#include "types/embedded_icon.h"
 #include "types/main_window_properties.h"
 #include "utility/sdlexcept.h"
+#include "utility/shell_util.h"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
@@ -54,18 +61,109 @@ MainFrame::MainFrame(Application& app)
 	createMenuBar();
 	CreateStatusBar();
 
-	auto layout = new wxBoxSizer(wxHORIZONTAL);
+	auto pages = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+								   wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE |
+									   wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_WINDOWLIST_BUTTON);
+
 	if (_currentPlatform)
 	{
-		_modListView = new ModListView(this, *_currentPlatform, _app.iconStorage());
-		layout->Add(_modListView, wxSizerFlags(1).Expand());
+		auto modListView = new ModListView(pages, *_currentPlatform, _app.iconStorage(),
+										   _currentPlatform->getManagedPath().string());
+		pages->AddPage(modListView, "Mods"_lng);
+
+		if (auto pluginManager = _currentPlatform->pluginManager())
+		{
+			auto pluginListView = new PluginListView(pages, *pluginManager,
+													 *_currentPlatform->modDataProvider(), app.iconStorage());
+			pages->AddPage(pluginListView, "Plugins"_lng);
+		}
+
+		if (auto presetManager = _currentPlatform->getPresetManager())
+		{
+			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, app.iconStorage());
+			pages->AddPage(presetManagerView, "Profiles"_lng);
+		}
+
+		if (_currentPlatform->nonAutoApplicable())
+		{
+			_revertButton = new wxButton(this, wxID_ANY, "main_frame/revert"_lng);
+			_revertButton->SetToolTip("main_frame/revert_tooltip"_lng);
+			_revertButton->SetBitmap(_app.iconStorage().get(embedded_icon::minus));
+			_applyButton = new wxButton(this, wxID_ANY, "main_frame/apply"_lng);
+			_applyButton->SetToolTip("main_frame/apply_tooltip"_lng);
+			_applyButton->SetBitmap(_app.iconStorage().get(embedded_icon::tick));
+		}
+
+		if (auto launchHelper = _currentPlatform->launchHelper())
+		{
+			_launchButton = new wxButton(
+				this, wxID_ANY, wxString::Format(wxString("Launch (%s)"_lng), launchHelper->getCaption()));
+			_launchButton->SetBitmap(launchHelper->getIcon());
+
+			wxSize goodSize = _launchButton->GetBestSize();
+			goodSize.SetWidth(goodSize.GetHeight());
+			_launchManageButton =
+				new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+			_launchManageButton->SetBitmap(_app.iconStorage().get(embedded_icon::cog));
+			_launchManageButton->SetToolTip("Change executable for launch"_lng);
+		}
 	}
 
-	SetSizer(layout);
+	auto layout = new wxBoxSizer(wxVERTICAL);
+
+	if (_currentPlatform && (_currentPlatform->nonAutoApplicable() || _currentPlatform->launchHelper()))
+	{
+		auto topLineSizer = new wxBoxSizer(wxHORIZONTAL);
+
+		if (_currentPlatform->nonAutoApplicable())
+		{
+			topLineSizer->Add(_revertButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
+			topLineSizer->Add(_applyButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
+		}
+
+		topLineSizer->AddStretchSpacer(1);
+
+		if (_currentPlatform->launchHelper())
+		{
+			topLineSizer->Add(_launchButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
+			topLineSizer->Add(_launchManageButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
+		}
+
+		layout->Add(topLineSizer, wxSizerFlags(0).Expand());
+	}
+
+	layout->Add(pages, wxSizerFlags(1).Expand());
+
+	auto panel = new wxPanel(this);
+	panel->SetSizer(layout);
+
+	auto mainLayout = new wxBoxSizer(wxVERTICAL);
+	mainLayout->Add(panel, wxSizerFlags(1).Expand());
+
+	SetSizer(mainLayout);
+
 	Layout();
 	Maximize(app.appConfig().mainWindow().maximized);
 
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnCloseWindow, this);
+
+	if (_currentPlatform)
+	{
+		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+		{
+			_revertButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&)
+								{ try_handle_exceptions(this, [&] { nonAuto->revert(); }); });
+			_applyButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&)
+							   { try_handle_exceptions(this, [&] { nonAuto->apply(); }); });
+		}
+
+		if (auto launchHelper = _currentPlatform->launchHelper())
+		{
+			launchHelper->onDataChanged().connect([this] { updateExecutableIcon(); });
+			_launchButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLaunchGameRequested(); });
+			_launchManageButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { selectExeToLaunch(); });
+		}
+	}
 };
 
 void MainFrame::OnAbout()
@@ -74,7 +172,7 @@ void MainFrame::OnAbout()
 	aboutInfo.SetName(PROGRAM_NAME);
 	aboutInfo.SetVersion(PROGRAM_VERSION);
 	aboutInfo.SetDescription("A mod manager for Era II");
-	aboutInfo.SetCopyright(L"(C) 2020 Aliaksei Karalenka");
+	aboutInfo.SetCopyright(L"(C) 2020-2021 Aliaksei Karalenka");
 	aboutInfo.SetWebSite("http://wforum.heroes35.net");
 	aboutInfo.AddDeveloper("Aliaksei SyDr Karalenka");
 	aboutInfo.SetLicence(constant::program_license_text);
@@ -84,14 +182,6 @@ void MainFrame::OnAbout()
 
 void MainFrame::createMenuBar()
 {
-	auto profileMenu = new wxMenu();
-	auto manageProfiles =
-		profileMenu->Append(wxID_ANY, "Manage"_lng, nullptr, "Manage profiles"_lng);
-	auto saveProfile =
-		profileMenu->Append(wxID_ANY, "Save as"_lng, nullptr, "Save current mod list as profile"_lng);
-	_menuItems[manageProfiles->GetId()] = [&] { OnMenuManageProfilesRequested(false); };
-	_menuItems[saveProfile->GetId()]    = [&] { OnMenuManageProfilesRequested(true); };
-
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
 	{
@@ -109,6 +199,10 @@ void MainFrame::createMenuBar()
 		toolsMenu->Append(wxID_ANY, "Resolve mods conflicts"_lng, nullptr, "Resolve mods conflicts"_lng);
 	_menuItems[sortMods->GetId()] = [&] { OnMenuToolsSortMods(); };
 
+	auto conflictResolveMode =
+		toolsMenu->Append(wxID_ANY, "conflicts/caption"_lng, nullptr, "conflicts/caption"_lng);
+	_menuItems[conflictResolveMode->GetId()] = [&] { OnMenuToolsChooseConflictResolveMode(); };
+
 	toolsMenu->AppendSeparator();
 
 	auto languageMenu = new wxMenu();
@@ -119,7 +213,7 @@ void MainFrame::createMenuBar()
 		if (_app.appConfig().currentLanguageCode() == lngCode)
 			lngItem->Check();
 
-		_menuItems[lngItem->GetId()] = [&] { OnMenuToolsLanguageSelected(lngCode); };
+		_menuItems[lngItem->GetId()] = [=] { OnMenuToolsLanguageSelected(lngCode); };
 	}
 
 	toolsMenu->AppendSubMenu(languageMenu, "Language"_lng, "Allows selecting other language for program"_lng);
@@ -129,23 +223,11 @@ void MainFrame::createMenuBar()
 	_menuItems[about->GetId()] = [&] { OnAbout(); };
 
 	_mainMenu = new wxMenuBar();
-	_mainMenu->Append(profileMenu, "Profiles"_lng);
 	_mainMenu->Append(toolsMenu, "Tools"_lng);
 	_mainMenu->Append(helpMenu, "?");
 	_mainMenu->Bind(wxEVT_MENU, &MainFrame::OnMenuItemSelected, this);
 
 	SetMenuBar(_mainMenu);
-}
-
-void MainFrame::OnMenuManageProfilesRequested(bool saveAs)
-{
-	try_handle_exceptions(this, [&] {
-		ManagePresetListView mplv(this, *_currentPlatform, _app.iconStorage());
-		if (saveAs)
-			mplv.CallAfter(&ManagePresetListView::onSavePresetRequested, wxEmptyString);
-
-		mplv.ShowWindowModal();
-	});
 }
 
 void MainFrame::OnMenuToolsChangeDirectory()
@@ -168,18 +250,36 @@ void MainFrame::OnMenuToolsChangeDirectory()
 
 void MainFrame::OnMenuToolsListModFiles()
 {
-	try_handle_exceptions(this, [&] {
-		showModFileList(*this, _app, *_currentPlatform->modDataProvider(),
-						_currentPlatform->getModManager()->mods());
-	});
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  showModFileList(*this, _app, *_currentPlatform->modDataProvider(),
+											  _currentPlatform->modManager()->mods());
+						  });
 }
 
 void MainFrame::OnMenuToolsSortMods()
 {
-	try_handle_exceptions(this, [&] {
-		ResolveModConflictsView view(this, _app.appConfig(), _app.iconStorage(), *_currentPlatform);
-		view.ShowModal();
-	});
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  ResolveModConflictsView view(this, _app.appConfig(), _app.iconStorage(),
+														   *_currentPlatform);
+							  view.ShowModal();
+						  });
+}
+
+void MainFrame::OnMenuToolsChooseConflictResolveMode()
+{
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  ChooseConflictResolveModeView dialog(this);
+
+							  if (dialog.ShowModal() == wxID_OK)
+								  _currentPlatform->localConfig()->conflictResolveMode(
+									  dialog.conflictResolveMode());
+						  });
 }
 
 void MainFrame::OnMenuChangePlatform()
@@ -188,14 +288,13 @@ void MainFrame::OnMenuChangePlatform()
 
 	SelectPlatformView dialog(this);
 
-	if (dialog.ShowModal() == wxID_OK)
-	{
-		wxBusyCursor bc;
-		std::string  platform = dialog.selectedPlatform();
+	if (dialog.ShowModal() != wxID_OK)
+		return;
 
-		_app.appConfig().setSelectedPlatformCode(platform);
-		wxGetApp().scheduleRestart();
-	}
+	wxBusyCursor bc;
+
+	_app.appConfig().setSelectedPlatformCode(dialog.selectedPlatform());
+	wxGetApp().scheduleRestart();
 
 	EX_UNEXPECTED;
 }
@@ -228,19 +327,13 @@ void MainFrame::reloadModel()
 
 	_currentPlatform = _app.platformService().create(_app.appConfig().selectedPlatform());
 
-	/*if (_currentPlatform->localConfig()->conflictResolveMode() ==
-	ConflictResolveMode::undefined)
-	{
-		ChooseConflictResolveModeView dialog(this);
-
-		if (dialog.ShowModal() == wxID_OK)
-			_currentPlatform->localConfig()->conflictResolveMode(dialog.conflictResolveMode());
-	}*/
+	if (_currentPlatform->localConfig()->conflictResolveMode() == ConflictResolveMode::undefined)
+		CallAfter(&MainFrame::OnMenuToolsChooseConflictResolveMode);
 
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
-	EX_ON_EXCEPTION(not_exist_path_error, [](not_exist_path_error const&) {
-		wxMessageOutputBest().Printf("Selected path doesn't exists, please choose suitable one");
-	});
+	EX_ON_EXCEPTION(
+		not_exist_path_error, [](not_exist_path_error const&)
+		{ wxMessageOutputBest().Printf("Selected path doesn't exists, please choose suitable one"); });
 	EX_UNEXPECTED;
 }
 
@@ -255,8 +348,29 @@ void MainFrame::OnMenuCheckForUpdates()
 
 void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
-	saveWindowProperties();
+	if (event.CanVeto() && _currentPlatform)
+	{
+		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+		{
+			if (nonAuto->changed())
+			{
+				auto saveChanges =
+					wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
+								 wxICON_QUESTION | wxYES_NO | wxCANCEL);
 
+				if (saveChanges == wxCANCEL)
+				{
+					event.Veto();
+					return;
+				}
+
+				if (saveChanges == wxYES)
+					nonAuto->apply();
+			}
+		}
+	}
+
+	saveWindowProperties();
 	event.Skip();
 }
 
@@ -269,4 +383,62 @@ void MainFrame::saveWindowProperties()
 	props.size      = GetSize();
 
 	_app.appConfig().setMainWindowProperties(props);
+}
+
+void MainFrame::selectExeToLaunch()
+{
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  if (!_currentPlatform)
+								  return;
+
+							  auto config = _currentPlatform->localConfig();
+							  auto helper = _currentPlatform->launchHelper();
+
+							  SelectExe dialog(this, config->getDataPath(), helper->getExecutable(),
+											   _app.iconStorage());
+
+							  if (dialog.ShowModal() == wxID_OK)
+								  helper->setExecutable(dialog.getSelectedFile().ToStdString());
+						  });
+}
+
+void MainFrame::onLaunchGameRequested()
+{
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  if (!_currentPlatform)
+								  return;
+
+							  auto config = _currentPlatform->localConfig();
+							  auto helper = _currentPlatform->launchHelper();
+
+							  if (helper->getExecutable().empty())
+								  selectExeToLaunch();
+
+							  if (!helper->getExecutable().empty())
+							  {
+								  const auto currentWorkDir = wxGetCwd();
+
+								  wxSetWorkingDirectory(config->getDataPath().wstring());
+								  shellLaunch(helper->getLaunchString());
+								  wxSetWorkingDirectory(currentWorkDir);
+							  }
+						  });
+}
+
+void MainFrame::updateExecutableIcon()
+{
+	if (!_currentPlatform)
+		return;
+
+	if (auto helper = _currentPlatform->launchHelper())
+	{
+		_launchButton->SetLabelText(wxString::Format(wxString("Launch (%s)"_lng), helper->getCaption()));
+		_launchButton->SetBitmap(wxNullBitmap);
+		_launchButton->SetBitmap(helper->getIcon());
+		Layout();
+	}
 }

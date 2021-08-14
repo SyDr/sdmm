@@ -9,12 +9,12 @@ class wxString;
 
 namespace mm
 {
-	class IAppConfig;
+	struct IAppConfig;
 	struct II18nService;
 	class IIconStorage;
 	class IPlatformService;
 
-	class Application
+	struct Application
 	{
 	public:
 		virtual ~Application() = default;

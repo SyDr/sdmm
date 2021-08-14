@@ -7,26 +7,26 @@
 
 #include "era2_config.h"
 
-#include <unordered_set>
 #include <fstream>
 #include <sstream>
+#include <unordered_set>
 
 #include <wx/dir.h>
-#include <wx/stdpaths.h>
-#include <wx/log.h>
 #include <wx/filename.h>
+#include <wx/log.h>
+#include <wx/stdpaths.h>
 
-#include "utility/sdlexcept.h"
 #include "utility/fs_util.h"
+#include "utility/sdlexcept.h"
 #include "utility/string_util.h"
 
 using namespace mm;
 
 namespace
 {
-	constexpr auto st_active_preset = "active_preset";
-	constexpr auto st_executable = "executable";
-	constexpr auto st_show_hidden = "show_hidden";
+	constexpr auto st_active_preset         = "active_preset";
+	constexpr auto st_executable            = "executable";
+	constexpr auto st_show_hidden           = "show_hidden";
 	constexpr auto st_conflict_resolve_mode = "conflict_resolve_mode";
 }
 
@@ -35,15 +35,15 @@ Era2Config::Era2Config(const std::filesystem::path& path)
 {
 	createDirectories();
 
-	if (std::ifstream datafile(getConfigFilePath().u8string()); datafile)
+	if (std::ifstream datafile(getConfigFilePath().string()); datafile)
 	{
-		std::stringstream stream;
+		/* std::stringstream stream;
 		stream << datafile.rdbuf();
-		datafile.close();
+		datafile.close();*/
 
 		try
 		{
-			_data = nlohmann::json::parse(stream);
+			_data = nlohmann::json::parse(datafile);
 		}
 		catch (...)
 		{
@@ -69,14 +69,14 @@ void Era2Config::createDirectories() const
 
 void Era2Config::save()
 {
-	std::ofstream datafile(getConfigFilePath().string());
-	datafile << _data.dump(2);
+	overwriteFileContent(getConfigFilePath(), _data.dump(2));
 }
 
 std::filesystem::path Era2Config::getDataPath() const
 {
 	return _path;
 }
+
 std::filesystem::path Era2Config::getProgramDataPath() const
 {
 	return getDataPath() / "_MM_Data";
@@ -89,7 +89,7 @@ std::filesystem::path Era2Config::getPresetsPath() const
 
 std::filesystem::path Era2Config::getTempPath() const
 {
-	return getProgramDataPath() / "_MM_Temp";
+	return getProgramDataPath() / "Temp";
 }
 
 std::filesystem::path Era2Config::getConfigFilePath() const
@@ -141,8 +141,7 @@ ConflictResolveMode Era2Config::conflictResolveMode() const
 	{
 	case ConflictResolveMode::undefined:
 	case ConflictResolveMode::automatic:
-	case ConflictResolveMode::manual:
-		return mode;
+	case ConflictResolveMode::manual: return mode;
 	}
 
 	return ConflictResolveMode::undefined;

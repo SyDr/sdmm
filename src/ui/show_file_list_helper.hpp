@@ -11,7 +11,7 @@ class wxWindow;
 
 namespace mm
 {
-	class Application;
+	struct Application;
 	struct IModDataProvider;
 
 	void showModFileList(wxWindow& parent, Application& application,

@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include "interface/domain/ilaunch_helper.h"
-
-#include <wigwag/signal.hpp>
+#include "interface/ilaunch_helper.h"
 
 #include "era2_config.h"
 
@@ -21,15 +19,16 @@ namespace mm
 		std::string getExecutable() const override;
 		void        setExecutable(const std::string& executable) override;
 
-		wxIcon                           getIcon() const override;
-		wxString                         getCaption() const override;
-		wxString                         getLaunchString() const override;
-		wigwag::signal_connector<void()> onDataChanged() const override;
+		wxIcon   getIcon() const override;
+		wxString getCaption() const override;
+		wxString getLaunchString() const override;
+
+		sigslot::signal<>& onDataChanged() override;
 
 	private:
 		IIconStorage& _iconStorage;
 		Era2Config&   _config;
 
-		wigwag::signal<void()> _dataChanged;
+		sigslot::signal<> _dataChanged;
 	};
 }

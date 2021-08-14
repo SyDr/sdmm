@@ -12,20 +12,20 @@
 #include <wx/stdpaths.h>
 #include <boost/algorithm/string/case_conv.hpp>
 
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "utility/string_util.h"
 
 using namespace mm;
 
 I18nService::I18nService(const IAppConfig& config)
 {
-	std::ifstream datafile((config.programPath() / "lng" / (config.currentLanguageCode() + ".json")).u8string());
+	std::ifstream datafile((config.programPath() / "lng" / (config.currentLanguageCode() + ".json")).string());
 
 	if (datafile)
 		build_cache(nlohmann::json::parse(datafile), "");
 }
 
-void I18nService::build_cache(nlohmann::json const& data, wxString const& prefix)
+void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix)
 {
 	wxASSERT_MSG(data.is_object(), "Unexpected type when parsing " + prefix);
 
@@ -48,7 +48,7 @@ void I18nService::build_cache(nlohmann::json const& data, wxString const& prefix
 	}
 }
 
-wxString I18nService::category(wxString const& category) const
+wxString I18nService::category(const wxString& category) const
 {
 	if (auto const it = _data.find("category/" + category.Lower()); it != _data.cend())
 		return it->second;
@@ -56,9 +56,9 @@ wxString I18nService::category(wxString const& category) const
 	return category;
 }
 
-wxString I18nService::get(wxString const& key) const
+wxString I18nService::get(const wxString& key) const
 {
-	if (auto const it = _data.find(key); it != _data.cend())
+	if (const auto it = _data.find(key); it != _data.cend())
 		return it->second;
 
 	wxLogDebug("Translation string not found \"%s\"", key);
@@ -70,7 +70,7 @@ wxString I18nService::languageName(wxString const& code) const
 {
 	if (code == "en_US")
 		return L"English";
-	else if (code == "ru_RU")
+	if (code == "ru_RU")
 		return L"Русский";
 
 	return code; // TODO: return name from lng file itself

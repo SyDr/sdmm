@@ -33,6 +33,11 @@ namespace mm
 		using std::runtime_error::runtime_error;
 	};
 
+	class condtion_error : public std::runtime_error
+	{
+		using std::runtime_error::runtime_error;
+	};
+
 	class mod_disabled_by_other : public std::logic_error
 	{
 		using std::logic_error::logic_error;
@@ -47,6 +52,14 @@ namespace mm
 #define MM_EXPECTS(what, exception_type) \
 	if (!(what))                         \
 		throw_with_trace(exception_type(STR(what)));
+
+#define MM_PRECONDTION(what) \
+	if (!(what))             \
+		throw_with_trace(mm::condtion_error(STR(what)));
+
+#define MM_UNREACHABLE(message)                           \
+	throw_with_trace(mm::unexpected_error((message))); \
+	throw "MSVC, throw_with_trace also throws";
 
 #define EX_TRY \
 	try        \
@@ -72,7 +85,7 @@ namespace mm
 
 #define EX_SKIP_REST_EXCEPTIONS \
 	}                           \
-	catch (...) {};   // do nothing
+	catch (...) {};  // do nothing
 
 #define SINK_EXCEPTION(handler) [=](const auto&) { handler(); }
 

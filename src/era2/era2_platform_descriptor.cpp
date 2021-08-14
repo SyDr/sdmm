@@ -8,7 +8,7 @@
 #include "era2_platform_descriptor.h"
 
 #include "era2/era2_platform.h"
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "application.h"
 #include "service/ii18n_service.hpp"
 #include "utility/sdlexcept.h"

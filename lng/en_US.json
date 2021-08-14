@@ -1,4 +1,10 @@
 {
+	"main_frame" : {
+		"revert" : "Reset",
+		"apply" : "Apply",
+		"unsaved_changes" : "Some changes are unsaved. Do you want to apply them now?",
+		"unsaved_changes_caption" : "Unsaved changes"
+	},
 	"category" : {
 		"gameplay" : "Gameplay",
 		"graphics" : "Graphics",
@@ -10,5 +16,12 @@
 		"platforms" : "Platforms",
 		"personal mods" : "My personal mods",
 		"utilities" : "Utilities"
+	},
+	"conflicts" : {
+		"caption" : "Choose conflict resolve mode",
+		"automatic" : "Automatic",
+		"automatic_note" : "Automatically resolve mod conflicts when you enable or disable any mod",
+		"manual" : "Manual",
+		"manual_note" : "Don't resolve conflicts automatically"
 	}
 }

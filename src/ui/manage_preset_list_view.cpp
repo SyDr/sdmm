@@ -8,8 +8,8 @@
 #include "manage_preset_list_view.hpp"
 
 #include "application.h"
-#include "domain/imod_manager.hpp"
-#include "domain/imod_platform.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
 #include "domain/ipreset_manager.hpp"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
@@ -37,7 +37,7 @@ using namespace mm;
 
 ManagePresetListView::ManagePresetListView(wxWindow* parent, IModPlatform& platform,
 										   IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Manage profiles"_lng, wxDefaultPosition, wxSize(800, 600))
+	: wxPanel(parent, wxID_ANY)
 	, _platform(platform)
 	, _selected(platform.localConfig()->getAcitvePreset())
 	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage, true))
@@ -135,8 +135,8 @@ void ManagePresetListView::updateLayout()
 	previewGroup->Add(_mods, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(midControls, wxSizerFlags(3).Expand().Border(wxALL, 5));
-	mainSizer->Add(previewGroup, wxSizerFlags(2).Expand().Border(wxALL, 5));
+	mainSizer->Add(midControls, wxSizerFlags(2).Expand().Border(wxALL, 5));
+	mainSizer->Add(previewGroup, wxSizerFlags(3).Expand().Border(wxALL, 5));
 
 	SetSizer(mainSizer);
 	Layout();
@@ -151,9 +151,9 @@ void ManagePresetListView::bindEvents()
 	_remove->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onDeletePreset(); });
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) { onSelectionChanged(); });
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onLoadPresetRequested(); });
+	_mods->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onLoadPresetRequested(); });
 
-	_connections += _platform.getPresetManager()->onListChanged().connect([=] { refreshListContent(); });
+	_platform.getPresetManager()->onListChanged().connect([=] { refreshListContent(); });
 }
 
 void ManagePresetListView::onSavePresetRequested(wxString baseName)
@@ -181,7 +181,7 @@ void ManagePresetListView::onSavePresetRequested(wxString baseName)
 				return;
 		}
 
-		_platform.getPresetManager()->savePreset(baseName, _platform.getModManager()->mods());
+		_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods());
 		_platform.localConfig()->setActivePreset(baseName);
 		_selected = baseName;
 
@@ -196,9 +196,9 @@ void ManagePresetListView::onLoadPresetRequested()
 		auto selected = getSelection();
 		auto mods     = _platform.getPresetManager()->loadPreset(selected);
 
-		mods.available = _platform.getModManager()->mods().available;
+		mods.available = _platform.modManager()->mods().available;
 
-		_platform.getModManager()->setMods(std::move(mods));
+		_platform.modManager()->mods(std::move(mods));
 		_platform.localConfig()->setActivePreset(selected);
 		_selected = selected;
 
@@ -273,7 +273,7 @@ void ManagePresetListView::updateModList()
 		if (!selected.empty())
 		{
 			mods           = _platform.getPresetManager()->loadPreset(selected);
-			mods.available = _platform.getModManager()->mods().available;
+			mods.available = _platform.modManager()->mods().available;
 		}
 
 		_listModel->setModList(mods);

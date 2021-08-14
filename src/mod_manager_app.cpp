@@ -9,7 +9,7 @@
 #include "impl/service/i18n_service.h"
 #include "impl/service/icon_storage.h"
 #include "impl/service/platform_service.h"
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "mod_manager_app.h"
 #include "service/ii18n_service.hpp"
 #include "system_info.hpp"
@@ -17,6 +17,7 @@
 #include "utility/sdlexcept.h"
 
 #include <wx/app.h>
+#include <wx/aui/framemanager.h>
 #include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/snglinst.h>
@@ -71,7 +72,7 @@ void ModManagerApp::OnUnhandledException()
 	}
 	catch (...)
 	{
-		what = "Unknow exception";
+		what = "Unknown exception";
 	}
 
 	wxMessageOutputBest().Printf(
@@ -120,12 +121,17 @@ IIconStorage& ModManagerApp::iconStorage() const
 
 void ModManagerApp::scheduleRestart()
 {
-	CallAfter([this] {
-		_mainFrame->Close();
-		_appConfig->save();
-		initServices();
-		initView();
-	});
+	CallAfter(
+		[this]
+		{
+			wxBusyCursor bc;
+			if (!_mainFrame->Close())
+				return;
+
+			_appConfig->save();
+			initServices();
+			initView();
+		});
 }
 
 void ModManagerApp::initServices()
@@ -140,4 +146,4 @@ wxString operator""_lng(const char* s, std::size_t)
 	return wxGetApp().translationString(s);
 }
 
-IMPLEMENT_APP(ModManagerApp);
+wxIMPLEMENT_APP(ModManagerApp);

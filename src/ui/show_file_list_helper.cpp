@@ -77,7 +77,7 @@ namespace
 			{
 				std::error_code ec;
 
-				auto const path     = it->path().u8string();
+				auto const path     = it->path().string();
 				auto const relative = std::filesystem::relative(path, modData->data_path, ec);
 
 				if (ec)

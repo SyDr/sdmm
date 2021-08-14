@@ -43,7 +43,7 @@ namespace mm
 		std::unordered_map<std::string, Package> plugins;
 
 		std::set<wxString> incompatible;
-		std::set<wxString> requires;
+		std::set<wxString> requires_;
 		std::set<wxString> load_after;
 	};
 }

@@ -9,7 +9,7 @@
 
 #include <wx/string.h>
 
-#include <wigwag/signal.hpp>
+#include <sigslot/signal.hpp>
 
 namespace mm
 {
@@ -29,6 +29,6 @@ namespace mm
 		virtual void rename(wxString const& from, wxString const& to) = 0;
 		virtual void remove(wxString const& name)                     = 0;
 
-		virtual wigwag::signal_connector<void()> onListChanged() const = 0;
+		virtual sigslot::signal<>& onListChanged() = 0;
 	};
 }

@@ -13,7 +13,7 @@
 
 namespace mm
 {
-	class IAppConfig;
+	struct IAppConfig;
 
 	struct I18nService : II18nService
 	{

@@ -7,6 +7,10 @@
 
 #include "domain/mod_data.hpp"
 
+#include <wx/string.h>
+
+#include <filesystem>
+
 namespace mm::era2_mod_loader
 {
 	ModData load(std::filesystem::path const& loadFrom, wxString const& preferredLng,

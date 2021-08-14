@@ -9,9 +9,8 @@
 
 namespace mm
 {
-	class ILocalConfig
+	struct ILocalConfig
 	{
-	public:
 		virtual ~ILocalConfig() = default;
 
 		virtual void save() = 0;

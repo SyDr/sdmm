@@ -3,10 +3,15 @@
     <builddir>sdmm-cppcheck-build-dir</builddir>
     <platform>win32W</platform>
     <importproject>SD MM.sln</importproject>
-    <analyze-all-vs-configs>false</analyze-all-vs-configs>
+    <analyze-all-vs-configs>true</analyze-all-vs-configs>
     <check-headers>true</check-headers>
-    <check-unused-templates>false</check-unused-templates>
-    <max-ctu-depth>10</max-ctu-depth>
+    <check-unused-templates>true</check-unused-templates>
+    <max-ctu-depth>2</max-ctu-depth>
+    <max-template-recursion>100</max-template-recursion>
+    <vs-configurations>
+        <config>Debug</config>
+        <config>Release</config>
+    </vs-configurations>
     <libraries>
         <library>wxwidgets</library>
     </libraries>

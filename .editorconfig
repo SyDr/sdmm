@@ -1,0 +1,3 @@
+# c++
+[*.{h,hpp,cpp}]
+guidelines = 80 1px dashed green, 120 1px dotted red

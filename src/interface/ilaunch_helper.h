@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <wigwag/signal_connector.hpp>
+#include <sigslot/signal.hpp>
 
 class wxString;
 class wxIcon;
@@ -16,13 +16,13 @@ namespace mm
 	{
 		virtual ~ILaunchHelper() = default;
 
-		virtual std::string getExecutable() const = 0;
-		virtual void setExecutable(const std::string& exe) = 0;
+		virtual std::string getExecutable() const                 = 0;
+		virtual void        setExecutable(const std::string& exe) = 0;
 
-		virtual wxIcon getIcon() const = 0;
-		virtual wxString getCaption() const = 0;
+		virtual wxIcon   getIcon() const         = 0;
+		virtual wxString getCaption() const      = 0;
 		virtual wxString getLaunchString() const = 0;
 
-		virtual wigwag::signal_connector<void()> onDataChanged() const = 0;
+		virtual sigslot::signal<>& onDataChanged() = 0;
 	};
 }

@@ -31,7 +31,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 		auto const currentId = currentlyActive[i];
 
 		auto modData = modDataProvider.modData(currentId);
-		for (auto const& id : modData->requires)
+		for (auto const& id : modData->requires_)
 		{
 			activatedInSession[id].insert(currentId);
 

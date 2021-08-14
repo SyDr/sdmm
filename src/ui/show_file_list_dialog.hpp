@@ -18,7 +18,7 @@ class wxDataViewCtrl;
 
 namespace mm
 {
-	class Application;
+	struct Application;
 	class IIconStorage;
 	struct IModDataProvider;
 	class ModListModel;
@@ -40,7 +40,7 @@ namespace mm
 		Era2DirectoryStructure _data;
 
 		wxObjectDataPtr<ModListModel> _listModel;
-		wxWidgetsPtr<wxDataViewCtrl>  _mods = nullptr;
+		wxWidgetsPtr<wxDataViewCtrl>  _list = nullptr;
 
 		wxWidgetsPtr<wxDataViewListCtrl> _fileList = nullptr;
 	};

@@ -78,6 +78,7 @@
 	"No mods from (%s) can be placed above each other, %s placed at the top" : "Ни один из модов (%s) не может быть помещён выше остальных, %s был помещён вверх списка",
 	"Select mod pairs to potentially remove from result" : "Выбор модов для потеницального уменьшения объёма результата",
 	"'%s' already exists, overwrite?" : "'%s' уже существует, перезаписать?",
+	"Plugins" : "Плагины",
 
 	"category" : {
 		"gameplay" : "Геймплей",
@@ -90,5 +91,18 @@
 		"platforms" : "Платформы",
 		"utilities" : "Утилиты",
 		"personal mods" : "Собственные разработки"
+	},
+	"main_frame" : {
+		"revert" : "Сброс",
+		"apply" : "Применить",
+		"unsaved_changes" : "Не все изменения применены. Применить сейчас?",
+		"unsaved_changes_caption" : "Несохранённые изменения"
+	},
+	"conflicts" : {
+		"caption" : "Выбор способа разрешения конфликтов между модами",
+		"automatic" : "Автоматически",
+		"automatic_note" : "Автоматически разрешать конфликты между модами при включении и выключении",
+		"manual" : "Вручную",
+		"manual_note" : "Разрешать конфликты по нажатию на кнопку"
 	}
 }

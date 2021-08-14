@@ -27,11 +27,11 @@ namespace mm
 		void rename(wxString const& from, wxString const& to) override;
 		void remove(wxString const& name) override;
 
-		wigwag::signal_connector<void()> onListChanged() const override;
+		sigslot::signal<>& onListChanged() override;
 
 	private:
 		std::filesystem::path _rootPath;
 
-		wigwag::signal<void()> _listChanged;
+		sigslot::signal<> _listChanged;
 	};
 }

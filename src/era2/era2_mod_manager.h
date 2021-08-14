@@ -5,33 +5,30 @@
 
 #pragma once
 
-#include "domain/imod_manager.hpp"
 #include "domain/mod_list.hpp"
+#include "interface/imod_manager.hpp"
 
 #include <deque>
-#include <vector>
+#include <optional>
 #include <set>
 #include <unordered_set>
-#include <optional>
-
-#include <wigwag/token_pool.hpp>
+#include <vector>
 
 namespace mm
 {
-	class Application;
+	struct Application;
 
-	struct Era2ModManager : public IModManager
+	struct Era2ModManager : IModManager
 	{
-		Era2ModManager() = default;
-		explicit Era2ModManager(ModList mods);
+		explicit Era2ModManager(ModList& mods);
 
 		ModList const& mods() const override;
-		void setMods(ModList mods) override;
+		void           mods(ModList mods) override;
 
 		std::optional<size_t> activePosition(wxString const& item) const override;
-		void activate(wxString const& item) override;
-		void deactivate(wxString const& item) override;
-		void switchState(wxString const& item) override;
+		void                  activate(wxString const& item) override;
+		void                  deactivate(wxString const& item) override;
+		void                  switchState(wxString const& item) override;
 
 		bool canMove(wxString const& from, wxString const& to) const override;
 		void move(wxString const& from, wxString const& to) override;
@@ -48,11 +45,11 @@ namespace mm
 
 		void remove(wxString const& item) override;
 
-		wigwag::signal_connector<void()> onListChanged() const override;
+		sigslot::signal<>& onListChanged() override;
 
 	private:
-		ModList _mods;
+		ModList& _list;
 
-		wigwag::signal<void()> _listChanged;
+		sigslot::signal<> _listChanged;
 	};
 }

@@ -14,7 +14,7 @@ class wxSingleInstanceChecker;
 
 namespace mm
 {
-	class AppConfig;
+	struct AppConfig;
 	struct I18nService;
 	class PlatformService;
 	class IconStorage;
@@ -26,7 +26,7 @@ namespace mm
 
 		wxString translationString(wxString const& key);
 		wxString categoryTranslationString(wxString const& key) const;
-		void scheduleRestart();
+		void     scheduleRestart();
 
 		bool OnInit() override;
 
@@ -36,25 +36,26 @@ namespace mm
 
 		void OnUnhandledException() override;
 
-		IAppConfig& appConfig() const override;
-		II18nService& i18nService() const override;
+		IAppConfig&       appConfig() const override;
+		II18nService&     i18nService() const override;
 		IPlatformService& platformService() const override;
-		IIconStorage& iconStorage() const override;
+		IIconStorage&     iconStorage() const override;
 
 	private:
 		void initView();
 
 	private:
-		wxWidgetsPtr<wxFrame> _mainFrame = nullptr;
+		wxWidgetsPtr<wxFrame>      _mainFrame = nullptr;
+
 		std::unique_ptr<wxSingleInstanceChecker> _singleInstanceChecker;
 
 		std::unique_ptr<AppConfig> _appConfig;
 
-		std::unique_ptr<I18nService> _i18nService;
+		std::unique_ptr<I18nService>     _i18nService;
 		std::unique_ptr<PlatformService> _platformService;
 
 		std::unique_ptr<IconStorage> _iconStorage = std::make_unique<IconStorage>();
 	};
 }
 
-DECLARE_APP(mm::ModManagerApp);
+wxDECLARE_APP(mm::ModManagerApp);

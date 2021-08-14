@@ -7,7 +7,7 @@
 
 #include "resolve_mod_conflicts_view.hpp"
 
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "application.h"
 #include "utility/sdlexcept.h"
 #include "interface/service/iicon_storage.h"
@@ -15,8 +15,8 @@
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "mod_list_model.h"
 #include "wx/priority_data_renderer.h"
-#include "domain/imod_platform.hpp"
-#include "domain/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
+#include "interface/imod_manager.hpp"
 #include "domain/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 
@@ -45,7 +45,7 @@ ResolveModConflictsView::ResolveModConflictsView(wxWindow *parent, IAppConfig& c
 {
 	SetIcon(_iconStorage.get(embedded_icon::main_icon));
 
-	_sortedMods = _managedPlatform.getModManager()->mods();
+	_sortedMods = _managedPlatform.modManager()->mods();
 	_listModel->showInactive(false);
 	_listModel->setModList(_sortedMods);
 
@@ -98,7 +98,7 @@ void ResolveModConflictsView::bindEvents()
 	});
 
 	_apply->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-		_managedPlatform.getModManager()->setMods(_sortedMods);
+		_managedPlatform.modManager()->mods(_sortedMods);
 		EndModal(wxID_OK);
 	});
 }
@@ -143,7 +143,7 @@ void ResolveModConflictsView::doResolveConflicts()
 		auto const currentId = currentlyActive[i];
 
 		auto modData = modDataProvider->modData(currentId);
-		for (auto const& id : modData->requires)
+		for (auto const& id : modData->requires_)
 		{
 			activatedInSession.insert(id);
 

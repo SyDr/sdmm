@@ -39,9 +39,9 @@ wxString Era2LaunchHelper::getLaunchString() const
 	return _config.getLaunchString();
 }
 
-wigwag::signal_connector<void()> Era2LaunchHelper::onDataChanged() const
+sigslot::signal<>& Era2LaunchHelper::onDataChanged()
 {
-	return _dataChanged.connector();
+	return _dataChanged;
 }
 
 std::string Era2LaunchHelper::getExecutable() const

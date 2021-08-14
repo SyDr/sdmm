@@ -5,12 +5,10 @@
 
 #pragma once
 
-#include <wigwag/signal.hpp>
-
+#include <sigslot/signal.hpp>
 #include <wx/string.h>
 
 #include <optional>
-#include <vector>
 
 namespace mm
 {
@@ -21,8 +19,8 @@ namespace mm
 	{
 		virtual ~IModManager() = default;
 
-		virtual ModList const& mods() const          = 0;
-		virtual void           setMods(ModList mods) = 0;
+		virtual ModList const& mods() const       = 0;
+		virtual void           mods(ModList mods) = 0;
 
 		virtual std::optional<size_t> activePosition(wxString const& item) const = 0;
 		virtual void                  activate(wxString const& item)             = 0;
@@ -44,6 +42,6 @@ namespace mm
 
 		virtual void remove(wxString const& item) = 0;
 
-		virtual wigwag::signal_connector<void()> onListChanged() const = 0;
+		virtual sigslot::signal<>& onListChanged() = 0;
 	};
 }

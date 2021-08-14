@@ -19,7 +19,7 @@
 #include <wx/stattext.h>
 #include <wx/dataview.h>
 
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "application.h"
 #include "utility/sdlexcept.h"
 #include "interface/service/iicon_storage.h"

@@ -9,7 +9,7 @@
 
 namespace mm
 {
-	auto utf8_to_wxString(const std::string& input) -> wxString;
-	auto utf8_to_wxString(const wxString& input) -> wxString;
-	auto wxString_to_utf8(const wxString& input) -> std::string;
+	wxString    utf8_to_wxString(const std::string& input);
+	wxString    utf8_to_wxString(const wxString& input);
+	std::string wxString_to_utf8(const wxString& input);
 }

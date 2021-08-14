@@ -11,7 +11,6 @@
 #include <memory>
 #include <vector>
 
-#include <wigwag/token_pool.hpp>
 #include <wx/dialog.h>
 
 class wxListView;
@@ -28,7 +27,7 @@ namespace mm
 	class ModListModel;
 	class IIconStorage;
 
-	class ManagePresetListView : public wxDialog
+	class ManagePresetListView : public wxPanel
 	{
 	public:
 		explicit ManagePresetListView(wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage);
@@ -58,8 +57,6 @@ namespace mm
 		IModPlatform& _platform;
 		IIconStorage& _iconStorage;
 		wxString      _selected;
-
-		wigwag::token_pool _connections;
 
 		wxWidgetsPtr<wxStaticBox> _presets = nullptr;
 

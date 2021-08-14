@@ -23,9 +23,9 @@ namespace
 	{
 		if (!useRequires)
 		{
-			what.requires = defaultRequires;
+			what.requires_ = defaultRequires;
 			if (what.id != "WoG")
-				what.requires.emplace("WoG");
+				what.requires_.emplace("WoG");
 		}
 
 		if (!useLoadAfter)
@@ -44,10 +44,10 @@ namespace
 	}
 }
 
-ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxString const& preferredLng,
-								  std::set<wxString> const& defaultIncompatible,
-								  std::set<wxString> const& defaultRequires,
-								  std::set<wxString> const& defaultLoadAfter)
+ModData era2_mod_loader::load(std::filesystem::path const& loadFrom, wxString const& preferredLng,
+							  std::set<wxString> const& defaultIncompatible,
+							  std::set<wxString> const& defaultRequires,
+							  std::set<wxString> const& defaultLoadAfter)
 {
 	bool hasRequires     = false;
 	bool hasLoadAfter    = false;
@@ -55,7 +55,7 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 
 	ModData result;
 	result.data_path   = loadFrom;
-	result.id          = wxString::FromUTF8(loadFrom.filename().u8string());
+	result.id          = wxString::FromUTF8(loadFrom.filename().string());
 	result.virtual_mod = !std::filesystem::is_directory(loadFrom);
 
 	auto supplyResultWithDefaults = [&] {
@@ -88,7 +88,7 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 	catch (nlohmann::json::parse_error const& e)
 	{
 		wxLogError(e.what());
-		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.u8string()));
+		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.string()));
 	}
 
 	if (!data.is_object())
@@ -220,16 +220,16 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 	{
 		if (auto const req = compat->find("requires"); req != compat->end() && req->is_array())
 		{
-			for (auto const item : *req)
+			for (auto const& item : *req)
 				if (item.is_string())
-					result.requires.emplace(item.get<std::string>());
+					result.requires_.emplace(item.get<std::string>());
 
 			hasRequires = true;
 		}
 
 		if (auto const after = compat->find("load_after"); after != compat->end() && after->is_array())
 		{
-			for (auto const item : *after)
+			for (auto const& item : *after)
 				if (item.is_string())
 					result.load_after.emplace(item.get<std::string>());
 
@@ -238,7 +238,7 @@ ModData mm::era2_mod_loader::load(std::filesystem::path const& loadFrom, wxStrin
 
 		if (auto const inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())
 		{
-			for (auto const item : *inc)
+			for (auto const& item : *inc)
 				if (item.is_string())
 					result.incompatible.emplace(item.get<std::string>());
 

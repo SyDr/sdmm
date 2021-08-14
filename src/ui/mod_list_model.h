@@ -7,8 +7,8 @@
 
 #include <deque>
 #include <memory>
+#include <unordered_set>
 
-#include <wigwag/token_pool.hpp>
 #include <wx/dataview.h>
 
 #include "domain/mod_list.hpp"
@@ -20,7 +20,6 @@ namespace mm
 	struct IModManager;
 	struct IModDataProvider;
 	struct ModData;
-	struct ModList;
 
 	class ModListModel : public wxDataViewIndexListModel
 	{
@@ -65,8 +64,8 @@ namespace mm
 		void reload();
 
 	private:
-		ModList                      _mods;
-		std::vector<wxString>        _displayedMods;
+		ModList                      _list;
+		std::vector<wxString>        _displayedItems;
 		std::unordered_set<wxString> _checked;
 
 		IModDataProvider& _modDataProvider;
@@ -74,7 +73,5 @@ namespace mm
 
 		bool _showHidden   = false;
 		bool _showInactive = true;
-
-		wigwag::token_pool _connections;
 	};
 }

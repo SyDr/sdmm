@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="impl\base\base_mod_platform.cpp" />
     <ClCompile Include="impl\service\app_config.cpp" />
     <ClCompile Include="impl\service\i18n_service.cpp" />
     <ClCompile Include="impl\service\icon_storage.cpp" />
@@ -38,15 +37,19 @@
     <ClCompile Include="ui\show_file_list_helper.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
     <ClCompile Include="ui\select_mod_pairs_dialog.cpp" />
+    <ClCompile Include="domain\plugin_list.cpp" />
+    <ClCompile Include="era2\era2_plugin_manager.cpp" />
+    <ClCompile Include="ui\plugin_list_model.cpp" />
+    <ClCompile Include="ui\plugin_list_view.cpp" />
+    <ClCompile Include="era2\era2_plugin_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="impl\base\base_mod_platform.h" />
     <ClInclude Include="impl\service\app_config.h" />
     <ClInclude Include="impl\service\i18n_service.h" />
     <ClInclude Include="impl\service\icon_storage.h" />
-    <ClInclude Include="interface\domain\ilaunch_helper.h" />
-    <ClInclude Include="interface\service\iapp_config.h" />
+    <ClInclude Include="interface\ilaunch_helper.h" />
+    <ClInclude Include="interface\iapp_config.h" />
     <ClInclude Include="interface\service\iicon_storage.h" />
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="impl\service\platform_service.h" />
@@ -72,7 +75,7 @@
     <ClInclude Include="wx\data_view_multiple_icons_renderer.h" />
     <ClInclude Include="wx\priority_data_renderer.h" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
-    <ClInclude Include="domain\imod_manager.hpp" />
+    <ClInclude Include="interface\imod_manager.hpp" />
     <ClInclude Include="era2\era2_config.h" />
     <ClInclude Include="era2\era2_directory_structure.hpp" />
     <ClInclude Include="era2\era2_launch_helper.h" />
@@ -85,7 +88,7 @@
     <ClInclude Include="domain\mod_metadata.hpp" />
     <ClInclude Include="domain\mod_data.hpp" />
     <ClInclude Include="era2\era2_mod_loader.hpp" />
-    <ClInclude Include="domain\imod_platform.hpp" />
+    <ClInclude Include="interface\imod_platform.hpp" />
     <ClInclude Include="domain\imod_data_provider.hpp" />
     <ClInclude Include="utility\non_owning_ptr.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
@@ -100,6 +103,15 @@
     <ClInclude Include="ui\select_mod_pairs_dialog.hpp" />
     <ClInclude Include="domain\ipreset_manager.hpp" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
+    <ClInclude Include="domain\plugin_list.hpp" />
+    <ClInclude Include="domain\iplugin_manager.hpp" />
+    <ClInclude Include="era2\era2_plugin_manager.hpp" />
+    <ClInclude Include="ui\plugin_list_model.hpp" />
+    <ClInclude Include="ui\plugin_list_view.hpp" />
+    <ClInclude Include="era2\era2_plugin_helper.hpp" />
+    <ClInclude Include="types\filesystem.hpp" />
+    <ClInclude Include="interface\inon_auto_applicable_platform.hpp" />
+    <ClInclude Include="license.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

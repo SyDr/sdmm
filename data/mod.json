@@ -1,0 +1,20 @@
+{
+	"caption": {
+		"en_US": "Techincal mod from SD Mod Manager",
+		"ru_RU": "Технический мод из SD Mod Manager"
+	},
+	"description": {
+		"full": {
+			"en_US": "description.txt",
+			"ru_RU": "description_rus.txt"
+		},
+	},
+	"mod_version": "1.0.0",
+	"priority": 42,
+	"compatibility": {
+		"class": "all",
+		"entries": {}
+	},
+	"platform": "era",
+	"info_version": "1.0.0",
+}

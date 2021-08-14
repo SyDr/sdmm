@@ -23,7 +23,7 @@ class wxDataViewListCtrl;
 
 namespace mm
 {
-	class IAppConfig;
+	struct IAppConfig;
 	class IIconStorage;
 
 	class SelectDirectoryDialog : public wxDialog

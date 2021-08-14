@@ -6,12 +6,11 @@
 #include "stdafx.h"
 
 #include "mod_list.hpp"
-#include "utility\sdlexcept.h"
+#include "utility/sdlexcept.h"
 
 using namespace mm;
 
-ModList::ModList(std::set<wxString> available, std::vector<wxString> active,
-				 std::set<wxString> hidden)
+ModList::ModList(std::set<wxString> available, std::vector<wxString> active, std::set<wxString> hidden)
 	: available(std::move(available))
 	, active(std::move(active))
 	, hidden(std::move(hidden))
@@ -104,8 +103,7 @@ bool ModList::canMoveDown(wxString const& item) const
 
 void ModList::moveDown(wxString const& item)
 {
-	if (auto position = activePosition(item);
-		position.has_value() && position.value() != active.size() - 1)
+	if (auto position = activePosition(item); position.has_value() && position.value() != active.size() - 1)
 	{
 		std::swap(active[position.value()], active[position.value() + 1]);
 	}

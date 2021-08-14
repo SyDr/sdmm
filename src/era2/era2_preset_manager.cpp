@@ -79,9 +79,9 @@ void Era2PresetManager::rename(const wxString& from, const wxString& to)
 	_listChanged();
 }
 
-wigwag::signal_connector<void()> Era2PresetManager::onListChanged() const
+sigslot::signal<>& Era2PresetManager::onListChanged()
 {
-	return _listChanged.connector();
+	return _listChanged;
 }
 
 ModList Era2PresetManager::loadPreset(wxString const& name)
@@ -92,7 +92,7 @@ ModList Era2PresetManager::loadPreset(wxString const& name)
 
 	if (!datafile)
 	{
-		wxLogError(wxString::Format("Cannot open file %s"_lng, path.u8string()));
+		wxLogError(wxString::Format("Cannot open file %s"_lng, path.string()));
 		return modList;
 	}
 
@@ -105,7 +105,7 @@ ModList Era2PresetManager::loadPreset(wxString const& name)
 	catch (nlohmann::json::parse_error const& e)
 	{
 		wxLogError(e.what());
-		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.u8string()));
+		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.string()));
 		return modList;
 	}
 

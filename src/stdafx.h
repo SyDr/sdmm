@@ -4,6 +4,7 @@
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include <atomic>
+#include <compare>
 #include <deque>
 #include <filesystem>
 #include <fstream>

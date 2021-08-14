@@ -10,6 +10,7 @@
 #include <optional>
 #include <set>
 #include <vector>
+#include <compare>
 
 namespace mm
 {
@@ -45,5 +46,7 @@ namespace mm
 		void switchVisibility(wxString const& item);
 
 		void remove(wxString const& item);
+
+		std::weak_ordering operator<=>(const ModList& other) const = default;
 	};
 }

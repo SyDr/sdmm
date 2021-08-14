@@ -11,6 +11,6 @@ namespace mm
 	{
 		undefined = -1,
 		automatic = 0,
-		manual = 1,
+		manual    = 1,
 	};
 }

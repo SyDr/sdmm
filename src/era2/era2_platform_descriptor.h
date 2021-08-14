@@ -9,7 +9,7 @@
 
 namespace mm
 {
-	class Application;
+	struct Application;
 
 	class Era2PlatfromDescriptor : public IPlatformDescriptor
 	{

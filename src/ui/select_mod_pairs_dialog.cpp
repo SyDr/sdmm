@@ -9,10 +9,10 @@
 
 #include "application.h"
 #include "domain/imod_data_provider.hpp"
-#include "domain/imod_manager.hpp"
-#include "domain/imod_platform.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
 #include "domain/mod_data.hpp"
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "interface/service/iicon_storage.h"
 #include "mod_list_model.h"
 #include "types/embedded_icon.h"
@@ -132,7 +132,7 @@ void SelectModPairsDialog::fillData()
 			auto const mod = _modDataProvider.modData(item);
 
 			if (!mod->icon_filename.empty())
-				icon = _iconStorage.get((mod->data_path / mod->icon_filename).u8string());
+				icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());
 			else
 				icon = _iconStorage.get(embedded_icon::folder);
 

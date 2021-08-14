@@ -8,7 +8,7 @@
 #include "show_file_list_dialog.hpp"
 
 #include "application.h"
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "interface/service/iicon_storage.h"
 #include "types/embedded_icon.h"
 #include "utility/sdlexcept.h"
@@ -53,9 +53,9 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, Application& applicatio
 
 void ShowFileListDialog::createControls()
 {
-	_mods = new wxDataViewCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+	_list = new wxDataViewCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 							   wxDV_ROW_LINES | wxDV_VERT_RULES);
-	_mods->AssociateModel(_listModel.get());
+	_list->AssociateModel(_listModel.get());
 
 	createListColumns();
 
@@ -84,8 +84,8 @@ void ShowFileListDialog::createListColumns()
 										static_cast<unsigned int>(ModListModel::Column::caption),
 										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
-	_mods->AppendColumn(column0);
-	_mods->AppendColumn(column1);
+	_list->AppendColumn(column0);
+	_list->AppendColumn(column1);
 
 	column0->SetSortOrder(true);
 }
@@ -96,7 +96,7 @@ void ShowFileListDialog::bindEvents() {}
 void ShowFileListDialog::buildLayout()
 {
 	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(_mods, wxSizerFlags(2).Expand().Border(wxALL, 4));
+	mainSizer->Add(_list, wxSizerFlags(2).Expand().Border(wxALL, 4));
 	mainSizer->Add(_fileList, wxSizerFlags(3).Expand().Border(wxALL, 4));
 
 	this->SetSizer(mainSizer);

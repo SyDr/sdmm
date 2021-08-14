@@ -10,13 +10,13 @@
 #include "application.h"
 #include "base/mod_conflict_resolver.hpp"
 #include "domain/imod_data_provider.hpp"
-#include "domain/imod_manager.hpp"
-#include "domain/imod_platform.hpp"
 #include "domain/ipreset_manager.hpp"
 #include "domain/mod_data.hpp"
-#include "interface/domain/ilaunch_helper.h"
 #include "interface/domain/ilocal_config.h"
-#include "interface/service/iapp_config.h"
+#include "interface/ilaunch_helper.h"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
+#include "interface/iapp_config.h"
 #include "interface/service/iicon_storage.h"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
@@ -41,9 +41,10 @@
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
+ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
+						 wxString const& managedPath)
 	: _managedPlatform(managedPlatform)
-	, _modManager(*managedPlatform.getModManager())
+	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
 								  managedPlatform.localConfig()->showHiddenMods()))
 	, _iconStorage(iconStorage)
@@ -51,7 +52,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
-	createControls();
+	createControls(managedPath);
 	_listModel->setModList(_modManager.mods());
 	buildLayout();
 	bindEvents();
@@ -79,127 +80,119 @@ void ModListView::buildLayout()
 	contentSizer->Add(leftGroupSizer, wxSizerFlags(168).Expand());
 	contentSizer->Add(_modDescription, wxSizerFlags(100).Expand().Border(wxALL, 4));
 
-	auto topLineSizer = new wxBoxSizer(wxHORIZONTAL);
-	topLineSizer->Add(_launchButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-	topLineSizer->Add(_launchManageButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-	topLineSizer->AddStretchSpacer(1);
-
-	auto mainSizer = new wxBoxSizer(wxVERTICAL);
-	mainSizer->Add(topLineSizer, wxSizerFlags(0).Expand().Border(wxALL, 4));
-	mainSizer->Add(contentSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
-
-	this->SetSizer(mainSizer);
+	this->SetSizer(contentSizer);
 }
 
 void ModListView::bindEvents()
 {
 	_checkboxShowHidden->Bind(wxEVT_CHECKBOX, &ModListView::OnEventCheckboxShowHidden, this);
 
-	if (auto launchHelper = _managedPlatform.launchHelper())
-		_connections += launchHelper->onDataChanged().connect([this] { updateExecutableIcon(); });
-
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
 
-	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
-		const auto item = _list->GetSelection();
-		_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxEmptyString;
-		updateControlsState();
-	});
+	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED,
+				[=](wxDataViewEvent&)
+				{
+					const auto item = _list->GetSelection();
+					_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxEmptyString;
+					updateControlsState();
+				});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED,
 				[=](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [=](wxDataViewEvent& event) {
-		event.Veto();  // default
-		auto const item = event.GetItem();
+	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG,
+				[=](wxDataViewEvent& event)
+				{
+					event.Veto();  // default
+					auto const item = event.GetItem();
 
-		if (!item.IsOk())
-			return;
+					if (!item.IsOk())
+						return;
 
-		if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
-			return;
-		else if (sortingColumn->GetModelColumn() != static_cast<unsigned int>(ModListModel::Column::priority))
-			return;
+					if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
+						return;
+					else if (sortingColumn->GetModelColumn() !=
+							 static_cast<unsigned int>(ModListModel::Column::priority))
+						return;
 
-		auto id = _listModel->findIdByItem(item);
+					auto id = _listModel->findIdByItem(item);
 
-		if (!_modManager.activePosition(id).has_value())
-			return;
+					if (!_modManager.activePosition(id).has_value())
+						return;
 
-		event.Allow();
-		event.SetDataObject(new wxTextDataObject(id));
-	});
+					event.Allow();
+					event.SetDataObject(new wxTextDataObject(id));
+				});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
-		event.Veto();  // default
-		auto const item(event.GetItem());
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE,
+				[=](wxDataViewEvent& event)
+				{
+					event.Veto();  // default
+					auto const item(event.GetItem());
 
-		if (!item.IsOk())
-			return;
+					if (!item.IsOk())
+						return;
 
-		if (!_modManager.activePosition(_listModel->findIdByItem(item)).has_value())
-			return;
+					if (!_modManager.activePosition(_listModel->findIdByItem(item)).has_value())
+						return;
 
-		event.Allow();
-	});
+					event.Allow();
+				});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
-		if (event.GetDataFormat() != wxDF_UNICODETEXT)
-			return;
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP,
+				[=](wxDataViewEvent& event)
+				{
+					if (event.GetDataFormat() != wxDF_UNICODETEXT)
+						return;
 
-		if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
-			return;
-		else if (sortingColumn->GetModelColumn() != static_cast<unsigned int>(ModListModel::Column::priority))
-			return;
+					if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
+						return;
+					else if (sortingColumn->GetModelColumn() !=
+							 static_cast<unsigned int>(ModListModel::Column::priority))
+						return;
 
-		auto const item(event.GetItem());
-		if (!item.IsOk())
-			return;
+					auto const item(event.GetItem());
+					if (!item.IsOk())
+						return;
 
-		wxTextDataObject from;
-		from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
+					wxTextDataObject from;
+					from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
 
-		_modManager.move(from.GetText(), _listModel->findIdByItem(item));
-	});
+					_modManager.move(from.GetText(), _listModel->findIdByItem(item));
+				});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [=](wxDataViewEvent& event) {
-		auto const item(event.GetItem());
-		if (!item.IsOk())
-		{
-			event.Veto();
-			return;
-		}
+	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU,
+				[=](wxDataViewEvent& event)
+				{
+					auto const item(event.GetItem());
+					if (!item.IsOk())
+					{
+						event.Veto();
+						return;
+					}
 
-		OnListItemContextMenu(item);
-	});
+					OnListItemContextMenu(item);
+				});
 
 	Bind(wxEVT_MENU, &ModListView::OnMenuItemSelected, this);
 
-	if (auto launchHelper = _managedPlatform.launchHelper())
-	{
-		_launchButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLaunchGameRequested(); });
-		_launchManageButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { selectExeToLaunch(); });
-	}
-
-	_connections += _modManager.onListChanged().connect([this] {
-		_listModel->setModList(_modManager.mods());
-		followSelection();
-		updateControlsState();
-	});
+	_modManager.onListChanged().connect(
+		[this]
+		{
+			_listModel->setModList(_modManager.mods());
+			followSelection();
+			updateControlsState();
+		});
 
 	_moveUp->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
-
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
-
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
-
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested(); });
 }
 
-void ModListView::createControls()
+void ModListView::createControls(wxString const& managedPath)
 {
-	_group = new wxStaticBox(
-		this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, _managedPlatform.getManagedPath().u8string()));
+	_group = new wxStaticBox(this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, managedPath));
 
 	createListControl();
 
@@ -210,26 +203,17 @@ void ModListView::createControls()
 		new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 					   wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
 
-	_moveUp      = new wxButton(_group, wxID_ANY, "Move Up"_lng);
-	_moveDown    = new wxButton(_group, wxID_ANY, "Move Down"_lng);
-	_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
-	_sort        = new wxButton(_group, wxID_ANY, "Sort"_lng);
-
+	_moveUp = new wxButton(_group, wxID_ANY, "Move Up"_lng);
 	_moveUp->SetBitmap(_iconStorage.get(embedded_icon::up));
-	_moveDown->SetBitmap(_iconStorage.get(embedded_icon::down));
-	_changeState->SetBitmap(_iconStorage.get(embedded_icon::plus));
-	_sort->SetBitmap(_iconStorage.get(embedded_icon::sort));
 
-	if (auto launchHelper = _managedPlatform.launchHelper())
-	{
-		_launchButton = new wxButton(
-			this, wxID_ANY, wxString::Format(wxString("Launch (%s)"_lng), launchHelper->getCaption()),
-			wxDefaultPosition, { -1, 25 }, wxBU_EXACTFIT);
-		_launchButton->SetBitmap(launchHelper->getIcon());
-		_launchManageButton =
-			new wxButton(this, wxID_ANY, "...", wxDefaultPosition, { 25, 25 }, wxBU_EXACTFIT);
-		_launchManageButton->SetToolTip("Change executable for launch"_lng);
-	}
+	_moveDown = new wxButton(_group, wxID_ANY, "Move Down"_lng);
+	_moveDown->SetBitmap(_iconStorage.get(embedded_icon::down));
+
+	_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
+	_changeState->SetBitmap(_iconStorage.get(embedded_icon::plus));
+
+	_sort = new wxButton(_group, wxID_ANY, "Sort"_lng);
+	_sort->SetBitmap(_iconStorage.get(embedded_icon::sort));
 
 	_menu.showOrHide     = _menu.menu.Append(wxID_ANY, "placeholder");
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
@@ -271,7 +255,7 @@ void ModListView::createListColumns()
 										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column1 =
 		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 	auto column2 =
 		new wxDataViewColumn("Category"_lng, r2, static_cast<unsigned int>(ModListModel::Column::category),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
@@ -385,127 +369,98 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 	else if (itemId == _menu.openHomepage->GetId())
 		wxLaunchDefaultBrowser(mod->homepage_link);
 	else if (itemId == _menu.openDir->GetId())
-		wxLaunchDefaultApplication(mod->data_path.u8string());
+		wxLaunchDefaultApplication(mod->data_path.string());
 	else if (itemId == _menu.deleteOrRemove->GetId())
 		onRemoveModRequested();
 }
 
 void ModListView::onSwitchSelectedModStateRequested()
 {
-	try_handle_exceptions(this, [&] {
-		if (!_modManager.activePosition(_selectedMod).has_value())
+	try_handle_exceptions(
+		this,
+		[&]
 		{
-			auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
-
-			std::vector<std::string> incompatible;
-			for (auto const& item : _modManager.mods().active)
+			if (!_modManager.activePosition(_selectedMod).has_value())
 			{
-				auto other = _managedPlatform.modDataProvider()->modData(item);
-				if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
+				auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
+
+				std::vector<std::string> incompatible;
+				for (auto const& item : _modManager.mods().active)
 				{
-					incompatible.emplace_back('"' + other->caption.ToStdString(wxConvUTF8) + '"');
+					auto other = _managedPlatform.modDataProvider()->modData(item);
+					if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
+					{
+						incompatible.emplace_back('"' + other->caption.ToStdString(wxConvUTF8) + '"');
+					}
+				}
+
+				if (!incompatible.empty())
+				{
+					auto const message = fmt::format(
+						"Mod \"{0}\" is incompatible with {1}.\r\n"
+						"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
+						_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
+
+					auto const answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
+													 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
+
+					if (answer != wxYES)
+						return;
 				}
 			}
 
-			if (!incompatible.empty())
-			{
-				auto const message = fmt::format(
-					"Mod \"{0}\" is incompatible with {1}.\r\n"
-					"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
-					_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
+			_modManager.switchState(_selectedMod);
 
-				auto const answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
-												 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
-
-				if (answer != wxYES)
-					return;
-			}
-		}
-
-		_modManager.switchState(_selectedMod);
-	});
-}
-
-void ModListView::selectExeToLaunch()
-{
-	try_handle_exceptions(this, [&] {
-		auto config = _managedPlatform.localConfig();
-		auto helper = _managedPlatform.launchHelper();
-
-		SelectExe dialog(this, config->getDataPath(), helper->getExecutable(), _iconStorage);
-
-		if (dialog.ShowModal() == wxID_OK)
-			helper->setExecutable(dialog.getSelectedFile().ToStdString());
-	});
-}
-
-void ModListView::onLaunchGameRequested()
-{
-	try_handle_exceptions(this, [&] {
-		auto config = _managedPlatform.localConfig();
-		auto helper = _managedPlatform.launchHelper();
-
-		if (helper->getExecutable().empty())
-			selectExeToLaunch();
-
-		if (!helper->getExecutable().empty())
-		{
-			const auto currentWorkDir = wxGetCwd();
-
-			wxSetWorkingDirectory(config->getDataPath().wstring());
-			shellLaunch(helper->getLaunchString());
-			wxSetWorkingDirectory(currentWorkDir);
-		}
-	});
+			if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
+				onSortModsRequested();
+		});
 }
 
 void ModListView::OnEventCheckboxShowHidden(const wxCommandEvent&)
 {
-	try_handle_exceptions(this, [&] {
-		_listModel->showHidden(_checkboxShowHidden->IsChecked());
-		_managedPlatform.localConfig()->showHiddenMods(_checkboxShowHidden->IsChecked());
-	});
-}
-
-void ModListView::updateExecutableIcon()
-{
-	if (auto helper = _managedPlatform.launchHelper())
-	{
-		_launchButton->SetLabelText(wxString::Format(wxString("Launch (%s)"_lng), helper->getCaption()));
-		_launchButton->SetBitmap(wxNullBitmap);
-		_launchButton->SetBitmap(helper->getIcon());
-		Layout();
-	}
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  _listModel->showHidden(_checkboxShowHidden->IsChecked());
+							  _managedPlatform.localConfig()->showHiddenMods(
+								  _checkboxShowHidden->IsChecked());
+						  });
 }
 
 void ModListView::onSortModsRequested()
 {
-	try_handle_exceptions(this, [&] {
-		_modManager.setMods(resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider()));
-	});
+	wxBusyCursor bc;
+
+	try_handle_exceptions(
+		this,
+		[&] {
+			_modManager.mods(resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider()));
+		});
 }
 
 void ModListView::onRemoveModRequested()
 {
-	try_handle_exceptions(this, [&] {
-		auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
-		if (!mod->virtual_mod)
-		{
-			auto const formatMessage =
-				"Are you sure want to delete mod \"%s\"?\n\n"
-				"It will be deleted to recycle bin, if possible."_lng;
-			auto const answer =
-				wxMessageBox(wxString::Format(formatMessage, mod->caption), wxTheApp->GetAppName(),
-							 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
+							  if (!mod->virtual_mod)
+							  {
+								  auto const formatMessage =
+									  "Are you sure want to delete mod \"%s\"?\n\n"
+									  "It will be deleted to recycle bin, if possible."_lng;
+								  auto const answer = wxMessageBox(
+									  wxString::Format(formatMessage, mod->caption), wxTheApp->GetAppName(),
+									  wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
-			if (answer != wxYES)
-				return;
+								  if (answer != wxYES)
+									  return;
 
-			if (!shellRemove(mod->data_path.u8string()))
-				return;
-		}
+								  if (!shellRemove(mod->data_path.string()))
+									  return;
+							  }
 
-		_modManager.remove(mod->id);
-	});
+							  _modManager.remove(mod->id);
+						  });
 }

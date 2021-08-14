@@ -44,7 +44,7 @@ SelectExe::SelectExe(wxWindow *parent, const std::filesystem::path& basePath, co
 	wxBusyCursor busy;
 	refreshListContent();
 
-	bVertical->Add(_list, 1, wxEXPAND | wxALL, 5);
+	bVertical->Add(_list, 1, wxEXPAND | static_cast<wxStretch>(wxALL), 5);
 
 	wxBoxSizer* bHorizontal = new wxBoxSizer(wxHORIZONTAL);
 	bVertical->Add(bHorizontal, 0, wxSTRETCH_NOT, 5);
@@ -74,7 +74,7 @@ SelectExe::SelectExe(wxWindow *parent, const std::filesystem::path& basePath, co
 	});
 
 	wxBoxSizer* bSizerMain = new wxBoxSizer(wxHORIZONTAL);
-	bSizerMain->Add(mainPanel, 1, wxEXPAND | wxALL);
+	bSizerMain->Add(mainPanel, 1, wxEXPAND | static_cast<wxStretch>(wxALL));
 	this->SetSizer(bSizerMain);
 	this->Layout();
 }

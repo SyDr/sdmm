@@ -9,10 +9,10 @@
 
 #include "application.h"
 #include "domain/imod_data_provider.hpp"
-#include "domain/imod_manager.hpp"
-#include "domain/imod_platform.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
 #include "domain/mod_data.hpp"
-#include "interface/service/iapp_config.h"
+#include "interface/iapp_config.h"
 #include "interface/service/iicon_storage.h"
 #include "mod_list_model.h"
 #include "types/embedded_icon.h"
@@ -42,7 +42,7 @@ SelectModsDialog::SelectModsDialog(wxWindow& parent, Application& application,
 			   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(application.iconStorage())
 	, _listModel(new ModListModel(dataProvider, application.iconStorage(), true))
-	, _mods(list)
+	, _mods(std::move(list))
 {
 	SetIcon(_iconStorage.get(embedded_icon::main_icon));
 

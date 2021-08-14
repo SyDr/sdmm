@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "domain/imod_platform.hpp"
+#include "domain/mod_list.hpp"
 #include "era2_config.h"
-
-#include <wigwag/token_pool.hpp>
+#include "interface/imod_platform.hpp"
+#include "interface/inon_auto_applicable_platform.hpp"
+#include "era2_plugin_helper.hpp"
+#include "domain/plugin_list.hpp"
 
 #include <deque>
 #include <unordered_set>
@@ -16,43 +18,56 @@
 
 namespace mm
 {
-	class Application;
+	struct Application;
 	struct Era2LaunchHelper;
 	struct Era2ModManager;
 	struct Era2PresetManager;
 	struct Era2ModDataProvider;
+	struct Era2PluginManager;
 	struct ModList;
 
-	struct Era2Platform : IModPlatform
+	struct Era2Platform : IModPlatform, INonAutoApplicablePlatform
 	{
-		explicit Era2Platform(const Application& app);
+		explicit Era2Platform(Application const& app);
 
 		std::filesystem::path getManagedPath() const override;
-		std::filesystem::path getModsDirPath() const;
 
 		IPresetManager*   getPresetManager() const override;
 		Era2Config*       localConfig() const override;
-		IModManager*      getModManager() const override;
+		IModManager*      modManager() const override;
 		ILaunchHelper*    launchHelper() const override;
 		IModDataProvider* modDataProvider() const override;
+		IPluginManager*   pluginManager() const override;
+
+		INonAutoApplicablePlatform* nonAutoApplicable() override;
+
+		bool changed() const override;
+		void apply() override;
+		void revert() override;
 
 	private:
-		std::filesystem::path getActiveListPath() const;
-		std::filesystem::path getHiddenListPath() const;
-
-		ModList load() const;
-		void save();
+		fspath getModsDirPath() const;
+		fspath getActiveListPath() const;
+		fspath getHiddenListPath() const;
+		fspath getPluginListPath() const;
 
 	private:
-		const Application&          _app;
-		const std::filesystem::path _rootDir;
+		Application const&          _app;
+		std::filesystem::path const _rootDir;
 
 		std::unique_ptr<Era2Config>          _localConfig;
 		std::unique_ptr<Era2LaunchHelper>    _launchHelper;
-		std::unique_ptr<Era2ModManager>      _modManager;
-		std::unique_ptr<Era2PresetManager>   _presetManager;
 		std::unique_ptr<Era2ModDataProvider> _modDataProvider;
+		std::unique_ptr<Era2ModManager>      _modManager;
+		std::unique_ptr<Era2PluginManager>   _pluginManager;
+		std::unique_ptr<Era2PresetManager>   _presetManager;
 
-		wigwag::token_pool _connections;
+		ModList _modList;
+		ModList _initalModList;
+
+		PluginList _pluginList;
+		PluginList _initialPluginList;
+
+		Era2PLuginListPhysicalStructure _plugins;
 	};
 }
