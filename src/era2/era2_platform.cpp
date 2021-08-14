@@ -105,69 +105,6 @@ namespace
 								   modsPath / mm::constant::mm_managed_mod / "description_rus.txt",
 								   std::filesystem::copy_options::overwrite_existing);
 	}
-
-	void loadPlugins(const fspath& pluginPath, PluginList& target)
-	{
-		if (std::ifstream datafile(pluginPath.string()); datafile)
-		{
-			try
-			{
-				auto data = nlohmann::json::parse(datafile);
-				for (auto& [key, value] : data.items())
-				{
-					target.overrideState(key,
-										 value == "enabled" ? PluginState::enabled : PluginState::disabled);
-				}
-			}
-			catch (...)
-			{
-				wxLogDebug("Can't parse data file");
-			}
-		}
-	}
-
-	void savePlugins(const fspath& pluginPath, const fspath& modsPath, const PluginList& list)
-	{
-		nlohmann::json data = nlohmann::json::object();
-		for (const auto& item : list.overridden)
-			data[item.first.ToStdString()] = (item.second == PluginState::enabled ? "enabled" : "disabled");
-
-		overwriteFileContent(pluginPath, data.dump(2));
-
-		auto                 targetPath = modsPath / mm::constant::mm_managed_mod / "EraPlugins";
-		constexpr std::array pluginDirs = { ".", "BeforeWog", "AfterWog" };
-		for (const auto& dir : pluginDirs)
-		{
-			const auto subPath = targetPath / dir;
-			std::filesystem::create_directories(subPath);
-		}
-		/*for (auto const& pluginDir : pluginDirs)
-			for (auto const& item : getAllFiles(basePath / pluginDir))
-				if (filter(item))
-					items.available[wxString(pluginDir) + "/" + removeOff(item)].emplace(mod);*/
-
-		for (auto const& [id, state] : list.overridden)
-		{
-			auto it = list.state.find(id);
-			if (it == list.state.end())
-				continue;
-
-			const auto mod = it->second.mod;
-			const auto copyFrom =
-				modsPath / mod.ToStdString() / "EraPlugins" /
-				(id + (it->second.state == PluginState::disabled ? ".off" : "")).ToStdString();
-
-			if (state != PluginState::disabled)
-			{
-				std::filesystem::copy_file(copyFrom, targetPath / id.ToStdString(),
-										   std::filesystem::copy_options::overwrite_existing);
-			}
-			else
-			{
-				std::ofstream(targetPath / id.ToStdString());
-			}
-		}
-	}
 }
 
 Era2Platform::Era2Platform(Application const& app)
@@ -184,8 +121,8 @@ Era2Platform::Era2Platform(Application const& app)
 	_modManager               = std::make_unique<Era2ModManager>(_modList);
 
 	_plugins    = era2_plugin_helper::loadPhysicalStructure(getModsDirPath());
-	_pluginList = era2_plugin_helper::load(_plugins, _modList);
-	loadPlugins(getPluginListPath(), _pluginList);
+	_pluginList = era2_plugin_helper::updateAvailability(_plugins, _modList);
+	era2_plugin_helper::loadManagedState(_pluginList, getPluginListPath());
 	_initialPluginList = _pluginList;
 	_pluginManager     = std::make_unique<Era2PluginManager>(_pluginList);
 
@@ -193,7 +130,7 @@ Era2Platform::Era2Platform(Application const& app)
 		[this]
 		{
 			// TODO: make better
-			era2_plugin_helper::load(_pluginList, _plugins, _modList);
+			era2_plugin_helper::updateAvailability(_pluginList, _plugins, _modList);
 			_pluginManager->plugins(_pluginList);
 		});
 }
@@ -270,7 +207,7 @@ void Era2Platform::apply()
 
 	_initalModList = _modList;
 
-	savePlugins(getPluginListPath(), getModsDirPath(), _pluginList);
+	era2_plugin_helper::saveManagedState(getPluginListPath(), getModsDirPath(), _pluginList);
 
 	_initialPluginList = _pluginList;
 }

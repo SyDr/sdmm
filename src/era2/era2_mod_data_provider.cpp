@@ -28,7 +28,7 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(wxString const& id)
 	if (it == _data.cend())
 	{
 		auto modData =
-			mm::era2_mod_loader::load(_basePath / id.ToStdWstring(), _preferredLng, _defaultIncompatible[id],
+			mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdWstring(), _preferredLng, _defaultIncompatible[id],
 									  _defaultRequires[id], _defaultLoadAfter[id]);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));

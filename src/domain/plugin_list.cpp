@@ -15,6 +15,7 @@ using namespace mm;
 void PluginList::overrideState(const wxString& item, PluginState newState)
 {
 	overridden[item] = newState;
+	available.emplace(item);
 }
 
 std::optional<ModPluginState> PluginList::defaultState(const wxString& item) const

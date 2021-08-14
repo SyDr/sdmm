@@ -11,9 +11,11 @@
 #include "domain/mod_list.hpp"
 #include "domain/plugin_list.hpp"
 #include "system_info.hpp"
+#include "utility/fs_util.h"
 #include "utility/json_util.h"
 
 #include <fmt/format.h>
+#include <nlohmann/json.hpp>
 
 #include <filesystem>
 
@@ -21,23 +23,18 @@ using namespace mm;
 
 namespace
 {
-	constexpr auto eraPluginsDir = "EraPlugins";
-	constexpr auto offExtension  = ".off";
-
-	constexpr std::array     pluginDirs = { ".", "BeforeWog", "AfterWog" };
-	const std::set<std::string> pluginExts = { ".dll", ".bin", ".era" };
-
 	bool isPlugin(fspath path)
 	{
-		if (path.extension().string() == offExtension)
+		if (path.extension().string() == constant::pluginOffExtension)
 			path = path.filename().replace_extension();
 
-		return path.has_extension() && pluginExts.count(path.extension().string());
+		return path.has_extension() && constant::pluginExts.count(path.extension().string());
 	}
 }
 
-void era2_plugin_helper::load(PluginList& current, const Era2PLuginListPhysicalStructure& structure,
-							  const ModList& mods)
+void era2_plugin_helper::updateAvailability(PluginList&                            current,
+											const Era2PLuginListPhysicalStructure& structure,
+											const ModList&                         mods)
 {
 	current.available.clear();
 	current.state.clear();
@@ -55,10 +52,10 @@ void era2_plugin_helper::load(PluginList& current, const Era2PLuginListPhysicalS
 				wxString id      = item;
 				bool     enabled = true;
 
-				if (id.ends_with(wxString(offExtension)))
+				if (id.ends_with(wxString(constant::pluginOffExtension)))
 				{
 					enabled = false;
-					id      = id.RemoveLast(std::char_traits<const char>::length(offExtension));
+					id = id.RemoveLast(std::char_traits<const char>::length(constant::pluginOffExtension));
 				}
 
 				return std::make_pair(id, enabled);
@@ -73,10 +70,11 @@ void era2_plugin_helper::load(PluginList& current, const Era2PLuginListPhysicalS
 		current.available.emplace(item.first);
 }
 
-mm::PluginList era2_plugin_helper::load(const Era2PLuginListPhysicalStructure& structure, const ModList& mods)
+mm::PluginList era2_plugin_helper::updateAvailability(const Era2PLuginListPhysicalStructure& structure,
+													  const ModList&                         mods)
 {
 	PluginList result;
-	load(result, structure, mods);
+	updateAvailability(result, structure, mods);
 
 	return result;
 }
@@ -96,9 +94,9 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 			continue;
 
 		auto& place = result.data[wxString::FromUTF8(modId.string())];
-		for (const auto& dir : pluginDirs)
+		for (const auto& dir : constant::pluginDirs)
 		{
-			const auto subPath = it->path() / eraPluginsDir / dir;
+			const auto subPath = it->path() / constant::pluginSubdir / dir;
 			if (!std::filesystem::is_directory(subPath))
 				continue;
 
@@ -118,4 +116,64 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 	}
 
 	return result;
+}
+
+void mm::era2_plugin_helper::loadManagedState(PluginList& target, const fspath& pluginPath)
+{
+	if (std::ifstream datafile(pluginPath.string()); datafile)
+	{
+		try
+		{
+			auto data = nlohmann::json::parse(datafile);
+			for (auto& [key, value] : data.items())
+			{
+				target.overrideState(key, value == "enabled" ? PluginState::enabled : PluginState::disabled);
+			}
+		}
+		catch (...)
+		{
+			wxLogDebug("Can't parse data file");
+		}
+	}
+}
+
+void era2_plugin_helper::saveManagedState(const fspath& pluginPath, const fspath& modsPath,
+										  const PluginList& list)
+{
+	nlohmann::json data = nlohmann::json::object();
+	for (const auto& item : list.overridden)
+		data[item.first.ToStdString()] = (item.second == PluginState::enabled ? "enabled" : "disabled");
+
+	overwriteFileContent(pluginPath, data.dump(2));
+
+	auto targetPath = modsPath / constant::mm_managed_mod / constant::pluginSubdir;
+	for (const auto& dir : constant::pluginDirs)
+	{
+		const auto subPath = targetPath / dir;
+		std::filesystem::remove_all(subPath);
+		std::filesystem::create_directories(subPath);
+	}
+
+	for (auto const& [id, state] : list.overridden)
+	{
+		auto it = list.state.find(id);
+		if (it == list.state.end())
+			continue;
+
+		const auto mod = it->second.mod;
+		const auto copyFrom =
+			modsPath / mod.ToStdString() / constant::pluginSubdir /
+			(id + (it->second.state == PluginState::disabled ? constant::pluginOffExtension : ""))
+				.ToStdString();
+
+		if (state != PluginState::disabled)
+		{
+			std::filesystem::copy_file(copyFrom, targetPath / id.ToStdString(),
+									   std::filesystem::copy_options::overwrite_existing);
+		}
+		else
+		{
+			std::ofstream(targetPath / id.ToStdString());
+		}
+	}
 }
