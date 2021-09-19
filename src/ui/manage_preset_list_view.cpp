@@ -60,8 +60,8 @@ void ManagePresetListView::refreshListContent()
 	auto const& list = _platform.getPresetManager()->list();
 	for (const auto& preset : list)
 	{
-		std::vector<wxVariant> data;
-		data.emplace_back(wxVariant(wxDataViewIconText(
+		wxVector<wxVariant> data;
+		data.push_back(wxVariant(wxDataViewIconText(
 			preset, _iconStorage.get(preset == _selected ? embedded_icon::tick : embedded_icon::blank))));
 		_list->AppendItem(data);
 
@@ -212,7 +212,7 @@ void ManagePresetListView::onRenamePreset()
 
 	const wxString    selected = getSelection();
 	wxTextEntryDialog ted(this, "Enter profile name"_lng, "Rename"_lng, selected);
-	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxEmptyString;
+	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxString();
 
 	if (!_platform.getPresetManager()->exists(newName))
 	{
@@ -230,7 +230,7 @@ void ManagePresetListView::onCopyPreset()
 
 	const wxString    selected = getSelection();
 	wxTextEntryDialog ted(this, "Enter profile name"_lng, "Copy"_lng, selected);
-	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxEmptyString;
+	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxString();
 
 	if (!newName.empty() && !_platform.getPresetManager()->list().count(newName))
 		_platform.getPresetManager()->copy(selected.ToStdString(), newName.ToStdString());

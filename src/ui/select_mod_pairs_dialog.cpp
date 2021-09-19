@@ -124,8 +124,8 @@ void SelectModPairsDialog::fillData()
 	{
 		auto const& [mod1, mod2] = _values[i];
 
-		std::vector<wxVariant> data;
-		data.emplace_back(wxVariant(false));
+		wxVector<wxVariant> data;
+		data.push_back(wxVariant(false));
 		for (auto const& item : { mod1, mod2 })
 		{
 			wxIcon     icon;
@@ -136,7 +136,7 @@ void SelectModPairsDialog::fillData()
 			else
 				icon = _iconStorage.get(embedded_icon::folder);
 
-			data.emplace_back(wxVariant(wxDataViewIconText(mod->caption, icon)));
+			data.push_back(wxVariant(wxDataViewIconText(mod->caption, icon)));
 		}
 
 		_list->AppendItem(data);

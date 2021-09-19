@@ -111,8 +111,8 @@ void ShowFileListDialog::fillData()
 		auto const& path    = _data.fileList[i];
 		auto const& modList = _data.entries[i];
 
-		std::vector<wxVariant> data;
-		data.emplace_back(wxVariant(wxString(path)));
+		wxVector<wxVariant> data;
+		data.push_back(wxVariant(wxString(path)));
 		for (auto const& mod : modList)
 		{
 			wxString item;
@@ -123,7 +123,7 @@ void ShowFileListDialog::fillData()
 			if (mod.lod)
 				item.Append('A');
 
-			data.emplace_back(wxVariant(item));
+			data.push_back(wxVariant(item));
 		}
 
 		_fileList->AppendItem(data);

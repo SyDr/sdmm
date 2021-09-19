@@ -93,7 +93,7 @@ void ModListView::bindEvents()
 				[=](wxDataViewEvent&)
 				{
 					const auto item = _list->GetSelection();
-					_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxEmptyString;
+					_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxString();
 					updateControlsState();
 				});
 

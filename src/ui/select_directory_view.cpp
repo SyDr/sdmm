@@ -145,7 +145,7 @@ void SelectDirectoryDialog::fillData()
 		wxIcon icon = _iconStorage.get(_appConfig.dataPathHasStar(value) ? embedded_icon::bookmark : embedded_icon::blank);
 
 		wxVector<wxVariant> data;
-		data.emplace_back(wxVariant(wxDataViewIconText(value.string(), icon)));
+		data.push_back(wxVariant(wxDataViewIconText(value.string(), icon)));
 
 		_recentDirsList->AppendItem(data);
 		if (value == getSelectedPath().ToStdString())
