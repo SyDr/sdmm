@@ -145,7 +145,18 @@ void PluginListModel::reload()
 {
 	_displayedItems.clear();
 	for (const auto& item : _items.available)
-		_displayedItems.emplace_back(item);
+	{
+		bool display = _showHidden || _items.overriddenState(item).has_value();
+		if (!display)
+		{
+			const auto value = _items.defaultState(item);
+			display          = value.has_value() && value->state == PluginState::disabled;
+		}
+
+		if (display)
+			_displayedItems.emplace_back(item);
+
+	}
 
 	Reset(_displayedItems.size());
 }

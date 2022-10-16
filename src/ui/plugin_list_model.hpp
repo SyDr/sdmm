@@ -60,5 +60,7 @@ namespace mm
 
 		wxString              _selected;
 		std::vector<wxString> _displayedItems;
+
+		bool _showHidden = false;
 	};
 }

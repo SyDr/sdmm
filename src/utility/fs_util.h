@@ -14,7 +14,7 @@
 
 namespace mm
 {
-	void overwriteFileContent(const fspath& path, const std::string& content);
+	void overwriteFileContent(const fs::path& path, const std::string& content);
 
 	bool createDir(const std::filesystem::path& path);
 	bool copyDir(const wxString& path, const wxString& newPath);

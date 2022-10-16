@@ -15,11 +15,12 @@
 #include "error_view.h"
 #include "interface/domain/ilocal_config.h"
 #include "mod_list_model.h"
+#include "plugin_list_model.hpp"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
-
 #include "interface/service/iicon_storage.h"
 #include "types/embedded_icon.h"
+
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <fmt/format.h>
@@ -41,9 +42,10 @@ ManagePresetListView::ManagePresetListView(wxWindow* parent, IModPlatform& platf
 	, _platform(platform)
 	, _selected(platform.localConfig()->getAcitvePreset())
 	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage, true))
+	, _pluginListModel(new PluginListModel(*platform.modDataProvider(), iconStorage))
 	, _iconStorage(iconStorage)
 {
-	MM_EXPECTS(parent, unexpected_error);
+	MM_EXPECTS(parent, mm::unexpected_error);
 
 	createControls();
 
@@ -57,7 +59,7 @@ void ManagePresetListView::refreshListContent()
 	_list->DeleteAllItems();
 	_profiles.clear();
 
-	auto const& list = _platform.getPresetManager()->list();
+	const auto list = _platform.getPresetManager()->list();
 	for (const auto& preset : list)
 	{
 		wxVector<wxVariant> data;
@@ -93,6 +95,10 @@ void ManagePresetListView::createControls()
 	_mods = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 							   wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
 	_mods->AssociateModel(_listModel.get());
+
+	_plugins = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+								  wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
+	_plugins->AssociateModel(_pluginListModel.get());
 
 	createListColumns();
 }
@@ -273,7 +279,7 @@ void ManagePresetListView::updateModList()
 		if (!selected.empty())
 		{
 			mods           = _platform.getPresetManager()->loadPreset(selected);
-			mods.available = _platform.modManager()->mods().available;
+			//mods.available = _platform.modManager()->mods().available;
 		}
 
 		_listModel->setModList(mods);

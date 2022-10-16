@@ -44,7 +44,7 @@ void Era2ModDataProvider::loadDefaults()
 	auto data = nlohmann::json::parse(datafile);
 	MM_EXPECTS(data.is_object(), unexpected_error);
 
-	for (auto const& [key, item] : data["incompatible"].items())
+	for (const auto& [key, item] : data["incompatible"].items())
 	{
 		auto wxKey = wxString::FromUTF8(key);
 		for (auto& value : item)
@@ -56,7 +56,7 @@ void Era2ModDataProvider::loadDefaults()
 		}
 	}
 
-	for (auto const& [key, item] : data["requires"].items())
+	for (const auto& [key, item] : data["requires"].items())
 	{
 		auto wxKey = wxString::FromUTF8(key);
 		for (auto& value : item)
@@ -67,7 +67,7 @@ void Era2ModDataProvider::loadDefaults()
 		}
 	}
 
-	for (auto const& [key, item] : data["load_after"].items())
+	for (const auto& [key, item] : data["load_after"].items())
 	{
 		auto wxKey = wxString::FromUTF8(key);
 		for (auto& value : item)

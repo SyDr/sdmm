@@ -32,7 +32,6 @@
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
     <ClCompile Include="ui\resolve_mod_conflicts_view.cpp" />
-    <ClCompile Include="base\mod_conflict_resolver.cpp" />
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\show_file_list_helper.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
@@ -42,6 +41,7 @@
     <ClCompile Include="ui\plugin_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="era2\era2_plugin_helper.cpp" />
+    <ClCompile Include="base\mod_conflict_resolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />

@@ -122,14 +122,14 @@ void SelectModPairsDialog::fillData()
 
 	for (size_t i = 0; i < _values.size(); ++i)
 	{
-		auto const& [mod1, mod2] = _values[i];
+		const auto& [mod1, mod2] = _values[i];
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(false));
-		for (auto const& item : { mod1, mod2 })
+		for (const auto& item : { mod1, mod2 })
 		{
 			wxIcon     icon;
-			auto const mod = _modDataProvider.modData(item);
+			const auto mod = _modDataProvider.modData(item);
 
 			if (!mod->icon_filename.empty())
 				icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());

@@ -61,9 +61,8 @@ MainFrame::MainFrame(Application& app)
 	createMenuBar();
 	CreateStatusBar();
 
-	auto pages = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-								   wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE |
-									   wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_WINDOWLIST_BUTTON);
+	auto panel = new wxPanel(this);
+	auto pages = new wxNotebook(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
 	if (_currentPlatform)
 	{
@@ -86,10 +85,10 @@ MainFrame::MainFrame(Application& app)
 
 		if (_currentPlatform->nonAutoApplicable())
 		{
-			_revertButton = new wxButton(this, wxID_ANY, "main_frame/revert"_lng);
+			_revertButton = new wxButton(panel, wxID_ANY, "main_frame/revert"_lng);
 			_revertButton->SetToolTip("main_frame/revert_tooltip"_lng);
 			_revertButton->SetBitmap(_app.iconStorage().get(embedded_icon::minus));
-			_applyButton = new wxButton(this, wxID_ANY, "main_frame/apply"_lng);
+			_applyButton = new wxButton(panel, wxID_ANY, "main_frame/apply"_lng);
 			_applyButton->SetToolTip("main_frame/apply_tooltip"_lng);
 			_applyButton->SetBitmap(_app.iconStorage().get(embedded_icon::tick));
 		}
@@ -97,13 +96,13 @@ MainFrame::MainFrame(Application& app)
 		if (auto launchHelper = _currentPlatform->launchHelper())
 		{
 			_launchButton = new wxButton(
-				this, wxID_ANY, wxString::Format(wxString("Launch (%s)"_lng), launchHelper->getCaption()));
+				panel, wxID_ANY, wxString::Format(wxString("Launch (%s)"_lng), launchHelper->getCaption()));
 			_launchButton->SetBitmap(launchHelper->getIcon());
 
 			wxSize goodSize = _launchButton->GetBestSize();
 			goodSize.SetWidth(goodSize.GetHeight());
 			_launchManageButton =
-				new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+				new wxButton(panel, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
 			_launchManageButton->SetBitmap(_app.iconStorage().get(embedded_icon::cog));
 			_launchManageButton->SetToolTip("Change executable for launch"_lng);
 		}
@@ -133,8 +132,6 @@ MainFrame::MainFrame(Application& app)
 	}
 
 	layout->Add(pages, wxSizerFlags(1).Expand());
-
-	auto panel = new wxPanel(this);
 	panel->SetSizer(layout);
 
 	auto mainLayout = new wxBoxSizer(wxVERTICAL);

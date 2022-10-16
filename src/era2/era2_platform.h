@@ -46,10 +46,10 @@ namespace mm
 		void revert() override;
 
 	private:
-		fspath getModsDirPath() const;
-		fspath getActiveListPath() const;
-		fspath getHiddenListPath() const;
-		fspath getPluginListPath() const;
+		fs::path getModsDirPath() const;
+		fs::path getActiveListPath() const;
+		fs::path getHiddenListPath() const;
+		fs::path getPluginListPath() const;
 
 	private:
 		Application const&          _app;

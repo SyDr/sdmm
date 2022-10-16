@@ -23,7 +23,7 @@ using namespace mm;
 
 namespace
 {
-	bool isPlugin(fspath path)
+	bool isPlugin(fs::path path)
 	{
 		if (path.extension().string() == constant::pluginOffExtension)
 			path = path.filename().replace_extension();
@@ -79,7 +79,7 @@ mm::PluginList era2_plugin_helper::updateAvailability(const Era2PLuginListPhysic
 	return result;
 }
 
-Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const fspath& base)
+Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const fs::path& base)
 {
 	Era2PLuginListPhysicalStructure result;
 
@@ -102,7 +102,7 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 
 			for (auto subIt = di(subPath), subEnd = di(); subIt != end; ++subIt)
 			{
-				auto pluginPath = subIt->path();
+				auto& pluginPath = subIt->path();
 
 				if (!std::filesystem::is_regular_file(pluginPath))
 					continue;
@@ -118,7 +118,7 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 	return result;
 }
 
-void mm::era2_plugin_helper::loadManagedState(PluginList& target, const fspath& pluginPath)
+void mm::era2_plugin_helper::loadManagedState(PluginList& target, const fs::path& pluginPath)
 {
 	if (std::ifstream datafile(pluginPath.string()); datafile)
 	{
@@ -137,7 +137,7 @@ void mm::era2_plugin_helper::loadManagedState(PluginList& target, const fspath& 
 	}
 }
 
-void era2_plugin_helper::saveManagedState(const fspath& pluginPath, const fspath& modsPath,
+void era2_plugin_helper::saveManagedState(const fs::path& pluginPath, const fs::path& modsPath,
 										  const PluginList& list)
 {
 	nlohmann::json data = nlohmann::json::object();
@@ -154,13 +154,13 @@ void era2_plugin_helper::saveManagedState(const fspath& pluginPath, const fspath
 		std::filesystem::create_directories(subPath);
 	}
 
-	for (auto const& [id, state] : list.overridden)
+	for (const auto& [id, state] : list.overridden)
 	{
 		auto it = list.state.find(id);
 		if (it == list.state.end())
 			continue;
 
-		const auto mod = it->second.mod;
+		const auto& mod = it->second.mod;
 		const auto copyFrom =
 			modsPath / mod.ToStdString() / constant::pluginSubdir /
 			(id + (it->second.state == PluginState::disabled ? constant::pluginOffExtension : ""))

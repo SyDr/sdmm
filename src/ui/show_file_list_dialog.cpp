@@ -108,12 +108,12 @@ void ShowFileListDialog::fillData()
 
 	for (size_t i = 0; i < _data.fileList.size(); ++i)
 	{
-		auto const& path    = _data.fileList[i];
-		auto const& modList = _data.entries[i];
+		const auto& path    = _data.fileList[i];
+		const auto& modList = _data.entries[i];
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxString(path)));
-		for (auto const& mod : modList)
+		for (const auto& mod : modList)
 		{
 			wxString item;
 

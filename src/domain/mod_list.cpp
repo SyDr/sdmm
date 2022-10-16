@@ -73,7 +73,7 @@ void ModList::move(wxString const& from, wxString const& to)
 	if (!posTo.has_value())
 		return;
 
-	auto const step = posFrom.value() < posTo.value() ? 1 : -1;
+	const auto step = posFrom.value() < posTo.value() ? 1 : -1;
 
 	for (auto index = posFrom.value(); index != posTo.value(); index += step)
 		std::swap(active[index], active[index + step]);

@@ -66,7 +66,7 @@ namespace
 
 		for (size_t i = 0; i < result.modList.size(); ++i)
 		{
-			auto const& item    = result.modList[i];
+			const auto& item    = result.modList[i];
 			auto        modData = dataProvider.modData(item);
 
 			if (!std::filesystem::exists(modData->data_path) || !std::filesystem::is_directory(modData->data_path))
@@ -77,8 +77,8 @@ namespace
 			{
 				std::error_code ec;
 
-				auto const path     = it->path().string();
-				auto const relative = std::filesystem::relative(path, modData->data_path, ec);
+				const auto path     = it->path().string();
+				const auto relative = std::filesystem::relative(path, modData->data_path, ec);
 
 				if (ec)
 				{
@@ -101,7 +101,7 @@ namespace
 				if (skip.count(boost::algorithm::to_lower_copy(it->path().filename().wstring())))
 					continue;
 
-				auto const index             = fileIndex(relative);
+				const auto index             = fileIndex(relative);
 				result.entries[index][i].raw = true;
 
 				static const std::unordered_set<std::wstring> pac = {
@@ -133,7 +133,7 @@ namespace
 					std::array<char, 16> filename;
 					file.read(filename.data(), filename.size());
 
-					auto const lodIndex             = fileIndex(relative.parent_path() / filename.data());
+					const auto lodIndex             = fileIndex(relative.parent_path() / filename.data());
 					result.entries[lodIndex][i].lod = true;
 				}
 			}
@@ -142,7 +142,7 @@ namespace
 		size_t current = 0;
 		for (size_t i = 0; i < result.fileList.size(); ++i)
 		{
-			auto const number = std::count_if(result.entries[i].cbegin(), result.entries[i].cend(),
+			const auto number = std::count_if(result.entries[i].cbegin(), result.entries[i].cend(),
 											  [](const Era2DirectoryEntry& item) { return item.any(); });
 
 			if (number > 1)
@@ -164,7 +164,7 @@ namespace
 		std::set<std::pair<wxString, wxString>> result;
 		for (size_t i = 0; i < data.modList.size(); ++i)
 			for (size_t j = i + 1; j < data.modList.size(); ++j)
-				for (auto const& row : data.entries)
+				for (const auto& row : data.entries)
 					if (row[i].any() && row[j].any())
 					{
 						result.emplace(data.modList[i], data.modList[j]);

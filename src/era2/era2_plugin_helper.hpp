@@ -22,13 +22,13 @@ namespace mm
 
 	namespace era2_plugin_helper
 	{
-		Era2PLuginListPhysicalStructure loadPhysicalStructure(const fspath& base);
+		Era2PLuginListPhysicalStructure loadPhysicalStructure(const fs::path& base);
 
 		PluginList updateAvailability(const Era2PLuginListPhysicalStructure& structure, const ModList& mods);
 		void       updateAvailability(PluginList& current, const Era2PLuginListPhysicalStructure& structure,
 									  const ModList& mods);
 
-		void loadManagedState(PluginList& target, const fspath& pluginPath);
-		void saveManagedState(const fspath& pluginPath, const fspath& modsPath, const PluginList& list);
+		void loadManagedState(PluginList& target, const fs::path& pluginPath);
+		void saveManagedState(const fs::path& pluginPath, const fs::path& modsPath, const PluginList& list);
 	}
 }

@@ -21,6 +21,11 @@ namespace mm
 		enabled,
 	};
 
+	inline PluginState switchPluginState(PluginState state)
+	{
+		return state == PluginState::enabled ? PluginState::disabled : PluginState::enabled;
+	}
+
 	struct ModPluginState
 	{
 		wxString    mod;

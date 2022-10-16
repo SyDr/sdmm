@@ -25,6 +25,7 @@ namespace mm
 {
 	struct IModPlatform;
 	class ModListModel;
+	class PluginListModel;
 	class IIconStorage;
 
 	class ManagePresetListView : public wxPanel
@@ -72,5 +73,8 @@ namespace mm
 		wxWidgetsPtr<wxStaticBox>     _preview = nullptr;
 		wxObjectDataPtr<ModListModel> _listModel;
 		wxWidgetsPtr<wxDataViewCtrl>  _mods = nullptr;
+
+		wxObjectDataPtr<PluginListModel> _pluginListModel;
+		wxWidgetsPtr<wxDataViewCtrl> _plugins = nullptr;
 	};
 }

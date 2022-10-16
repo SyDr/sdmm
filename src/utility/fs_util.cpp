@@ -16,7 +16,7 @@
 #include <wx/filename.h>
 #include <wx/log.h>
 
-void mm::overwriteFileContent(const fspath& path, const std::string& content)
+void mm::overwriteFileContent(const fs::path& path, const std::string& content)
 {
 	wxTempFile target(path.string());
 

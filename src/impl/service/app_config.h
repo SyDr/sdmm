@@ -15,12 +15,12 @@ namespace mm
 {
 	struct PortableMode
 	{
-		fspath managedPath;
+		fs::path managedPath;
 	};
 
 	struct MainMode
 	{
-		fspath programDataPath;
+		fs::path programDataPath;
 	};
 
 	struct AppConfig : IAppConfig
@@ -28,8 +28,8 @@ namespace mm
 		AppConfig();
 
 		bool portableMode() const override;
-		fspath dataPath() const override;
-		fspath programPath() const override;
+		fs::path dataPath() const override;
+		fs::path programPath() const override;
 
 		void save() override;
 
@@ -39,21 +39,21 @@ namespace mm
 		wxString selectedPlatform() const override;
 		void setSelectedPlatformCode(const wxString& newPlatform) override;
 
-		fspath getDataPath() const override;
-		void setDataPath(const fspath& path) override;
-		void forgetDataPath(const fspath& path) override;
+		fs::path getDataPath() const override;
+		void setDataPath(const fs::path& path) override;
+		void forgetDataPath(const fs::path& path) override;
 
-		std::vector<fspath> getKnownDataPathList() const override;
+		std::vector<fs::path> getKnownDataPathList() const override;
 
 		void setMainWindowProperties(const MainWindowProperties& props) override;
 		MainWindowProperties mainWindow() const override;
 
-		bool dataPathHasStar(const fspath& path) const override;
-		void starDataPath(const fspath& path, bool star = true) override;
-		void unstarDataPath(const fspath& path) override;
+		bool dataPathHasStar(const fs::path& path) const override;
+		void starDataPath(const fs::path& path, bool star = true) override;
+		void unstarDataPath(const fs::path& path) override;
 
 	private:
-		fspath configFilePath() const;
+		fs::path configFilePath() const;
 		void validate();
 
 	private:

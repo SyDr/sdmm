@@ -24,7 +24,7 @@ namespace
 {
 	std::variant<PortableMode, MainMode> constructProgramMode()
 	{
-		fspath result(wxStandardPaths::Get().GetDataDir().ToStdString());
+		fs::path result(wxStandardPaths::Get().GetDataDir().ToStdString());
 		result = result.parent_path().parent_path() / "_MM_Data";
 		if (std::filesystem::exists(result) && std::filesystem::is_directory(result))
 			return PortableMode(result.make_preferred());
@@ -49,12 +49,12 @@ namespace
 
 	struct DataPath
 	{
-		fspath operator()(const PortableMode& pm)
+		fs::path operator()(const PortableMode& pm)
 		{
 			return pm.managedPath;
 		}
 
-		fspath operator()(const MainMode& mm)
+		fs::path operator()(const MainMode& mm)
 		{
 			return mm.programDataPath;
 		}
@@ -104,14 +104,14 @@ bool AppConfig::portableMode() const
 	return std::visit(IsPortable(), _mode);
 }
 
-fspath AppConfig::dataPath() const
+fs::path AppConfig::dataPath() const
 {
 	return std::visit(DataPath(), _mode);
 }
 
-fspath AppConfig::programPath() const
+fs::path AppConfig::programPath() const
 {
-	return fspath(wxStandardPaths::Get().GetDataDir().ToStdString());
+	return fs::path(wxStandardPaths::Get().GetDataDir().ToStdString());
 }
 
 #define SD_LNG_CODE "language"
@@ -143,11 +143,11 @@ void AppConfig::save()
 	datafile << _data.dump(2);
 }
 
-std::vector<fspath> AppConfig::getKnownDataPathList() const
+std::vector<fs::path> AppConfig::getKnownDataPathList() const
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	std::vector<fspath> result;
+	std::vector<fs::path> result;
 	for (const auto& path :
 		 _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN].get<std::vector<std::string>>())
 		result.emplace_back(path);
@@ -162,7 +162,7 @@ wxString AppConfig::selectedPlatform() const
 	return _data[sd_game][SD_PLATFORM].get<std::string>();
 }
 
-fspath AppConfig::getDataPath() const
+fs::path AppConfig::getDataPath() const
 {
 	if (!portableMode())
 		return _data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED].get<std::string>();
@@ -170,7 +170,7 @@ fspath AppConfig::getDataPath() const
 	return dataPath().parent_path();
 }
 
-void AppConfig::setDataPath(const fspath& path)
+void AppConfig::setDataPath(const fs::path& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
@@ -183,7 +183,7 @@ void AppConfig::setDataPath(const fspath& path)
 	_data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED] = newPath;
 }
 
-void AppConfig::forgetDataPath(const fspath& path)
+void AppConfig::forgetDataPath(const fs::path& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
@@ -277,7 +277,7 @@ MainWindowProperties AppConfig::mainWindow() const
 	return result;
 }
 
-bool AppConfig::dataPathHasStar(const fspath& path) const
+bool AppConfig::dataPathHasStar(const fs::path& path) const
 {
 	const auto toStar     = path.string();
 	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_FAVS];
@@ -286,7 +286,7 @@ bool AppConfig::dataPathHasStar(const fspath& path) const
 	return it != knownPaths.end();
 }
 
-void AppConfig::starDataPath(const fspath& path, bool star /*= true*/)
+void AppConfig::starDataPath(const fs::path& path, bool star /*= true*/)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
@@ -304,12 +304,12 @@ void AppConfig::starDataPath(const fspath& path, bool star /*= true*/)
 		knownPaths.erase(it);
 }
 
-void AppConfig::unstarDataPath(const fspath& path)
+void AppConfig::unstarDataPath(const fs::path& path)
 {
 	starDataPath(path, false);
 }
 
-fspath AppConfig::configFilePath() const
+fs::path AppConfig::configFilePath() const
 {
 	return dataPath() / "settings.json";
 }

@@ -14,6 +14,7 @@
 #include <boost/range/algorithm_ext/erase.hpp>
 #include <boost/range/combine.hpp>
 #include <wx/dir.h>
+#include <wx/textfile.h>
 
 #include "application.h"
 #include "domain/mod_data.hpp"
@@ -39,20 +40,22 @@ using namespace mm;
 
 namespace
 {
-	std::vector<wxString> readFile(const fspath& path)
+	std::vector<wxString> readFile(const fs::path& path)
 	{
-		std::ifstream listFile(path.string());
-
-		std::string tmp;
+		wxTextFile        file;
+		if (!file.Open(path.wstring()))
+			return {};
 
 		std::vector<wxString> result;
-		while (std::getline(listFile, tmp))
-			result.emplace_back(wxString::FromUTF8(tmp));
+		for (auto& str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine())
+			result.emplace_back(str);
+
+		file.Close();
 
 		return result;
 	}
 
-	ModList loadMods(const fspath& activePath, const fspath& hiddenPath, const fspath& modsPath)
+	ModList loadMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath)
 	{
 		ModList items;
 
@@ -84,7 +87,7 @@ namespace
 		return items;
 	}
 
-	void saveMods(const fspath& activePath, const fspath& hiddenPath, const fspath& modsPath,
+	void saveMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath,
 				  const std::vector<wxString>& activeContent, const std::set<wxString>& hiddenContent)
 	{
 		auto                 reversedRange = activeContent | boost::adaptors::reversed;
@@ -185,7 +188,7 @@ IPluginManager* Era2Platform::pluginManager() const
 	return _pluginManager.get();
 }
 
-fspath Era2Platform::getPluginListPath() const
+fs::path Era2Platform::getPluginListPath() const
 {
 	return _localConfig->getProgramDataPath() / "plugins.json";
 }

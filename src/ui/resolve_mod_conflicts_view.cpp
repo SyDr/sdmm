@@ -140,10 +140,10 @@ void ResolveModConflictsView::doResolveConflicts()
 
 	for (size_t i = 0; i < currentlyActive.size();)
 	{
-		auto const currentId = currentlyActive[i];
+		const auto currentId = currentlyActive[i];
 
 		auto modData = modDataProvider->modData(currentId);
-		for (auto const& id : modData->requires_)
+		for (const auto& id : modData->requires_)
 		{
 			activatedInSession.insert(id);
 
@@ -154,7 +154,7 @@ void ResolveModConflictsView::doResolveConflicts()
 			}
 		}
 
-		for (auto const& id : modData->incompatible)
+		for (const auto& id : modData->incompatible)
 		{
 			disabledInSession.insert(id);
 
@@ -172,7 +172,7 @@ void ResolveModConflictsView::doResolveConflicts()
 
 	for (size_t i = 0; !currentlyActive.empty();)
 	{
-		auto const& candidate = currentlyActive[i];
+		const auto& candidate = currentlyActive[i];
 		_log->AppendText(wxString::Format("Position check: %s... "_lng, candidate));
 
 		bool ok = true;
@@ -211,7 +211,7 @@ void ResolveModConflictsView::doResolveConflicts()
 	_log->AppendText("Done\n"_lng);
 
 	currentState.active = sortedActive;
-	for (auto const& item : sortedActive)
+	for (const auto& item : sortedActive)
 		currentState.hidden.erase(item);
 
 	std::swap(currentState, _sortedMods);

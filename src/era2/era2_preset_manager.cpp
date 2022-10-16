@@ -36,8 +36,8 @@ Era2PresetManager::Era2PresetManager(std::filesystem::path rootPath)
 
 void Era2PresetManager::copy(const wxString& from, const wxString& to)
 {
-	auto const pathFrom = toPath(_rootPath, from);
-	auto const pathTo   = toPath(_rootPath, to);
+	const auto pathFrom = toPath(_rootPath, from);
+	const auto pathTo   = toPath(_rootPath, to);
 
 	std::filesystem::copy(pathFrom, pathTo);
 
@@ -46,7 +46,7 @@ void Era2PresetManager::copy(const wxString& from, const wxString& to)
 
 void Era2PresetManager::remove(const wxString& name)
 {
-	auto const path = toPath(_rootPath, name);
+	const auto path = toPath(_rootPath, name);
 
 	std::filesystem::remove(path);
 
@@ -71,8 +71,8 @@ std::set<wxString> Era2PresetManager::list() const
 
 void Era2PresetManager::rename(const wxString& from, const wxString& to)
 {
-	auto const pathFrom = toPath(_rootPath, from);
-	auto const pathTo   = toPath(_rootPath, to);
+	const auto pathFrom = toPath(_rootPath, from);
+	const auto pathTo   = toPath(_rootPath, to);
 
 	std::filesystem::rename(pathFrom, pathTo);
 
@@ -86,7 +86,7 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 
 ModList Era2PresetManager::loadPreset(wxString const& name)
 {
-	auto const    path = toPath(_rootPath, name);
+	const auto    path = toPath(_rootPath, name);
 	ModList       modList;
 	std::ifstream datafile(path);
 
@@ -113,11 +113,11 @@ ModList Era2PresetManager::loadPreset(wxString const& name)
 		return modList;
 
 	if (auto active = data.find("active"); active != data.end() && active->is_array())
-		for (auto const& item : *active)
+		for (const auto& item : *active)
 			modList.active.emplace_back(wxString::FromUTF8(item));
 
 	if (auto hidden = data.find("hidden"); hidden != data.end() && hidden->is_array())
-		for (auto const& item : *hidden)
+		for (const auto& item : *hidden)
 			modList.hidden.emplace(wxString::FromUTF8(item));
 
 	return modList;
@@ -130,14 +130,14 @@ void Era2PresetManager::savePreset(wxString const& name, ModList const& list)
 		active[i] = list.active[i].ToStdString();
 
 	std::vector<std::string> hidden;
-	for (auto const& item : list.hidden)
+	for (const auto& item : list.hidden)
 		hidden.emplace_back(item.ToStdString());
 
 	nlohmann::json data;
 	data["active"] = active;
 	data["hidden"] = hidden;
 
-	auto const path          = toPath(_rootPath, name);
+	const auto path          = toPath(_rootPath, name);
 	bool const already_exist = std::filesystem::exists(path);
 
 	std::ofstream datafile(path);

@@ -21,8 +21,8 @@ namespace mm
 		virtual ~IAppConfig() = default;
 
 		virtual bool   portableMode() const = 0;
-		virtual fspath dataPath() const     = 0;
-		virtual fspath programPath() const  = 0;
+		virtual fs::path dataPath() const     = 0;
+		virtual fs::path programPath() const  = 0;
 
 		virtual void save() = 0;
 
@@ -35,14 +35,14 @@ namespace mm
 		virtual void                 setMainWindowProperties(const MainWindowProperties& props) = 0;
 		virtual MainWindowProperties mainWindow() const                                         = 0;
 
-		virtual fspath getDataPath() const                = 0;
-		virtual void   setDataPath(const fspath& path)    = 0;
-		virtual void   forgetDataPath(const fspath& path) = 0;
+		virtual fs::path getDataPath() const                = 0;
+		virtual void   setDataPath(const fs::path& path)    = 0;
+		virtual void   forgetDataPath(const fs::path& path) = 0;
 
-		virtual bool dataPathHasStar(const fspath& path) const          = 0;
-		virtual void starDataPath(const fspath& path, bool star = true) = 0;
-		virtual void unstarDataPath(const fspath& path)                 = 0;
+		virtual bool dataPathHasStar(const fs::path& path) const          = 0;
+		virtual void starDataPath(const fs::path& path, bool star = true) = 0;
+		virtual void unstarDataPath(const fs::path& path)                 = 0;
 
-		virtual std::vector<fspath> getKnownDataPathList() const = 0;
+		virtual std::vector<fs::path> getKnownDataPathList() const = 0;
 	};
 }

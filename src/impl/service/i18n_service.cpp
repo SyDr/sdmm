@@ -31,7 +31,7 @@ void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix
 
 	for (auto it = data.begin(); it != data.end(); ++it)
 	{
-		auto const key = prefix + it.key();
+		const auto key = prefix + it.key();
 
 		switch (it->type())
 		{
@@ -50,7 +50,7 @@ void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix
 
 wxString I18nService::category(const wxString& category) const
 {
-	if (auto const it = _data.find("category/" + category.Lower()); it != _data.cend())
+	if (const auto it = _data.find("category/" + category.Lower()); it != _data.cend())
 		return it->second;
 
 	return category;

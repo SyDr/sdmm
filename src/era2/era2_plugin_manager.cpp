@@ -42,8 +42,7 @@ void Era2PluginManager::switchState(const wxString& plugin)
 	}
 	else
 	{
-		_items.overrideState(plugin, defaultState->state == PluginState::enabled ? PluginState::disabled
-																				 : PluginState::enabled);
+		_items.overrideState(plugin, switchPluginState(defaultState->state));
 	}
 
 	_listChanged();

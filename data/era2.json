@@ -4,29 +4,17 @@
       "ERA Scripts Rus",
       "WoG Scripts",
       "WoG Scripts Rus"
-    ],
-	"Test4" : [
-	  "WoG",
-	  "BattleHeroes"
-	]
+    ]
   },
   "requires" : {
     "WoG Scripts Rus" : [
       "WoG Scripts",
       "WoG"
-    ],
-	"Test5" : [
-	  "Test1",
-	  "Test2"
-	],
-	"Test3" : [
-	  "Test5"
-	]
+    ]
   },
   "load_after" : {
     "WoG Scripts Rus" : [
       "WoG Scripts",
-      "WoG Scripts Rus",
       "WoG"
     ],
     "ERA Scripts Rus" : [
@@ -41,16 +29,6 @@
     "WoG Scripts" : [
       "WoG Rus",
       "WoG"
-    ],
-	"Test1" : [
-	  "Test2",
-	  "XXL"
-	],
-	"Test2" : [
-	  "Test1"
-	],
-	"Test3" : [
-	  "XXL"
-	]
+    ]
   }
 }

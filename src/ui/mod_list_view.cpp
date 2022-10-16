@@ -13,10 +13,10 @@
 #include "domain/ipreset_manager.hpp"
 #include "domain/mod_data.hpp"
 #include "interface/domain/ilocal_config.h"
+#include "interface/iapp_config.h"
 #include "interface/ilaunch_helper.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/iapp_config.h"
 #include "interface/service/iicon_storage.h"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
@@ -104,7 +104,7 @@ void ModListView::bindEvents()
 				[=](wxDataViewEvent& event)
 				{
 					event.Veto();  // default
-					auto const item = event.GetItem();
+					const auto item = event.GetItem();
 
 					if (!item.IsOk())
 						return;
@@ -128,7 +128,7 @@ void ModListView::bindEvents()
 				[=](wxDataViewEvent& event)
 				{
 					event.Veto();  // default
-					auto const item(event.GetItem());
+					const auto item(event.GetItem());
 
 					if (!item.IsOk())
 						return;
@@ -142,29 +142,30 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP,
 				[=](wxDataViewEvent& event)
 				{
-					if (event.GetDataFormat() != wxDF_UNICODETEXT)
-						return;
-
 					if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
 						return;
 					else if (sortingColumn->GetModelColumn() !=
 							 static_cast<unsigned int>(ModListModel::Column::priority))
 						return;
 
-					auto const item(event.GetItem());
+					const auto item(event.GetItem());
 					if (!item.IsOk())
 						return;
 
 					wxTextDataObject from;
 					from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
 
-					_modManager.move(from.GetText(), _listModel->findIdByItem(item));
+					wxString text = from.GetText();
+					if (text.Last() == L'\0')
+						text = text.Left(text.Len() - 1);
+
+					_modManager.move(text, _listModel->findIdByItem(item));
 				});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU,
 				[=](wxDataViewEvent& event)
 				{
-					auto const item(event.GetItem());
+					const auto item(event.GetItem());
 					if (!item.IsOk())
 					{
 						event.Veto();
@@ -248,7 +249,7 @@ void ModListView::createListColumns()
 
 	r4->EnableEllipsize(wxELLIPSIZE_END);
 
-	auto constexpr columnFlags =
+	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
 	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
@@ -289,7 +290,7 @@ void ModListView::updateControlsState()
 		return;
 	}
 
-	auto const mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	const auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
@@ -385,7 +386,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 				auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 				std::vector<std::string> incompatible;
-				for (auto const& item : _modManager.mods().active)
+				for (const auto& item : _modManager.mods().active)
 				{
 					auto other = _managedPlatform.modDataProvider()->modData(item);
 					if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
@@ -396,16 +397,16 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 				if (!incompatible.empty())
 				{
-					auto const message = fmt::format(
+					/* const auto message = fmt::format(
 						"Mod \"{0}\" is incompatible with {1}.\r\n"
 						"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
 						_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
 
-					auto const answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
+					const auto answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
 													 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 					if (answer != wxYES)
-						return;
+						return;*/
 				}
 			}
 
@@ -447,10 +448,10 @@ void ModListView::onRemoveModRequested()
 
 							  if (!mod->virtual_mod)
 							  {
-								  auto const formatMessage =
+								  const auto formatMessage =
 									  "Are you sure want to delete mod \"%s\"?\n\n"
 									  "It will be deleted to recycle bin, if possible."_lng;
-								  auto const answer = wxMessageBox(
+								  const auto answer = wxMessageBox(
 									  wxString::Format(formatMessage, mod->caption), wxTheApp->GetAppName(),
 									  wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 

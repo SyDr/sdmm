@@ -69,7 +69,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 		return supplyResultWithDefaults();
 	}
 
-	auto const path = loadFrom / mm::constant::mod_info_filename;
+	const auto path = loadFrom / mm::constant::mod_info_filename;
 
 	std::ifstream datafile(path);
 
@@ -111,14 +111,14 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 	}
 
 	[&] {  // load caption
-		auto const it = data.find("caption");
+		const auto it = data.find("caption");
 		if (it == data.end() || !it->is_object())
 		{
 			result.caption = result.id;
 			return;
 		}
 
-		if (auto const preferredIt = it->find(preferredLng);
+		if (const auto preferredIt = it->find(preferredLng);
 			preferredIt != it->end() && preferredIt->is_string())
 		{
 			result.caption = wxString::FromUTF8(preferredIt->get<std::string>());
@@ -128,7 +128,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 		if (preferredLng != mm::constant::default_language)
 		{
-			if (auto const defaultIt = it->find(mm::constant::default_language);
+			if (const auto defaultIt = it->find(mm::constant::default_language);
 				defaultIt != it->end() && defaultIt->is_string())
 			{
 				result.caption = wxString::FromUTF8(defaultIt->get<std::string>());
@@ -141,14 +141,14 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 	}();
 
 	[&] {  // load description
-		auto const it = data.find("description");
+		const auto it = data.find("description");
 		if (it == data.end() || !it->is_object())
 			return;
 
 		[&] {  // load full
-			if (auto const fullIt = it->find("full"); fullIt != it->end() && fullIt->is_object())
+			if (const auto fullIt = it->find("full"); fullIt != it->end() && fullIt->is_object())
 			{
-				if (auto const preferredIt = fullIt->find(preferredLng);
+				if (const auto preferredIt = fullIt->find(preferredLng);
 					preferredIt != fullIt->end() && preferredIt->is_string())
 				{
 					result.full_description =
@@ -159,7 +159,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 				if (preferredLng != mm::constant::default_language)
 				{
-					if (auto const defaultIt = fullIt->find(mm::constant::default_language);
+					if (const auto defaultIt = fullIt->find(mm::constant::default_language);
 						defaultIt != fullIt->end() && defaultIt->is_string())
 					{
 						result.full_description =
@@ -174,9 +174,9 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 		}();
 
 		[&] {  // load short
-			if (auto const shortIt = it->find("short"); shortIt != it->end() && shortIt->is_object())
+			if (const auto shortIt = it->find("short"); shortIt != it->end() && shortIt->is_object())
 			{
-				if (auto const preferredIt = shortIt->find(preferredLng);
+				if (const auto preferredIt = shortIt->find(preferredLng);
 					preferredIt != shortIt->end() && preferredIt->is_string())
 				{
 					result.short_description =
@@ -187,7 +187,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 				if (preferredLng != mm::constant::default_language)
 				{
-					if (auto const defaultIt = shortIt->find(mm::constant::default_language);
+					if (const auto defaultIt = shortIt->find(mm::constant::default_language);
 						defaultIt != shortIt->end() && defaultIt->is_string())
 					{
 						result.short_description =
@@ -216,29 +216,29 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 	result.homepage_link = get_string_value(&data, "homepage");
 
-	if (auto const compat = data.find("compatibility"); compat != data.end())
+	if (const auto compat = data.find("compatibility"); compat != data.end())
 	{
-		if (auto const req = compat->find("requires"); req != compat->end() && req->is_array())
+		if (const auto req = compat->find("requires"); req != compat->end() && req->is_array())
 		{
-			for (auto const& item : *req)
+			for (const auto& item : *req)
 				if (item.is_string())
 					result.requires_.emplace(item.get<std::string>());
 
 			hasRequires = true;
 		}
 
-		if (auto const after = compat->find("load_after"); after != compat->end() && after->is_array())
+		if (const auto after = compat->find("load_after"); after != compat->end() && after->is_array())
 		{
-			for (auto const& item : *after)
+			for (const auto& item : *after)
 				if (item.is_string())
 					result.load_after.emplace(item.get<std::string>());
 
 			hasLoadAfter = true;
 		}
 
-		if (auto const inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())
+		if (const auto inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())
 		{
-			for (auto const& item : *inc)
+			for (const auto& item : *inc)
 				if (item.is_string())
 					result.incompatible.emplace(item.get<std::string>());
 

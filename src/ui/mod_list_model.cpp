@@ -77,7 +77,7 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	{
 		wxIcon icon;
 
-		auto const mod = _modDataProvider.modData(item);
+		const auto mod = _modDataProvider.modData(item);
 
 		if (!mod->icon_filename.empty())
 			icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());
@@ -89,19 +89,19 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	}
 	case Column::author:
 	{
-		auto const mod = _modDataProvider.modData(item);
+		const auto mod = _modDataProvider.modData(item);
 		variant        = wxVariant(mod->authors);
 		break;
 	}
 	case Column::category:
 	{
-		auto const mod = _modDataProvider.modData(item);
+		const auto mod = _modDataProvider.modData(item);
 		variant        = wxVariant(wxGetApp().categoryTranslationString(mod->category));
 		break;
 	}
 	case Column::version:
 	{
-		auto const mod = _modDataProvider.modData(item);
+		const auto mod = _modDataProvider.modData(item);
 		variant        = wxVariant(mod->mod_version);
 		break;
 	}
@@ -161,8 +161,8 @@ int ModListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem& ite
 
 	if (static_cast<Column>(column) == Column::priority)
 	{
-		auto const row1 = GetRow(item1);
-		auto const row2 = GetRow(item2);
+		const auto row1 = GetRow(item1);
+		const auto row2 = GetRow(item2);
 
 		bool const active1 = _list.isActive(_displayedItems[GetRow(item1)]);
 		bool const active2 = _list.isActive(_displayedItems[GetRow(item2)]);

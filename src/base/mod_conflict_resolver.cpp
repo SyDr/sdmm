@@ -5,15 +5,13 @@
 
 #include "stdafx.h"
 
+#include <wx/string.h>
+
 #include "application.h"
 #include "domain/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
 #include "mod_conflict_resolver.hpp"
-
-#include <wx/string.h>
-
-#include <fmt/format.h>
 
 #include <set>
 
@@ -28,15 +26,15 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 
 	for (size_t i = 0; i < currentlyActive.size();)
 	{
-		auto const currentId = currentlyActive[i];
+		const auto currentId = currentlyActive[i];
 
 		auto modData = modDataProvider.modData(currentId);
-		for (auto const& id : modData->requires_)
+		for (const auto& id : modData->requires_)
 		{
 			activatedInSession[id].insert(currentId);
 
-			if (std::find(currentlyActive.cbegin(), currentlyActive.cend(), id) ==
-				currentlyActive.cend())
+			if (std::find(currentlyActive.begin(), currentlyActive.end(), id) ==
+				currentlyActive.end())
 				currentlyActive.emplace_back(id);
 
 			if (modDataProvider.modData(id)->virtual_mod)
@@ -45,22 +43,22 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 									 "but unavailable"_lng,
 									 id, currentId));
 
-			if (auto it = disabledInSession.find(id); it != disabledInSession.cend())
+			if (auto it = disabledInSession.find(id); it != disabledInSession.end())
 				wxLogWarning(
 					wxString::Format("Mod %s required by %s, "
 									 "but incompatible with (%s)"_lng,
 									 id, currentId, boost::algorithm::join(it->second, ", ")));
 		}
 
-		for (auto const& id : modData->incompatible)
+		for (const auto& id : modData->incompatible)
 		{
 			disabledInSession[id].insert(currentId);
 
-			if (auto it = std::find(currentlyActive.cbegin(), currentlyActive.cend(), id);
-				it != currentlyActive.cend())
+			if (auto it = std::find(currentlyActive.begin(), currentlyActive.end(), id);
+				it != currentlyActive.end())
 				currentlyActive.erase(it);
 
-			if (auto it = activatedInSession.find(id); it != activatedInSession.cend())
+			if (auto it = activatedInSession.find(id); it != activatedInSession.end())
 				wxLogWarning(
 					wxString::Format("Mod %s incompatible with %s, "
 									 "but required by (%s)"_lng,
@@ -74,7 +72,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 
 	for (size_t i = 0; !currentlyActive.empty();)
 	{
-		auto const& candidate = currentlyActive[i];
+		const auto& candidate = currentlyActive[i];
 
 		bool ok = true;
 		for (size_t j = 0; ok && j < currentlyActive.size(); ++j)
@@ -89,7 +87,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 		if (ok)
 		{
 			sortedActive.emplace_back(candidate);
-			currentlyActive.erase(currentlyActive.cbegin() + i);
+			currentlyActive.erase(currentlyActive.begin() + i);
 			i = 0;
 		}
 		else
@@ -102,14 +100,14 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 					"%s placed at the top"_lng,
 					boost::algorithm::join(currentlyActive, ", "), currentlyActive.front()));
 				sortedActive.emplace_back(currentlyActive.front());
-				currentlyActive.erase(currentlyActive.cbegin());
+				currentlyActive.erase(currentlyActive.begin());
 				i = 0;
 			}
 		}
 	}
 
 	mods.active = sortedActive;
-	for (auto const& item : sortedActive)
+	for (const auto& item : sortedActive)
 		mods.hidden.erase(item);
 
 	return mods;
