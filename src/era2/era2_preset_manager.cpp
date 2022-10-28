@@ -65,7 +65,6 @@ std::set<wxString> Era2PresetManager::list() const
 			result.emplace(di->path().stem());
 	}
 
-
 	return result;
 }
 
@@ -84,16 +83,18 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 	return _listChanged;
 }
 
-ModList Era2PresetManager::loadPreset(wxString const& name)
+std::pair<ModList, std::unordered_map<wxString, PluginState>>
+Era2PresetManager::loadPreset(wxString const& name)
 {
 	const auto    path = toPath(_rootPath, name);
 	ModList       modList;
+	std::unordered_map<wxString, PluginState> pluginList;
 	std::ifstream datafile(path);
 
 	if (!datafile)
 	{
 		wxLogError(wxString::Format("Cannot open file %s"_lng, path.string()));
-		return modList;
+		return { modList, pluginList };
 	}
 
 	nlohmann::json data;
@@ -106,39 +107,64 @@ ModList Era2PresetManager::loadPreset(wxString const& name)
 	{
 		wxLogError(e.what());
 		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.string()));
-		return modList;
+		return { modList, pluginList };
 	}
 
 	if (!data.is_object())
-		return modList;
+		return { modList, pluginList };
 
-	if (auto active = data.find("active"); active != data.end() && active->is_array())
-		for (const auto& item : *active)
-			modList.active.emplace_back(wxString::FromUTF8(item));
+	if (auto mods = data.find("mods"); mods != data.end() && mods->is_object())
+	{
+		if (auto active = mods->find("active"); active != mods->end() && active->is_array())
+			for (const auto& item : *active)
+				modList.active.emplace_back(wxString::FromUTF8(item));
 
-	if (auto hidden = data.find("hidden"); hidden != data.end() && hidden->is_array())
-		for (const auto& item : *hidden)
-			modList.hidden.emplace(wxString::FromUTF8(item));
+		if (auto hidden = mods->find("hidden"); hidden != mods->end() && hidden->is_array())
+			for (const auto& item : *hidden)
+				modList.hidden.emplace(wxString::FromUTF8(item));
+	}
+	
+	if (auto plugins = data.find("plugins"); plugins != data.end() && plugins->is_object())
+	{
+		if (auto enabled = plugins->find("enabled"); enabled != plugins->end() && enabled->is_array())
+			for (const auto& item : *enabled)
+				pluginList[wxString::FromUTF8(item)] = PluginState::enabled;
 
-	return modList;
+		if (auto disabled = plugins->find("disabled"); disabled != plugins->end() && disabled->is_array())
+			for (const auto& item : *disabled)
+				pluginList[wxString::FromUTF8(item)] = PluginState::disabled;
+	}
+
+	return { modList, pluginList };
 }
 
-void Era2PresetManager::savePreset(wxString const& name, ModList const& list)
+void Era2PresetManager::savePreset(const wxString& name, const ModList& list,
+								   const std::unordered_map<wxString, PluginState>& plugins)
 {
-	std::vector<std::string> active(list.active.size());
-	for (size_t i = 0; i < list.active.size(); ++i)
-		active[i] = list.active[i].ToStdString();
-
-	std::vector<std::string> hidden;
-	for (const auto& item : list.hidden)
-		hidden.emplace_back(item.ToStdString());
-
 	nlohmann::json data;
-	data["active"] = active;
-	data["hidden"] = hidden;
+
+	data["mods"]           = nlohmann::json::object();
+	data["mods"]["active"] = nlohmann::json::array();
+	data["mods"]["hidden"] = nlohmann::json::array();
+
+	for (const auto& item : list.active)
+		data["mods"]["active"].emplace_back(item.ToStdString());
+
+	for (const auto& item : list.hidden)
+		data["mods"]["hidden"].emplace_back(item.ToStdString());
+
+	data["plugins"]           = nlohmann::json::object();
+	data["plugins"]["enabled"] = nlohmann::json::array();
+	data["plugins"]["disabled"] = nlohmann::json::array();
+
+	for (const auto& item : plugins)
+		if (item.second == PluginState::enabled)
+			data["plugins"]["enabled"].emplace_back(item.first.ToStdString());
+		else
+			data["plugins"]["disabled"].emplace_back(item.first.ToStdString());
 
 	const auto path          = toPath(_rootPath, name);
-	bool const already_exist = std::filesystem::exists(path);
+	const bool already_exist = std::filesystem::exists(path);
 
 	std::ofstream datafile(path);
 	datafile << data.dump(2);

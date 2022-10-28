@@ -9,11 +9,13 @@
 #include "domain/mod_data.hpp"
 #include "era2_config.h"
 #include "era2_plugin_manager.hpp"
+#include "era2_mod_manager.h"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "utility/string_util.h"
+#include "era2_plugin_helper.hpp"
 
 #include <wx/dir.h>
 
@@ -21,31 +23,61 @@
 
 using namespace mm;
 
-Era2PluginManager::Era2PluginManager(PluginList& items)
-	: _items(items)
+Era2PluginManager::Era2PluginManager(Era2ModManager& modManager, const fs::path& modsDir, const fs::path& listPath)
+	: _modManager(modManager)
+	, _modsDir(modsDir)
+	, _listPath(listPath)
 {
+	_physicalStructure = era2_plugin_helper::loadPhysicalStructure(modsDir);
+	_pluginList        = era2_plugin_helper::loadBaseState(_physicalStructure, _modManager.mods());
+	era2_plugin_helper::loadManagedState(_pluginList, listPath);
+	_initialPluginList = _pluginList;
+
+	_modManager.onListChanged().connect(
+		[this]
+		{
+			era2_plugin_helper::updateBaseState(_pluginList, _physicalStructure, _modManager.mods());
+			_listChanged();
+		});
 }
 
 const PluginList& Era2PluginManager::plugins() const
 {
-	return _items;
+	return _pluginList;
 }
 
 void Era2PluginManager::switchState(const wxString& plugin)
 {
-	auto defaultState = _items.defaultState(plugin);
-	auto currentState = _items.overriddenState(plugin);
+	auto defaultState = _pluginList.defaultState(plugin);
+	auto currentState = _pluginList.overriddenState(plugin);
 
 	if (currentState.has_value() || !defaultState.has_value())
 	{
-		_items.reset(plugin);
+		_pluginList.reset(plugin);
 	}
 	else
 	{
-		_items.overrideState(plugin, switchPluginState(defaultState->state));
+		_pluginList.overrideState(plugin, switchPluginState(defaultState->state));
 	}
 
 	_listChanged();
+}
+
+void Era2PluginManager::save()
+{
+	era2_plugin_helper::saveManagedState(_listPath, _modsDir, _pluginList);
+
+	_initialPluginList = _pluginList;
+}
+
+bool Era2PluginManager::changed() const
+{
+	return _pluginList != _initialPluginList;
+}
+
+void Era2PluginManager::revert()
+{
+	plugins(_initialPluginList);
 }
 
 sigslot::signal<>& Era2PluginManager::onListChanged()
@@ -55,7 +87,12 @@ sigslot::signal<>& Era2PluginManager::onListChanged()
 
 void Era2PluginManager::plugins(PluginList items)
 {
-	_items = std::move(items);
+	_pluginList = std::move(items);
 
 	_listChanged();
+}
+
+void Era2PluginManager::updateBaseState(PluginList& plugins, const ModList& mods) const
+{
+	era2_plugin_helper::updateBaseState(plugins, _physicalStructure, mods);
 }

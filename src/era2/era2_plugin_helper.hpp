@@ -24,9 +24,9 @@ namespace mm
 	{
 		Era2PLuginListPhysicalStructure loadPhysicalStructure(const fs::path& base);
 
-		PluginList updateAvailability(const Era2PLuginListPhysicalStructure& structure, const ModList& mods);
-		void       updateAvailability(PluginList& current, const Era2PLuginListPhysicalStructure& structure,
-									  const ModList& mods);
+		PluginList loadBaseState(const Era2PLuginListPhysicalStructure& structure, const ModList& mods);
+		void       updateBaseState(PluginList& current, const Era2PLuginListPhysicalStructure& structure,
+								   const ModList& mods);
 
 		void loadManagedState(PluginList& target, const fs::path& pluginPath);
 		void saveManagedState(const fs::path& pluginPath, const fs::path& modsPath, const PluginList& list);

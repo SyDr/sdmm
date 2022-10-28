@@ -8,18 +8,19 @@
 #include "manage_preset_list_view.hpp"
 
 #include "application.h"
-#include "interface/imod_manager.hpp"
-#include "interface/imod_platform.hpp"
+#include "domain/iplugin_manager.hpp"
 #include "domain/ipreset_manager.hpp"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
 #include "interface/domain/ilocal_config.h"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
+#include "interface/service/iicon_storage.h"
 #include "mod_list_model.h"
 #include "plugin_list_model.hpp"
+#include "types/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
-#include "interface/service/iicon_storage.h"
-#include "types/embedded_icon.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -101,6 +102,7 @@ void ManagePresetListView::createControls()
 	_plugins->AssociateModel(_pluginListModel.get());
 
 	createListColumns();
+	createPluginsListColumns();
 }
 
 void ManagePresetListView::createListColumns()
@@ -123,6 +125,30 @@ void ManagePresetListView::createListColumns()
 	column0->SetSortOrder(true);
 }
 
+void ManagePresetListView::createPluginsListColumns()
+{
+	auto r0 = new mmPriorityDataRenderer();
+	auto r1 = new wxDataViewTextRenderer();
+
+	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
+
+	constexpr auto columnFlags =
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
+
+	auto column0 = new wxDataViewColumn("", r0, static_cast<unsigned int>(PluginListModel::Column::state),
+										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
+	auto column1 =
+		new wxDataViewColumn("Plugin"_lng, r1, static_cast<unsigned int>(PluginListModel::Column::caption),
+							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
+	_plugins->AppendColumn(column0);
+	_plugins->AppendColumn(column1);
+
+	column1->SetSortOrder(true);
+}
+
 void ManagePresetListView::updateLayout()
 {
 	auto manageControls = new wxBoxSizer(wxVERTICAL);
@@ -138,7 +164,8 @@ void ManagePresetListView::updateLayout()
 	midControls->Add(manageControls, wxSizerFlags(0));
 
 	auto previewGroup = new wxStaticBoxSizer(_preview, wxVERTICAL);
-	previewGroup->Add(_mods, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	previewGroup->Add(_mods, wxSizerFlags(3).Expand().Border(wxALL, 5));
+	previewGroup->Add(_plugins, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(midControls, wxSizerFlags(2).Expand().Border(wxALL, 5));
@@ -164,52 +191,62 @@ void ManagePresetListView::bindEvents()
 
 void ManagePresetListView::onSavePresetRequested(wxString baseName)
 {
-	try_handle_exceptions(this, [&] {
-		if (baseName.empty())
+	try_handle_exceptions(
+		this,
+		[&]
 		{
-			wxTextEntryDialog ted(this, "Enter profile name"_lng, "Create"_lng, baseName);
-			ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
-			ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
+			if (baseName.empty())
+			{
+				wxTextEntryDialog ted(this, "Enter profile name"_lng, "Create"_lng, baseName);
+				ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
+				ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
 
-			if (ted.ShowModal() != wxID_OK)
-				return;
+				if (ted.ShowModal() != wxID_OK)
+					return;
 
-			baseName = ted.GetValue();
-		}
+				baseName = ted.GetValue();
+			}
 
-		if (_platform.getPresetManager()->exists(baseName))
-		{
-			int const answer =
-				wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
-								wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+			if (_platform.getPresetManager()->exists(baseName))
+			{
+				int const answer =
+					wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
+								 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
-			if (answer != wxYES)
-				return;
-		}
+				if (answer != wxYES)
+					return;
+			}
 
-		_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods());
-		_platform.localConfig()->setActivePreset(baseName);
-		_selected = baseName;
+			_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods(),
+													 _platform.pluginManager()->plugins().overridden);
+			_platform.localConfig()->setActivePreset(baseName);
+			_selected = baseName;
 
-		refreshListContent();
-		// EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
-	});
+			refreshListContent();
+			// EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+		});
 }
 
 void ManagePresetListView::onLoadPresetRequested()
 {
-	try_handle_exceptions(this, [&] {
-		auto selected = getSelection();
-		auto mods     = _platform.getPresetManager()->loadPreset(selected);
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  auto selected           = getSelection();
+							  auto [mods, overridden] = _platform.getPresetManager()->loadPreset(selected);
 
-		mods.available = _platform.modManager()->mods().available;
+							  mods.available = _platform.modManager()->mods().available;
 
-		_platform.modManager()->mods(std::move(mods));
-		_platform.localConfig()->setActivePreset(selected);
-		_selected = selected;
+							  _platform.modManager()->mods(std::move(mods));
 
-		refreshListContent();
-	});
+							  auto currentPlugins = _platform.pluginManager()->plugins();
+							  currentPlugins.replaceOverridenState(overridden);
+							  _platform.pluginManager()->plugins(currentPlugins);
+							  _platform.localConfig()->setActivePreset(selected);
+							  _selected = selected;
+
+							  refreshListContent();
+						  });
 }
 
 void ManagePresetListView::onRenamePreset()
@@ -251,7 +288,7 @@ void ManagePresetListView::onDeletePreset()
 
 	auto      selected = getSelection();
 	const int answer   = wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), selected),
-									wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+									  wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 	if (answer == wxYES)
 		_platform.getPresetManager()->remove(selected);
@@ -268,22 +305,34 @@ void ManagePresetListView::onFilesystemError(const std::filesystem::filesystem_e
 		e.what());
 }
 
-void ManagePresetListView::updateModList()
+void ManagePresetListView::updatePreview()
 {
 	wxBusyCursor bc;
 
-	try_handle_exceptions(this, [&] {
-		auto selected = getSelection();
+	try_handle_exceptions(this,
+						  [&]
+						  {
+							  auto selected = getSelection();
 
-		ModList mods;
-		if (!selected.empty())
-		{
-			mods           = _platform.getPresetManager()->loadPreset(selected);
-			//mods.available = _platform.modManager()->mods().available;
-		}
+							  ModList                                   mods;
+							  std::unordered_map<wxString, PluginState> plugins;
+							  if (!selected.empty())
+							  {
+								  std::tie(mods, plugins) =
+									  _platform.getPresetManager()->loadPreset(selected);
+								  // mods.available = _platform.modManager()->mods().available;
+							  }
 
-		_listModel->setModList(mods);
-	});
+							  _listModel->setModList(mods);
+							  PluginList pluginsData;
+							  _platform.pluginManager()->updateBaseState(pluginsData, mods);
+							  pluginsData.available.clear();
+							  pluginsData.replaceOverridenState(plugins);
+							  _pluginListModel->setList(pluginsData);
+
+							  _plugins->Show(!pluginsData.overridden.empty());
+							  Layout();
+						  });
 }
 
 wxString ManagePresetListView::getSelection() const
@@ -298,7 +347,7 @@ void ManagePresetListView::onSelectionChanged()
 {
 	auto selected = getSelection();
 
-	updateModList();
+	updatePreview();
 
 	_new->SetLabel(selected.empty() ? "Save as"_lng : "Overwrite"_lng);
 

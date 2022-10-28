@@ -14,16 +14,16 @@
 
 namespace mm::constant
 {
-	constexpr auto data_dir          = "data";
-	constexpr auto mod_info_filename = "mod.json";
-	constexpr auto default_language  = "en_US";
+	constexpr const auto data_dir          = "data";
+	constexpr const auto mod_info_filename = "mod.json";
+	constexpr const auto default_language  = "en_US";
 
-	constexpr auto mm_managed_mod = "_MM_Managed_";
+	constexpr const auto mm_managed_mod = "_MM_Managed_";
 
-	constexpr auto              pluginSubdir       = "EraPlugins";
-	constexpr auto              pluginOffExtension = ".off";
-	constexpr std::array        pluginDirs         = { ".", "BeforeWog", "AfterWog" };
+	constexpr const auto        pluginSubdir       = "EraPlugins";
+	constexpr const auto        pluginOffExtension = ".off";
+	constexpr const std::array  pluginDirs         = { ".", "BeforeWog", "AfterWog" };
 	const std::set<std::string> pluginExts         = { ".dll", ".bin", ".era" };
 
-	constexpr auto program_full_version = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
+	constexpr const auto program_full_version = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
 }

@@ -42,7 +42,7 @@ namespace
 {
 	std::vector<wxString> readFile(const fs::path& path)
 	{
-		wxTextFile        file;
+		wxTextFile file;
 		if (!file.Open(path.wstring()))
 			return {};
 
@@ -122,20 +122,7 @@ Era2Platform::Era2Platform(Application const& app)
 
 	_initalModList = _modList = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
 	_modManager               = std::make_unique<Era2ModManager>(_modList);
-
-	_plugins    = era2_plugin_helper::loadPhysicalStructure(getModsDirPath());
-	_pluginList = era2_plugin_helper::updateAvailability(_plugins, _modList);
-	era2_plugin_helper::loadManagedState(_pluginList, getPluginListPath());
-	_initialPluginList = _pluginList;
-	_pluginManager     = std::make_unique<Era2PluginManager>(_pluginList);
-
-	_modManager->onListChanged().connect(
-		[this]
-		{
-			// TODO: make better
-			era2_plugin_helper::updateAvailability(_pluginList, _plugins, _modList);
-			_pluginManager->plugins(_pluginList);
-		});
+	_pluginManager = std::make_unique<Era2PluginManager>(*_modManager, getModsDirPath(), getPluginListPath());
 }
 
 std::filesystem::path Era2Platform::getManagedPath() const
@@ -143,12 +130,12 @@ std::filesystem::path Era2Platform::getManagedPath() const
 	return _rootDir;
 }
 
-std::filesystem::path Era2Platform::getModsDirPath() const
+fs::path Era2Platform::getModsDirPath() const
 {
 	return _rootDir / "Mods";
 }
 
-Era2Config* Era2Platform::localConfig() const
+ILocalConfig* Era2Platform::localConfig() const
 {
 	return _localConfig.get();
 }
@@ -173,12 +160,12 @@ IModDataProvider* Era2Platform::modDataProvider() const
 	return _modDataProvider.get();
 }
 
-std::filesystem::path Era2Platform::getActiveListPath() const
+fs::path Era2Platform::getActiveListPath() const
 {
 	return getModsDirPath() / "list.txt";
 }
 
-std::filesystem::path Era2Platform::getHiddenListPath() const
+fs::path Era2Platform::getHiddenListPath() const
 {
 	return _localConfig->getProgramDataPath() / "hidden_mods.txt";
 }
@@ -200,7 +187,7 @@ INonAutoApplicablePlatform* Era2Platform::nonAutoApplicable()
 
 bool Era2Platform::changed() const
 {
-	return _modList != _initalModList || _pluginList != _initialPluginList;
+	return _modList != _initalModList || _pluginManager->changed();
 }
 
 void Era2Platform::apply()
@@ -210,13 +197,11 @@ void Era2Platform::apply()
 
 	_initalModList = _modList;
 
-	era2_plugin_helper::saveManagedState(getPluginListPath(), getModsDirPath(), _pluginList);
-
-	_initialPluginList = _pluginList;
+	_pluginManager->save();
 }
 
 void Era2Platform::revert()
 {
 	_modManager->mods(_initalModList);
-	_pluginManager->plugins(_initialPluginList);
+	_pluginManager->revert();
 }

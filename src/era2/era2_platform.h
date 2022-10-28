@@ -33,7 +33,7 @@ namespace mm
 		std::filesystem::path getManagedPath() const override;
 
 		IPresetManager*   getPresetManager() const override;
-		Era2Config*       localConfig() const override;
+		ILocalConfig*       localConfig() const override;
 		IModManager*      modManager() const override;
 		ILaunchHelper*    launchHelper() const override;
 		IModDataProvider* modDataProvider() const override;
@@ -64,10 +64,5 @@ namespace mm
 
 		ModList _modList;
 		ModList _initalModList;
-
-		PluginList _pluginList;
-		PluginList _initialPluginList;
-
-		Era2PLuginListPhysicalStructure _plugins;
 	};
 }

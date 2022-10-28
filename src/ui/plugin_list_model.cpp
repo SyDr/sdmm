@@ -112,9 +112,15 @@ bool PluginListModel::GetAttrByRow(unsigned row, unsigned, wxDataViewItemAttr& a
 {
 	const auto& item = _displayedItems[row];
 
+	// no such item
 	if (auto defaultState = _items.defaultState(item); !defaultState.has_value())
 	{
 		attr.SetBackgroundColour(wxColour(255, 127, 127));
+		return true;
+	}
+	else if (auto overriden = _items.overriddenState(item); overriden.has_value() && overriden.value() == defaultState.value().state)
+	{
+		attr.SetBackgroundColour(*wxLIGHT_GREY);
 		return true;
 	}
 

@@ -24,10 +24,10 @@ using namespace mm;
 
 namespace
 {
-	constexpr auto st_active_preset         = "active_preset";
-	constexpr auto st_executable            = "executable";
-	constexpr auto st_show_hidden           = "show_hidden";
-	constexpr auto st_conflict_resolve_mode = "conflict_resolve_mode";
+	constexpr const auto st_active_preset         = "active_preset";
+	constexpr const auto st_executable            = "executable";
+	constexpr const auto st_show_hidden           = "show_hidden";
+	constexpr const auto st_conflict_resolve_mode = "conflict_resolve_mode";
 }
 
 Era2Config::Era2Config(const std::filesystem::path& path)

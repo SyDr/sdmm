@@ -33,6 +33,7 @@
 #include <wx/collpane.h>
 #include <wx/dataview.h>
 #include <wx/msgdlg.h>
+#include <wx/notifmsg.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
@@ -413,7 +414,17 @@ void ModListView::onSwitchSelectedModStateRequested()
 			_modManager.switchState(_selectedMod);
 
 			if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
+			{
 				onSortModsRequested();
+
+				static bool messageWasShown = false;
+				if (!messageWasShown)
+				{
+					wxNotificationMessage nm("conflicts/caption"_lng, "conflicts/automatic_warning"_lng, this);
+					nm.Show();
+					messageWasShown = true;
+				}
+			}
 		});
 }
 

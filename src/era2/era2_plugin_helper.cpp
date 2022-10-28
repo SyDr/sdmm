@@ -32,9 +32,9 @@ namespace
 	}
 }
 
-void era2_plugin_helper::updateAvailability(PluginList&                            current,
-											const Era2PLuginListPhysicalStructure& structure,
-											const ModList&                         mods)
+void era2_plugin_helper::updateBaseState(PluginList&                            current,
+										 const Era2PLuginListPhysicalStructure& structure,
+										 const ModList&                         mods)
 {
 	current.available.clear();
 	current.state.clear();
@@ -70,11 +70,11 @@ void era2_plugin_helper::updateAvailability(PluginList&                         
 		current.available.emplace(item.first);
 }
 
-mm::PluginList era2_plugin_helper::updateAvailability(const Era2PLuginListPhysicalStructure& structure,
-													  const ModList&                         mods)
+mm::PluginList era2_plugin_helper::loadBaseState(const Era2PLuginListPhysicalStructure& structure,
+												 const ModList&                         mods)
 {
 	PluginList result;
-	updateAvailability(result, structure, mods);
+	updateBaseState(result, structure, mods);
 
 	return result;
 }
@@ -161,7 +161,7 @@ void era2_plugin_helper::saveManagedState(const fs::path& pluginPath, const fs::
 			continue;
 
 		const auto& mod = it->second.mod;
-		const auto copyFrom =
+		const auto  copyFrom =
 			modsPath / mod.ToStdString() / constant::pluginSubdir /
 			(id + (it->second.state == PluginState::disabled ? constant::pluginOffExtension : ""))
 				.ToStdString();

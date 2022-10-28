@@ -338,7 +338,7 @@ void MainFrame::OnMenuCheckForUpdates()
 {
 	EX_TRY;
 
-	throw std::runtime_error("Hey, you found a bug here... No... In fact this is not a bug");
+	throw std::runtime_error("Hey, you found a bug here... No... Not a bug.");
 
 	EX_UNEXPECTED;
 }

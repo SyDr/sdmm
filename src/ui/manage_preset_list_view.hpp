@@ -37,9 +37,10 @@ namespace mm
 	private:
 		void createControls();
 		void createListColumns();
+		void createPluginsListColumns();
 		void updateLayout();
 		void bindEvents();
-		void updateModList();
+		void updatePreview();
 
 		void refreshListContent();
 
@@ -64,17 +65,17 @@ namespace mm
 		wxWidgetsPtr<wxDataViewListCtrl> _list = nullptr;
 		std::vector<wxString>            _profiles;
 
-		wxWidgetsPtr<wxButton> _new       = nullptr;
-		wxWidgetsPtr<wxButton> _load      = nullptr;
-		//wxWidgetsPtr<wxButton> _rename    = nullptr;
-		//wxWidgetsPtr<wxButton> _copy      = nullptr;
-		wxWidgetsPtr<wxButton> _remove    = nullptr;
+		wxWidgetsPtr<wxButton> _new  = nullptr;
+		wxWidgetsPtr<wxButton> _load = nullptr;
+		// wxWidgetsPtr<wxButton> _rename    = nullptr;
+		// wxWidgetsPtr<wxButton> _copy      = nullptr;
+		wxWidgetsPtr<wxButton> _remove = nullptr;
 
 		wxWidgetsPtr<wxStaticBox>     _preview = nullptr;
 		wxObjectDataPtr<ModListModel> _listModel;
 		wxWidgetsPtr<wxDataViewCtrl>  _mods = nullptr;
 
 		wxObjectDataPtr<PluginListModel> _pluginListModel;
-		wxWidgetsPtr<wxDataViewCtrl> _plugins = nullptr;
+		wxWidgetsPtr<wxDataViewCtrl>     _plugins = nullptr;
 	};
 }

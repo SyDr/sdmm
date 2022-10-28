@@ -18,6 +18,13 @@ void PluginList::overrideState(const wxString& item, PluginState newState)
 	available.emplace(item);
 }
 
+void PluginList::replaceOverridenState(const std::unordered_map<wxString, PluginState>& newState)
+{
+	overridden.clear();
+	for (const auto& item : newState)
+		overrideState(item.first, item.second);
+}
+
 std::optional<ModPluginState> PluginList::defaultState(const wxString& item) const
 {
 	auto it = state.find(item);

@@ -46,6 +46,7 @@ namespace mm
 		std::unordered_map<wxString, PluginState>    overridden;
 
 		void overrideState(const wxString& item, PluginState newState);
+		void replaceOverridenState(const std::unordered_map<wxString, PluginState>& state);
 		void reset(const wxString& item);
 
 		std::optional<ModPluginState> defaultState(const wxString& item) const;

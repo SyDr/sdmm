@@ -12,6 +12,7 @@
 namespace mm
 {
 	struct PluginList;
+	struct ModList;
 
 	struct IPluginManager
 	{
@@ -20,7 +21,13 @@ namespace mm
 		virtual PluginList const& plugins() const           = 0;
 		virtual void              plugins(PluginList items) = 0;
 
+		virtual void updateBaseState(PluginList& plugins, const ModList& mods) const = 0;
+
 		virtual void switchState(const wxString& plugin) = 0;
+
+		virtual void save()          = 0;
+		virtual bool changed() const = 0;
+		virtual void revert()        = 0;
 
 		virtual sigslot::signal<>& onListChanged() = 0;
 	};

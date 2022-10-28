@@ -17,15 +17,17 @@ namespace mm
 	{
 		explicit Era2PresetManager(std::filesystem::path rootPath);
 
-		ModList loadPreset(wxString const& name) override;
-		void    savePreset(wxString const& name, ModList const& list) override;
+		std::pair<ModList, std::unordered_map<wxString, PluginState>>
+			 loadPreset(const wxString& name) override;
+		void savePreset(const wxString& name, const ModList& list,
+						const std::unordered_map<wxString, PluginState>& plugins) override;
 
 		std::set<wxString> list() const override;
 
-		bool exists(wxString const& name) const override;
-		void copy(wxString const& from, wxString const& to) override;
-		void rename(wxString const& from, wxString const& to) override;
-		void remove(wxString const& name) override;
+		bool exists(const wxString& name) const override;
+		void copy(const wxString& from, const wxString& to) override;
+		void rename(const wxString& from, const wxString& to) override;
+		void remove(const wxString& name) override;
 
 		sigslot::signal<>& onListChanged() override;
 

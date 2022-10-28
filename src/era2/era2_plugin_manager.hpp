@@ -7,6 +7,7 @@
 
 #include "domain/iplugin_manager.hpp"
 #include "domain/plugin_list.hpp"
+#include "era2_plugin_helper.hpp"
 
 #include <deque>
 #include <optional>
@@ -17,21 +18,36 @@
 namespace mm
 {
 	struct Application;
+	struct Era2ModManager;
+	struct Era2PLuginListPhysicalStructure;
 
 	struct Era2PluginManager : IPluginManager
 	{
-		Era2PluginManager() = default;
-		explicit Era2PluginManager(PluginList& items);
+		explicit Era2PluginManager(Era2ModManager& modManager, const fs::path& modsDir,
+								   const fs::path& listPath);
 
 		PluginList const& plugins() const override;
 		void              plugins(PluginList items) override;
 
+		void updateBaseState(PluginList& plugins, const ModList& mods) const override;
+
 		void switchState(const wxString& plugin) override;
+
+		void save() override;
+		bool changed() const override;
+		void revert() override;
 
 		sigslot::signal<>& onListChanged() override;
 
 	private:
-		PluginList& _items;
+		Era2ModManager& _modManager;
+		fs::path        _modsDir;
+		fs::path        _listPath;
+
+		Era2PLuginListPhysicalStructure _physicalStructure;
+
+		PluginList _initialPluginList;
+		PluginList _pluginList;
 
 		sigslot::signal<> _listChanged;
 	};
