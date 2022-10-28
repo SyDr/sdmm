@@ -409,6 +409,22 @@ void MainFrame::onLaunchGameRequested()
 							  if (!_currentPlatform)
 								  return;
 
+							  if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+							  {
+								  if (nonAuto->changed())
+								  {
+									  auto saveChanges =
+										  wxMessageBox("main_frame/unsaved_changes"_lng,
+													   "main_frame/unsaved_changes_caption"_lng,
+													   wxICON_QUESTION | wxYES_NO);
+
+									  if (saveChanges != wxYES)
+										  return;
+
+									  nonAuto->apply();
+								  }
+							  }
+
 							  auto config = _currentPlatform->localConfig();
 							  auto helper = _currentPlatform->launchHelper();
 
