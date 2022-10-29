@@ -64,37 +64,28 @@ Name: "Custom"; Description: "CustomInstallation"; Flags: iscustom
 
 [Components]
 Name: "sdmm"; Description: "{cm:main_files}"; Types: Full Custom; Flags: fixed
-Name: "redist"; Description: "Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86)"; Types: Full
+Name: "redist"; Description: "Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86)"; Types: Full
 
 [CustomMessages]
 main_files=Main program files (required)
 ru.main_files=Файлы программы (обязательно)
 
-redist_title=Installing Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86)
-ru.redist_title=Установка Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86)
+redist_title=Installing Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86)
+ru.redist_title=Установка Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86)
 
-redist_description=Please wait while Setup installs Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86) on your computer.
-ru.redist_description=Пожалуйста, подождите, идёт установка Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86).
+redist_description=Please wait while Setup installs Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86) on your computer.
+ru.redist_description=Пожалуйста, подождите, идёт установка Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86).
 
-redist_status=Installing Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86)...
-ru.redist_status=Устанавливается Microsoft Visual C++ Redistributable for Visual Studio 2015, 2017 and 2019 (x86)...
+redist_status=Installing Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86)...
+ru.redist_status=Устанавливается Microsoft Visual C++ Redistributable for Visual Studio 2015-2022 (x86)...
 
 [Code]
 var
   RedistLocalPath : String;
 
-function MsiQueryProductState(szProduct: string): Longint;
-external 'MsiQueryProductStateW@msi.dll stdcall';
-
-function IsRedistInstalled(): boolean;
-begin
-    Result :=
-    (MsiQueryProductState('{2BC3BD4D-FABA-4394-93C7-9AC82A263FE2}') = 5);
-end;
-
 function IsRedistInstallRequired() : boolean;
 begin
-  Result := IsComponentSelected('redist') and not isRedistInstalled();
+  Result := IsComponentSelected('redist');
 end;
 
 function InstallRedist(var NeedsRestart: boolean): String;
