@@ -194,7 +194,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;wxNO_UNSAFE_WXSTRING_CONV;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -249,7 +249,7 @@
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;wxUSE_GUI;__WXMSW__;NDEBUG;_WINDOWS;CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;wxNO_UNSAFE_WXSTRING_CONV;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;wxUSE_GUI;__WXMSW__;NDEBUG;_WINDOWS;CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(ProjectName)\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
