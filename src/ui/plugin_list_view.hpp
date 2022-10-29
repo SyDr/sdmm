@@ -59,5 +59,6 @@ namespace mm
 		wxWidgetsPtr<wxStaticBox>    _group       = nullptr;
 		wxWidgetsPtr<wxDataViewCtrl> _list        = nullptr;
 		wxWidgetsPtr<wxButton>       _changeState = nullptr;
+		wxWidgetsPtr<wxCheckBox>     _showAll     = nullptr;
 	};
 }

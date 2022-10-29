@@ -147,6 +147,12 @@ void PluginListModel::setList(const PluginList& items)
 	reload();
 }
 
+void PluginListModel::showAll(bool value)
+{
+	_showHidden = value;
+	reload();
+}
+
 void PluginListModel::reload()
 {
 	_displayedItems.clear();

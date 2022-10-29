@@ -46,6 +46,7 @@ namespace mm
 					bool ascending) const override;
 
 		void setList(PluginList const& items);
+		void showAll(bool value);
 
 		wxString       findIdByItem(const wxDataViewItem& item) const;
 		wxDataViewItem findItemById(const wxString& plugin) const;

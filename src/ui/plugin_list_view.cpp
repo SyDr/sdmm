@@ -58,14 +58,19 @@ PluginListView::PluginListView(wxWindow* parent, IPluginManager& pluginManager,
 
 void PluginListView::buildLayout()
 {
+	auto leftVertSize = new wxBoxSizer(wxVERTICAL);
+	leftVertSize->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	leftVertSize->Add(_showAll, wxSizerFlags(0).Border(wxALL, 4));
+
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
 	buttonSizer->Add(_changeState, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 	auto leftGroupSizer = new wxStaticBoxSizer(_group, wxHORIZONTAL);
-	leftGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	leftGroupSizer->Add(leftVertSize, wxSizerFlags(1).Expand());
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+
 	mainSizer->Add(leftGroupSizer, wxSizerFlags(1).Expand());
 
 	this->SetSizer(mainSizer);
@@ -89,6 +94,7 @@ void PluginListView::bindEvents()
 	});
 
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedStateRequested(); });
+	_showAll->Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { _listModel->showAll(_showAll->IsChecked()); });
 }
 
 void PluginListView::createControls()
@@ -99,6 +105,8 @@ void PluginListView::createControls()
 
 	_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
 	_changeState->SetBitmap(_iconStorage.get(embedded_icon::plus));
+
+	_showAll = new wxCheckBox(_group, wxID_ANY, "Show all"_lng);
 }
 
 void PluginListView::createListControl()
