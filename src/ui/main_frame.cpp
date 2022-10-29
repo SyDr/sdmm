@@ -231,6 +231,21 @@ void MainFrame::OnMenuToolsChangeDirectory()
 {
 	EX_TRY;
 
+	if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+	{
+		if (nonAuto->changed())
+		{
+			auto saveChanges =
+				wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
+							 wxICON_QUESTION | wxYES_NO);
+
+			if (saveChanges != wxYES)
+				return;
+
+			nonAuto->apply();
+		}
+	}
+
 	SelectDirectoryDialog dialog(this, _app.appConfig(), _app.iconStorage());
 
 	if (dialog.ShowModal() == wxID_OK)
