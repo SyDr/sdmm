@@ -4,13 +4,22 @@
       "ERA Scripts Rus",
       "WoG Scripts",
       "WoG Scripts Rus"
-    ]
+    ],
+	"Advanced Classes Mod" : [
+	  "NewSpells"
+	],
+	"16 2-way teleports" : [
+	  "Probably incompatible with XXL, check this"
+	]
   },
   "requires" : {
     "WoG Scripts Rus" : [
       "WoG Scripts",
       "WoG"
-    ]
+    ],
+	"Advanced Classes Mod Rus" : [
+	  "Advanced Classes Mod"
+	]
   },
   "load_after" : {
     "WoG Scripts Rus" : [
@@ -29,6 +38,23 @@
     "WoG Scripts" : [
       "WoG Rus",
       "WoG"
-    ]
+    ],
+	"WoG Rus" : [
+	  "BattleQueue"
+	],
+	"Advanced Classes Mod" : [
+	  "WoG Rus"
+	],
+	"Advanced Classes Mod Rus" : [
+	  "Advanced Classes Mod"
+	],
+	"Enhanced Henchmen" : [
+	  "WoG Scripts",
+	  "WoG Rus",
+	  "Why WoG Rus has same file with different values?"
+	],
+	"Difficulty Mod" : [
+	  "WoG Scripts"
+	]
   }
 }
