@@ -55,7 +55,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 	ModData result;
 	result.data_path   = loadFrom;
-	result.id          = wxString::FromUTF8(loadFrom.filename().string());
+	result.id          = loadFrom.filename().wstring();
 	result.virtual_mod = !std::filesystem::is_directory(loadFrom);
 
 	auto supplyResultWithDefaults = [&] {

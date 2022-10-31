@@ -144,7 +144,7 @@ void era2_plugin_helper::saveManagedState(const fs::path& pluginPath, const fs::
 	for (const auto& item : list.overridden)
 		data[item.first.ToStdString()] = (item.second == PluginState::enabled ? "enabled" : "disabled");
 
-	overwriteFileContent(pluginPath, data.dump(2));
+	overwriteFileContent(pluginPath, wxString::FromUTF8(data.dump(2)));
 
 	auto targetPath = modsPath / constant::mm_managed_mod / constant::pluginSubdir;
 	for (const auto& dir : constant::pluginDirs)

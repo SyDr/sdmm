@@ -14,7 +14,7 @@
 
 namespace mm
 {
-	void overwriteFileContent(const fs::path& path, const std::string& content);
+	void overwriteFileContent(const fs::path& path, const wxString& content);
 
 	bool createDir(const std::filesystem::path& path);
 	bool copyDir(const wxString& path, const wxString& newPath);
@@ -30,6 +30,6 @@ namespace mm
 		for (const auto& item : content)
 			stream << item.ToUTF8() << '\n';
 
-		overwriteFileContent(path, stream.str());
+		overwriteFileContent(path, wxString::FromUTF8(stream.str()));
 	}
 }

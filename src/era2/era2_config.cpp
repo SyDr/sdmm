@@ -69,7 +69,7 @@ void Era2Config::createDirectories() const
 
 void Era2Config::save()
 {
-	overwriteFileContent(getConfigFilePath(), _data.dump(2));
+	overwriteFileContent(getConfigFilePath(), wxString::FromUTF8(_data.dump(2)));
 }
 
 std::filesystem::path Era2Config::getDataPath() const
