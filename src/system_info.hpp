@@ -10,7 +10,7 @@
 
 #define PROGRAM_NAME    "SD Mod Manager"
 #define PROGRAM_ALIAS   "The Sparrow"
-#define PROGRAM_VERSION "0.98.1.alpha"
+#define PROGRAM_VERSION "0.98.3.alpha"
 
 namespace mm::constant
 {
