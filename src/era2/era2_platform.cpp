@@ -40,8 +40,26 @@ using namespace mm;
 
 namespace
 {
+	bool validateModId(const fs::path& modsPath, wxString& id)
+	{
+		id.Trim();
+		if (id.empty())
+			return false;
+
+		if (id == mm::constant::mm_managed_mod)
+			return false;
+
+		const auto path = modsPath / id.ToStdWstring();
+		if (!fs::exists(path) || !fs::is_directory(path))
+			return false;
+
+		return true;
+	}
+
 	std::vector<wxString> readFile(const fs::path& path)
 	{
+		wxLogNull noLogging;  // suppress wxWidgets messages about inability to open file
+
 		wxTextFile file;
 		if (!file.Open(path.wstring()))
 			return {};
@@ -62,9 +80,9 @@ namespace
 		auto activeMods = readFile(activePath);
 
 		// active mods / ignore mm_managed_mod
-		for (const auto& item : boost::adaptors::reverse(activeMods))
+		for (auto item : boost::adaptors::reverse(activeMods))
 		{
-			if (item != mm::constant::mm_managed_mod)
+			if (validateModId(modsPath, item))
 			{
 				items.active.emplace_back(item);
 				items.available.emplace(item);
@@ -72,8 +90,13 @@ namespace
 		}
 
 		// hidden mods in data dir
-		for (const auto& item : readFile(hiddenPath))
-			items.hidden.emplace(item);
+		for (auto item : readFile(hiddenPath))
+		{
+			if (validateModId(modsPath, item))
+			{
+				items.hidden.emplace(item);
+			}
+		}
 
 		// remaining items from directory
 		for (const auto& item : getAllDirs(modsPath))
