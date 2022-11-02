@@ -43,7 +43,7 @@
 using namespace mm;
 
 ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-						 wxString const& managedPath)
+						 const wxString& managedPath)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
@@ -192,7 +192,7 @@ void ModListView::bindEvents()
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested(); });
 }
 
-void ModListView::createControls(wxString const& managedPath)
+void ModListView::createControls(const wxString& managedPath)
 {
 	_group = new wxStaticBox(this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, managedPath));
 

@@ -42,12 +42,12 @@ void Era2ModManager::mods(ModList mods)
 	_listChanged();
 }
 
-std::optional<size_t> Era2ModManager::activePosition(wxString const& item) const
+std::optional<size_t> Era2ModManager::activePosition(const wxString& item) const
 {
 	return _list.activePosition(item);
 }
 
-void Era2ModManager::activate(wxString const& item)
+void Era2ModManager::activate(const wxString& item)
 {
 	const auto size = _list.active.size();
 
@@ -57,7 +57,7 @@ void Era2ModManager::activate(wxString const& item)
 		_listChanged();
 }
 
-void Era2ModManager::deactivate(wxString const& item)
+void Era2ModManager::deactivate(const wxString& item)
 {
 	const auto size = _list.active.size();
 
@@ -67,7 +67,7 @@ void Era2ModManager::deactivate(wxString const& item)
 		_listChanged();
 }
 
-void Era2ModManager::switchState(wxString const& item)
+void Era2ModManager::switchState(const wxString& item)
 {
 	if (!_list.isActive(item))
 		activate(item);
@@ -75,12 +75,12 @@ void Era2ModManager::switchState(wxString const& item)
 		deactivate(item);
 }
 
-bool Era2ModManager::canMove(wxString const& from, wxString const& to) const
+bool Era2ModManager::canMove(const wxString& from, const wxString& to) const
 {
 	return _list.canMove(from, to);
 }
 
-void Era2ModManager::move(wxString const& from, wxString const& to)
+void Era2ModManager::move(const wxString& from, const wxString& to)
 {
 	if (from == to)
 		return;
@@ -90,31 +90,31 @@ void Era2ModManager::move(wxString const& from, wxString const& to)
 	_listChanged();
 }
 
-bool Era2ModManager::canMoveUp(wxString const& item) const
+bool Era2ModManager::canMoveUp(const wxString& item) const
 {
 	return _list.canMoveUp(item);
 }
 
-void Era2ModManager::moveUp(wxString const& item)
+void Era2ModManager::moveUp(const wxString& item)
 {
 	_list.moveUp(item);
 
 	_listChanged();
 }
 
-bool Era2ModManager::canMoveDown(wxString const& item) const
+bool Era2ModManager::canMoveDown(const wxString& item) const
 {
 	return _list.canMoveDown(item);
 }
 
-void Era2ModManager::moveDown(wxString const& item)
+void Era2ModManager::moveDown(const wxString& item)
 {
 	_list.moveDown(item);
 
 	_listChanged();
 }
 
-void Era2ModManager::hide(wxString const& item)
+void Era2ModManager::hide(const wxString& item)
 {
 	const auto size = _list.hidden.size();
 
@@ -124,7 +124,7 @@ void Era2ModManager::hide(wxString const& item)
 		_listChanged();
 }
 
-void Era2ModManager::show(wxString const& item)
+void Era2ModManager::show(const wxString& item)
 {
 	const auto size = _list.hidden.size();
 
@@ -134,7 +134,7 @@ void Era2ModManager::show(wxString const& item)
 		_listChanged();
 }
 
-void Era2ModManager::switchVisibility(wxString const& item)
+void Era2ModManager::switchVisibility(const wxString& item)
 {
 	if (_list.isHidden(item))
 		show(item);
@@ -142,7 +142,7 @@ void Era2ModManager::switchVisibility(wxString const& item)
 		hide(item);
 }
 
-void Era2ModManager::remove(wxString const& id)
+void Era2ModManager::remove(const wxString& id)
 {
 	_list.remove(id);
 

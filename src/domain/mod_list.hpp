@@ -7,10 +7,10 @@
 
 #include <wx/string.h>
 
+#include <compare>
 #include <optional>
 #include <set>
 #include <vector>
-#include <compare>
 
 namespace mm
 {
@@ -20,32 +20,33 @@ namespace mm
 		std::set<wxString>    hidden;
 		std::vector<wxString> active;
 
+		std::vector<wxString> invalid;
+
 		ModList() = default;
-		ModList(std::set<wxString> available, std::vector<wxString> active,
-				std::set<wxString> hidden);
+		ModList(std::set<wxString> available, std::vector<wxString> active, std::set<wxString> hidden);
 
-		bool isActive(wxString const& item) const;
-		bool isHidden(wxString const& item) const;
+		bool isActive(const wxString& item) const;
+		bool isHidden(const wxString& item) const;
 
-		std::optional<size_t> activePosition(wxString const& item) const;
-		void                  activate(wxString const& item);
-		void                  deactivate(wxString const& item);
-		void                  switchState(wxString const& item);
+		std::optional<size_t> activePosition(const wxString& item) const;
+		void                  activate(const wxString& item);
+		void                  deactivate(const wxString& item);
+		void                  switchState(const wxString& item);
 
-		bool canMove(wxString const& from, wxString const& to) const;
-		void move(wxString const& from, wxString const& to);
+		bool canMove(const wxString& from, const wxString& to) const;
+		void move(const wxString& from, const wxString& to);
 
-		bool canMoveUp(wxString const& item) const;
-		void moveUp(wxString const& item);
+		bool canMoveUp(const wxString& item) const;
+		void moveUp(const wxString& item);
 
-		bool canMoveDown(wxString const& item) const;
-		void moveDown(wxString const& item);
+		bool canMoveDown(const wxString& item) const;
+		void moveDown(const wxString& item);
 
-		void hide(wxString const& item);
-		void show(wxString const& item);
-		void switchVisibility(wxString const& item);
+		void hide(const wxString& item);
+		void show(const wxString& item);
+		void switchVisibility(const wxString& item);
 
-		void remove(wxString const& item);
+		void remove(const wxString& item);
 
 		std::weak_ordering operator<=>(const ModList& other) const = default;
 	};

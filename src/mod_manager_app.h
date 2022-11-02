@@ -24,8 +24,8 @@ namespace mm
 	public:
 		ModManagerApp();
 
-		wxString translationString(wxString const& key);
-		wxString categoryTranslationString(wxString const& key) const;
+		wxString translationString(const wxString& key);
+		wxString categoryTranslationString(const wxString& key) const;
 		void     scheduleRestart();
 
 		bool OnInit() override;

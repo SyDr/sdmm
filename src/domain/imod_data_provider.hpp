@@ -17,6 +17,6 @@ namespace mm
 	{
 		virtual ~IModDataProvider() = default;
 
-		virtual non_owning_ptr<ModData const> modData(wxString const& id) = 0;
+		virtual non_owning_ptr<ModData const> modData(const wxString& id) = 0;
 	};
 }

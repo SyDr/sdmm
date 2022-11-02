@@ -87,16 +87,16 @@ namespace
 				items.active.emplace_back(item);
 				items.available.emplace(item);
 			}
+			else if (!item.empty() && item != constant::mm_managed_mod)
+			{
+				items.invalid.emplace_back(item);
+			}
 		}
 
 		// hidden mods in data dir
 		for (auto item : readFile(hiddenPath))
-		{
 			if (validateModId(modsPath, item))
-			{
 				items.hidden.emplace(item);
-			}
-		}
 
 		// remaining items from directory
 		for (const auto& item : getAllDirs(modsPath))
@@ -111,14 +111,15 @@ namespace
 	}
 
 	void saveMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath,
-				  const std::vector<wxString>& activeContent, const std::set<wxString>& hiddenContent)
+				  const ModList& mods)
 	{
-		auto                 reversedRange = activeContent | boost::adaptors::reversed;
+		auto                 reversedRange = mods.active | boost::adaptors::reversed;
 		std::deque<wxString> reversed(reversedRange.begin(), reversedRange.end());
 		reversed.emplace_back(mm::constant::mm_managed_mod);
+		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
 
 		overwriteFileFromContainer(activePath, reversed);
-		overwriteFileFromContainer(hiddenPath, hiddenContent);
+		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
 		std::filesystem::create_directories(modsPath / mm::constant::mm_managed_mod);
 		std::filesystem::copy_file(std::filesystem::path(mm::constant::data_dir) / "mod.json",
@@ -215,8 +216,7 @@ bool Era2Platform::changed() const
 
 void Era2Platform::apply()
 {
-	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods().active,
-			 _modManager->mods().hidden);
+	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
 
 	_initalModList = _modList;
 

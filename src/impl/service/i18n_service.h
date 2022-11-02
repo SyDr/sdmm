@@ -19,12 +19,12 @@ namespace mm
 	{
 		explicit I18nService(IAppConfig const& config);
 
-		wxString category(wxString const& category) const override;
-		wxString get(wxString const& key) const override;
-		wxString languageName(wxString const& code) const override;
+		wxString category(const wxString& category) const override;
+		wxString get(const wxString& key) const override;
+		wxString languageName(const wxString& code) const override;
 
 	private:
-		void build_cache(nlohmann::json const& data, wxString const& prefix);
+		void build_cache(nlohmann::json const& data, const wxString& prefix);
 
 	private:
 		std::map<wxString, wxString> _data;

@@ -44,7 +44,7 @@ namespace
 	}
 }
 
-ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFrom, wxString const& preferredLng,
+ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFrom, const wxString& preferredLng,
 							  std::set<wxString> const& defaultIncompatible,
 							  std::set<wxString> const& defaultRequires,
 							  std::set<wxString> const& defaultLoadAfter)

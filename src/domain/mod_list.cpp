@@ -17,17 +17,17 @@ ModList::ModList(std::set<wxString> available, std::vector<wxString> active, std
 {
 }
 
-bool ModList::isActive(wxString const& item) const
+bool ModList::isActive(const wxString& item) const
 {
 	return activePosition(item).has_value();
 }
 
-bool ModList::isHidden(wxString const& item) const
+bool ModList::isHidden(const wxString& item) const
 {
 	return hidden.count(item);
 }
 
-std::optional<size_t> ModList::activePosition(wxString const& item) const
+std::optional<size_t> ModList::activePosition(const wxString& item) const
 {
 	if (auto it = std::find(active.cbegin(), active.cend(), item); it != active.cend())
 		return std::distance(active.cbegin(), it);
@@ -35,18 +35,18 @@ std::optional<size_t> ModList::activePosition(wxString const& item) const
 	return {};
 }
 
-void ModList::activate(wxString const& item)
+void ModList::activate(const wxString& item)
 {
 	active.emplace(active.begin(), item);
 }
 
-void ModList::deactivate(wxString const& item)
+void ModList::deactivate(const wxString& item)
 {
 	if (auto position = activePosition(item); position.has_value())
 		active.erase(active.begin() + position.value());
 }
 
-void ModList::switchState(wxString const& item)
+void ModList::switchState(const wxString& item)
 {
 	if (auto position = activePosition(item); position.has_value())
 		active.erase(active.begin() + position.value());
@@ -54,7 +54,7 @@ void ModList::switchState(wxString const& item)
 		active.emplace(active.begin(), item);
 }
 
-bool ModList::canMove(wxString const& from, wxString const& to) const
+bool ModList::canMove(const wxString& from, const wxString& to) const
 {
 	if (auto position1 = activePosition(from); position1.has_value())
 		if (auto position2 = activePosition(to); position2.has_value())
@@ -63,7 +63,7 @@ bool ModList::canMove(wxString const& from, wxString const& to) const
 	return false;
 }
 
-void ModList::move(wxString const& from, wxString const& to)
+void ModList::move(const wxString& from, const wxString& to)
 {
 	auto posFrom = activePosition(from);
 	if (!posFrom.has_value())
@@ -79,7 +79,7 @@ void ModList::move(wxString const& from, wxString const& to)
 		std::swap(active[index], active[index + step]);
 }
 
-bool ModList::canMoveUp(wxString const& item) const
+bool ModList::canMoveUp(const wxString& item) const
 {
 	if (auto position = activePosition(item); position.has_value() && position.value() != 0)
 		return true;
@@ -87,13 +87,13 @@ bool ModList::canMoveUp(wxString const& item) const
 	return false;
 }
 
-void ModList::moveUp(wxString const& item)
+void ModList::moveUp(const wxString& item)
 {
 	if (auto position = activePosition(item); position.has_value() && position.value() != 0)
 		std::swap(active[position.value()], active[position.value() - 1]);
 }
 
-bool ModList::canMoveDown(wxString const& item) const
+bool ModList::canMoveDown(const wxString& item) const
 {
 	if (auto position = activePosition(item))
 		return position.has_value() && position.value() != active.size() - 1;
@@ -101,7 +101,7 @@ bool ModList::canMoveDown(wxString const& item) const
 	return false;
 }
 
-void ModList::moveDown(wxString const& item)
+void ModList::moveDown(const wxString& item)
 {
 	if (auto position = activePosition(item); position.has_value() && position.value() != active.size() - 1)
 	{
@@ -109,17 +109,17 @@ void ModList::moveDown(wxString const& item)
 	}
 }
 
-void ModList::hide(wxString const& item)
+void ModList::hide(const wxString& item)
 {
 	hidden.emplace(item);
 }
 
-void ModList::show(wxString const& item)
+void ModList::show(const wxString& item)
 {
 	hidden.erase(item);
 }
 
-void ModList::switchVisibility(wxString const& item)
+void ModList::switchVisibility(const wxString& item)
 {
 	if (hidden.count(item))
 		show(item);
@@ -127,7 +127,7 @@ void ModList::switchVisibility(wxString const& item)
 		hide(item);
 }
 
-void ModList::remove(wxString const& item)
+void ModList::remove(const wxString& item)
 {
 	show(item);
 	deactivate(item);

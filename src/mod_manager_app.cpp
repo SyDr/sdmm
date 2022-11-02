@@ -89,12 +89,12 @@ int ModManagerApp::OnExit()
 	return wxApp::OnExit();
 }
 
-wxString ModManagerApp::translationString(wxString const& key)
+wxString ModManagerApp::translationString(const wxString& key)
 {
 	return _i18nService->get(key);
 }
 
-wxString ModManagerApp::categoryTranslationString(wxString const& key) const
+wxString ModManagerApp::categoryTranslationString(const wxString& key) const
 {
 	return _i18nService->category(key.ToStdString());
 }

@@ -236,6 +236,7 @@ void ManagePresetListView::onLoadPresetRequested()
 							  auto [mods, overridden] = _platform.getPresetManager()->loadPreset(selected);
 
 							  mods.available = _platform.modManager()->mods().available;
+							  mods.invalid   = _platform.modManager()->mods().invalid;
 
 							  _platform.modManager()->mods(std::move(mods));
 

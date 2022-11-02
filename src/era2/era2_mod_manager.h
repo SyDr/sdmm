@@ -25,25 +25,25 @@ namespace mm
 		ModList const& mods() const override;
 		void           mods(ModList mods) override;
 
-		std::optional<size_t> activePosition(wxString const& item) const override;
-		void                  activate(wxString const& item) override;
-		void                  deactivate(wxString const& item) override;
-		void                  switchState(wxString const& item) override;
+		std::optional<size_t> activePosition(const wxString& item) const override;
+		void                  activate(const wxString& item) override;
+		void                  deactivate(const wxString& item) override;
+		void                  switchState(const wxString& item) override;
 
-		bool canMove(wxString const& from, wxString const& to) const override;
-		void move(wxString const& from, wxString const& to) override;
+		bool canMove(const wxString& from, const wxString& to) const override;
+		void move(const wxString& from, const wxString& to) override;
 
-		bool canMoveUp(wxString const& item) const override;
-		void moveUp(wxString const& item) override;
+		bool canMoveUp(const wxString& item) const override;
+		void moveUp(const wxString& item) override;
 
-		bool canMoveDown(wxString const& item) const override;
-		void moveDown(wxString const& item) override;
+		bool canMoveDown(const wxString& item) const override;
+		void moveDown(const wxString& item) override;
 
-		void hide(wxString const& item) override;
-		void show(wxString const& item) override;
-		void switchVisibility(wxString const& item) override;
+		void hide(const wxString& item) override;
+		void show(const wxString& item) override;
+		void switchVisibility(const wxString& item) override;
 
-		void remove(wxString const& item) override;
+		void remove(const wxString& item) override;
 
 		sigslot::signal<>& onListChanged() override;
 

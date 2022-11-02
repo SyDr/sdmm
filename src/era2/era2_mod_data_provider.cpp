@@ -21,7 +21,7 @@ Era2ModDataProvider::Era2ModDataProvider(std::filesystem::path basePath, wxStrin
 	loadDefaults();
 }
 
-non_owning_ptr<ModData const> Era2ModDataProvider::modData(wxString const& id)
+non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 {
 	auto it = _data.find(id);
 

@@ -21,7 +21,7 @@ namespace mm
 	{
 		Era2ModDataProvider(std::filesystem::path basePath, wxString preferredLng);
 
-		non_owning_ptr<ModData const> modData(wxString const& id) override;
+		non_owning_ptr<ModData const> modData(const wxString& id) override;
 
 	private:
 		void loadDefaults();

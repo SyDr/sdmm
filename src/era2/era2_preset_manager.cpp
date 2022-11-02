@@ -23,7 +23,7 @@ using namespace mm;
 
 namespace
 {
-	std::filesystem::path toPath(std::filesystem::path const& base, wxString const& name)
+	std::filesystem::path toPath(std::filesystem::path const& base, const wxString& name)
 	{
 		return base / (name + ".json").ToStdString();
 	}
@@ -84,7 +84,7 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 }
 
 std::pair<ModList, std::unordered_map<wxString, PluginState>>
-Era2PresetManager::loadPreset(wxString const& name)
+Era2PresetManager::loadPreset(const wxString& name)
 {
 	const auto    path = toPath(_rootPath, name);
 	ModList       modList;
@@ -174,7 +174,7 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list,
 		_listChanged();
 }
 
-bool Era2PresetManager::exists(wxString const& name) const
+bool Era2PresetManager::exists(const wxString& name) const
 {
 	return std::filesystem::exists(toPath(_rootPath, name));
 }

@@ -66,7 +66,7 @@ wxString I18nService::get(const wxString& key) const
 	return key;
 }
 
-wxString I18nService::languageName(wxString const& code) const
+wxString I18nService::languageName(const wxString& code) const
 {
 	if (code == "en_US")
 		return L"English";

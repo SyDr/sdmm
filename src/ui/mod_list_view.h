@@ -32,10 +32,10 @@ namespace mm
 	{
 	public:
 		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-							 wxString const& managedPath);
+							 const wxString& managedPath);
 
 	private:
-		void createControls(wxString const& managedPath);
+		void createControls(const wxString& managedPath);
 
 		void createListControl();
 		void createListColumns();

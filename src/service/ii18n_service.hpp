@@ -13,8 +13,8 @@ namespace mm
 	{
 		virtual ~II18nService() = default;
 
-		virtual wxString category(wxString const& category) const = 0;
-		virtual wxString get(wxString const& key) const = 0;
-		virtual wxString languageName(wxString const& code) const = 0;
+		virtual wxString category(const wxString& category) const = 0;
+		virtual wxString get(const wxString& key) const = 0;
+		virtual wxString languageName(const wxString& code) const = 0;
 	};
 }
