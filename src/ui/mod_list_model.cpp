@@ -106,7 +106,7 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	}
 	case Column::checkbox:
 	{
-		variant = wxVariant(static_cast<bool>(_checked.count(item)));
+		variant = wxVariant(_checked.contains(item));
 		break;
 	}
 	}
