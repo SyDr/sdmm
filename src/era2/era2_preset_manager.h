@@ -8,6 +8,7 @@
 #include "domain/ipreset_manager.hpp"
 
 #include <vector>
+#include <filesystem>
 
 namespace mm
 {
