@@ -14,10 +14,10 @@
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 
-#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include <filesystem>
+#include <format>
 
 using namespace mm;
 
@@ -110,7 +110,7 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 				if (!isPlugin(pluginPath))
 					continue;
 
-				place.emplace(fmt::format("{}/{}", dir, pluginPath.filename().string()));
+				place.emplace(std::format("{}/{}", dir, pluginPath.filename().string()));
 			}
 		}
 	}

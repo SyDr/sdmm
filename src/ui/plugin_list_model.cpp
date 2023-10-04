@@ -18,7 +18,6 @@
 #include "utility/sdlexcept.h"
 #include "utility/string_util.h"
 
-#include <fmt/format.h>
 #include <wx/app.h>
 #include <wx/msgdlg.h>
 

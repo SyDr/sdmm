@@ -24,7 +24,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
-#include <fmt/format.h>
 #include <wx/app.h>
 #include <wx/button.h>
 #include <wx/checkbox.h>

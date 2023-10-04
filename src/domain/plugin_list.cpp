@@ -8,8 +8,6 @@
 #include "plugin_list.hpp"
 #include "utility/sdlexcept.h"
 
-#include <fmt/format.h>
-
 using namespace mm;
 
 void PluginList::overrideState(const wxString& item, PluginState newState)

@@ -26,7 +26,6 @@
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
 
-#include <fmt/format.h>
 #include <wx/app.h>
 #include <wx/bmpcbox.h>
 #include <wx/button.h>

@@ -34,7 +34,6 @@
 #include "utility/string_util.h"
 
 #include "era2_plugin_helper.hpp"
-#include <fmt/format.h>
 
 using namespace mm;
 
