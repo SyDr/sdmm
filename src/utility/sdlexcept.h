@@ -37,16 +37,6 @@ namespace mm
 	{
 		using std::runtime_error::runtime_error;
 	};
-
-	class mod_disabled_by_other : public std::logic_error
-	{
-		using std::logic_error::logic_error;
-	};
-
-	class mod_activated_by_other : public std::logic_error
-	{
-		using std::logic_error::logic_error;
-	};
 }
 
 #define MM_EXPECTS(what, exception_type) \
@@ -57,17 +47,9 @@ namespace mm
 	if (!(what))             \
 		throw_with_trace(mm::condtion_error(STR(what)));
 
-#define MM_UNREACHABLE(message)                           \
-	throw_with_trace(mm::unexpected_error((message))); \
-	throw "MSVC, throw_with_trace also throws";
-
 #define EX_TRY \
 	try        \
 	{
-#define EX_RETHROW \
-	try            \
-	{              \
-		throw;
 
 #define EX_ON_EXCEPTION(type, handler) \
 	}                                  \
@@ -82,10 +64,6 @@ namespace mm
 		ErrorView ev(this); \
 		ev.ShowModal();     \
 	};
-
-#define EX_SKIP_REST_EXCEPTIONS \
-	}                           \
-	catch (...) {};  // do nothing
 
 #define SINK_EXCEPTION(handler) [=](const auto&) { handler(); }
 
