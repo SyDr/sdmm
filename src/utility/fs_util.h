@@ -22,6 +22,8 @@ namespace mm
 	std::vector<wxString> getAllDirs(const std::filesystem::path& path);
 	std::vector<wxString> getAllFiles(const std::filesystem::path& path);
 
+	std::vector<wxString> readFile(const fs::path& path);
+
 	template <typename Container>
 	void overwriteFileFromContainer(std::filesystem::path const& path, Container const& content)
 	{

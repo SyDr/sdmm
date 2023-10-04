@@ -55,23 +55,6 @@ namespace
 		return true;
 	}
 
-	std::vector<wxString> readFile(const fs::path& path)
-	{
-		wxLogNull noLogging;  // suppress wxWidgets messages about inability to open file
-
-		wxTextFile file;
-		if (!file.Open(path.wstring()))
-			return {};
-
-		std::vector<wxString> result;
-		for (auto& str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine())
-			result.emplace_back(str);
-
-		file.Close();
-
-		return result;
-	}
-
 	ModList loadMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath)
 	{
 		ModList items;

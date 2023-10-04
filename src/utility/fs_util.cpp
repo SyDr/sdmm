@@ -15,6 +15,7 @@
 #include <wx/file.h>
 #include <wx/filename.h>
 #include <wx/log.h>
+#include <wx/textfile.h>
 
 void mm::overwriteFileContent(const fs::path& path, const wxString& content)
 {
@@ -96,6 +97,23 @@ std::vector<wxString> mm::getAllFiles(const std::filesystem::path& path)
 		while (dir.GetNext(&tmp))
 			result.push_back(tmp);
 	}
+
+	return result;
+}
+
+std::vector<wxString> mm::readFile(const fs::path& path)
+{
+	wxLogNull noLogging;  // suppress wxWidgets messages about inability to open file
+
+	wxTextFile file;
+	if (!file.Open(path.wstring()))
+		return {};
+
+	std::vector<wxString> result;
+	for (auto& str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine())
+		result.emplace_back(str);
+
+	file.Close();
 
 	return result;
 }
