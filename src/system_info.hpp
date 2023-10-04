@@ -25,5 +25,12 @@ namespace mm::constant
 	constexpr const std::array  pluginDirs         = { ".", "BeforeWog", "AfterWog" };
 	const std::set<std::string> pluginExts         = { ".dll", ".bin", ".era" };
 
+	const std::unordered_set<std::wstring> pacExtensions = {
+		L".lod",
+		L".snd",
+		L".vid",
+		L".pac",
+	};
+
 	constexpr const auto program_full_version = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
 }

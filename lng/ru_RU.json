@@ -80,6 +80,7 @@
 	"'%s' already exists, overwrite?" : "'%s' уже существует, перезаписать?",
 	"Plugins" : "Плагины",
 	"Plugin" : "Плагин",
+	"Index" : "Номер",
 
 	"category" : {
 		"gameplay" : "Геймплей",

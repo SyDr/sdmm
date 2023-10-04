@@ -62,6 +62,9 @@ void ShowFileListDialog::createControls()
 	_fileList = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 									   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 	_fileList->AppendTextColumn(
+		"Index"_lng, wxDATAVIEW_CELL_INERT, 30);
+
+	_fileList->AppendTextColumn(
 		"Path"_lng, wxDATAVIEW_CELL_INERT,
 		std::max(200l, 400l - static_cast<long>(40l * _data.modList.size())));
 
@@ -106,12 +109,14 @@ void ShowFileListDialog::fillData()
 {
 	_fileList->DeleteAllItems();
 
+	size_t index = 0;
 	for (size_t i = 0; i < _data.fileList.size(); ++i)
 	{
 		const auto& path    = _data.fileList[i];
 		const auto& modList = _data.entries[i];
 
 		wxVector<wxVariant> data;
+		data.push_back(wxVariant(wxString(std::to_string(++index))));
 		data.push_back(wxVariant(wxString(path)));
 		for (const auto& mod : modList)
 		{

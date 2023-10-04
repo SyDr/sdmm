@@ -13,6 +13,7 @@
 #include "select_mods_dialog.hpp"
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
+#include "system_info.hpp"
 
 #include <boost/range/algorithm_ext/erase.hpp>
 
@@ -95,7 +96,8 @@ namespace
 					continue;
 
 				static const std::unordered_set<std::wstring> skip = {
-					L"description.txt", L"description_rus.txt", L"mod.json", L"mod_info.ini", L"readme.txt", L"change.log",
+					L"description.txt", L"description_rus.txt", L"description_chn.txt", L"mod.json",
+					L"mod_info.ini",    L"readme.txt",          L"change.log",          L"changelog.txt",
 				};
 
 				if (skip.count(boost::algorithm::to_lower_copy(it->path().filename().wstring())))
@@ -104,14 +106,8 @@ namespace
 				const auto index             = fileIndex(relative);
 				result.entries[index][i].raw = true;
 
-				static const std::unordered_set<std::wstring> pac = {
-					L".lod",
-					L".snd",
-					L".vid",
-					L".pac",
-				};
-
-				if (!pac.count(boost::algorithm::to_lower_copy(it->path().extension().wstring())))
+				if (!constant::pacExtensions.count(
+						boost::algorithm::to_lower_copy(it->path().extension().wstring())))
 					continue;
 
 				std::fstream        file(path, std::fstream::in | std::fstream::binary);
