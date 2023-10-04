@@ -7,17 +7,17 @@
 
 namespace mm::embedded_icon
 {
-	constexpr auto blank      = L"icons/blank.png";
-	constexpr auto bookmark   = L"icons/bookmark.png";
-	constexpr auto cog        = L"icons/cog.png";
-	constexpr auto down       = L"icons/down.png";
-	constexpr auto folder     = L"icons/folder.png";
-	constexpr auto main_icon  = L"icons/main-icon.png";
-	constexpr auto minus      = L"icons/minus.png";
-	constexpr auto minus_gray = L"icons/minus-gray.png";
-	constexpr auto plus       = L"icons/plus.png";
-	constexpr auto sort       = L"icons/sort.png";
-	constexpr auto tick       = L"icons/tick.png";
-	constexpr auto tick_gray  = L"icons/tick-gray.png";
-	constexpr auto up         = L"icons/up.png";
+	constexpr const auto blank      = L"icons/blank.png";
+	constexpr const auto bookmark   = L"icons/bookmark.png";
+	constexpr const auto cog        = L"icons/cog.png";
+	constexpr const auto down       = L"icons/down.png";
+	constexpr const auto folder     = L"icons/folder.png";
+	constexpr const auto main_icon  = L"icons/main-icon.png";
+	constexpr const auto minus      = L"icons/minus.png";
+	constexpr const auto minus_gray = L"icons/minus-gray.png";
+	constexpr const auto plus       = L"icons/plus.png";
+	constexpr const auto sort       = L"icons/sort.png";
+	constexpr const auto tick       = L"icons/tick.png";
+	constexpr const auto tick_gray  = L"icons/tick-gray.png";
+	constexpr const auto up         = L"icons/up.png";
 }
