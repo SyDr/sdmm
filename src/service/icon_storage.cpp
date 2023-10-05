@@ -10,7 +10,7 @@
 #include <wx/log.h>
 #include <wx/icon.h>
 
-#include "types/embedded_icon.h"
+#include "type/embedded_icon.h"
 
 using namespace mm;
 

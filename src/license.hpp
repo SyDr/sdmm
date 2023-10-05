@@ -5,9 +5,9 @@
 
 #pragma once
 
-namespace mm::constant
+namespace mm
 {
-	constexpr auto program_license_text = R"LICENSE(Copyright (c) 2020-2021 Aliaksei Karalenka
+	constexpr const auto ProgramLicenseText = R"LICENSE(Copyright (c) 2020-2023 Aliaksei Karalenka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files(the "Software"), to deal

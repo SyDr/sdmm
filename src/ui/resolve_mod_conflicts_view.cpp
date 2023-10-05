@@ -10,14 +10,14 @@
 #include "interface/iapp_config.h"
 #include "application.h"
 #include "utility/sdlexcept.h"
-#include "interface/service/iicon_storage.h"
-#include "types/embedded_icon.h"
+#include "interface/iicon_storage.h"
+#include "type/embedded_icon.h"
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "mod_list_model.h"
 #include "wx/priority_data_renderer.h"
 #include "interface/imod_platform.hpp"
 #include "interface/imod_manager.hpp"
-#include "domain/imod_data_provider.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 
 #include <boost/algorithm/string.hpp>

@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="impl\service\app_config.cpp" />
-    <ClCompile Include="impl\service\i18n_service.cpp" />
-    <ClCompile Include="impl\service\icon_storage.cpp" />
+    <ClCompile Include="service\app_config.cpp" />
+    <ClCompile Include="service\i18n_service.cpp" />
+    <ClCompile Include="service\icon_storage.cpp" />
     <ClCompile Include="mod_manager_app.cpp" />
-    <ClCompile Include="impl\service\platform_service.cpp" />
+    <ClCompile Include="service\platform_service.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="ui\error_view.cpp" />
     <ClCompile Include="ui\main_frame.cpp" />
@@ -41,24 +41,24 @@
     <ClCompile Include="ui\plugin_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="era2\era2_plugin_helper.cpp" />
-    <ClCompile Include="base\mod_conflict_resolver.cpp" />
+    <ClCompile Include="domain\mod_conflict_resolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="impl\service\app_config.h" />
-    <ClInclude Include="impl\service\i18n_service.h" />
-    <ClInclude Include="impl\service\icon_storage.h" />
+    <ClInclude Include="service\app_config.h" />
+    <ClInclude Include="service\i18n_service.h" />
+    <ClInclude Include="service\icon_storage.h" />
     <ClInclude Include="interface\ilaunch_helper.h" />
     <ClInclude Include="interface\iapp_config.h" />
-    <ClInclude Include="interface\service\iicon_storage.h" />
+    <ClInclude Include="interface\iicon_storage.h" />
     <ClInclude Include="mod_manager_app.h" />
-    <ClInclude Include="impl\service\platform_service.h" />
-    <ClInclude Include="interface\domain\ilocal_config.h" />
-    <ClInclude Include="interface\domain\iplatform_descriptor.h" />
-    <ClInclude Include="interface\service\iplatform_service.h" />
+    <ClInclude Include="service\platform_service.h" />
+    <ClInclude Include="interface\ilocal_config.h" />
+    <ClInclude Include="interface\iplatform_descriptor.h" />
+    <ClInclude Include="interface\iplatform_service.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="types\embedded_icon.h" />
-    <ClInclude Include="types\main_window_properties.h" />
+    <ClInclude Include="type\embedded_icon.h" />
+    <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="ui\error_view.h" />
     <ClInclude Include="ui\main_frame.h" />
     <ClInclude Include="ui\mod_list_model.h" />
@@ -83,33 +83,33 @@
     <ClInclude Include="era2\era2_platform.h" />
     <ClInclude Include="era2\era2_platform_descriptor.h" />
     <ClInclude Include="era2\era2_preset_manager.h" />
-    <ClInclude Include="service\ii18n_service.hpp" />
+    <ClInclude Include="interface\ii18n_service.hpp" />
     <ClInclude Include="system_info.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
     <ClInclude Include="domain\mod_data.hpp" />
     <ClInclude Include="era2\era2_mod_loader.hpp" />
     <ClInclude Include="interface\imod_platform.hpp" />
-    <ClInclude Include="domain\imod_data_provider.hpp" />
+    <ClInclude Include="interface\imod_data_provider.hpp" />
     <ClInclude Include="utility\non_owning_ptr.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
     <ClInclude Include="era2\era2_mod_data_provider.hpp" />
     <ClInclude Include="utility\wx_widgets_ptr.hpp" />
     <ClInclude Include="ui\resolve_mod_conflicts_view.hpp" />
-    <ClInclude Include="base\mod_conflict_resolver.hpp" />
-    <ClInclude Include="types\conflict_resolve_mode.hpp" />
+    <ClInclude Include="domain\mod_conflict_resolver.hpp" />
+    <ClInclude Include="type\conflict_resolve_mode.hpp" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="ui\show_file_list_helper.hpp" />
     <ClInclude Include="ui\select_mods_dialog.hpp" />
     <ClInclude Include="ui\select_mod_pairs_dialog.hpp" />
-    <ClInclude Include="domain\ipreset_manager.hpp" />
+    <ClInclude Include="interface\ipreset_manager.hpp" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
     <ClInclude Include="domain\plugin_list.hpp" />
-    <ClInclude Include="domain\iplugin_manager.hpp" />
+    <ClInclude Include="interface\iplugin_manager.hpp" />
     <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="ui\plugin_list_model.hpp" />
     <ClInclude Include="ui\plugin_list_view.hpp" />
     <ClInclude Include="era2\era2_plugin_helper.hpp" />
-    <ClInclude Include="types\filesystem.hpp" />
+    <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="interface\inon_auto_applicable_platform.hpp" />
     <ClInclude Include="license.hpp" />
   </ItemGroup>

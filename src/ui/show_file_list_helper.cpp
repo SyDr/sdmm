@@ -6,7 +6,7 @@
 #include "stdafx.h"
 
 #include "application.h"
-#include "domain/imod_data_provider.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "era2/era2_directory_structure.hpp"
 #include "select_mod_pairs_dialog.hpp"

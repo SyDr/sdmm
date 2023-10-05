@@ -22,8 +22,8 @@
 #include "interface/iapp_config.h"
 #include "application.h"
 #include "utility/sdlexcept.h"
-#include "interface/service/iicon_storage.h"
-#include "types/embedded_icon.h"
+#include "interface/iicon_storage.h"
+#include "type/embedded_icon.h"
 
 using namespace mm;
 

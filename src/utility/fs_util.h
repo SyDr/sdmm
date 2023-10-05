@@ -10,7 +10,7 @@
 
 #include <wx/string.h>
 
-#include "types/filesystem.hpp"
+#include "type/filesystem.hpp"
 
 namespace mm
 {

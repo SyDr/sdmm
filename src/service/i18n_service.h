@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "service/ii18n_service.hpp"
+#include "interface/ii18n_service.hpp"
 
 #include <unordered_map>
 #include <wx/string.h>

@@ -9,14 +9,14 @@
 
 #include "application.h"
 #include "choose_conflict_resolve_mode_view.hpp"
-#include "interface/domain/ilocal_config.h"
+#include "interface/ilocal_config.h"
 #include "interface/ilaunch_helper.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/inon_auto_applicable_platform.hpp"
 #include "interface/iapp_config.h"
-#include "interface/service/iicon_storage.h"
-#include "interface/service/iplatform_service.h"
+#include "interface/iicon_storage.h"
+#include "interface/iplatform_service.h"
 #include "license.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
@@ -26,12 +26,12 @@
 #include "select_directory_view.h"
 #include "select_exe.h"
 #include "select_platform_view.h"
-#include "service/ii18n_service.hpp"
+#include "interface/ii18n_service.hpp"
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
 #include "system_info.hpp"
-#include "types/embedded_icon.h"
-#include "types/main_window_properties.h"
+#include "type/embedded_icon.h"
+#include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 
@@ -169,10 +169,10 @@ void MainFrame::OnAbout()
 	aboutInfo.SetName(PROGRAM_NAME);
 	aboutInfo.SetVersion(PROGRAM_VERSION);
 	aboutInfo.SetDescription("A mod manager for Era II");
-	aboutInfo.SetCopyright(L"(C) 2020-2021 Aliaksei Karalenka");
+	aboutInfo.SetCopyright(L"(C) 2020-2023 Aliaksei Karalenka");
 	aboutInfo.SetWebSite("http://wforum.heroes35.net");
 	aboutInfo.AddDeveloper("Aliaksei SyDr Karalenka");
-	aboutInfo.SetLicence(constant::program_license_text);
+	aboutInfo.SetLicence(ProgramLicenseText);
 
 	wxAboutBox(aboutInfo);
 }
@@ -231,18 +231,21 @@ void MainFrame::OnMenuToolsChangeDirectory()
 {
 	EX_TRY;
 
-	if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+	if (_currentPlatform)
 	{
-		if (nonAuto->changed())
+		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
 		{
-			auto saveChanges =
-				wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
-							 wxICON_QUESTION | wxYES_NO);
+			if (nonAuto->changed())
+			{
+				auto saveChanges =
+					wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
+								 wxICON_QUESTION | wxYES_NO);
 
-			if (saveChanges != wxYES)
-				return;
+				if (saveChanges != wxYES)
+					return;
 
-			nonAuto->apply();
+				nonAuto->apply();
+			}
 		}
 	}
 

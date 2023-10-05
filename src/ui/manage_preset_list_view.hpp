@@ -26,7 +26,7 @@ namespace mm
 	struct IModPlatform;
 	class ModListModel;
 	class PluginListModel;
-	class IIconStorage;
+	struct IIconStorage;
 
 	class ManagePresetListView : public wxPanel
 	{

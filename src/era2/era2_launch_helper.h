@@ -11,7 +11,7 @@
 
 namespace mm
 {
-	class IIconStorage;
+	struct IIconStorage;
 	struct Era2LaunchHelper : ILaunchHelper
 	{
 		Era2LaunchHelper(Era2Config& config, IIconStorage& iconStorage);

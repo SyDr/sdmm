@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "types/conflict_resolve_mode.hpp"
+#include "type/conflict_resolve_mode.hpp"
 
 namespace mm
 {

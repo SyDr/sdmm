@@ -10,7 +10,7 @@
 #include <wx/icon.h>
 #include <wx/string.h>
 
-#include "interface/service/iicon_storage.h"
+#include "interface/iicon_storage.h"
 #include "mod_manager_app.h"
 
 using namespace mm;

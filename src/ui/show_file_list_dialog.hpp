@@ -19,7 +19,7 @@ class wxDataViewCtrl;
 namespace mm
 {
 	struct Application;
-	class IIconStorage;
+	struct IIconStorage;
 	struct IModDataProvider;
 	class ModListModel;
 

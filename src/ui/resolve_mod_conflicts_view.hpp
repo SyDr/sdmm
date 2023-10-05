@@ -20,7 +20,7 @@ class wxDataViewCtrl;
 namespace mm
 {
 	struct IAppConfig;
-	class IIconStorage;
+	struct IIconStorage;
 	struct IModPlatform;
 
 	class ResolveModConflictsView : public wxDialog

@@ -15,9 +15,9 @@
 #include <wx/checkbox.h>
 #include <wx/button.h>
 
-#include "interface/service/iicon_storage.h"
+#include "interface/iicon_storage.h"
 #include "application.h"
-#include "types/embedded_icon.h"
+#include "type/embedded_icon.h"
 
 using namespace mm;
 

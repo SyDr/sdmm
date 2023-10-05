@@ -6,11 +6,11 @@
 #pragma once
 
 #include "domain/mod_list.hpp"
+#include "domain/plugin_list.hpp"
 #include "era2_config.h"
 #include "interface/imod_platform.hpp"
 #include "interface/inon_auto_applicable_platform.hpp"
-#include "era2_plugin_helper.hpp"
-#include "domain/plugin_list.hpp"
+#include "type/filesystem.hpp"
 
 #include <deque>
 #include <unordered_set>
@@ -30,10 +30,10 @@ namespace mm
 	{
 		explicit Era2Platform(Application const& app);
 
-		std::filesystem::path getManagedPath() const override;
+		fs::path getManagedPath() const override;
 
 		IPresetManager*   getPresetManager() const override;
-		ILocalConfig*       localConfig() const override;
+		ILocalConfig*     localConfig() const override;
 		IModManager*      modManager() const override;
 		ILaunchHelper*    launchHelper() const override;
 		IModDataProvider* modDataProvider() const override;
@@ -52,8 +52,8 @@ namespace mm
 		fs::path getPluginListPath() const;
 
 	private:
-		Application const&          _app;
-		std::filesystem::path const _rootDir;
+		const Application& _app;
+		const fs::path     _rootDir;
 
 		std::unique_ptr<Era2Config>          _localConfig;
 		std::unique_ptr<Era2LaunchHelper>    _launchHelper;

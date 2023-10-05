@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -10,7 +10,7 @@
 #include "era2/era2_platform.h"
 #include "interface/iapp_config.h"
 #include "application.h"
-#include "service/ii18n_service.hpp"
+#include "interface/ii18n_service.hpp"
 #include "utility/sdlexcept.h"
 
 using namespace mm;

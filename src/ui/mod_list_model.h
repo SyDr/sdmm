@@ -16,7 +16,7 @@
 
 namespace mm
 {
-	class IIconStorage;
+	struct IIconStorage;
 	struct IModManager;
 	struct IModDataProvider;
 	struct ModData;

@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <wx/string.h>
 
-#include "interface/service/iicon_storage.h"
+#include "interface/iicon_storage.h"
 
 namespace mm
 {

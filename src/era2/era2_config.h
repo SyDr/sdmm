@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "interface/domain/ilocal_config.h"
+#include "interface/ilocal_config.h"
 
 #include <nlohmann/json.hpp>
 #include <wx/string.h>

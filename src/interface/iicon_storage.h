@@ -10,9 +10,8 @@ class wxString;
 
 namespace mm
 {
-	class IIconStorage
+	struct IIconStorage
 	{
-	public:
 		virtual ~IIconStorage() = default;
 
 		virtual wxIcon get(const wxString& name) = 0;

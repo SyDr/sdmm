@@ -8,7 +8,7 @@
 #include <wx/string.h>
 
 #include "application.h"
-#include "domain/imod_data_provider.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
 #include "mod_conflict_resolver.hpp"

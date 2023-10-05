@@ -8,7 +8,7 @@
 #include "era2/era2_platform_descriptor.h"
 #include "utility/sdlexcept.h"
 #include "interface/imod_platform.hpp"
-#include "interface/domain/iplatform_descriptor.h"
+#include "interface/iplatform_descriptor.h"
 #include "platform_service.h"
 
 using namespace mm;

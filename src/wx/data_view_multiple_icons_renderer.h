@@ -12,9 +12,9 @@ class mmDataViewMultipleIconsRenderer : public wxDataViewCustomRenderer
 public:
 	mmDataViewMultipleIconsRenderer();
 
-	bool GetValue(wxVariant& value) const override;
-	bool Render(wxRect cell, wxDC *dc, int state) override;
-	bool SetValue(const wxVariant& value) override;
+	bool   GetValue(wxVariant& value) const override;
+	bool   Render(wxRect cell, wxDC* dc, int state) override;
+	bool   SetValue(const wxVariant& value) override;
 	wxSize GetSize() const override;
 
 private:

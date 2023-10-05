@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "interface/domain/iplatform_descriptor.h"
+#include "interface/iplatform_descriptor.h"
 
 namespace mm
 {

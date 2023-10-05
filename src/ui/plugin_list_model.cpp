@@ -8,13 +8,13 @@
 #include "plugin_list_model.hpp"
 
 #include "application.h"
-#include "domain/imod_data_provider.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
 #include "interface/imod_manager.hpp"
-#include "interface/service/iicon_storage.h"
+#include "interface/iicon_storage.h"
 #include "mod_manager_app.h"
-#include "types/embedded_icon.h"
+#include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "utility/string_util.h"
 

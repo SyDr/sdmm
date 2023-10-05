@@ -15,7 +15,7 @@ mmDataViewMultipleIconsRenderer::mmDataViewMultipleIconsRenderer()
 	_data.NullList();
 }
 
-bool mmDataViewMultipleIconsRenderer::Render(wxRect cell, wxDC *dc, int)
+bool mmDataViewMultipleIconsRenderer::Render(wxRect cell, wxDC* dc, int)
 {
 	int xOffset = 0;
 

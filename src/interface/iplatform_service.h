@@ -13,9 +13,8 @@ namespace mm
 	struct IModPlatform;
 	class IPlatformDescriptor;
 
-	class IPlatformService
+	struct IPlatformService
 	{
-	public:
 		virtual ~IPlatformService() = default;
 
 		virtual std::deque<IPlatformDescriptor*> availablePlatforms() const = 0;

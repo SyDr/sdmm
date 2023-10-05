@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="base\mod_conflict_resolver.cpp" />
+    <ClCompile Include="domain\mod_conflict_resolver.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
     <ClCompile Include="domain\plugin_list.cpp" />
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
@@ -21,14 +21,14 @@
     <ClCompile Include="era2\era2_plugin_helper.cpp" />
     <ClCompile Include="era2\era2_plugin_manager.cpp" />
     <ClCompile Include="era2\era2_preset_manager.cpp" />
-    <ClCompile Include="impl\service\app_config.cpp" />
-    <ClCompile Include="impl\service\i18n_service.cpp" />
-    <ClCompile Include="impl\service\icon_storage.cpp" />
+    <ClCompile Include="service\app_config.cpp" />
+    <ClCompile Include="service\i18n_service.cpp" />
+    <ClCompile Include="service\icon_storage.cpp" />
     <ClCompile Include="mod_manager_app.cpp" />
     <ClCompile Include="era2\era2_config.cpp" />
     <ClCompile Include="era2\era2_platform.cpp" />
     <ClCompile Include="era2\era2_platform_descriptor.cpp" />
-    <ClCompile Include="impl\service\platform_service.cpp" />
+    <ClCompile Include="service\platform_service.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -58,9 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="base\mod_conflict_resolver.hpp" />
-    <ClInclude Include="domain\imod_data_provider.hpp" />
-    <ClInclude Include="domain\iplugin_manager.hpp" />
+    <ClInclude Include="domain\mod_conflict_resolver.hpp" />
+    <ClInclude Include="interface\imod_data_provider.hpp" />
+    <ClInclude Include="interface\iplugin_manager.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
     <ClInclude Include="domain\plugin_list.hpp" />
@@ -72,33 +72,33 @@
     <ClInclude Include="era2\era2_plugin_helper.hpp" />
     <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="era2\era2_preset_manager.h" />
-    <ClInclude Include="impl\service\app_config.h" />
-    <ClInclude Include="impl\service\i18n_service.h" />
-    <ClInclude Include="impl\service\icon_storage.h" />
+    <ClInclude Include="service\app_config.h" />
+    <ClInclude Include="service\i18n_service.h" />
+    <ClInclude Include="service\icon_storage.h" />
     <ClInclude Include="interface\ilaunch_helper.h" />
     <ClInclude Include="interface\imod_manager.hpp" />
     <ClInclude Include="interface\inon_auto_applicable_platform.hpp" />
     <ClInclude Include="interface\iapp_config.h" />
     <ClInclude Include="license.hpp" />
-    <ClInclude Include="service\ii18n_service.hpp" />
-    <ClInclude Include="interface\service\iicon_storage.h" />
+    <ClInclude Include="interface\ii18n_service.hpp" />
+    <ClInclude Include="interface\iicon_storage.h" />
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="era2\era2_config.h" />
     <ClInclude Include="era2\era2_platform.h" />
     <ClInclude Include="era2\era2_platform_descriptor.h" />
-    <ClInclude Include="impl\service\platform_service.h" />
-    <ClInclude Include="interface\domain\ilocal_config.h" />
+    <ClInclude Include="service\platform_service.h" />
+    <ClInclude Include="interface\ilocal_config.h" />
     <ClInclude Include="domain\mod_data.hpp" />
     <ClInclude Include="interface\imod_platform.hpp" />
-    <ClInclude Include="interface\domain\iplatform_descriptor.h" />
-    <ClInclude Include="domain\ipreset_manager.hpp" />
-    <ClInclude Include="interface\service\iplatform_service.h" />
+    <ClInclude Include="interface\iplatform_descriptor.h" />
+    <ClInclude Include="interface\ipreset_manager.hpp" />
+    <ClInclude Include="interface\iplatform_service.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system_info.hpp" />
-    <ClInclude Include="types\conflict_resolve_mode.hpp" />
-    <ClInclude Include="types\embedded_icon.h" />
-    <ClInclude Include="types\filesystem.hpp" />
-    <ClInclude Include="types\main_window_properties.h" />
+    <ClInclude Include="type\conflict_resolve_mode.hpp" />
+    <ClInclude Include="type\embedded_icon.h" />
+    <ClInclude Include="type\filesystem.hpp" />
+    <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="ui\error_view.h" />
     <ClInclude Include="ui\main_frame.h" />

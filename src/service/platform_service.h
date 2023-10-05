@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "interface/service/iplatform_service.h"
+#include "interface/iplatform_service.h"
 
 namespace mm
 {

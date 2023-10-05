@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "types/conflict_resolve_mode.hpp"
+#include "type/conflict_resolve_mode.hpp"
 
 #include <wx/dialog.h>
 
 namespace mm
 {
-	class IIconStorage;
+	struct IIconStorage;
 
 	class ChooseConflictResolveModeView : public wxDialog
 	{

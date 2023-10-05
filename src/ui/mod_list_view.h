@@ -24,7 +24,7 @@ namespace mm
 {
 	struct IModPlatform;
 	struct IModManager;
-	class IIconStorage;
+	struct IIconStorage;
 
 	class ModListModel;
 

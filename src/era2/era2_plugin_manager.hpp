@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "domain/iplugin_manager.hpp"
+#include "interface/iplugin_manager.hpp"
 #include "domain/plugin_list.hpp"
 #include "era2_plugin_helper.hpp"
 

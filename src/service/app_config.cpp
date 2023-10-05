@@ -14,7 +14,7 @@
 #include <wx/log.h>
 #include <wx/stdpaths.h>
 
-#include "types/main_window_properties.h"
+#include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 #include "utility/string_util.h"
 

@@ -11,12 +11,11 @@ namespace mm
 {
 	struct IAppConfig;
 	struct II18nService;
-	class IIconStorage;
-	class IPlatformService;
+	struct IIconStorage;
+	struct IPlatformService;
 
 	struct Application
 	{
-	public:
 		virtual ~Application() = default;
 
 		virtual IAppConfig& appConfig() const = 0;

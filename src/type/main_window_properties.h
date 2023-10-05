@@ -11,8 +11,8 @@ namespace mm
 {
 	struct MainWindowProperties
 	{
-		bool maximized = false;
-		wxSize size;
+		bool    maximized = false;
+		wxSize  size;
 		wxPoint position;
 	};
 }

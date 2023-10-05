@@ -5,13 +5,13 @@
 
 #include "stdafx.h"
 
-#include "impl/service/app_config.h"
-#include "impl/service/i18n_service.h"
-#include "impl/service/icon_storage.h"
-#include "impl/service/platform_service.h"
+#include "service/app_config.h"
+#include "service/i18n_service.h"
+#include "service/icon_storage.h"
+#include "service/platform_service.h"
 #include "interface/iapp_config.h"
 #include "mod_manager_app.h"
-#include "service/ii18n_service.hpp"
+#include "interface/ii18n_service.hpp"
 #include "system_info.hpp"
 #include "ui/main_frame.h"
 #include "utility/sdlexcept.h"

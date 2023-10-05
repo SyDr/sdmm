@@ -15,7 +15,7 @@ class wxImageList;
 
 namespace mm
 {
-	class IIconStorage;
+	struct IIconStorage;
 
 	class SelectExe : public wxDialog
 	{

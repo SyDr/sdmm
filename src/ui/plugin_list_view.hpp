@@ -22,7 +22,7 @@ class wxBitmapComboBox;
 namespace mm
 {
 	struct IPluginManager;
-	class IIconStorage;
+	struct IIconStorage;
 	struct IModDataProvider;
 
 	class PluginListModel;

@@ -33,8 +33,6 @@
 #include "utility/shell_util.h"
 #include "utility/string_util.h"
 
-#include "era2_plugin_helper.hpp"
-
 using namespace mm;
 
 namespace

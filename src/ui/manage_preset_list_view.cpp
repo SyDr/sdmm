@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,17 +8,17 @@
 #include "manage_preset_list_view.hpp"
 
 #include "application.h"
-#include "domain/iplugin_manager.hpp"
-#include "domain/ipreset_manager.hpp"
+#include "interface/iplugin_manager.hpp"
+#include "interface/ipreset_manager.hpp"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
-#include "interface/domain/ilocal_config.h"
+#include "interface/ilocal_config.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/service/iicon_storage.h"
+#include "interface/iicon_storage.h"
 #include "mod_list_model.h"
 #include "plugin_list_model.hpp"
-#include "types/embedded_icon.h"
+#include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 

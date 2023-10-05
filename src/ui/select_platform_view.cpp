@@ -17,8 +17,8 @@
 #include <wx/statbox.h>
 
 #include "application.h"
-#include "interface/service/iplatform_service.h"
-#include "interface/domain/iplatform_descriptor.h"
+#include "interface/iplatform_service.h"
+#include "interface/iplatform_descriptor.h"
 
 using namespace mm;
 
