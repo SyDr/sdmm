@@ -66,12 +66,21 @@ bool ModList::canMove(const wxString& from, const wxString& to) const
 void ModList::move(const wxString& from, const wxString& to)
 {
 	auto posFrom = activePosition(from);
-	if (!posFrom.has_value())
-		return;
+	auto posTo   = activePosition(to);
 
-	auto posTo = activePosition(to);
 	if (!posTo.has_value())
+	{
+		if (posFrom.has_value())
+			deactivate(from);
+
 		return;
+	}
+
+	if (!posFrom.has_value())
+	{
+		activate(from);
+		posFrom = activePosition(from);
+	}
 
 	const auto step = posFrom.value() < posTo.value() ? 1 : -1;
 

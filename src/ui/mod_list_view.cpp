@@ -102,76 +102,33 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG,
 				[=](wxDataViewEvent& event)
 				{
-					event.Veto();  // default
-					const auto item = event.GetItem();
-
-					if (!item.IsOk())
-						return;
-
-					if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
-						return;
-					else if (sortingColumn->GetModelColumn() !=
-							 static_cast<unsigned int>(ModListModel::Column::priority))
-						return;
-
-					auto id = _listModel->findIdByItem(item);
-
-					if (!_modManager.activePosition(id).has_value())
-						return;
-
-					event.Allow();
+					auto id = _listModel->findIdByItem(event.GetItem());
 					event.SetDataObject(new wxTextDataObject(id));
 				});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE,
-				[=](wxDataViewEvent& event)
-				{
-					event.Veto();  // default
-					const auto item(event.GetItem());
-
-					if (!item.IsOk())
-						return;
-
-					if (!_modManager.activePosition(_listModel->findIdByItem(item)).has_value())
-						return;
-
-					event.Allow();
-				});
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent&) {});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP,
 				[=](wxDataViewEvent& event)
 				{
-					if (auto sortingColumn = _list->GetSortingColumn(); !sortingColumn)
-						return;
-					else if (sortingColumn->GetModelColumn() !=
-							 static_cast<unsigned int>(ModListModel::Column::priority))
-						return;
-
-					const auto item(event.GetItem());
-					if (!item.IsOk())
-						return;
-
+					wxString moveFrom;
 					wxTextDataObject from;
 					from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
+					moveFrom = from.GetText();
 
-					wxString text = from.GetText();
-					if (text.Last() == L'\0')
-						text = text.Left(text.Len() - 1);
-
-					_modManager.move(text, _listModel->findIdByItem(item));
+					_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
 				});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU,
 				[=](wxDataViewEvent& event)
 				{
-					const auto item(event.GetItem());
-					if (!item.IsOk())
+					if (!event.GetItem().IsOk())
 					{
 						event.Veto();
 						return;
 					}
 
-					OnListItemContextMenu(item);
+					OnListItemContextMenu(event.GetItem());
 				});
 
 	Bind(wxEVT_MENU, &ModListView::OnMenuItemSelected, this);
