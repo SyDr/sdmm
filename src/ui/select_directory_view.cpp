@@ -28,7 +28,7 @@
 using namespace mm;
 
 SelectDirectoryDialog::SelectDirectoryDialog(wxWindow *parent, IAppConfig& config, IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Select game directory for management"_lng, wxDefaultPosition, wxSize(800, 444))
+	: wxDialog(parent, wxID_ANY, "Select game directory for management"_lng, wxDefaultPosition, wxSize(1000, 666))
 	, _appConfig(config)
 	, _iconStorage(iconStorage)
 {
