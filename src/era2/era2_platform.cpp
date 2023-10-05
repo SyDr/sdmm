@@ -129,7 +129,7 @@ Era2Platform::Era2Platform(Application const& app)
 	_pluginManager = std::make_unique<Era2PluginManager>(*_modManager, getModsDirPath(), getPluginListPath());
 }
 
-std::filesystem::path Era2Platform::getManagedPath() const
+fs::path Era2Platform::managedPath() const
 {
 	return _rootDir;
 }

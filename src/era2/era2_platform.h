@@ -30,7 +30,7 @@ namespace mm
 	{
 		explicit Era2Platform(Application const& app);
 
-		fs::path getManagedPath() const override;
+		fs::path managedPath() const override;
 
 		IPresetManager*   getPresetManager() const override;
 		ILocalConfig*     localConfig() const override;

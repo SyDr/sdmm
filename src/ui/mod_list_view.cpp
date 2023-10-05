@@ -41,8 +41,7 @@
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-						 const wxString& managedPath)
+ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
@@ -52,7 +51,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
-	createControls(managedPath);
+	createControls(managedPlatform.managedPath().string());
 	_listModel->setModList(_modManager.mods());
 	buildLayout();
 	bindEvents();

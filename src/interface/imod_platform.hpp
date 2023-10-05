@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <filesystem>
+#include "type/filesystem.hpp"
 
 namespace mm
 {
@@ -21,7 +21,7 @@ namespace mm
 	{
 		virtual ~IModPlatform() = default;
 
-		virtual std::filesystem::path getManagedPath() const = 0;
+		virtual fs::path managedPath() const = 0;
 
 		virtual INonAutoApplicablePlatform* nonAutoApplicable() = 0;
 

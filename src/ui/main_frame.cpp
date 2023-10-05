@@ -66,8 +66,7 @@ MainFrame::MainFrame(Application& app)
 
 	if (_currentPlatform)
 	{
-		auto modListView = new ModListView(pages, *_currentPlatform, _app.iconStorage(),
-										   _currentPlatform->getManagedPath().string());
+		auto modListView = new ModListView(pages, *_currentPlatform, _app.iconStorage());
 		pages->AddPage(modListView, "Mods"_lng);
 
 		if (auto pluginManager = _currentPlatform->pluginManager())
