@@ -57,6 +57,9 @@
 	"Manage" : "Управление",
 	"Save current mod list as profile" : "Сохранить текущий список модов как профиль",
 	"Save as" : "Сохранить как",
+	"Save" : "Сохранить",
+	"Export" : "Экспорт",
+	"Import" : "Импорт",
 	"Resolve mods conflicts" : "Разрешить конфликты между модами",
 	"Profiles" : "Профили",
 	"Profile" : "Профиль",
@@ -81,6 +84,8 @@
 	"Plugins" : "Плагины",
 	"Plugin" : "Плагин",
 	"Index" : "Номер",
+	"Profile \"%s\" loaded." : "Профиль \"%s\" загружен.",
+	"Profile \"%s\" already exists." : "Профиль \"%s\" уже существует.",
 
 	"category" : {
 		"gameplay" : "Геймплей",

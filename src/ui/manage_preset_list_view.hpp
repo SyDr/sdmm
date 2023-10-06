@@ -20,6 +20,7 @@ class wxButton;
 class wxDataViewCtrl;
 class wxStaticBox;
 class wxDataViewListCtrl;
+class wxInfoBarGeneric;
 
 namespace mm
 {
@@ -65,10 +66,15 @@ namespace mm
 		wxWidgetsPtr<wxDataViewListCtrl> _list = nullptr;
 		std::vector<wxString>            _profiles;
 
-		wxWidgetsPtr<wxButton> _new  = nullptr;
 		wxWidgetsPtr<wxButton> _load = nullptr;
-		// wxWidgetsPtr<wxButton> _rename    = nullptr;
-		// wxWidgetsPtr<wxButton> _copy      = nullptr;
+		wxWidgetsPtr<wxButton> _save = nullptr;
+
+		wxWidgetsPtr<wxButton> _export = nullptr;
+		wxWidgetsPtr<wxButton> _import = nullptr;
+
+		wxWidgetsPtr<wxButton> _rename = nullptr;
+		wxWidgetsPtr<wxButton> _copy = nullptr;
+
 		wxWidgetsPtr<wxButton> _remove = nullptr;
 
 		wxWidgetsPtr<wxStaticBox>     _preview = nullptr;
@@ -77,5 +83,7 @@ namespace mm
 
 		wxObjectDataPtr<PluginListModel> _pluginListModel;
 		wxWidgetsPtr<wxDataViewCtrl>     _plugins = nullptr;
+
+		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 	};
 }

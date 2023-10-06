@@ -8,14 +8,14 @@
 #include "manage_preset_list_view.hpp"
 
 #include "application.h"
-#include "interface/iplugin_manager.hpp"
-#include "interface/ipreset_manager.hpp"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
+#include "interface/iicon_storage.h"
 #include "interface/ilocal_config.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/iicon_storage.h"
+#include "interface/iplugin_manager.hpp"
+#include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
 #include "plugin_list_model.hpp"
 #include "type/embedded_icon.h"
@@ -33,8 +33,26 @@
 #include <wx/listctrl.h>
 #include <wx/msgdlg.h>
 #include <wx/sizer.h>
+#include <wx/infobar.h>
+
+#include <format>
 
 using namespace mm;
+
+namespace
+{
+	wxString showEnterNameDialog(wxWindow* parent, wxString message, wxString caption, wxString name)
+	{
+		wxTextEntryDialog ted(parent, message, caption, name);
+		ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
+		ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
+
+		if (ted.ShowModal() != wxID_OK)
+			return {};
+
+		return ted.GetValue();
+	}
+}
 
 ManagePresetListView::ManagePresetListView(wxWindow* parent, IModPlatform& platform,
 										   IIconStorage& iconStorage)
@@ -84,10 +102,17 @@ void ManagePresetListView::createControls()
 								   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 	_list->AppendIconTextColumn("Profile"_lng, wxDATAVIEW_CELL_INERT);
 
-	_new  = new wxButton(_presets, wxID_ANY, "Save as"_lng);
 	_load = new wxButton(_presets, wxID_ANY, "Load"_lng);
-	// _rename = new wxButton(_presets, wxID_ANY, "Rename"_lng);
-	// _copy   = new wxButton(_presets, wxID_ANY, "Copy"_lng);
+	_save = new wxButton(_presets, wxID_ANY, "Save"_lng);
+
+	_export = new wxButton(_presets, wxID_ANY, "Export"_lng);
+	_export->Hide();
+	_import = new wxButton(_presets, wxID_ANY, "Import"_lng);
+	_import->Hide();
+
+	_rename = new wxButton(_presets, wxID_ANY, "Rename"_lng);
+	_copy   = new wxButton(_presets, wxID_ANY, "Copy"_lng);
+
 	_remove = new wxButton(_presets, wxID_ANY, "Delete"_lng);
 
 	_preview = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
@@ -99,6 +124,8 @@ void ManagePresetListView::createControls()
 	_plugins = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 								  wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
 	_plugins->AssociateModel(_pluginListModel.get());
+
+	_infoBar = new wxInfoBar(this);
 
 	createListColumns();
 	createPluginsListColumns();
@@ -151,11 +178,15 @@ void ManagePresetListView::createPluginsListColumns()
 void ManagePresetListView::updateLayout()
 {
 	auto manageControls = new wxBoxSizer(wxVERTICAL);
-	manageControls->Add(_new, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	manageControls->Add(_load, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->Add(_save, wxSizerFlags(1).Expand().Border(wxALL, 5));
 	manageControls->AddSpacer(16);
-	// manageControls->Add(_rename, wxSizerFlags(1).Expand().Border(wxALL, 5));
-	// manageControls->Add(_copy, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->Add(_export, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->Add(_import, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->AddSpacer(16);
+	manageControls->Add(_rename, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->Add(_copy, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	manageControls->AddSpacer(16);
 	manageControls->Add(_remove, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	auto midControls = new wxStaticBoxSizer(_presets, wxHORIZONTAL);
@@ -170,98 +201,105 @@ void ManagePresetListView::updateLayout()
 	mainSizer->Add(midControls, wxSizerFlags(2).Expand().Border(wxALL, 5));
 	mainSizer->Add(previewGroup, wxSizerFlags(3).Expand().Border(wxALL, 5));
 
-	SetSizer(mainSizer);
+	auto vertSizer = new wxBoxSizer(wxVERTICAL);
+	vertSizer->Add(mainSizer, wxSizerFlags(1).Expand());
+	vertSizer->Add(_infoBar, wxSizerFlags(0).Expand());
+
+	SetSizer(vertSizer);
 	Layout();
 }
 
 void ManagePresetListView::bindEvents()
 {
-	_new->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(getSelection()); });
-	_load->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLoadPresetRequested(); });
-	//_rename->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onRenamePreset(); });
-	//_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
-	_remove->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onDeletePreset(); });
+	_platform.getPresetManager()->onListChanged().connect([=] { refreshListContent(); });
+
+	_list->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onLoadPresetRequested(); });
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) { onSelectionChanged(); });
 
-	_mods->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onLoadPresetRequested(); });
+	_load->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLoadPresetRequested(); });
+	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(getSelection()); });
 
-	_platform.getPresetManager()->onListChanged().connect([=] { refreshListContent(); });
+	_rename->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onRenamePreset(); });
+	_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
+
+	_remove->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onDeletePreset(); });
 }
 
 void ManagePresetListView::onSavePresetRequested(wxString baseName)
 {
-	try_handle_exceptions(
-		this,
-		[&]
-		{
-			if (baseName.empty())
-			{
-				wxTextEntryDialog ted(this, "Enter profile name"_lng, "Create"_lng, baseName);
-				ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
-				ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
+	EX_TRY;
 
-				if (ted.ShowModal() != wxID_OK)
-					return;
+	if (baseName.empty())
+		baseName = showEnterNameDialog(this, "Enter profile name"_lng, "Create"_lng, baseName);
 
-				baseName = ted.GetValue();
-			}
+	if (baseName.empty())
+		return;
 
-			if (_platform.getPresetManager()->exists(baseName))
-			{
-				int const answer =
-					wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
-								 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+	if (_platform.getPresetManager()->exists(baseName))
+	{
+		int const answer =
+			wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
+						 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
-				if (answer != wxYES)
-					return;
-			}
+		if (answer != wxYES)
+			return;
+	}
 
-			_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods(),
-													 _platform.pluginManager()->plugins().overridden);
-			_platform.localConfig()->setActivePreset(baseName);
-			_selected = baseName;
+	_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods(),
+											 _platform.pluginManager()->plugins().overridden);
+	_platform.localConfig()->setActivePreset(baseName);
+	_selected = baseName;
 
-			refreshListContent();
-			// EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
-		});
+	refreshListContent();
+
+	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_UNEXPECTED;
 }
 
 void ManagePresetListView::onLoadPresetRequested()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  auto selected           = getSelection();
-							  auto [mods, overridden] = _platform.getPresetManager()->loadPreset(selected);
+	EX_TRY;
 
-							  mods.available = _platform.modManager()->mods().available;
-							  mods.invalid   = _platform.modManager()->mods().invalid;
+	auto selected           = getSelection();
+	auto [mods, overridden] = _platform.getPresetManager()->loadPreset(selected);
 
-							  _platform.modManager()->mods(std::move(mods));
+	mods.available = _platform.modManager()->mods().available;
+	mods.invalid   = _platform.modManager()->mods().invalid;
 
-							  auto currentPlugins = _platform.pluginManager()->plugins();
-							  currentPlugins.replaceOverridenState(overridden);
-							  _platform.pluginManager()->plugins(currentPlugins);
-							  _platform.localConfig()->setActivePreset(selected);
-							  _selected = selected;
+	_platform.modManager()->mods(std::move(mods));
 
-							  refreshListContent();
-						  });
+	auto currentPlugins = _platform.pluginManager()->plugins();
+	currentPlugins.replaceOverridenState(overridden);
+	_platform.pluginManager()->plugins(currentPlugins);
+	_platform.localConfig()->setActivePreset(selected);
+	_selected = selected;
+
+	refreshListContent();
+
+	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, selected));
+
+	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_UNEXPECTED;
 }
 
 void ManagePresetListView::onRenamePreset()
 {
 	EX_TRY;
 
-	const wxString    selected = getSelection();
-	wxTextEntryDialog ted(this, "Enter profile name"_lng, "Rename"_lng, selected);
-	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxString();
+	const wxString selected = getSelection();
+	const wxString newName  = showEnterNameDialog(this, "Enter profile name"_lng, "Rename"_lng, selected);
 
-	if (!_platform.getPresetManager()->exists(newName))
+	if (newName.empty())
+		return;
+
+	if (_platform.getPresetManager()->exists(newName))
 	{
-		_platform.getPresetManager()->rename(selected.ToStdString(), newName.ToStdString());
-		_selected = newName;
+		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		return;
 	}
+
+	_platform.getPresetManager()->rename(selected.ToStdString(), newName.ToStdString());
+	_selected = newName;
 
 	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
@@ -271,12 +309,19 @@ void ManagePresetListView::onCopyPreset()
 {
 	EX_TRY;
 
-	const wxString    selected = getSelection();
-	wxTextEntryDialog ted(this, "Enter profile name"_lng, "Copy"_lng, selected);
-	const wxString    newName = ted.ShowModal() == wxID_OK ? ted.GetValue() : wxString();
+	const wxString selected = getSelection();
+	const wxString newName  = showEnterNameDialog(this, "Enter profile name"_lng, "Copy"_lng, selected);
 
-	if (!newName.empty() && !_platform.getPresetManager()->list().count(newName))
-		_platform.getPresetManager()->copy(selected.ToStdString(), newName.ToStdString());
+	if (newName.empty())
+		return;
+
+	if (_platform.getPresetManager()->exists(newName))
+	{
+		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		return;
+	}
+
+	_platform.getPresetManager()->copy(selected.ToStdString(), newName.ToStdString());
 
 	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
@@ -300,7 +345,7 @@ void ManagePresetListView::onDeletePreset()
 void ManagePresetListView::onFilesystemError(const std::filesystem::filesystem_error& e)
 {
 	wxMessageOutputBest().Printf(
-		"Error happened during execution of operation."
+		"Error happened during execution of operation. "
 		"Details:\n\n %s"_lng,
 		e.what());
 }
@@ -309,30 +354,29 @@ void ManagePresetListView::updatePreview()
 {
 	wxBusyCursor bc;
 
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  auto selected = getSelection();
+	EX_TRY;
 
-							  ModList                                   mods;
-							  std::unordered_map<wxString, PluginState> plugins;
-							  if (!selected.empty())
-							  {
-								  std::tie(mods, plugins) =
-									  _platform.getPresetManager()->loadPreset(selected);
-								  // mods.available = _platform.modManager()->mods().available;
-							  }
+	auto selected = getSelection();
 
-							  _listModel->setModList(mods);
-							  PluginList pluginsData;
-							  _platform.pluginManager()->updateBaseState(pluginsData, mods);
-							  pluginsData.available.clear();
-							  pluginsData.replaceOverridenState(plugins);
-							  _pluginListModel->setList(pluginsData);
+	ModList                                   mods;
+	std::unordered_map<wxString, PluginState> plugins;
+	if (!selected.empty())
+	{
+		std::tie(mods, plugins) = _platform.getPresetManager()->loadPreset(selected);
+		// mods.available = _platform.modManager()->mods().available;
+	}
 
-							  _plugins->Show(!pluginsData.overridden.empty());
-							  Layout();
-						  });
+	_listModel->setModList(mods);
+	PluginList pluginsData;
+	_platform.pluginManager()->updateBaseState(pluginsData, mods);
+	pluginsData.available.clear();
+	pluginsData.replaceOverridenState(plugins);
+	_pluginListModel->setList(pluginsData);
+
+	_plugins->Show(!pluginsData.overridden.empty());
+	Layout();
+
+	EX_UNEXPECTED;
 }
 
 wxString ManagePresetListView::getSelection() const
@@ -349,10 +393,11 @@ void ManagePresetListView::onSelectionChanged()
 
 	updatePreview();
 
-	_new->SetLabel(selected.empty() ? "Save as"_lng : "Overwrite"_lng);
+	_save->SetLabel(selected.empty() ? "Save as"_lng : "Save"_lng);
 
 	_load->Enable(!selected.empty());
-	//_rename->Enable(!selected.empty());
-	//_copy->Enable(!selected.empty());
+	_export->Enable(!selected.empty());
+	_rename->Enable(!selected.empty());
+	_copy->Enable(!selected.empty());
 	_remove->Enable(!selected.empty());
 }
