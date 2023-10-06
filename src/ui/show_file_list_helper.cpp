@@ -103,8 +103,10 @@ namespace
 					continue;
 
 				static const std::unordered_set<std::wstring> skip = {
-					L"description.txt", L"description_rus.txt", L"description_chn.txt", L"mod.json",
-					L"mod_info.ini",    L"readme.txt",          L"change.log",          L"changelog.txt",
+					L"description.txt", L"description_rus.txt", L"description_chn.txt",
+					L"mod.json",        L"description_ru.txt",  L"description_en.txt",
+					L"icon.ico",        L"mod_info.ini",        L"readme.txt",
+					L"change.log",      L"changelog.txt",
 				};
 
 				if (skip.count(boost::to_lower_copy(it->path().filename().wstring())))
