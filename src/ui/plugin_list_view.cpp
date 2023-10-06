@@ -192,8 +192,10 @@ void PluginListView::followSelection()
 
 void PluginListView::onSwitchSelectedStateRequested()
 {
-	try_handle_exceptions(this, [&] {
-		_manager.switchState(_selected);
-		_listModel->ItemChanged(_listModel->findItemById(_selected));
-	});
+	EX_TRY;
+
+	_manager.switchState(_selected);
+	_listModel->ItemChanged(_listModel->findItemById(_selected));
+
+	EX_UNEXPECTED;
 }

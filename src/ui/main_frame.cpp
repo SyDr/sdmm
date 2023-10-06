@@ -147,10 +147,8 @@ MainFrame::MainFrame(Application& app)
 	{
 		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
 		{
-			_revertButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&)
-								{ try_handle_exceptions(this, [&] { nonAuto->revert(); }); });
-			_applyButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&)
-							   { try_handle_exceptions(this, [&] { nonAuto->apply(); }); });
+			_revertButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { nonAuto->revert(); });
+			_applyButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { nonAuto->apply(); });
 		}
 
 		if (auto launchHelper = _currentPlatform->launchHelper())
@@ -264,36 +262,36 @@ void MainFrame::OnMenuToolsChangeDirectory()
 
 void MainFrame::OnMenuToolsListModFiles()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  showModFileList(*this, _app, *_currentPlatform->modDataProvider(),
-											  _currentPlatform->modManager()->mods());
-						  });
+	EX_TRY;
+
+	showModFileList(*this, _app, *_currentPlatform->modDataProvider(),
+					_currentPlatform->modManager()->mods());
+
+	EX_UNEXPECTED;
 }
 
 void MainFrame::OnMenuToolsSortMods()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  ResolveModConflictsView view(this, _app.appConfig(), _app.iconStorage(),
-														   *_currentPlatform);
-							  view.ShowModal();
-						  });
+	EX_TRY;
+
+	ResolveModConflictsView view(this, _app.appConfig(), _app.iconStorage(), *_currentPlatform);
+	view.ShowModal();
+
+	EX_UNEXPECTED;
 }
 
 void MainFrame::OnMenuToolsChooseConflictResolveMode()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  ChooseConflictResolveModeView dialog(this);
+	EX_TRY;
 
-							  if (dialog.ShowModal() == wxID_OK)
-								  _currentPlatform->localConfig()->conflictResolveMode(
-									  dialog.conflictResolveMode());
-						  });
+	ChooseConflictResolveModeView dialog(this);
+
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	_currentPlatform->localConfig()->conflictResolveMode(dialog.conflictResolveMode());
+
+	EX_UNEXPECTED;
 }
 
 void MainFrame::OnMenuChangePlatform()
@@ -401,62 +399,60 @@ void MainFrame::saveWindowProperties()
 
 void MainFrame::selectExeToLaunch()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  if (!_currentPlatform)
-								  return;
+	EX_TRY;
 
-							  auto config = _currentPlatform->localConfig();
-							  auto helper = _currentPlatform->launchHelper();
+	if (!_currentPlatform)
+		return;
 
-							  SelectExe dialog(this, config->getDataPath(), helper->getExecutable(),
-											   _app.iconStorage());
+	auto config = _currentPlatform->localConfig();
+	auto helper = _currentPlatform->launchHelper();
 
-							  if (dialog.ShowModal() == wxID_OK)
-								  helper->setExecutable(dialog.getSelectedFile().ToStdString());
-						  });
+	SelectExe dialog(this, config->getDataPath(), helper->getExecutable(), _app.iconStorage());
+
+	if (dialog.ShowModal() == wxID_OK)
+		helper->setExecutable(dialog.getSelectedFile().ToStdString());
+
+	EX_UNEXPECTED;
 }
 
 void MainFrame::onLaunchGameRequested()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  if (!_currentPlatform)
-								  return;
+	EX_TRY;
 
-							  if (auto nonAuto = _currentPlatform->nonAutoApplicable())
-							  {
-								  if (nonAuto->changed())
-								  {
-									  auto saveChanges =
-										  wxMessageBox("main_frame/unsaved_changes"_lng,
-													   "main_frame/unsaved_changes_caption"_lng,
-													   wxICON_QUESTION | wxYES_NO);
+	if (!_currentPlatform)
+		return;
 
-									  if (saveChanges != wxYES)
-										  return;
+	if (auto nonAuto = _currentPlatform->nonAutoApplicable())
+	{
+		if (nonAuto->changed())
+		{
+			auto saveChanges =
+				wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
+							 wxICON_QUESTION | wxYES_NO);
 
-									  nonAuto->apply();
-								  }
-							  }
+			if (saveChanges != wxYES)
+				return;
 
-							  auto config = _currentPlatform->localConfig();
-							  auto helper = _currentPlatform->launchHelper();
+			nonAuto->apply();
+		}
+	}
 
-							  if (helper->getExecutable().empty())
-								  selectExeToLaunch();
+	auto config = _currentPlatform->localConfig();
+	auto helper = _currentPlatform->launchHelper();
 
-							  if (!helper->getExecutable().empty())
-							  {
-								  const auto currentWorkDir = wxGetCwd();
+	if (helper->getExecutable().empty())
+		selectExeToLaunch();
 
-								  wxSetWorkingDirectory(config->getDataPath().wstring());
-								  shellLaunch(helper->getLaunchString());
-								  wxSetWorkingDirectory(currentWorkDir);
-							  }
-						  });
+	if (!helper->getExecutable().empty())
+	{
+		const auto currentWorkDir = wxGetCwd();
+
+		wxSetWorkingDirectory(config->getDataPath().wstring());
+		shellLaunch(helper->getLaunchString());
+		wxSetWorkingDirectory(currentWorkDir);
+	}
+
+	EX_UNEXPECTED;
 }
 
 void MainFrame::updateExecutableIcon()

@@ -9,15 +9,15 @@
 
 #include "application.h"
 #include "domain/mod_conflict_resolver.hpp"
-#include "interface/imod_data_provider.hpp"
-#include "interface/ipreset_manager.hpp"
 #include "domain/mod_data.hpp"
-#include "interface/ilocal_config.h"
 #include "interface/iapp_config.h"
+#include "interface/iicon_storage.h"
 #include "interface/ilaunch_helper.h"
+#include "interface/ilocal_config.h"
+#include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/iicon_storage.h"
+#include "interface/ipreset_manager.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
 #include "select_exe.h"
@@ -111,7 +111,7 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP,
 				[=](wxDataViewEvent& event)
 				{
-					wxString moveFrom;
+					wxString         moveFrom;
 					wxTextDataObject from;
 					from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
 					moveFrom = from.GetText();
@@ -333,101 +333,100 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 
 void ModListView::onSwitchSelectedModStateRequested()
 {
-	try_handle_exceptions(
-		this,
-		[&]
+	EX_TRY;
+
+	if (!_modManager.activePosition(_selectedMod).has_value())
+	{
+		auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
+
+		std::vector<std::string> incompatible;
+		for (const auto& item : _modManager.mods().active)
 		{
-			if (!_modManager.activePosition(_selectedMod).has_value())
+			auto other = _managedPlatform.modDataProvider()->modData(item);
+			if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
 			{
-				auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
-
-				std::vector<std::string> incompatible;
-				for (const auto& item : _modManager.mods().active)
-				{
-					auto other = _managedPlatform.modDataProvider()->modData(item);
-					if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
-					{
-						incompatible.emplace_back('"' + other->caption.ToStdString(wxConvUTF8) + '"');
-					}
-				}
-
-				if (!incompatible.empty())
-				{
-					/* const auto message = fmt::format(
-						"Mod \"{0}\" is incompatible with {1}.\r\n"
-						"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
-						_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
-
-					const auto answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
-													 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
-
-					if (answer != wxYES)
-						return;*/
-				}
+				incompatible.emplace_back('"' + other->caption.ToStdString(wxConvUTF8) + '"');
 			}
+		}
 
-			_modManager.switchState(_selectedMod);
+		if (!incompatible.empty())
+		{
+			/* const auto message = fmt::format(
+				"Mod \"{0}\" is incompatible with {1}.\r\n"
+				"Do you really want to enable this mod?"_lng.ToStdString(wxConvUTF8),
+				_selectedMod.ToStdString(wxConvUTF8), boost::algorithm::join(incompatible, ", "));
 
-			if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
-			{
-				onSortModsRequested();
+			const auto answer = wxMessageBox(wxString::FromUTF8(message), wxTheApp->GetAppName(),
+											 wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
-				static bool messageWasShown = false;
-				if (!messageWasShown)
-				{
-					wxNotificationMessage nm("conflicts/caption"_lng, "conflicts/automatic_warning"_lng, this);
-					nm.Show();
-					messageWasShown = true;
-				}
-			}
-		});
+			if (answer != wxYES)
+				return;*/
+		}
+	}
+
+	_modManager.switchState(_selectedMod);
+
+	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
+	{
+		onSortModsRequested();
+
+		static bool messageWasShown = false;
+		if (!messageWasShown)
+		{
+			wxNotificationMessage nm("conflicts/caption"_lng, "conflicts/automatic_warning"_lng, this);
+			nm.Show();
+			messageWasShown = true;
+		}
+	}
+
+	EX_UNEXPECTED;
 }
 
 void ModListView::OnEventCheckboxShowHidden(const wxCommandEvent&)
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  _listModel->showHidden(_checkboxShowHidden->IsChecked());
-							  _managedPlatform.localConfig()->showHiddenMods(
-								  _checkboxShowHidden->IsChecked());
-						  });
+	EX_TRY;
+
+	_listModel->showHidden(_checkboxShowHidden->IsChecked());
+	_managedPlatform.localConfig()->showHiddenMods(_checkboxShowHidden->IsChecked());
+
+	EX_UNEXPECTED;
 }
 
 void ModListView::onSortModsRequested()
 {
 	wxBusyCursor bc;
 
-	try_handle_exceptions(
-		this,
-		[&] {
-			_modManager.mods(resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider()));
-		});
+	EX_TRY;
+
+	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider());
+	if (mods != _modManager.mods())
+		_modManager.mods(mods);
+
+	EX_UNEXPECTED;
 }
 
 void ModListView::onRemoveModRequested()
 {
-	try_handle_exceptions(this,
-						  [&]
-						  {
-							  auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	EX_TRY;
 
-							  if (!mod->virtual_mod)
-							  {
-								  const auto formatMessage =
-									  "Are you sure want to delete mod \"%s\"?\n\n"
-									  "It will be deleted to recycle bin, if possible."_lng;
-								  const auto answer = wxMessageBox(
-									  wxString::Format(formatMessage, mod->caption), wxTheApp->GetAppName(),
-									  wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
+	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
-								  if (answer != wxYES)
-									  return;
+	if (!mod->virtual_mod)
+	{
+		const auto formatMessage =
+			"Are you sure want to delete mod \"%s\"?\n\n"
+			"It will be deleted to recycle bin, if possible."_lng;
+		const auto answer = wxMessageBox(wxString::Format(formatMessage, mod->caption),
+										 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
-								  if (!shellRemove(mod->data_path.string()))
-									  return;
-							  }
+		if (answer != wxYES)
+			return;
 
-							  _modManager.remove(mod->id);
-						  });
+		if (!shellRemove(mod->data_path.string()))
+			return;
+	}
+
+	_modManager.remove(mod->id);
+
+	EX_UNEXPECTED;
 }

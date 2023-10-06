@@ -66,19 +66,3 @@ namespace mm
 	};
 
 #define SINK_EXCEPTION(handler) [=](const auto&) { handler(); }
-
-namespace mm
-{
-	template <typename T, typename... Args>
-	void try_handle_exceptions(wxWindow* owner, const T& call, Args&&... args)
-	{
-		try
-		{
-			call(std::forward<Args>(args)...);
-		}
-		catch (...)
-		{
-			ErrorView(owner).ShowModal();
-		}
-	}
-}
