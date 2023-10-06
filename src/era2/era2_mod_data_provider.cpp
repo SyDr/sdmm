@@ -39,7 +39,7 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 
 void Era2ModDataProvider::loadDefaults()
 {
-	std::ifstream datafile(std::filesystem::path(mm::constant::data_dir) / "era2.json");
+	std::ifstream datafile(std::filesystem::path(mm::SystemInfo::DataDir) / "era2.json");
 
 	auto data = nlohmann::json::parse(datafile);
 	MM_EXPECTS(data.is_object(), unexpected_error);

@@ -49,7 +49,7 @@ namespace
 }
 
 MainFrame::MainFrame(Application& app)
-	: wxFrame(nullptr, wxID_ANY, constant::program_full_version, app.appConfig().mainWindow().position,
+	: wxFrame(nullptr, wxID_ANY, SystemInfo::ProgramVersion, app.appConfig().mainWindow().position,
 			  app.appConfig().mainWindow().size)
 	, _app(app)
 {

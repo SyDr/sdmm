@@ -43,7 +43,7 @@ namespace
 		if (id.empty())
 			return false;
 
-		if (id == mm::constant::mm_managed_mod)
+		if (id == mm::SystemInfo::ManagedMod)
 			return false;
 
 		const auto path = modsPath / id.ToStdWstring();
@@ -67,7 +67,7 @@ namespace
 				items.active.emplace_back(item);
 				items.available.emplace(item);
 			}
-			else if (!item.empty() && item != constant::mm_managed_mod)
+			else if (!item.empty() && item != SystemInfo::ManagedMod)
 			{
 				items.invalid.emplace_back(item);
 			}
@@ -85,7 +85,7 @@ namespace
 				items.available.emplace(item);
 		}
 
-		items.available.erase(mm::constant::mm_managed_mod);
+		items.available.erase(mm::SystemInfo::ManagedMod);
 
 		return items;
 	}
@@ -95,21 +95,21 @@ namespace
 	{
 		auto                 reversedRange = mods.active | boost::adaptors::reversed;
 		std::deque<wxString> reversed(reversedRange.begin(), reversedRange.end());
-		reversed.emplace_back(mm::constant::mm_managed_mod);
+		reversed.emplace_back(mm::SystemInfo::ManagedMod);
 		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
 
 		overwriteFileFromContainer(activePath, reversed);
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
-		std::filesystem::create_directories(modsPath / mm::constant::mm_managed_mod);
-		std::filesystem::copy_file(std::filesystem::path(mm::constant::data_dir) / "mod.json",
-								   modsPath / mm::constant::mm_managed_mod / "mod.json",
+		std::filesystem::create_directories(modsPath / mm::SystemInfo::ManagedMod);
+		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
+								   modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
 								   std::filesystem::copy_options::overwrite_existing);
-		std::filesystem::copy_file(std::filesystem::path(mm::constant::data_dir) / "description.txt",
-								   modsPath / mm::constant::mm_managed_mod / "description.txt",
+		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description.txt",
+								   modsPath / mm::SystemInfo::ManagedMod / "description.txt",
 								   std::filesystem::copy_options::overwrite_existing);
-		std::filesystem::copy_file(std::filesystem::path(mm::constant::data_dir) / "description_rus.txt",
-								   modsPath / mm::constant::mm_managed_mod / "description_rus.txt",
+		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description_rus.txt",
+								   modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
 								   std::filesystem::copy_options::overwrite_existing);
 	}
 }

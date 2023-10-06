@@ -23,12 +23,17 @@ using namespace mm;
 
 namespace
 {
+	const std::set<std::string> PluginExts         = { ".dll", ".bin", ".era" };
+	constexpr const auto        PluginOffExtension = ".off";
+	constexpr const auto        PluginSubdir       = "EraPlugins";
+	constexpr const std::array  PluginDirs         = { ".", "BeforeWog", "AfterWog" };
+
 	bool isPlugin(fs::path path)
 	{
-		if (path.extension().string() == constant::pluginOffExtension)
+		if (path.extension().string() == PluginOffExtension)
 			path = path.filename().replace_extension();
 
-		return path.has_extension() && constant::pluginExts.count(path.extension().string());
+		return path.has_extension() && PluginExts.count(path.extension().string());
 	}
 }
 
@@ -52,10 +57,10 @@ void era2_plugin_helper::updateBaseState(PluginList&                            
 				wxString id      = item;
 				bool     enabled = true;
 
-				if (id.ends_with(wxString(constant::pluginOffExtension)))
+				if (id.ends_with(wxString(PluginOffExtension)))
 				{
 					enabled = false;
-					id = id.RemoveLast(std::char_traits<const char>::length(constant::pluginOffExtension));
+					id      = id.RemoveLast(std::char_traits<const char>::length(PluginOffExtension));
 				}
 
 				return std::make_pair(id, enabled);
@@ -90,13 +95,13 @@ Era2PLuginListPhysicalStructure era2_plugin_helper::loadPhysicalStructure(const 
 			continue;
 
 		const auto modId = it->path().filename();
-		if (modId == mm::constant::mm_managed_mod)
+		if (modId == mm::SystemInfo::ManagedMod)
 			continue;
 
 		auto& place = result.data[wxString::FromUTF8(modId.string())];
-		for (const auto& dir : constant::pluginDirs)
+		for (const auto& dir : PluginDirs)
 		{
-			const auto subPath = it->path() / constant::pluginSubdir / dir;
+			const auto subPath = it->path() / PluginSubdir / dir;
 			if (!std::filesystem::is_directory(subPath))
 				continue;
 
@@ -146,8 +151,8 @@ void era2_plugin_helper::saveManagedState(const fs::path& pluginPath, const fs::
 
 	overwriteFileContent(pluginPath, wxString::FromUTF8(data.dump(2)));
 
-	auto targetPath = modsPath / constant::mm_managed_mod / constant::pluginSubdir;
-	for (const auto& dir : constant::pluginDirs)
+	auto targetPath = modsPath / SystemInfo::ManagedMod / PluginSubdir;
+	for (const auto& dir : PluginDirs)
 	{
 		const auto subPath = targetPath / dir;
 		std::filesystem::remove_all(subPath);
@@ -162,9 +167,8 @@ void era2_plugin_helper::saveManagedState(const fs::path& pluginPath, const fs::
 
 		const auto& mod = it->second.mod;
 		const auto  copyFrom =
-			modsPath / mod.ToStdString() / constant::pluginSubdir /
-			(id + (it->second.state == PluginState::disabled ? constant::pluginOffExtension : ""))
-				.ToStdString();
+			modsPath / mod.ToStdString() / PluginSubdir /
+			(id + (it->second.state == PluginState::disabled ? PluginOffExtension : "")).ToStdString();
 
 		if (state != PluginState::disabled)
 		{

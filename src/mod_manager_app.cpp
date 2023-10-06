@@ -27,7 +27,7 @@ using namespace mm;
 
 ModManagerApp::ModManagerApp()
 {
-	SetAppDisplayName(constant::program_full_version);
+	SetAppDisplayName(SystemInfo::ProgramVersion);
 	SetAppName(PROGRAM_NAME);
 }
 

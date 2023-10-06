@@ -17,6 +17,7 @@
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 #include "utility/string_util.h"
+#include "system_info.hpp"
 
 using namespace mm;
 
@@ -203,13 +204,12 @@ void AppConfig::setSelectedPlatformCode(const wxString& newPlatform)
 	_data[sd_game][SD_PLATFORM] = newPlatform.ToStdString();
 }
 
-#define SD_MM_DEFAULT_LNG_CODE "en_US"
 #define SD_MM_DEFAULT_PLATFORM "era2"
 
 void AppConfig::validate()
 {
 	if (!_data.count(SD_LNG_CODE) || !_data[SD_LNG_CODE].is_string())
-		_data[SD_LNG_CODE] = SD_MM_DEFAULT_LNG_CODE;
+		_data[SD_LNG_CODE] = SystemInfo::DefaultLanguage;
 
 	if (!_data.count(SD_WINDOW) || !_data[SD_WINDOW].is_object())
 		_data[SD_WINDOW] = {};

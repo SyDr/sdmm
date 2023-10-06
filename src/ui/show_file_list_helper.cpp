@@ -24,6 +24,13 @@ using namespace mm;
 
 namespace
 {
+	const std::unordered_set<std::wstring> pacExtensions = {
+		L".lod",
+		L".snd",
+		L".vid",
+		L".pac",
+	};
+
 	Era2DirectoryStructure removeDeadMods(Era2DirectoryStructure data)
 	{
 		for (size_t i = 0; i < data.modList.size();)
@@ -100,14 +107,13 @@ namespace
 					L"mod_info.ini",    L"readme.txt",          L"change.log",          L"changelog.txt",
 				};
 
-				if (skip.count(boost::algorithm::to_lower_copy(it->path().filename().wstring())))
+				if (skip.count(boost::to_lower_copy(it->path().filename().wstring())))
 					continue;
 
 				const auto index             = fileIndex(relative);
 				result.entries[index][i].raw = true;
 
-				if (!constant::pacExtensions.count(
-						boost::algorithm::to_lower_copy(it->path().extension().wstring())))
+				if (!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
 					continue;
 
 				std::fstream        file(path, std::fstream::in | std::fstream::binary);
