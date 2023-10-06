@@ -8,27 +8,28 @@
 #include "select_directory_view.h"
 
 #include <boost/algorithm/string.hpp>
+#include <wx/button.h>
+#include <wx/checkbox.h>
+#include <wx/dataview.h>
 #include <wx/dir.h>
+#include <wx/dirctrl.h>
+#include <wx/imaglist.h>
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
-#include <wx/imaglist.h>
-#include <wx/checkbox.h>
-#include <wx/button.h>
-#include <wx/dirctrl.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
-#include <wx/dataview.h>
 
-#include "interface/iapp_config.h"
 #include "application.h"
-#include "utility/sdlexcept.h"
+#include "interface/iapp_config.h"
 #include "interface/iicon_storage.h"
 #include "type/embedded_icon.h"
+#include "utility/sdlexcept.h"
 
 using namespace mm;
 
-SelectDirectoryDialog::SelectDirectoryDialog(wxWindow *parent, IAppConfig& config, IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Select game directory for management"_lng, wxDefaultPosition, wxSize(1000, 666))
+SelectDirectoryDialog::SelectDirectoryDialog(wxWindow* parent, IAppConfig& config, IIconStorage& iconStorage)
+	: wxDialog(
+		  parent, wxID_ANY, "Select game directory for management"_lng, wxDefaultPosition, wxSize(1000, 666))
 	, _appConfig(config)
 	, _iconStorage(iconStorage)
 {
@@ -48,21 +49,21 @@ wxString SelectDirectoryDialog::getSelectedPath() const
 void SelectDirectoryDialog::createControls()
 {
 	auto selectedPath = _appConfig.getDataPath();
-	auto dirToSelect = selectedPath.empty() ? wxDirDialogDefaultFolderStr : selectedPath.string();
+	auto dirToSelect  = selectedPath.empty() ? wxDirDialogDefaultFolderStr : selectedPath.string();
 
-	_explorerList = new wxGenericDirCtrl(this, wxID_ANY, dirToSelect,
-		wxDefaultPosition, wxDefaultSize, wxDIRCTRL_DIR_ONLY | wxDIRCTRL_3D_INTERNAL);
+	_explorerList = new wxGenericDirCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize,
+		wxDIRCTRL_DIR_ONLY | wxDIRCTRL_3D_INTERNAL);
 
-	_recentDirsList = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-		wxDV_HORIZ_RULES | wxDV_ROW_LINES | wxDV_NO_HEADER);
+	_recentDirsList = new wxDataViewListCtrl(
+		this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES | wxDV_ROW_LINES | wxDV_NO_HEADER);
 	_recentDirsList->AppendIconTextColumn("Path");
 
-	_selectedLabel = new wxStaticText(this, wxID_ANY, "Selected:"_lng);
-	_selectedPathEdit = new wxTextCtrl(this, wxID_ANY, _appConfig.getDataPath().string(), wxDefaultPosition,
-		wxDefaultSize,	wxTE_READONLY);
+	_selectedLabel    = new wxStaticText(this, wxID_ANY, "Selected:"_lng);
+	_selectedPathEdit = new wxTextCtrl(
+		this, wxID_ANY, _appConfig.getDataPath().string(), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
 	_accept = new wxButton(this, wxID_ANY, "Accept"_lng);
 
-	_menu.starUnstar = _menu.menu.Append(wxID_ANY, "placeholder");
+	_menu.starUnstar     = _menu.menu.Append(wxID_ANY, "placeholder");
 	_menu.removeFromList = _menu.menu.Append(wxID_ANY, "Remove from list"_lng);
 }
 
@@ -142,7 +143,8 @@ void SelectDirectoryDialog::fillData()
 
 	for (const auto& value : _appConfig.getKnownDataPathList())
 	{
-		wxIcon icon = _iconStorage.get(_appConfig.dataPathHasStar(value) ? embedded_icon::bookmark : embedded_icon::blank);
+		wxIcon icon = _iconStorage.get(
+			_appConfig.dataPathHasStar(value) ? embedded_icon::bookmark : embedded_icon::blank);
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxDataViewIconText(value.string(), icon)));
@@ -202,9 +204,8 @@ void SelectDirectoryDialog::OnListItemContextMenu()
 	EX_TRY;
 
 	auto path = _appConfig.getKnownDataPathList().at(row);
-	_menu.starUnstar->SetItemLabel(!_appConfig.dataPathHasStar(path) ?
-		"Add to favorites"_lng :
-		"Remove from favorites"_lng);
+	_menu.starUnstar->SetItemLabel(
+		!_appConfig.dataPathHasStar(path) ? "Add to favorites"_lng : "Remove from favorites"_lng);
 
 	_recentDirsList->PopupMenu(&_menu.menu);
 	EX_UNEXPECTED;

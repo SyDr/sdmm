@@ -16,7 +16,7 @@ namespace mm
 
 	class Era2Config : public ILocalConfig
 	{
-	  public:
+	public:
 		explicit Era2Config(const std::filesystem::path& path);
 
 		void save() override;
@@ -41,13 +41,13 @@ namespace mm
 		ConflictResolveMode conflictResolveMode() const override;
 		void                conflictResolveMode(ConflictResolveMode value) override;
 
-	  private:
+	private:
 		std::filesystem::path getConfigFilePath() const;
 		void                  createDirectories() const;
 
 		void validate();
 
-	  private:
+	private:
 		const std::filesystem::path _path;
 		nlohmann::json              _data;
 	};

@@ -5,13 +5,13 @@
 
 #include "stdafx.h"
 
+#include "interface/iapp_config.h"
+#include "interface/ii18n_service.hpp"
+#include "mod_manager_app.h"
 #include "service/app_config.h"
 #include "service/i18n_service.h"
 #include "service/icon_storage.h"
 #include "service/platform_service.h"
-#include "interface/iapp_config.h"
-#include "mod_manager_app.h"
-#include "interface/ii18n_service.hpp"
 #include "system_info.hpp"
 #include "ui/main_frame.h"
 #include "utility/sdlexcept.h"
@@ -121,17 +121,15 @@ IIconStorage& ModManagerApp::iconStorage() const
 
 void ModManagerApp::scheduleRestart()
 {
-	CallAfter(
-		[this]
-		{
-			wxBusyCursor bc;
-			if (!_mainFrame->Close())
-				return;
+	CallAfter([this] {
+		wxBusyCursor bc;
+		if (!_mainFrame->Close())
+			return;
 
-			_appConfig->save();
-			initServices();
-			initView();
-		});
+		_appConfig->save();
+		initServices();
+		initView();
+	});
 }
 
 void ModManagerApp::initServices()

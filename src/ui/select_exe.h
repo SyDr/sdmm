@@ -20,21 +20,21 @@ namespace mm
 	class SelectExe : public wxDialog
 	{
 	public:
-		SelectExe(wxWindow *parent, const std::filesystem::path& basePath, const wxString& initiallySelectedFile,
-			IIconStorage& iconStorage);
+		SelectExe(wxWindow* parent, const std::filesystem::path& basePath,
+			const wxString& initiallySelectedFile, IIconStorage& iconStorage);
 
 		wxString getSelectedFile() const;
 
 	private:
-		void refreshListContent();
+		void                  refreshListContent();
 		std::vector<wxString> getFileList();
 
 	private:
 		const std::filesystem::path _basePath;
-		IIconStorage& _iconStorage;
-		wxString _selectedFile;
+		IIconStorage&               _iconStorage;
+		wxString                    _selectedFile;
 
-		wxListView* _list = nullptr;
+		wxListView*                  _list = nullptr;
 		std::unique_ptr<wxImageList> _imageList;
 	};
 }

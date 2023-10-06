@@ -8,21 +8,21 @@
 #include "select_platform_view.h"
 
 #include <boost/algorithm/string.hpp>
+#include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/dir.h>
+#include <wx/imaglist.h>
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
-#include <wx/imaglist.h>
-#include <wx/checkbox.h>
-#include <wx/button.h>
 #include <wx/statbox.h>
 
 #include "application.h"
-#include "interface/iplatform_service.h"
 #include "interface/iplatform_descriptor.h"
+#include "interface/iplatform_service.h"
 
 using namespace mm;
 
-SelectPlatformView::SelectPlatformView(wxWindow *parent)
+SelectPlatformView::SelectPlatformView(wxWindow* parent)
 	: wxDialog(parent, wxID_ANY, "select_platform/caption"_lng, wxDefaultPosition, wxSize(400, 444))
 {
 	SetIcon(wxICON(sample));
@@ -42,7 +42,8 @@ std::string SelectPlatformView::selectedPlatform() const
 void SelectPlatformView::createControls()
 {
 	_mainGroup = new wxStaticBox(this, wxID_ANY, "select_platform/select"_lng);
-	_listView = new wxListView(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_LIST | wxLC_ALIGN_LEFT | wxLC_SINGLE_SEL);
+	_listView  = new wxListView(
+        this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_LIST | wxLC_ALIGN_LEFT | wxLC_SINGLE_SEL);
 }
 
 void SelectPlatformView::buildLayout()

@@ -44,8 +44,8 @@ using namespace mm;
 ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
-	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
-								  managedPlatform.localConfig()->showHiddenMods()))
+	, _listModel(new ModListModel(
+		  *managedPlatform.modDataProvider(), iconStorage, managedPlatform.localConfig()->showHiddenMods()))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
@@ -88,58 +88,48 @@ void ModListView::bindEvents()
 
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
 
-	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED,
-				[=](wxDataViewEvent&)
-				{
-					const auto item = _list->GetSelection();
-					_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxString();
-					updateControlsState();
-				});
+	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
+		const auto item = _list->GetSelection();
+		_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxString();
+		updateControlsState();
+	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_ACTIVATED,
-				[=](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
+	_list->Bind(
+		wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG,
-				[=](wxDataViewEvent& event)
-				{
-					auto id = _listModel->findIdByItem(event.GetItem());
-					event.SetDataObject(new wxTextDataObject(id));
-				});
+	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [=](wxDataViewEvent& event) {
+		auto id = _listModel->findIdByItem(event.GetItem());
+		event.SetDataObject(new wxTextDataObject(id));
+	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent&) {});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP,
-				[=](wxDataViewEvent& event)
-				{
-					wxString         moveFrom;
-					wxTextDataObject from;
-					from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
-					moveFrom = from.GetText();
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
+		wxString         moveFrom;
+		wxTextDataObject from;
+		from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
+		moveFrom = from.GetText();
 
-					_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
-				});
+		_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
+	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU,
-				[=](wxDataViewEvent& event)
-				{
-					if (!event.GetItem().IsOk())
-					{
-						event.Veto();
-						return;
-					}
+	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [=](wxDataViewEvent& event) {
+		if (!event.GetItem().IsOk())
+		{
+			event.Veto();
+			return;
+		}
 
-					OnListItemContextMenu(event.GetItem());
-				});
+		OnListItemContextMenu(event.GetItem());
+	});
 
 	Bind(wxEVT_MENU, &ModListView::OnMenuItemSelected, this);
 
-	_modManager.onListChanged().connect(
-		[this]
-		{
-			_listModel->setModList(_modManager.mods());
-			followSelection();
-			updateControlsState();
-		});
+	_modManager.onListChanged().connect([this] {
+		_listModel->setModList(_modManager.mods());
+		followSelection();
+		updateControlsState();
+	});
 
 	_moveUp->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
@@ -156,9 +146,8 @@ void ModListView::createControls(const wxString& managedPath)
 	_checkboxShowHidden = new wxCheckBox(_group, wxID_ANY, "Show hidden"_lng);
 	_checkboxShowHidden->SetValue(_managedPlatform.localConfig()->showHiddenMods());
 
-	_modDescription =
-		new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-					   wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
+	_modDescription = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
 
 	_moveUp = new wxButton(_group, wxID_ANY, "Move Up"_lng);
 	_moveUp->SetBitmap(_iconStorage.get(embedded_icon::up));
@@ -180,8 +169,8 @@ void ModListView::createControls(const wxString& managedPath)
 
 void ModListView::createListControl()
 {
-	_list = new wxDataViewCtrl(_group, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-							   wxDV_ROW_LINES | wxDV_VERT_RULES);
+	_list = new wxDataViewCtrl(
+		_group, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_ROW_LINES | wxDV_VERT_RULES);
 	_list->EnableDragSource(wxDF_UNICODETEXT);
 	_list->EnableDropTarget(wxDF_UNICODETEXT);
 	_list->AssociateModel(_listModel.get());
@@ -209,19 +198,19 @@ void ModListView::createListColumns()
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
 	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
-										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column1 =
 		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 	auto column2 =
 		new wxDataViewColumn("Category"_lng, r2, static_cast<unsigned int>(ModListModel::Column::category),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column3 =
 		new wxDataViewColumn("Version"_lng, r3, static_cast<unsigned int>(ModListModel::Column::version),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column4 =
 		new wxDataViewColumn("Author"_lng, r4, static_cast<unsigned int>(ModListModel::Column::author),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	_list->AppendColumn(column0);
 	_list->AppendColumn(column1);
@@ -252,8 +241,8 @@ void ModListView::updateControlsState()
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(_iconStorage.get(
 		_modManager.activePosition(mod->id).has_value() ? embedded_icon::minus : embedded_icon::plus));
-	_changeState->SetLabelText(_modManager.activePosition(mod->id).has_value() ? "Disable"_lng
-																			   : "Enable"_lng);
+	_changeState->SetLabelText(
+		_modManager.activePosition(mod->id).has_value() ? "Disable"_lng : "Enable"_lng);
 
 	_moveUp->Enable(_modManager.canMoveUp(mod->id));
 	_moveDown->Enable(_modManager.canMoveDown(mod->id));
@@ -417,7 +406,7 @@ void ModListView::onRemoveModRequested()
 			"Are you sure want to delete mod \"%s\"?\n\n"
 			"It will be deleted to recycle bin, if possible."_lng;
 		const auto answer = wxMessageBox(wxString::Format(formatMessage, mod->caption),
-										 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
+			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 		if (answer != wxYES)
 			return;

@@ -17,9 +17,8 @@ using namespace mm;
 namespace
 {
 	ModData supplyWithDefaults(ModData what, std::set<wxString> const& defaultIncompatible,
-							   std::set<wxString> const& defaultRequires,
-							   std::set<wxString> const& defaultLoadAfter, bool useIncompatbile,
-							   bool useRequires, bool useLoadAfter)
+		std::set<wxString> const& defaultRequires, std::set<wxString> const& defaultLoadAfter,
+		bool useIncompatbile, bool useRequires, bool useLoadAfter)
 	{
 		if (!useRequires)
 		{
@@ -44,10 +43,9 @@ namespace
 	}
 }
 
-ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFrom, const wxString& preferredLng,
-							  std::set<wxString> const& defaultIncompatible,
-							  std::set<wxString> const& defaultRequires,
-							  std::set<wxString> const& defaultLoadAfter)
+ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFrom,
+	const wxString& preferredLng, std::set<wxString> const& defaultIncompatible,
+	std::set<wxString> const& defaultRequires, std::set<wxString> const& defaultLoadAfter)
 {
 	bool hasRequires     = false;
 	bool hasLoadAfter    = false;
@@ -60,7 +58,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 	auto supplyResultWithDefaults = [&] {
 		return supplyWithDefaults(std::move(result), defaultIncompatible, defaultRequires, defaultLoadAfter,
-								  hasIncompatible, hasRequires, hasLoadAfter);
+			hasIncompatible, hasRequires, hasLoadAfter);
 	};
 
 	if (result.virtual_mod)

@@ -8,14 +8,14 @@
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "era2_config.h"
-#include "era2_plugin_manager.hpp"
 #include "era2_mod_manager.h"
+#include "era2_plugin_helper.hpp"
+#include "era2_plugin_manager.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "utility/string_util.h"
-#include "era2_plugin_helper.hpp"
 
 #include <wx/dir.h>
 
@@ -23,7 +23,8 @@
 
 using namespace mm;
 
-Era2PluginManager::Era2PluginManager(Era2ModManager& modManager, const fs::path& modsDir, const fs::path& listPath)
+Era2PluginManager::Era2PluginManager(
+	Era2ModManager& modManager, const fs::path& modsDir, const fs::path& listPath)
 	: _modManager(modManager)
 	, _modsDir(modsDir)
 	, _listPath(listPath)
@@ -33,12 +34,10 @@ Era2PluginManager::Era2PluginManager(Era2ModManager& modManager, const fs::path&
 	era2_plugin_helper::loadManagedState(_pluginList, listPath);
 	_initialPluginList = _pluginList;
 
-	_modManager.onListChanged().connect(
-		[this]
-		{
-			era2_plugin_helper::updateBaseState(_pluginList, _physicalStructure, _modManager.mods());
-			_listChanged();
-		});
+	_modManager.onListChanged().connect([this] {
+		era2_plugin_helper::updateBaseState(_pluginList, _physicalStructure, _modManager.mods());
+		_listChanged();
+	});
 }
 
 const PluginList& Era2PluginManager::plugins() const

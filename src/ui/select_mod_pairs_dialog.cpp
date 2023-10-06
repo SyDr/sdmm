@@ -8,12 +8,12 @@
 #include "select_mod_pairs_dialog.hpp"
 
 #include "application.h"
-#include "interface/imod_data_provider.hpp"
-#include "interface/imod_manager.hpp"
-#include "interface/imod_platform.hpp"
 #include "domain/mod_data.hpp"
 #include "interface/iapp_config.h"
 #include "interface/iicon_storage.h"
+#include "interface/imod_data_provider.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
 #include "mod_list_model.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
@@ -37,10 +37,9 @@
 using namespace mm;
 
 SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, Application& application,
-										   IModDataProvider&                          dataProvider,
-										   std::vector<std::pair<wxString, wxString>> values)
-	: wxDialog(&parent, wxID_ANY, "Select mod pairs to potentially remove from result"_lng, wxDefaultPosition, wxSize(800, 444),
-			   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+	IModDataProvider& dataProvider, std::vector<std::pair<wxString, wxString>> values)
+	: wxDialog(&parent, wxID_ANY, "Select mod pairs to potentially remove from result"_lng, wxDefaultPosition,
+		  wxSize(800, 444), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(application.iconStorage())
 	, _modDataProvider(dataProvider)
 	, _values(std::move(values))
@@ -83,14 +82,15 @@ void SelectModPairsDialog::createControls()
 void SelectModPairsDialog::createListControl()
 {
 	_list = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-								   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
+		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 
 	_list->AppendToggleColumn("", wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE);
-	_list->AppendIconTextColumn("Mod"_lng + " 1", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
-								wxALIGN_LEFT,
-								wxDATAVIEW_COL_SORTABLE)->SetSortOrder(true);
-	_list->AppendIconTextColumn("Mod"_lng + " 2", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE,
-								wxALIGN_LEFT, wxDATAVIEW_COL_SORTABLE);
+	_list
+		->AppendIconTextColumn("Mod"_lng + " 1", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
+			wxDATAVIEW_COL_SORTABLE)
+		->SetSortOrder(true);
+	_list->AppendIconTextColumn(
+		"Mod"_lng + " 2", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_SORTABLE);
 }
 
 void SelectModPairsDialog::bindEvents()

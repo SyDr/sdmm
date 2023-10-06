@@ -45,7 +45,7 @@ namespace mm
 		void initView();
 
 	private:
-		wxWidgetsPtr<wxFrame>      _mainFrame = nullptr;
+		wxWidgetsPtr<wxFrame> _mainFrame = nullptr;
 
 		std::unique_ptr<wxSingleInstanceChecker> _singleInstanceChecker;
 

@@ -28,7 +28,7 @@ namespace mm
 
 	private:
 		std::filesystem::path const _basePath;
-		wxString const _preferredLng;
+		wxString const              _preferredLng;
 
 		std::map<wxString, ModData> _data;
 

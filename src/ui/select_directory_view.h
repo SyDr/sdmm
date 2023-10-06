@@ -29,7 +29,7 @@ namespace mm
 	class SelectDirectoryDialog : public wxDialog
 	{
 	public:
-		SelectDirectoryDialog(wxWindow *parent, IAppConfig& config, IIconStorage& iconStorage);
+		SelectDirectoryDialog(wxWindow* parent, IAppConfig& config, IIconStorage& iconStorage);
 
 		wxString getSelectedPath() const;
 
@@ -44,22 +44,21 @@ namespace mm
 		void starUnstarRequested();
 
 	private:
-		IAppConfig& _appConfig;
+		IAppConfig&   _appConfig;
 		IIconStorage& _iconStorage;
 
-		wxWidgetsPtr<wxGenericDirCtrl> _explorerList = nullptr;
+		wxWidgetsPtr<wxGenericDirCtrl>   _explorerList   = nullptr;
 		wxWidgetsPtr<wxDataViewListCtrl> _recentDirsList = nullptr;
 
-		wxWidgetsPtr<wxStaticText> _selectedLabel = nullptr;
-		wxWidgetsPtr<wxTextCtrl> _selectedPathEdit = nullptr;
-		wxWidgetsPtr<wxButton> _accept = nullptr;
+		wxWidgetsPtr<wxStaticText> _selectedLabel    = nullptr;
+		wxWidgetsPtr<wxTextCtrl>   _selectedPathEdit = nullptr;
+		wxWidgetsPtr<wxButton>     _accept           = nullptr;
 
-		struct // Menu
+		struct  // Menu
 		{
-			wxMenu menu;
-			wxWidgetsPtr<wxMenuItem> starUnstar = nullptr;
+			wxMenu                   menu;
+			wxWidgetsPtr<wxMenuItem> starUnstar     = nullptr;
 			wxWidgetsPtr<wxMenuItem> removeFromList = nullptr;
 		} _menu;
-
 	};
 }

@@ -6,7 +6,7 @@
 #include "stdafx.h"
 
 #include "era2_mod_data_provider.hpp"
-//#include "domain/mod_data.hpp"
+// #include "domain/mod_data.hpp"
 
 #include "era2_mod_loader.hpp"
 #include "system_info.hpp"
@@ -27,9 +27,8 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 
 	if (it == _data.cend())
 	{
-		auto modData =
-			mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdWstring(), _preferredLng, _defaultIncompatible[id],
-									  _defaultRequires[id], _defaultLoadAfter[id]);
+		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdWstring(), _preferredLng,
+			_defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id]);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
 	}

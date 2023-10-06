@@ -13,11 +13,11 @@
 #include <fstream>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <optional>
 
 // boost
 #include <boost/algorithm/string.hpp>

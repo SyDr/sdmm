@@ -8,21 +8,21 @@
 #include "select_exe.h"
 
 #include <boost/algorithm/string.hpp>
+#include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/dir.h>
+#include <wx/imaglist.h>
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
-#include <wx/imaglist.h>
-#include <wx/checkbox.h>
-#include <wx/button.h>
 
-#include "interface/iicon_storage.h"
 #include "application.h"
+#include "interface/iicon_storage.h"
 #include "type/embedded_icon.h"
 
 using namespace mm;
 
-SelectExe::SelectExe(wxWindow *parent, const std::filesystem::path& basePath, const wxString& initiallySelectedFile,
-	IIconStorage& iconStorage)
+SelectExe::SelectExe(wxWindow* parent, const std::filesystem::path& basePath,
+	const wxString& initiallySelectedFile, IIconStorage& iconStorage)
 	: wxDialog(parent, wxID_ANY, "Select executable"_lng, wxDefaultPosition, wxSize(200, 324))
 	, _basePath(basePath)
 	, _selectedFile(initiallySelectedFile)
@@ -38,7 +38,8 @@ SelectExe::SelectExe(wxWindow *parent, const std::filesystem::path& basePath, co
 	wxBoxSizer* bVertical = new wxBoxSizer(wxVERTICAL);
 	mainPanel->SetSizer(bVertical);
 
-	_list = new wxListView(mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SMALL_ICON | wxLC_SINGLE_SEL);
+	_list = new wxListView(
+		mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SMALL_ICON | wxLC_SINGLE_SEL);
 	_list->SetImageList(_imageList.get(), wxIMAGE_LIST_SMALL);
 
 	wxBusyCursor busy;
@@ -65,13 +66,9 @@ SelectExe::SelectExe(wxWindow *parent, const std::filesystem::path& basePath, co
 		buttonOk->Disable();
 	});
 
-	_list->Bind(wxEVT_LIST_ITEM_ACTIVATED, [=](wxListEvent&) {
-		this->EndModal(wxID_OK);
-	});
+	_list->Bind(wxEVT_LIST_ITEM_ACTIVATED, [=](wxListEvent&) { this->EndModal(wxID_OK); });
 
-	buttonOk->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-		this->EndModal(wxID_OK);
-	});
+	buttonOk->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { this->EndModal(wxID_OK); });
 
 	wxBoxSizer* bSizerMain = new wxBoxSizer(wxHORIZONTAL);
 	bSizerMain->Add(mainPanel, 1, wxEXPAND | static_cast<wxStretch>(wxALL));

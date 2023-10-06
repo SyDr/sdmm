@@ -23,8 +23,7 @@ using namespace mm;
 
 Era2ModManager::Era2ModManager(ModList& mods)
 	: _list(mods)
-{
-}
+{}
 
 sigslot::signal<>& Era2ModManager::onListChanged()
 {

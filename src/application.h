@@ -18,11 +18,11 @@ namespace mm
 	{
 		virtual ~Application() = default;
 
-		virtual IAppConfig& appConfig() const = 0;
-		virtual II18nService& i18nService() const = 0;
-		virtual IIconStorage& iconStorage() const  = 0;
+		virtual IAppConfig&       appConfig() const       = 0;
+		virtual II18nService&     i18nService() const     = 0;
+		virtual IIconStorage&     iconStorage() const     = 0;
 		virtual IPlatformService& platformService() const = 0;
 	};
 }
 
-wxString operator "" _lng(const char* s, std::size_t);
+wxString operator"" _lng(const char* s, std::size_t);
