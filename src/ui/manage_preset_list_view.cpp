@@ -344,7 +344,7 @@ void ManagePresetListView::onDeletePreset()
 
 void ManagePresetListView::onFilesystemError(const std::filesystem::filesystem_error& e)
 {
-	wxMessageOutputBest().Printf(
+	wxMessageOutputMessageBox().Printf(
 		"Error happened during execution of operation. "
 		"Details:\n\n %s"_lng,
 		e.what());

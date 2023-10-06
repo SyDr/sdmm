@@ -345,7 +345,7 @@ void MainFrame::reloadModel()
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
 	EX_ON_EXCEPTION(
 		not_exist_path_error, [](not_exist_path_error const&)
-		{ wxMessageOutputBest().Printf("Selected path doesn't exists, please choose suitable one"); });
+		{ wxMessageOutputMessageBox().Printf("Selected path doesn't exists, please choose suitable one"); });
 	EX_UNEXPECTED;
 }
 
