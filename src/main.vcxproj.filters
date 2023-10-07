@@ -42,6 +42,7 @@
     <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="era2\era2_plugin_helper.cpp" />
     <ClCompile Include="domain\mod_conflict_resolver.cpp" />
+    <ClCompile Include="ui\image_gallery_view.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="interface\inon_auto_applicable_platform.hpp" />
     <ClInclude Include="license.hpp" />
+    <ClInclude Include="ui\image_gallery_view.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

@@ -27,6 +27,7 @@ namespace mm
 	struct IIconStorage;
 
 	class ModListModel;
+	struct ImageGalleryView;
 
 	class ModListView : public wxPanel
 	{
@@ -83,5 +84,7 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
+
+		wxWidgetsPtr<ImageGalleryView> _galleryView = nullptr;
 	};
 }

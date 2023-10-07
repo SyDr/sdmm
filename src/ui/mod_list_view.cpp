@@ -25,6 +25,7 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
+#include "image_gallery_view.hpp"
 
 #include <wx/app.h>
 #include <wx/button.h>
@@ -75,9 +76,13 @@ void ModListView::buildLayout()
 	leftGroupSizer->Add(listGroupSizer, wxSizerFlags(1).Expand());
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
+	auto rightSizer = new wxBoxSizer(wxVERTICAL);
+	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
 	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
 	contentSizer->Add(leftGroupSizer, wxSizerFlags(168).Expand());
-	contentSizer->Add(_modDescription, wxSizerFlags(100).Expand().Border(wxALL, 4));
+	contentSizer->Add(rightSizer, wxSizerFlags(100).Expand().Border(wxALL, 4));
 
 	this->SetSizer(contentSizer);
 }
@@ -165,6 +170,8 @@ void ModListView::createControls(const wxString& managedPath)
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, "placeholder");
+
+	_galleryView = new ImageGalleryView(this);
 }
 
 void ModListView::createListControl()
@@ -225,12 +232,15 @@ void ModListView::updateControlsState()
 {
 	wxLogDebug(__FUNCTION__);
 
+	EX_TRY;
+
 	if (_selectedMod.empty())
 	{
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
 		_modDescription->SetValue(wxEmptyString);
+		_galleryView->Clear();
 
 		return;
 	}
@@ -272,8 +282,11 @@ void ModListView::updateControlsState()
 	}
 
 	_modDescription->SetValue(description);
+	_galleryView->LoadFrom((mod->data_path / "Screens").string());
 
 	Layout();
+
+	EX_UNEXPECTED;
 }
 
 void ModListView::followSelection()
