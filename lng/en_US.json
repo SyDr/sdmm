@@ -15,7 +15,9 @@
 		"other" : "Other",
 		"platforms" : "Platforms",
 		"personal mods" : "My personal mods",
-		"utilities" : "Utilities"
+		"utilities" : "Utilities",
+		"localization" : "Localization",
+		"mapeditor" : "Map editor"
 	},
 	"conflicts" : {
 		"caption" : "Choose conflict resolve mode",

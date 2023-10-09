@@ -97,7 +97,9 @@
 		"other" : "Другие",
 		"platforms" : "Платформы",
 		"utilities" : "Утилиты",
-		"personal mods" : "Собственные разработки"
+		"personal mods" : "Собственные разработки",
+		"localization" : "Перевод",
+		"mapeditor" : "Редактор карт"
 	},
 	"main_frame" : {
 		"revert" : "Сброс",
