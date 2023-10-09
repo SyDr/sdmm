@@ -12,3 +12,4 @@
 /setup/mm_release_files_old/
 /setup/Output/*
 /setup/to_archive/*
+/src/vcpkg_installed/

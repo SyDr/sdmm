@@ -30,7 +30,7 @@ namespace
 	{
 		if (value.IsSameAs("BeforeWog", false))
 			return PluginLocation::before_wog;
-		if (value.IsSameAs("AfterWoG", false))
+		if (value.IsSameAs("AfterWog", false))
 			return PluginLocation::after_wog;
 
 		return PluginLocation::root;
