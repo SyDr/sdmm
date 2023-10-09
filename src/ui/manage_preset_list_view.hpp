@@ -85,5 +85,6 @@ namespace mm
 		wxWidgetsPtr<wxDataViewCtrl>     _plugins = nullptr;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
+		wxWidgetsPtr<wxTimer>          _infoBarTimer = nullptr;
 	};
 }

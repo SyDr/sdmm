@@ -126,6 +126,7 @@ void ManagePresetListView::createControls()
 	_plugins->AssociateModel(_pluginListModel.get());
 
 	_infoBar = new wxInfoBar(this);
+	_infoBarTimer = new wxTimer(this);
 
 	createListColumns();
 	createPluginsListColumns();
@@ -228,6 +229,8 @@ void ManagePresetListView::bindEvents()
 	_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
 
 	_remove->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onDeletePreset(); });
+
+	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
 }
 
 void ManagePresetListView::onSavePresetRequested(wxString baseName)
@@ -282,6 +285,7 @@ void ManagePresetListView::onLoadPresetRequested()
 	refreshListContent();
 
 	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, selected));
+	_infoBarTimer->StartOnce(5000);
 
 	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
@@ -300,6 +304,7 @@ void ManagePresetListView::onRenamePreset()
 	if (_platform.getPresetManager()->exists(newName))
 	{
 		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		_infoBarTimer->StartOnce(5000);
 		return;
 	}
 
@@ -323,6 +328,7 @@ void ManagePresetListView::onCopyPreset()
 	if (_platform.getPresetManager()->exists(newName))
 	{
 		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		_infoBarTimer->StartOnce(5000);
 		return;
 	}
 
