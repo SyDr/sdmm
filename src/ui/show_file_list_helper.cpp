@@ -6,9 +6,9 @@
 #include "stdafx.h"
 
 #include "application.h"
-#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "era2/era2_directory_structure.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "select_mod_pairs_dialog.hpp"
 #include "select_mods_dialog.hpp"
 #include "show_file_list_dialog.hpp"
@@ -36,7 +36,7 @@ namespace
 		for (size_t i = 0; i < data.modList.size();)
 		{
 			bool const hasFiles = std::any_of(data.entries.cbegin(), data.entries.cend(),
-											  [&](const std::vector<Era2DirectoryEntry>& item) { return item[i].any(); });
+				[&](const std::vector<Era2DirectoryEntry>& item) { return item[i].any(); });
 
 			if (hasFiles)
 			{
@@ -53,7 +53,8 @@ namespace
 		return data;
 	}
 
-	Era2DirectoryStructure listModFiles(std::unordered_set<wxString> const& mods, mm::IModDataProvider& dataProvider)
+	Era2DirectoryStructure listModFiles(
+		std::unordered_set<wxString> const& mods, mm::IModDataProvider& dataProvider)
 	{
 		std::map<std::filesystem::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure                  result;
@@ -77,7 +78,8 @@ namespace
 			const auto& item    = result.modList[i];
 			auto        modData = dataProvider.modData(item);
 
-			if (!std::filesystem::exists(modData->data_path) || !std::filesystem::is_directory(modData->data_path))
+			if (!std::filesystem::exists(modData->data_path) ||
+				!std::filesystem::is_directory(modData->data_path))
 				continue;
 
 			using rdi = std::filesystem::recursive_directory_iterator;
@@ -90,23 +92,33 @@ namespace
 
 				if (ec)
 				{
-					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng), path, ec.message(),
-							   ec.value());
+					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng), path,
+						ec.message(), ec.value());
 					continue;
 				}
 
 				const bool isFile = it->is_regular_file(ec);
 				if (ec)
-					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), path, ec.message(), ec.value());
+					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), path, ec.message(),
+						ec.value());
 
 				if (!isFile)
 					continue;
 
 				static const std::unordered_set<std::wstring> skip = {
-					L"description.txt", L"description_rus.txt", L"description_chn.txt",
-					L"mod.json",        L"description_ru.txt",  L"description_en.txt",
-					L"icon.ico",        L"mod_info.ini",        L"readme.txt",
-					L"change.log",      L"changelog.txt",
+					L"change.log",
+					L"changelog.txt",
+					L"description.txt",
+					L"description_chn.txt",
+					L"description_en.txt",
+					L"description_ru.txt",
+					L"description_rus.txt",
+					L"icon.ico",
+					L"mod.json",
+					L"mod_info.ini",
+					L"readme.txt",
+					L"readme_cn.txt",
+					L"readme_ru.txt",
 				};
 
 				if (skip.count(boost::to_lower_copy(it->path().filename().wstring())))
@@ -147,7 +159,7 @@ namespace
 		for (size_t i = 0; i < result.fileList.size(); ++i)
 		{
 			const auto number = std::count_if(result.entries[i].cbegin(), result.entries[i].cend(),
-											  [](const Era2DirectoryEntry& item) { return item.any(); });
+				[](const Era2DirectoryEntry& item) { return item.any(); });
 
 			if (number > 1)
 			{
@@ -179,7 +191,8 @@ namespace
 		return { result.begin(), result.end() };
 	}
 
-	Era2DirectoryStructure removeCombinationsIfPossible(Era2DirectoryStructure data, std::set<std::pair<wxString, wxString>> remove)
+	Era2DirectoryStructure removeCombinationsIfPossible(
+		Era2DirectoryStructure data, std::set<std::pair<wxString, wxString>> remove)
 	{
 		if (remove.empty())
 			return data;
@@ -218,7 +231,8 @@ namespace
 	}
 }
 
-void mm::showModFileList(wxWindow& parent, Application& application, IModDataProvider& dataProvider, ModList list)
+void mm::showModFileList(
+	wxWindow& parent, Application& application, IModDataProvider& dataProvider, ModList list)
 {
 	SelectModsDialog smd(parent, application, dataProvider, list);
 	if (smd.ShowModal() != wxID_OK)
