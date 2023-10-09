@@ -141,9 +141,9 @@ void Era2ModManager::switchVisibility(const wxString& item)
 		hide(item);
 }
 
-void Era2ModManager::remove(const wxString& id)
+void Era2ModManager::remove(const wxString& item)
 {
-	_list.remove(id);
+	_list.remove(item);
 
 	_listChanged();
 }

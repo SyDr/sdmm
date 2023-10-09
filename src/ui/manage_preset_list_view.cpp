@@ -29,11 +29,11 @@
 #include <wx/checkbox.h>
 #include <wx/dir.h>
 #include <wx/generic/textdlgg.h>
+#include <wx/infobar.h>
 #include <wx/listbox.h>
 #include <wx/listctrl.h>
 #include <wx/msgdlg.h>
 #include <wx/sizer.h>
-#include <wx/infobar.h>
 
 #include <format>
 
@@ -54,8 +54,8 @@ namespace
 	}
 }
 
-ManagePresetListView::ManagePresetListView(wxWindow* parent, IModPlatform& platform,
-										   IIconStorage& iconStorage)
+ManagePresetListView::ManagePresetListView(
+	wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage)
 	: wxPanel(parent, wxID_ANY)
 	, _platform(platform)
 	, _selected(platform.localConfig()->getAcitvePreset())
@@ -99,7 +99,7 @@ void ManagePresetListView::createControls()
 	_presets = new wxStaticBox(this, wxID_ANY, "Profiles"_lng);
 
 	_list = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-								   wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
+		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 	_list->AppendIconTextColumn("Profile"_lng, wxDATAVIEW_CELL_INERT);
 
 	_load = new wxButton(_presets, wxID_ANY, "Load"_lng);
@@ -118,11 +118,11 @@ void ManagePresetListView::createControls()
 	_preview = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
 
 	_mods = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-							   wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
+		wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
 	_mods->AssociateModel(_listModel.get());
 
 	_plugins = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-								  wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
+		wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
 	_plugins->AssociateModel(_pluginListModel.get());
 
 	_infoBar = new wxInfoBar(this);
@@ -140,10 +140,9 @@ void ManagePresetListView::createListColumns()
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
 	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
-										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 =
-		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	auto column1 = new wxDataViewColumn("Mod"_lng, r1,
+		static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_mods->AppendColumn(column0);
 	_mods->AppendColumn(column1);
@@ -155,6 +154,7 @@ void ManagePresetListView::createPluginsListColumns()
 {
 	auto r0 = new mmPriorityDataRenderer();
 	auto r1 = new wxDataViewTextRenderer();
+	auto r2 = new wxDataViewIconTextRenderer();
 
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
@@ -163,14 +163,19 @@ void ManagePresetListView::createPluginsListColumns()
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
 	auto column0 = new wxDataViewColumn("", r0, static_cast<unsigned int>(PluginListModel::Column::state),
-										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	auto column1 =
 		new wxDataViewColumn("Plugin"_lng, r1, static_cast<unsigned int>(PluginListModel::Column::caption),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
+	auto column2 =
+		new wxDataViewColumn("Mod"_lng, r2, static_cast<unsigned int>(PluginListModel::Column::mod),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 
 	_plugins->AppendColumn(column0);
 	_plugins->AppendColumn(column1);
+	_plugins->AppendColumn(column2);
 
 	column1->SetSortOrder(true);
 }
@@ -239,14 +244,14 @@ void ManagePresetListView::onSavePresetRequested(wxString baseName)
 	{
 		int const answer =
 			wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
-						 wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+				wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 		if (answer != wxYES)
 			return;
 	}
 
-	_platform.getPresetManager()->savePreset(baseName, _platform.modManager()->mods(),
-											 _platform.pluginManager()->plugins().overridden);
+	_platform.getPresetManager()->savePreset(
+		baseName, _platform.modManager()->mods(), _platform.pluginManager()->plugins());
 	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
@@ -260,16 +265,16 @@ void ManagePresetListView::onLoadPresetRequested()
 {
 	EX_TRY;
 
-	auto selected           = getSelection();
-	auto [mods, overridden] = _platform.getPresetManager()->loadPreset(selected);
+	auto selected        = getSelection();
+	auto [mods, managed] = _platform.getPresetManager()->loadPreset(selected);
 
 	mods.available = _platform.modManager()->mods().available;
 	mods.invalid   = _platform.modManager()->mods().invalid;
 
 	_platform.modManager()->mods(std::move(mods));
 
-	auto currentPlugins = _platform.pluginManager()->plugins();
-	currentPlugins.replaceOverridenState(overridden);
+	auto currentPlugins    = _platform.pluginManager()->plugins();
+	currentPlugins.managed = managed.managed;
 	_platform.pluginManager()->plugins(currentPlugins);
 	_platform.localConfig()->setActivePreset(selected);
 	_selected = selected;
@@ -333,7 +338,7 @@ void ManagePresetListView::onDeletePreset()
 
 	auto      selected = getSelection();
 	const int answer   = wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), selected),
-									  wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+		  wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 	if (answer == wxYES)
 		_platform.getPresetManager()->remove(selected);
@@ -358,8 +363,8 @@ void ManagePresetListView::updatePreview()
 
 	auto selected = getSelection();
 
-	ModList                                   mods;
-	std::unordered_map<wxString, PluginState> plugins;
+	ModList    mods;
+	PluginList plugins;
 	if (!selected.empty())
 	{
 		std::tie(mods, plugins) = _platform.getPresetManager()->loadPreset(selected);
@@ -367,13 +372,9 @@ void ManagePresetListView::updatePreview()
 	}
 
 	_listModel->setModList(mods);
-	PluginList pluginsData;
-	_platform.pluginManager()->updateBaseState(pluginsData, mods);
-	pluginsData.available.clear();
-	pluginsData.replaceOverridenState(plugins);
-	_pluginListModel->setList(pluginsData);
+	_pluginListModel->setList(plugins);
 
-	_plugins->Show(!pluginsData.overridden.empty());
+	_plugins->Show(!plugins.managed.empty());
 	Layout();
 
 	EX_UNEXPECTED;

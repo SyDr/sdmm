@@ -15,15 +15,12 @@ namespace mm
 	struct IModManager;
 	struct IPluginManager;
 	struct IPresetManager;
-	struct INonAutoApplicablePlatform;
 
 	struct IModPlatform
 	{
 		virtual ~IModPlatform() = default;
 
 		virtual fs::path managedPath() const = 0;
-
-		virtual INonAutoApplicablePlatform* nonAutoApplicable() = 0;
 
 		virtual ILaunchHelper*    launchHelper() const     = 0;
 		virtual ILocalConfig*     localConfig() const      = 0;

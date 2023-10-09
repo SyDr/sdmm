@@ -13,6 +13,7 @@
 #include <wx/menu.h>
 
 #include "utility/wx_widgets_ptr.hpp"
+#include "domain/plugin_list.hpp"
 
 class wxDataViewCtrl;
 class wxStaticBox;
@@ -51,7 +52,7 @@ namespace mm
 		IPluginManager& _manager;
 		IIconStorage&   _iconStorage;
 
-		wxString _selected;
+		PluginSource _selected;
 
 	private:
 		wxObjectDataPtr<PluginListModel> _listModel;

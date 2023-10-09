@@ -150,7 +150,7 @@ void PluginListView::updateControlsState()
 {
 	wxLogDebug(__FUNCTION__);
 
-	if (_selected.empty())
+	if (_selected.name.empty())
 	{
 		_changeState->Disable();
 
@@ -158,13 +158,10 @@ void PluginListView::updateControlsState()
 	}
 
 	const bool isActive = [&] {
-		if (auto state = _manager.plugins().overriddenState(_selected))
-			return state == PluginState::enabled;
+		if (_manager.plugins().managed.contains(_selected))
+			return !_selected.active();
 
-		if (auto state = _manager.plugins().defaultState(_selected))
-			return state->state == PluginState::enabled;
-
-		return false;
+		return _selected.active();
 	}();
 
 	_changeState->Enable();
@@ -186,7 +183,7 @@ void PluginListView::followSelection()
 	}
 	else
 	{
-		_selected = wxEmptyString;
+		_selected = {};
 	}
 }
 

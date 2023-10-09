@@ -7,8 +7,7 @@
 
 #include "interface/ipreset_manager.hpp"
 
-#include <vector>
-#include <filesystem>
+#include "type/filesystem.hpp"
 
 namespace mm
 {
@@ -16,12 +15,10 @@ namespace mm
 
 	struct Era2PresetManager : IPresetManager
 	{
-		explicit Era2PresetManager(std::filesystem::path rootPath);
+		explicit Era2PresetManager(fs::path rootPath, fs::path modsPath);
 
-		std::pair<ModList, std::unordered_map<wxString, PluginState>>
-			 loadPreset(const wxString& name) override;
-		void savePreset(const wxString& name, const ModList& list,
-						const std::unordered_map<wxString, PluginState>& plugins) override;
+		std::pair<ModList, PluginList> loadPreset(const wxString& name) override;
+		void savePreset(const wxString& name, const ModList& list, const PluginList& plugins) override;
 
 		std::set<wxString> list() const override;
 
@@ -33,7 +30,8 @@ namespace mm
 		sigslot::signal<>& onListChanged() override;
 
 	private:
-		std::filesystem::path _rootPath;
+		fs::path _rootPath;
+		fs::path _modsPath;
 
 		sigslot::signal<> _listChanged;
 	};

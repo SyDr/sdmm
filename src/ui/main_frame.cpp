@@ -9,13 +9,13 @@
 
 #include "application.h"
 #include "choose_conflict_resolve_mode_view.hpp"
-#include "interface/ilocal_config.h"
+#include "interface/iapp_config.h"
+#include "interface/ii18n_service.hpp"
+#include "interface/iicon_storage.h"
 #include "interface/ilaunch_helper.h"
+#include "interface/ilocal_config.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/inon_auto_applicable_platform.hpp"
-#include "interface/iapp_config.h"
-#include "interface/iicon_storage.h"
 #include "interface/iplatform_service.h"
 #include "license.hpp"
 #include "manage_preset_list_view.hpp"
@@ -26,7 +26,6 @@
 #include "select_directory_view.h"
 #include "select_exe.h"
 #include "select_platform_view.h"
-#include "interface/ii18n_service.hpp"
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
 #include "system_info.hpp"
@@ -50,7 +49,7 @@ namespace
 
 MainFrame::MainFrame(Application& app)
 	: wxFrame(nullptr, wxID_ANY, SystemInfo::ProgramVersion, app.appConfig().mainWindow().position,
-			  app.appConfig().mainWindow().size)
+		  app.appConfig().mainWindow().size)
 	, _app(app)
 {
 	SetIcon(wxICON(MainMMIcon));
@@ -71,8 +70,8 @@ MainFrame::MainFrame(Application& app)
 
 		if (auto pluginManager = _currentPlatform->pluginManager())
 		{
-			auto pluginListView = new PluginListView(pages, *pluginManager,
-													 *_currentPlatform->modDataProvider(), app.iconStorage());
+			auto pluginListView = new PluginListView(
+				pages, *pluginManager, *_currentPlatform->modDataProvider(), app.iconStorage());
 			pages->AddPage(pluginListView, "Plugins"_lng);
 		}
 
@@ -80,16 +79,6 @@ MainFrame::MainFrame(Application& app)
 		{
 			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, app.iconStorage());
 			pages->AddPage(presetManagerView, "Profiles"_lng);
-		}
-
-		if (_currentPlatform->nonAutoApplicable())
-		{
-			_revertButton = new wxButton(panel, wxID_ANY, "main_frame/revert"_lng);
-			_revertButton->SetToolTip("main_frame/revert_tooltip"_lng);
-			_revertButton->SetBitmap(_app.iconStorage().get(embedded_icon::minus));
-			_applyButton = new wxButton(panel, wxID_ANY, "main_frame/apply"_lng);
-			_applyButton->SetToolTip("main_frame/apply_tooltip"_lng);
-			_applyButton->SetBitmap(_app.iconStorage().get(embedded_icon::tick));
 		}
 
 		if (auto launchHelper = _currentPlatform->launchHelper())
@@ -109,23 +98,13 @@ MainFrame::MainFrame(Application& app)
 
 	auto layout = new wxBoxSizer(wxVERTICAL);
 
-	if (_currentPlatform && (_currentPlatform->nonAutoApplicable() || _currentPlatform->launchHelper()))
+	if (_currentPlatform && _currentPlatform->launchHelper())
 	{
 		auto topLineSizer = new wxBoxSizer(wxHORIZONTAL);
 
-		if (_currentPlatform->nonAutoApplicable())
-		{
-			topLineSizer->Add(_revertButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-			topLineSizer->Add(_applyButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-		}
-
 		topLineSizer->AddStretchSpacer(1);
-
-		if (_currentPlatform->launchHelper())
-		{
-			topLineSizer->Add(_launchButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-			topLineSizer->Add(_launchManageButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-		}
+		topLineSizer->Add(_launchButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
+		topLineSizer->Add(_launchManageButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
 
 		layout->Add(topLineSizer, wxSizerFlags(0).Expand());
 	}
@@ -145,12 +124,6 @@ MainFrame::MainFrame(Application& app)
 
 	if (_currentPlatform)
 	{
-		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
-		{
-			_revertButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { nonAuto->revert(); });
-			_applyButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { nonAuto->apply(); });
-		}
-
 		if (auto launchHelper = _currentPlatform->launchHelper())
 		{
 			launchHelper->onDataChanged().connect([this] { updateExecutableIcon(); });
@@ -180,7 +153,7 @@ void MainFrame::createMenuBar()
 	if (!_app.appConfig().portableMode())
 	{
 		auto changeDirectory = toolsMenu->Append(wxID_ANY, "Change managed directory"_lng, nullptr,
-												 "Allows selecting other directory for management"_lng);
+			"Allows selecting other directory for management"_lng);
 
 		_menuItems[changeDirectory->GetId()] = [&] { OnMenuToolsChangeDirectory(); };
 	}
@@ -228,34 +201,16 @@ void MainFrame::OnMenuToolsChangeDirectory()
 {
 	EX_TRY;
 
-	if (_currentPlatform)
-	{
-		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
-		{
-			if (nonAuto->changed())
-			{
-				auto saveChanges =
-					wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
-								 wxICON_QUESTION | wxYES_NO);
-
-				if (saveChanges != wxYES)
-					return;
-
-				nonAuto->apply();
-			}
-		}
-	}
-
 	SelectDirectoryDialog dialog(this, _app.appConfig(), _app.iconStorage());
 
-	if (dialog.ShowModal() == wxID_OK)
-	{
-		wxBusyCursor bc;
-		wxString     path = dialog.getSelectedPath();
+	if (dialog.ShowModal() != wxID_OK)
+		return;
 
-		_app.appConfig().setDataPath(path.ToStdWstring());
-		wxGetApp().scheduleRestart();
-	}
+	wxBusyCursor bc;
+	wxString     path = dialog.getSelectedPath();
+
+	_app.appConfig().setDataPath(path.ToStdWstring());
+	wxGetApp().scheduleRestart();
 
 	EX_UNEXPECTED;
 }
@@ -264,8 +219,8 @@ void MainFrame::OnMenuToolsListModFiles()
 {
 	EX_TRY;
 
-	showModFileList(*this, _app, *_currentPlatform->modDataProvider(),
-					_currentPlatform->modManager()->mods());
+	showModFileList(
+		*this, _app, *_currentPlatform->modDataProvider(), _currentPlatform->modManager()->mods());
 
 	EX_UNEXPECTED;
 }
@@ -343,9 +298,9 @@ void MainFrame::reloadModel()
 		CallAfter(&MainFrame::OnMenuToolsChooseConflictResolveMode);
 
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
-	EX_ON_EXCEPTION(
-		not_exist_path_error, [](not_exist_path_error const&)
-		{ wxMessageOutputMessageBox().Printf("Selected path doesn't exists, please choose suitable one"); });
+	EX_ON_EXCEPTION(not_exist_path_error, [](not_exist_path_error const&) {
+		wxMessageOutputMessageBox().Printf("Selected path doesn't exists, please choose suitable one");
+	});
 	EX_UNEXPECTED;
 }
 
@@ -360,28 +315,6 @@ void MainFrame::OnMenuCheckForUpdates()
 
 void MainFrame::OnCloseWindow(wxCloseEvent& event)
 {
-	if (event.CanVeto() && _currentPlatform)
-	{
-		if (auto nonAuto = _currentPlatform->nonAutoApplicable())
-		{
-			if (nonAuto->changed())
-			{
-				auto saveChanges =
-					wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
-								 wxICON_QUESTION | wxYES_NO | wxCANCEL);
-
-				if (saveChanges == wxCANCEL)
-				{
-					event.Veto();
-					return;
-				}
-
-				if (saveChanges == wxYES)
-					nonAuto->apply();
-			}
-		}
-	}
-
 	saveWindowProperties();
 	event.Skip();
 }
@@ -421,21 +354,6 @@ void MainFrame::onLaunchGameRequested()
 
 	if (!_currentPlatform)
 		return;
-
-	if (auto nonAuto = _currentPlatform->nonAutoApplicable())
-	{
-		if (nonAuto->changed())
-		{
-			auto saveChanges =
-				wxMessageBox("main_frame/unsaved_changes"_lng, "main_frame/unsaved_changes_caption"_lng,
-							 wxICON_QUESTION | wxYES_NO);
-
-			if (saveChanges != wxYES)
-				return;
-
-			nonAuto->apply();
-		}
-	}
 
 	auto config = _currentPlatform->localConfig();
 	auto helper = _currentPlatform->launchHelper();

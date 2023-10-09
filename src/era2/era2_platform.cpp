@@ -90,8 +90,8 @@ namespace
 		return items;
 	}
 
-	void saveMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath,
-				  const ModList& mods)
+	void saveMods(
+		const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath, const ModList& mods)
 	{
 		auto                 reversedRange = mods.active | boost::adaptors::reversed;
 		std::deque<wxString> reversed(reversedRange.begin(), reversedRange.end());
@@ -102,31 +102,35 @@ namespace
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
 		std::filesystem::create_directories(modsPath / mm::SystemInfo::ManagedMod);
-		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
-								   modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
-								   std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy_file(
+			std::filesystem::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
+			modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
+			std::filesystem::copy_options::overwrite_existing);
 		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description.txt",
-								   modsPath / mm::SystemInfo::ManagedMod / "description.txt",
-								   std::filesystem::copy_options::overwrite_existing);
+			modsPath / mm::SystemInfo::ManagedMod / "description.txt",
+			std::filesystem::copy_options::overwrite_existing);
 		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description_rus.txt",
-								   modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
-								   std::filesystem::copy_options::overwrite_existing);
+			modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
+			std::filesystem::copy_options::overwrite_existing);
 	}
 }
 
 Era2Platform::Era2Platform(Application const& app)
-	: _rootDir(app.appConfig().getDataPath())
-	, _app(app)
+	: _app(app)
+	, _rootDir(app.appConfig().getDataPath())
 {
 	_localConfig   = std::make_unique<Era2Config>(_rootDir);
-	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath());
+	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
 	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig, app.iconStorage());
 	_modDataProvider =
 		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode());
 
-	_initalModList = _modList = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
-	_modManager               = std::make_unique<Era2ModManager>(_modList);
+	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
+	_modManager    = std::make_unique<Era2ModManager>(_modList);
 	_pluginManager = std::make_unique<Era2PluginManager>(*_modManager, getModsDirPath(), getPluginListPath());
+
+	_modListChanged    = _modManager->onListChanged().connect([this] { save(); });
+	_pluginListChanged = _pluginManager->onListChanged().connect([this] { _pluginManager->save(); });
 }
 
 fs::path Era2Platform::managedPath() const
@@ -184,27 +188,8 @@ fs::path Era2Platform::getPluginListPath() const
 	return _localConfig->getProgramDataPath() / "plugins.json";
 }
 
-INonAutoApplicablePlatform* Era2Platform::nonAutoApplicable()
-{
-	return this;
-}
-
-bool Era2Platform::changed() const
-{
-	return _modList != _initalModList || _pluginManager->changed();
-}
-
-void Era2Platform::apply()
+void Era2Platform::save()
 {
 	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
-
-	_initalModList = _modList;
-
 	_pluginManager->save();
-}
-
-void Era2Platform::revert()
-{
-	_modManager->mods(_initalModList);
-	_pluginManager->revert();
 }

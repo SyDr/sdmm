@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -11,6 +11,7 @@
 #include "era2_config.h"
 #include "era2_mod_manager.h"
 #include "era2_platform.h"
+#include "era2_plugin_manager.hpp"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
@@ -29,10 +30,10 @@ namespace
 	}
 }
 
-Era2PresetManager::Era2PresetManager(std::filesystem::path rootPath)
+Era2PresetManager::Era2PresetManager(std::filesystem::path rootPath, fs::path modsPath)
 	: _rootPath(std::move(rootPath))
-{
-}
+	, _modsPath(std::move(modsPath))
+{}
 
 void Era2PresetManager::copy(const wxString& from, const wxString& to)
 {
@@ -83,12 +84,13 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 	return _listChanged;
 }
 
-std::pair<ModList, std::unordered_map<wxString, PluginState>>
-Era2PresetManager::loadPreset(const wxString& name)
+std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& name)
 {
-	const auto    path = toPath(_rootPath, name);
-	ModList       modList;
-	std::unordered_map<wxString, PluginState> pluginList;
+	ModList    modList;
+	PluginList pluginList;
+
+	const auto path = toPath(_rootPath, name);
+
 	std::ifstream datafile(path);
 
 	if (!datafile)
@@ -123,23 +125,17 @@ Era2PresetManager::loadPreset(const wxString& name)
 			for (const auto& item : *hidden)
 				modList.hidden.emplace(wxString::FromUTF8(item));
 	}
-	
-	if (auto plugins = data.find("plugins"); plugins != data.end() && plugins->is_object())
-	{
-		if (auto enabled = plugins->find("enabled"); enabled != plugins->end() && enabled->is_array())
-			for (const auto& item : *enabled)
-				pluginList[wxString::FromUTF8(item)] = PluginState::enabled;
 
-		if (auto disabled = plugins->find("disabled"); disabled != plugins->end() && disabled->is_array())
-			for (const auto& item : *disabled)
-				pluginList[wxString::FromUTF8(item)] = PluginState::disabled;
-	}
+	pluginList.available = Era2PluginManager::loadAvailablePlugins(_modsPath, modList);
+	if (auto plugins = data.find("plugins"); plugins != data.end() && plugins->is_object())
+		pluginList.managed = Era2PluginManager::loadManagedState(*plugins);
+
+	erase_if(pluginList.available, [&](const PluginSource& item) { return !pluginList.managed.contains(item); });
 
 	return { modList, pluginList };
 }
 
-void Era2PresetManager::savePreset(const wxString& name, const ModList& list,
-								   const std::unordered_map<wxString, PluginState>& plugins)
+void Era2PresetManager::savePreset(const wxString& name, const ModList& list, const PluginList& plugins)
 {
 	nlohmann::json data;
 
@@ -153,15 +149,13 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list,
 	for (const auto& item : list.hidden)
 		data["mods"]["hidden"].emplace_back(item.ToStdString());
 
-	data["plugins"]           = nlohmann::json::object();
-	data["plugins"]["enabled"] = nlohmann::json::array();
-	data["plugins"]["disabled"] = nlohmann::json::array();
-
-	for (const auto& item : plugins)
-		if (item.second == PluginState::enabled)
-			data["plugins"]["enabled"].emplace_back(item.first.ToStdString());
-		else
-			data["plugins"]["disabled"].emplace_back(item.first.ToStdString());
+	auto& ref = data["plugins"] = nlohmann::json::object();
+	for (const auto& source : plugins.managed)
+	{
+		auto& modRef = ref[source.modId.ToStdString()];
+		auto& keyRef = modRef[toString(source.location)];
+		keyRef.emplace_back(source.name.ToStdString());
+	}
 
 	const auto path          = toPath(_rootPath, name);
 	const bool already_exist = std::filesystem::exists(path);

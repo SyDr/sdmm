@@ -15,7 +15,6 @@ namespace mm
 {
 	struct ModList;
 	struct PluginList;
-	enum class PluginState;
 
 	struct IPresetManager
 	{
@@ -23,10 +22,8 @@ namespace mm
 
 		virtual std::set<wxString> list() const = 0;
 
-		virtual std::pair<ModList, std::unordered_map<wxString, PluginState>>
-					 loadPreset(const wxString& name)                                     = 0;
-		virtual void savePreset(const wxString& name, const ModList& list,
-								const std::unordered_map<wxString, PluginState>& plugins) = 0;
+		virtual std::pair<ModList, PluginList> loadPreset(const wxString& name)                       = 0;
+		virtual void savePreset(const wxString& name, const ModList& list, const PluginList& plugins) = 0;
 
 		virtual bool exists(const wxString& name) const               = 0;
 		virtual void copy(const wxString& from, const wxString& to)   = 0;

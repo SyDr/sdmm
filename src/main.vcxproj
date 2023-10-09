@@ -18,7 +18,6 @@
     <ClCompile Include="era2\era2_mod_loader.cpp" />
     <ClCompile Include="era2\era2_launch_helper.cpp" />
     <ClCompile Include="era2\era2_mod_manager.cpp" />
-    <ClCompile Include="era2\era2_plugin_helper.cpp" />
     <ClCompile Include="era2\era2_plugin_manager.cpp" />
     <ClCompile Include="era2\era2_preset_manager.cpp" />
     <ClCompile Include="service\app_config.cpp" />
@@ -70,7 +69,6 @@
     <ClInclude Include="era2\era2_directory_structure.hpp" />
     <ClInclude Include="era2\era2_launch_helper.h" />
     <ClInclude Include="era2\era2_mod_manager.h" />
-    <ClInclude Include="era2\era2_plugin_helper.hpp" />
     <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="era2\era2_preset_manager.h" />
     <ClInclude Include="service\app_config.h" />
@@ -78,7 +76,6 @@
     <ClInclude Include="service\icon_storage.h" />
     <ClInclude Include="interface\ilaunch_helper.h" />
     <ClInclude Include="interface\imod_manager.hpp" />
-    <ClInclude Include="interface\inon_auto_applicable_platform.hpp" />
     <ClInclude Include="interface\iapp_config.h" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />

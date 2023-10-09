@@ -1,56 +1,89 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include <wx/string.h>
 
-#include <optional>
-#include <set>
 #include <compare>
-#include <unordered_map>
-#include <vector>
+#include <set>
+
+#include "type/filesystem.hpp"
 
 namespace mm
 {
-	enum class PluginState
+	enum class PluginLocation
 	{
-		disabled,
-		enabled,
+		root       = 0,
+		before_wog = 1,
+		after_wog  = 2,
 	};
 
-	inline PluginState switchPluginState(PluginState state)
+	inline wxString toString(PluginLocation location)
 	{
-		return state == PluginState::enabled ? PluginState::disabled : PluginState::enabled;
+		switch (location)
+		{
+		case PluginLocation::root: return ".";
+		case PluginLocation::before_wog: return "BeforeWoG";
+		case PluginLocation::after_wog: return "AfterWoG";
+		}
+
+		return "";
 	}
 
-	struct ModPluginState
+	struct PluginSource
 	{
-		wxString    mod;
-		PluginState state = PluginState::disabled;
+		wxString       modId;
+		PluginLocation location = PluginLocation::root;
+		wxString       name;
 
-		ModPluginState(wxString mod, PluginState state)
-			: mod(std::move(mod))
-			, state(state) {};
+		PluginSource() = default;
+		PluginSource(const wxString& modId, PluginLocation location, const wxString& name);
 
-		std::weak_ordering operator<=>(const ModPluginState& other) const = default;
+		wxString toString() const
+		{
+			wxString result = name;
+			if (result.ends_with(wxString(".off")))
+				result = result.RemoveLast(std::char_traits<const char>::length(".off"));
+
+			if (location == PluginLocation::root)
+				return result;
+
+			return result + " (" + mm::toString(location) + ")";
+		}
+
+		bool active() const
+		{
+			return !name.ends_with(".off");
+		}
+
+		auto operator<=>(const PluginSource& other) const
+		{
+			return std::tie(location, name, modId) <=> std::tie(other.location, other.name, other.modId);
+		}
+
+		bool operator==(const PluginSource& other) const = default;
 	};
 
 	struct PluginList
 	{
-		std::set<wxString> available;
+		std::set<PluginSource> available;
+		std::set<PluginSource> managed;
 
-		std::unordered_map<wxString, ModPluginState> state;
-		std::unordered_map<wxString, PluginState>    overridden;
+		bool active(const PluginSource& item) const
+		{
+			return item.active() xor managed.contains(item);
+		}
 
-		void overrideState(const wxString& item, PluginState newState);
-		void replaceOverridenState(const std::unordered_map<wxString, PluginState>& state);
-		void reset(const wxString& item);
-
-		std::optional<ModPluginState> defaultState(const wxString& item) const;
-		std::optional<PluginState>    overriddenState(const wxString& item) const;
+		void switchState(const PluginSource& item)
+		{
+			if (managed.contains(item))
+				managed.erase(item);
+			else
+				managed.emplace(item);
+		}
 
 		std::weak_ordering operator<=>(const PluginList& other) const = default;
 	};

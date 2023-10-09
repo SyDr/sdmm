@@ -43,13 +43,13 @@ namespace mm
 		bool GetAttrByRow(unsigned row, unsigned col, wxDataViewItemAttr& attr) const override;
 
 		int Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column,
-					bool ascending) const override;
+			bool ascending) const override;
 
-		void setList(PluginList const& items);
+		void setList(const PluginList& items);
 		void showAll(bool value);
 
-		wxString       findIdByItem(const wxDataViewItem& item) const;
-		wxDataViewItem findItemById(const wxString& plugin) const;
+		PluginSource   findIdByItem(const wxDataViewItem& item) const;
+		wxDataViewItem findItemById(const PluginSource& plugin) const;
 
 	private:
 		void reload();
@@ -59,8 +59,8 @@ namespace mm
 		IIconStorage&     _iconStorage;
 		PluginList        _items;
 
-		wxString              _selected;
-		std::vector<wxString> _displayedItems;
+		PluginSource              _selected;
+		std::vector<PluginSource> _displayedItems;
 
 		bool _showHidden = false;
 	};

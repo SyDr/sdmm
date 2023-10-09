@@ -9,7 +9,6 @@
 #include "domain/plugin_list.hpp"
 #include "era2_config.h"
 #include "interface/imod_platform.hpp"
-#include "interface/inon_auto_applicable_platform.hpp"
 #include "type/filesystem.hpp"
 
 #include <deque>
@@ -26,7 +25,7 @@ namespace mm
 	struct Era2PluginManager;
 	struct ModList;
 
-	struct Era2Platform : IModPlatform, INonAutoApplicablePlatform
+	struct Era2Platform : IModPlatform
 	{
 		explicit Era2Platform(Application const& app);
 
@@ -39,17 +38,13 @@ namespace mm
 		IModDataProvider* modDataProvider() const override;
 		IPluginManager*   pluginManager() const override;
 
-		INonAutoApplicablePlatform* nonAutoApplicable() override;
-
-		bool changed() const override;
-		void apply() override;
-		void revert() override;
-
 	private:
 		fs::path getModsDirPath() const;
 		fs::path getActiveListPath() const;
 		fs::path getHiddenListPath() const;
 		fs::path getPluginListPath() const;
+
+		void save();
 
 	private:
 		const Application& _app;
@@ -62,7 +57,8 @@ namespace mm
 		std::unique_ptr<Era2PluginManager>   _pluginManager;
 		std::unique_ptr<Era2PresetManager>   _presetManager;
 
-		ModList _modList;
-		ModList _initalModList;
+		ModList             _modList;
+		sigslot::connection _modListChanged;
+		sigslot::connection _pluginListChanged;
 	};
 }
