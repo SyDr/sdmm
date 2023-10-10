@@ -76,8 +76,15 @@ void ModListView::buildLayout()
 	leftGroupSizer->Add(listGroupSizer, wxSizerFlags(1).Expand());
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
+	auto rightBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	//rightBottomSizer->Add(_authorsLabel, wxSizerFlags(1).CenterVertical());
+	rightBottomSizer->AddStretchSpacer();
+	rightBottomSizer->Add(_showGalleryButton, wxSizerFlags(0).Border(wxLEFT, 4));
+	rightBottomSizer->Add(_expandGallery, wxSizerFlags(0));
+
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
 	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	rightSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand());
 	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -140,6 +147,11 @@ void ModListView::bindEvents()
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested(); });
+
+	_showGalleryButton->Bind(
+		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown, _galleryExpanded); });
+	_expandGallery->Bind(
+		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(_galleryShown, !_galleryExpanded); });
 }
 
 void ModListView::createControls(const wxString& managedPath)
@@ -171,7 +183,16 @@ void ModListView::createControls(const wxString& managedPath)
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, "placeholder");
 
-	_galleryView = new ImageGalleryView(this);
+	_showGalleryButton = new wxButton(this, wxID_ANY, "Screenshots"_lng);
+	_showGalleryButton->SetBitmap(_iconStorage.get(embedded_icon::double_up));
+
+	wxSize goodSize = _showGalleryButton->GetBestSize();
+	goodSize.SetWidth(goodSize.GetHeight());
+	_expandGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+	_expandGallery->SetBitmap(_iconStorage.get(embedded_icon::maximize));
+
+	_galleryView = new ImageGalleryView(this, wxID_ANY);
+	_galleryView->Show(_galleryShown);
 }
 
 void ModListView::createListControl()
@@ -240,7 +261,7 @@ void ModListView::updateControlsState()
 		_moveDown->Disable();
 		_changeState->Disable();
 		_modDescription->SetValue(wxEmptyString);
-		_galleryView->Clear();
+		_galleryView->Reset();
 
 		return;
 	}
@@ -282,7 +303,7 @@ void ModListView::updateControlsState()
 	}
 
 	_modDescription->SetValue(description);
-	_galleryView->LoadFrom((mod->data_path / "Screens").string());
+	_galleryView->SetPath(mod->data_path / "Screens");
 
 	Layout();
 
@@ -429,6 +450,33 @@ void ModListView::onRemoveModRequested()
 	}
 
 	_modManager.remove(mod->id);
+
+	EX_UNEXPECTED;
+}
+
+void ModListView::updateGalleryState(bool show, bool expand)
+{
+	EX_TRY;
+
+	if (!show && _galleryExpanded)
+		expand = false;
+
+	if (expand && !_galleryShown)
+		show = true;
+
+	_galleryShown    = show;
+	_galleryExpanded = expand;
+
+	//_showGalleryButton->SetBitmap(wxNullBitmap);
+	_showGalleryButton->SetBitmap(
+		_iconStorage.get(show || expand ? embedded_icon::double_down : embedded_icon::double_up));
+	_galleryView->Show(show || expand);
+	_galleryView->Expand(expand);
+
+	if (auto topWindow = dynamic_cast<wxTopLevelWindow*>(wxTheApp->GetTopWindow()))
+		topWindow->ShowFullScreen(expand, wxFULLSCREEN_NOBORDER);
+
+	Layout();
 
 	EX_UNEXPECTED;
 }

@@ -54,6 +54,8 @@ namespace mm
 		void onSortModsRequested();
 		void onRemoveModRequested();
 
+		void updateGalleryState(bool show, bool expand);
+
 	private:
 		IModPlatform& _managedPlatform;
 		IModManager&  _modManager;
@@ -85,6 +87,11 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 
-		wxWidgetsPtr<ImageGalleryView> _galleryView = nullptr;
+		wxWidgetsPtr<wxButton>         _showGalleryButton = nullptr;
+		wxWidgetsPtr<wxButton>         _expandGallery     = nullptr;
+		wxWidgetsPtr<ImageGalleryView> _galleryView       = nullptr;
+
+		bool _galleryShown    = false;
+		bool _galleryExpanded = false;
 	};
 }

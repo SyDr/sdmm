@@ -5,25 +5,48 @@
 
 #pragma once
 
-#include <wx/panel.h>
-#include <wx/generic/statbmpg.h>
+#include "type/filesystem.hpp"
 
-#include "utility/wx_widgets_ptr.hpp"
+#include <future>
+#include <mutex>
+
+#include <wx/sizer.h>
+#include <wx/vscroll.h>
+#include <wx/wx.h>
 
 namespace mm
 {
-	struct IIconStorage;
-
-	struct ImageGalleryView : public wxScrolled<wxPanel>
+	struct ImageGalleryView : public wxScrolledCanvas
 	{
 	public:
-		ImageGalleryView(wxWindow* parent);
+		ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs::path& directory = {},
+			const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+			const wxString& name = "mmGalleryWidget");
+		~ImageGalleryView();
 
-		void Clear();
-		void LoadFrom(wxString modId);
+		void SetPath(const fs::path& directory);
+		void Reset();
+		void Expand(bool value);
+		void Reload();
+
+	protected:
+		wxSize DoGetBestSize() const override;
+		void   OnPaint(wxPaintEvent&);
 
 	private:
-		wxWidgetsPtr<wxBoxSizer>                         _mainSizer = nullptr;
-		std::vector<wxWidgetsPtr<wxGenericStaticBitmap>> _items;
+		void resetThread();
+		void start();
+		void backgroundThread();
+
+	private:
+		fs::path _path;
+		bool     _expanded = false;
+
+		mutable std::mutex _dataAccess;
+		std::future<void>  _thread;
+		std::atomic_bool   _canceled   = false;
+		std::atomic_size_t _bestHeight = 0;
+
+		std::vector<std::pair<fs::path, wxBitmap>> _images;
 	};
 }

@@ -20,7 +20,7 @@ namespace mm
 	{
 		virtual ~IAppConfig() = default;
 
-		virtual bool   portableMode() const = 0;
+		virtual bool     portableMode() const = 0;
 		virtual fs::path dataPath() const     = 0;
 		virtual fs::path programPath() const  = 0;
 
@@ -35,9 +35,9 @@ namespace mm
 		virtual void                 setMainWindowProperties(const MainWindowProperties& props) = 0;
 		virtual MainWindowProperties mainWindow() const                                         = 0;
 
-		virtual fs::path getDataPath() const                = 0;
-		virtual void   setDataPath(const fs::path& path)    = 0;
-		virtual void   forgetDataPath(const fs::path& path) = 0;
+		virtual fs::path getDataPath() const                  = 0;
+		virtual void     setDataPath(const fs::path& path)    = 0;
+		virtual void     forgetDataPath(const fs::path& path) = 0;
 
 		virtual bool dataPathHasStar(const fs::path& path) const          = 0;
 		virtual void starDataPath(const fs::path& path, bool star = true) = 0;
