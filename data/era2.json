@@ -16,7 +16,7 @@
 	},
 	"16 2-way teleports": {
 		"incompatible": [
-			"Probably incompatible with XXL - need to check"
+			"XXL"
 		]
 	},
 	"WoG Scripts Rus": {
@@ -30,6 +30,9 @@
 		]
 	},
 	"Advanced Classes Mod Rus": {
+		"incompatible": [
+			"XXL"
+		],
 		"requires": [
 			"Advanced Classes Mod"
 		],
@@ -58,13 +61,24 @@
 	"Enhanced Henchmen": {
 		"load_after": [
 			"WoG Scripts",
-			"WoG Rus",
-			"Why WoG Rus has same file with different values?"
+			"WoG Rus"
 		]
 	},
 	"Difficulty Mod": {
 		"load_after": [
 			"WoG Scripts"
+		]
+	},
+	"@to_sort_data": {
+		"random": [
+			"TrainerX and WoG graphicsX both replace zobj049.def",
+			"ERA scripts RUS and Advanced classes both replace ILCK22.def and 5 others",
+			"Enhanced Henchmen and WoG rus both replace erm script and mod rus.json",
+			"Random wallpaper menu and Legend menu both replace legendmenu.json",
+			"Quick savings and Wog Rus both replace quick savings.json",
+			"BattleQueue and Wog Rus both replace battlequeue.json",
+			"Legend menu and Wog Rus both replace legendmenurus.zip",
+			"Difficulty Mod has a lot of similar files to Advanced classes"
 		]
 	}
 }
