@@ -7,6 +7,7 @@
 
 #include "interface/imod_data_provider.hpp"
 
+#include "type/filesystem.hpp"
 #include "wx/string.h"
 
 #include <filesystem>
@@ -19,7 +20,7 @@ namespace mm
 
 	struct Era2ModDataProvider : IModDataProvider
 	{
-		Era2ModDataProvider(std::filesystem::path basePath, wxString preferredLng);
+		Era2ModDataProvider(fs::path basePath, wxString preferredLng);
 
 		non_owning_ptr<ModData const> modData(const wxString& id) override;
 
@@ -27,8 +28,8 @@ namespace mm
 		void loadDefaults();
 
 	private:
-		std::filesystem::path const _basePath;
-		wxString const              _preferredLng;
+		const fs::path _basePath;
+		const wxString _preferredLng;
 
 		std::map<wxString, ModData> _data;
 
