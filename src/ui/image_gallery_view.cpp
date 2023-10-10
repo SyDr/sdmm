@@ -32,6 +32,10 @@ ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs:
 {
 	SetScrollRate(180, -1);
 	Bind(wxEVT_PAINT, &ImageGalleryView::OnPaint, this);
+	Bind(wxEVT_SHOW, [=](const wxShowEvent& event) {
+		if (!event.IsShown())
+			_bestHeight = 0;
+	});
 	SetPath(directory);
 }
 
@@ -136,18 +140,18 @@ void ImageGalleryView::backgroundThread()
 	{
 		std::lock_guard<std::mutex> lock(_dataAccess);
 
-		if (!_images[i].second.IsOk())
-		{
-			wxImage item;
-			item.LoadFile(_images[i].first.string());
+		wxImage item;
+		item.LoadFile(_images[i].first.string());
 
-			const wxSize bestSize(getBestSize(item.GetSize(), _bestHeight));
-			item.Rescale(bestSize.GetWidth(), bestSize.GetHeight(), wxIMAGE_QUALITY_NORMAL);
+		if (!item.IsOk())
+			continue;
 
-			_images[i].second = wxBitmap(item);
+		const wxSize bestSize(getBestSize(item.GetSize(), _bestHeight));
+		item.Rescale(bestSize.GetWidth(), bestSize.GetHeight(), wxIMAGE_QUALITY_NORMAL);
 
-			CallAfter([=] { Refresh(false); });
-		}
+		_images[i].second = wxBitmap(item);
+
+		CallAfter([=] { Refresh(false); });
 	}
 
 	CallAfter([=] { Refresh(false); });
