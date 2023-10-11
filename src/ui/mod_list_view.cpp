@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -77,10 +77,10 @@ void ModListView::buildLayout()
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
 	auto rightBottomSizer = new wxBoxSizer(wxHORIZONTAL);
-	//rightBottomSizer->Add(_authorsLabel, wxSizerFlags(1).CenterVertical());
 	rightBottomSizer->AddStretchSpacer();
-	rightBottomSizer->Add(_showGalleryButton, wxSizerFlags(0).Border(wxLEFT, 4));
-	rightBottomSizer->Add(_expandGallery, wxSizerFlags(0));
+	rightBottomSizer->Add(_showGallery, wxSizerFlags(0).Border(wxALL, 4));
+	rightBottomSizer->Add(_openGallery, wxSizerFlags(0).Border(wxALL, 4));
+	rightBottomSizer->Add(_expandGallery, wxSizerFlags(0).Border(wxALL, 4));
 
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
 	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
@@ -148,7 +148,9 @@ void ModListView::bindEvents()
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested(); });
 
-	_showGalleryButton->Bind(
+	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
+
+	_showGallery->Bind(
 		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown, _galleryExpanded); });
 	_expandGallery->Bind(
 		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(_galleryShown, !_galleryExpanded); });
@@ -183,11 +185,15 @@ void ModListView::createControls(const wxString& managedPath)
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, "placeholder");
 
-	_showGalleryButton = new wxButton(this, wxID_ANY, "Screenshots"_lng);
-	_showGalleryButton->SetBitmap(_iconStorage.get(embedded_icon::double_up));
+	_showGallery = new wxButton(this, wxID_ANY, "Screenshots"_lng);
+	_showGallery->SetBitmap(_iconStorage.get(embedded_icon::double_up));
 
-	wxSize goodSize = _showGalleryButton->GetBestSize();
+	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
+
+	_openGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+	_openGallery->SetBitmap(_iconStorage.get(embedded_icon::folder));
+
 	_expandGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
 	_expandGallery->SetBitmap(_iconStorage.get(embedded_icon::maximize));
 
@@ -260,7 +266,8 @@ void ModListView::updateControlsState()
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		_modDescription->SetValue(wxEmptyString);
+		_modDescription->SetValue("");
+		_openGallery->Disable();
 		_galleryView->Reset();
 
 		return;
@@ -303,6 +310,7 @@ void ModListView::updateControlsState()
 	}
 
 	_modDescription->SetValue(description);
+	_openGallery->Enable(fs::exists(mod->data_path / "Screens"));
 	_galleryView->SetPath(mod->data_path / "Screens");
 
 	Layout();
@@ -454,6 +462,17 @@ void ModListView::onRemoveModRequested()
 	EX_UNEXPECTED;
 }
 
+void ModListView::openGalleryRequested()
+{
+	EX_TRY;
+
+	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+
+	wxLaunchDefaultApplication((mod->data_path / "Screens").string());
+
+	EX_UNEXPECTED;
+}
+
 void ModListView::updateGalleryState(bool show, bool expand)
 {
 	EX_TRY;
@@ -467,8 +486,7 @@ void ModListView::updateGalleryState(bool show, bool expand)
 	_galleryShown    = show;
 	_galleryExpanded = expand;
 
-	//_showGalleryButton->SetBitmap(wxNullBitmap);
-	_showGalleryButton->SetBitmap(
+	_showGallery->SetBitmap(
 		_iconStorage.get(show || expand ? embedded_icon::double_down : embedded_icon::double_up));
 	_galleryView->Show(show || expand);
 	_galleryView->Expand(expand);

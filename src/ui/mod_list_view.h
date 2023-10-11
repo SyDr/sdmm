@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -53,6 +53,7 @@ namespace mm
 		void updateControlsState();
 		void onSortModsRequested();
 		void onRemoveModRequested();
+		void openGalleryRequested();
 
 		void updateGalleryState(bool show, bool expand);
 
@@ -87,9 +88,10 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 
-		wxWidgetsPtr<wxButton>         _showGalleryButton = nullptr;
-		wxWidgetsPtr<wxButton>         _expandGallery     = nullptr;
-		wxWidgetsPtr<ImageGalleryView> _galleryView       = nullptr;
+		wxWidgetsPtr<wxButton>         _showGallery   = nullptr;
+		wxWidgetsPtr<wxButton>         _openGallery   = nullptr;
+		wxWidgetsPtr<wxButton>         _expandGallery = nullptr;
+		wxWidgetsPtr<ImageGalleryView> _galleryView   = nullptr;
 
 		bool _galleryShown    = false;
 		bool _galleryExpanded = false;

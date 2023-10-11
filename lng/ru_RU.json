@@ -86,6 +86,7 @@
 	"Index" : "Номер",
 	"Profile \"%s\" loaded." : "Профиль \"%s\" загружен.",
 	"Profile \"%s\" already exists." : "Профиль \"%s\" уже существует.",
+	"Screenshots" : "Скриншоты",
 
 	"category" : {
 		"gameplay" : "Геймплей",
