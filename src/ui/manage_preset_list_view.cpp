@@ -269,16 +269,14 @@ void ManagePresetListView::onLoadPresetRequested()
 	EX_TRY;
 
 	auto selected        = getSelection();
-	auto [mods, managed] = _platform.getPresetManager()->loadPreset(selected);
+	auto [mods, plugins] = _platform.getPresetManager()->loadPreset(selected);
 
 	mods.available = _platform.modManager()->mods().available;
 	mods.invalid   = _platform.modManager()->mods().invalid;
 
-	_platform.modManager()->mods(std::move(mods));
+	plugins.available = _platform.pluginManager()->plugins().available;
 
-	auto currentPlugins    = _platform.pluginManager()->plugins();
-	currentPlugins.managed = managed.managed;
-	_platform.pluginManager()->plugins(currentPlugins);
+	_platform.apply(&mods, &plugins);
 	_platform.localConfig()->setActivePreset(selected);
 	_selected = selected;
 

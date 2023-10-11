@@ -10,6 +10,7 @@
 #include "application.h"
 #include "domain/mod_conflict_resolver.hpp"
 #include "domain/mod_data.hpp"
+#include "image_gallery_view.hpp"
 #include "interface/iapp_config.h"
 #include "interface/iicon_storage.h"
 #include "interface/ilaunch_helper.h"
@@ -25,7 +26,6 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
-#include "image_gallery_view.hpp"
 
 #include <wx/app.h>
 #include <wx/button.h>
@@ -257,7 +257,7 @@ void ModListView::createListColumns()
 
 void ModListView::updateControlsState()
 {
-	wxLogDebug(__FUNCTION__);
+	// wxLogDebug(__FUNCTION__);
 
 	EX_TRY;
 
@@ -320,7 +320,7 @@ void ModListView::updateControlsState()
 
 void ModListView::followSelection()
 {
-	wxLogDebug(__FUNCTION__);
+	// wxLogDebug(__FUNCTION__);
 	const auto itemToSelect = _listModel->findItemById(_selectedMod);
 
 	if (itemToSelect.IsOk())
@@ -431,7 +431,7 @@ void ModListView::onSortModsRequested()
 
 	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider());
 	if (mods != _modManager.mods())
-		_modManager.mods(mods);
+		_managedPlatform.apply(&mods, nullptr);
 
 	EX_UNEXPECTED;
 }

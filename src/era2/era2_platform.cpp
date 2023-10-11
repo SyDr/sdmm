@@ -47,7 +47,7 @@ namespace
 			return false;
 
 		const auto path = modsPath / id.ToStdWstring();
-		if (!fs::exists(path) || !fs::is_directory(path))
+		if (!exists(path) || !is_directory(path))
 			return false;
 
 		return true;
@@ -57,9 +57,8 @@ namespace
 	{
 		ModList items;
 
-		auto activeMods = readFile(activePath);
-
 		// active mods / ignore mm_managed_mod
+		auto activeMods = readFile(activePath);
 		for (auto item : boost::adaptors::reverse(activeMods))
 		{
 			if (validateModId(modsPath, item))
@@ -80,10 +79,7 @@ namespace
 
 		// remaining items from directory
 		for (const auto& item : getAllDirs(modsPath))
-		{
-			if (const auto it = std::find(activeMods.begin(), activeMods.end(), item); it == activeMods.end())
-				items.available.emplace(item);
-		}
+			items.available.emplace(item);
 
 		items.available.erase(mm::SystemInfo::ManagedMod);
 
@@ -140,7 +136,33 @@ fs::path Era2Platform::managedPath() const
 
 void Era2Platform::reload()
 {
+	auto block = _modListChanged.blocker();
+
 	_modManager->mods(loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath()));
+	_modManager->onListChanged()();
+}
+
+void Era2Platform::apply(ModList* mods, PluginList* plugins)
+{
+	auto block1 = _modListChanged.blocker();
+	auto block2 = _pluginListChanged.blocker();
+
+	if (mods)
+	{
+		_modManager->mods(*mods);
+		if (plugins)
+			_pluginManager->plugins(*plugins);
+
+		_modManager->onListChanged();
+	}
+	else if (plugins)
+	{
+		_pluginManager->plugins(*plugins);
+		_pluginManager->onListChanged()();
+	}
+
+	if (mods || plugins)
+		save();
 }
 
 fs::path Era2Platform::getModsDirPath() const
@@ -195,6 +217,7 @@ fs::path Era2Platform::getPluginListPath() const
 
 void Era2Platform::save()
 {
+	wxLogDebug(__FUNCTION__);
 	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
 	_pluginManager->save();
 }

@@ -25,8 +25,9 @@ namespace mm
 		explicit Era2PluginManager(
 			Era2ModManager& modManager, const fs::path& modsDir, const fs::path& listPath);
 
+		void plugins(PluginList items);
+
 		PluginList const& plugins() const override;
-		void              plugins(PluginList items) override;
 
 		void switchState(const PluginSource& plugin) override;
 

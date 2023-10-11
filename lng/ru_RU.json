@@ -88,6 +88,7 @@
 	"Profile \"%s\" already exists." : "Профиль \"%s\" уже существует.",
 	"Screenshots" : "Скриншоты",
 	"Reload data from disk" : "Перезагрузить данные с диска",
+	"Show all" : "Показать все",
 
 	"category" : {
 		"gameplay" : "Геймплей",

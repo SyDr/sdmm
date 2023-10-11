@@ -98,7 +98,7 @@ void ResolveModConflictsView::bindEvents()
 	});
 
 	_apply->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-		_managedPlatform.modManager()->mods(_sortedMods);
+		_managedPlatform.apply(&_sortedMods, nullptr);
 		EndModal(wxID_OK);
 	});
 }

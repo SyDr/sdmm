@@ -16,12 +16,17 @@ namespace mm
 	struct IPluginManager;
 	struct IPresetManager;
 
+	struct ModList;
+	struct PluginList;
+
 	struct IModPlatform
 	{
 		virtual ~IModPlatform() = default;
 
 		virtual fs::path managedPath() const = 0;
 		virtual void     reload()            = 0;
+
+		virtual void apply(ModList* mods, PluginList* plugins) = 0;
 
 		virtual ILaunchHelper*    launchHelper() const     = 0;
 		virtual ILocalConfig*     localConfig() const      = 0;

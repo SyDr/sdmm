@@ -32,6 +32,8 @@ namespace mm
 		fs::path managedPath() const override;
 		void     reload() override;
 
+		void apply(ModList* mods, PluginList* plugins) override;
+
 		IPresetManager*   getPresetManager() const override;
 		ILocalConfig*     localConfig() const override;
 		IModManager*      modManager() const override;
@@ -58,8 +60,9 @@ namespace mm
 		std::unique_ptr<Era2PluginManager>   _pluginManager;
 		std::unique_ptr<Era2PresetManager>   _presetManager;
 
-		ModList             _modList;
-		sigslot::connection _modListChanged;
-		sigslot::connection _pluginListChanged;
+		ModList _modList;
+
+		sigslot::scoped_connection _modListChanged;
+		sigslot::scoped_connection _pluginListChanged;
 	};
 }

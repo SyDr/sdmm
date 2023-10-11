@@ -38,7 +38,6 @@ ModList const& Era2ModManager::mods() const
 void Era2ModManager::mods(ModList mods)
 {
 	_list = std::move(mods);
-	_listChanged();
 }
 
 std::optional<size_t> Era2ModManager::activePosition(const wxString& item) const

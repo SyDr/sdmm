@@ -141,6 +141,7 @@ void Era2PluginManager::switchState(const PluginSource& plugin)
 
 void Era2PluginManager::save()
 {
+	wxLogDebug(__FUNCTION__);
 	saveManagedState(_listPath, _modsDir, _pluginList, _modManager.mods());
 }
 
@@ -152,8 +153,6 @@ sigslot::signal<>& Era2PluginManager::onListChanged()
 void Era2PluginManager::plugins(PluginList items)
 {
 	_pluginList = std::move(items);
-
-	_listChanged();
 }
 
 std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& basePath, const ModList& mods)

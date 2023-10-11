@@ -9,15 +9,15 @@
 
 #include "application.h"
 #include "domain/mod_conflict_resolver.hpp"
-#include "interface/imod_data_provider.hpp"
-#include "interface/iplugin_manager.hpp"
-#include "interface/ipreset_manager.hpp"
 #include "domain/mod_data.hpp"
-#include "interface/ilocal_config.h"
-#include "interface/imod_manager.hpp"
-#include "interface/imod_platform.hpp"
 #include "interface/iapp_config.h"
 #include "interface/iicon_storage.h"
+#include "interface/ilocal_config.h"
+#include "interface/imod_data_provider.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
+#include "interface/iplugin_manager.hpp"
+#include "interface/ipreset_manager.hpp"
 #include "manage_preset_list_view.hpp"
 #include "plugin_list_model.hpp"
 #include "select_exe.h"
@@ -42,7 +42,7 @@
 using namespace mm;
 
 PluginListView::PluginListView(wxWindow* parent, IPluginManager& pluginManager,
-							   IModDataProvider& modDataProvider, IIconStorage& iconStorage)
+	IModDataProvider& modDataProvider, IIconStorage& iconStorage)
 	: wxPanel(parent, wxID_ANY)
 	, _manager(pluginManager)
 	, _listModel(new PluginListModel(modDataProvider, iconStorage))
@@ -110,8 +110,8 @@ void PluginListView::createControls()
 
 void PluginListView::createListControl()
 {
-	_list = new wxDataViewCtrl(_group, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-							   wxDV_ROW_LINES | wxDV_VERT_RULES);
+	_list = new wxDataViewCtrl(
+		_group, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_ROW_LINES | wxDV_VERT_RULES);
 	_list->AssociateModel(_listModel.get());
 
 	createListColumns();
@@ -130,14 +130,14 @@ void PluginListView::createListColumns()
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
 	auto column0 = new wxDataViewColumn("", r0, static_cast<unsigned int>(PluginListModel::Column::state),
-										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	auto column1 =
 		new wxDataViewColumn("Plugin"_lng, r1, static_cast<unsigned int>(PluginListModel::Column::caption),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column2 =
 		new wxDataViewColumn("Mod"_lng, r2, static_cast<unsigned int>(PluginListModel::Column::mod),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 
 	_list->AppendColumn(column0);
 	_list->AppendColumn(column1);
@@ -148,7 +148,7 @@ void PluginListView::createListColumns()
 
 void PluginListView::updateControlsState()
 {
-	wxLogDebug(__FUNCTION__);
+	// wxLogDebug(__FUNCTION__);
 
 	if (_selected.name.empty())
 	{
@@ -172,7 +172,7 @@ void PluginListView::updateControlsState()
 
 void PluginListView::followSelection()
 {
-	wxLogDebug(__FUNCTION__);
+	// wxLogDebug(__FUNCTION__);
 
 	const auto itemToSelect = _listModel->findItemById(_selected);
 

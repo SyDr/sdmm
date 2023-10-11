@@ -20,7 +20,6 @@ namespace mm
 		virtual ~IModManager() = default;
 
 		virtual ModList const& mods() const       = 0;
-		virtual void           mods(ModList mods) = 0;
 
 		virtual std::optional<size_t> activePosition(const wxString& item) const = 0;
 		virtual void                  activate(const wxString& item)             = 0;

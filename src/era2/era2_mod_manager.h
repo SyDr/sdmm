@@ -22,8 +22,9 @@ namespace mm
 	{
 		explicit Era2ModManager(ModList& mods);
 
+		void mods(ModList mods);
+
 		ModList const& mods() const override;
-		void           mods(ModList mods) override;
 
 		std::optional<size_t> activePosition(const wxString& item) const override;
 		void                  activate(const wxString& item) override;
