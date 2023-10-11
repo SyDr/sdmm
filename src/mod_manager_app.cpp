@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -66,7 +66,7 @@ void ModManagerApp::OnUnhandledException()
 	{
 		throw;
 	}
-	catch (std::exception const& e)
+	catch (const std::exception& e)
 	{
 		what = wxString::FromUTF8(e.what());
 	}
@@ -89,14 +89,14 @@ int ModManagerApp::OnExit()
 	return wxApp::OnExit();
 }
 
-wxString ModManagerApp::translationString(const wxString& key)
+std::string ModManagerApp::translationString(const std::string& key) const
 {
 	return _i18nService->get(key);
 }
 
-wxString ModManagerApp::categoryTranslationString(const wxString& key) const
+std::string ModManagerApp::categoryTranslationString(const std::string& key) const
 {
-	return _i18nService->category(key.ToStdString());
+	return _i18nService->category(key);
 }
 
 IAppConfig& ModManagerApp::appConfig() const
@@ -141,7 +141,7 @@ void ModManagerApp::initServices()
 
 wxString operator""_lng(const char* s, std::size_t)
 {
-	return wxGetApp().translationString(s);
+	return wxString::FromUTF8(wxGetApp().translationString(s));
 }
 
 wxIMPLEMENT_APP(ModManagerApp);

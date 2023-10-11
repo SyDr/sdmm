@@ -8,11 +8,11 @@
 #include "mod_list_model.h"
 
 #include "application.h"
-#include "interface/imod_data_provider.hpp"
-#include "interface/imod_manager.hpp"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
 #include "interface/iicon_storage.h"
+#include "interface/imod_data_provider.hpp"
+#include "interface/imod_manager.hpp"
 #include "mod_manager_app.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
@@ -23,8 +23,7 @@
 
 using namespace mm;
 
-ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
-						   bool showHidden)
+ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden)
 	: _modDataProvider(modDataProvider)
 	, _iconStorage(iconStorage)
 	, _showHidden(showHidden)
@@ -95,7 +94,8 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	case Column::category:
 	{
 		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(wxGetApp().categoryTranslationString(mod->category));
+		variant =
+			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod->category.ToStdString())));
 		break;
 	}
 	case Column::version:
@@ -148,8 +148,8 @@ bool ModListModel::GetAttrByRow(unsigned row, unsigned, wxDataViewItemAttr& attr
 	return false;
 }
 
-int ModListModel::Compare(const wxDataViewItem& item1, const wxDataViewItem& item2,
-						  unsigned int column, bool ascending) const
+int ModListModel::Compare(
+	const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column, bool ascending) const
 {
 	auto compareRest = [&](unsigned int col) {
 		return wxDataViewIndexListModel::Compare(item1, item2, col, ascending);

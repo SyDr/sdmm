@@ -22,6 +22,7 @@
 // boost
 #include <boost/algorithm/string.hpp>
 #include <boost/exception/all.hpp>
+#include <boost/nowide/fstream.hpp>
 
 // wxWidgets
 #include <wx/dataview.h>

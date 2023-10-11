@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -24,9 +24,10 @@ namespace mm
 	public:
 		ModManagerApp();
 
-		wxString translationString(const wxString& key);
-		wxString categoryTranslationString(const wxString& key) const;
-		void     scheduleRestart();
+		std::string translationString(const std::string& key) const;
+		std::string categoryTranslationString(const std::string& key) const;
+
+		void scheduleRestart();
 
 		bool OnInit() override;
 

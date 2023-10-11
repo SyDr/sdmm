@@ -1,11 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
-class wxString;
+#include <string>
 
 namespace mm
 {
@@ -13,8 +13,8 @@ namespace mm
 	{
 		virtual ~II18nService() = default;
 
-		virtual wxString category(const wxString& category) const = 0;
-		virtual wxString get(const wxString& key) const = 0;
-		virtual wxString languageName(const wxString& code) const = 0;
+		virtual std::string category(const std::string& category) const = 0;
+		virtual std::string get(const std::string& key) const           = 0;
+		virtual std::string languageName(const std::string& code) const = 0;
 	};
 }

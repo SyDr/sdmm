@@ -1,31 +1,33 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
 #include "i18n_service.h"
 
-#include <fstream>
-#include <string>
-#include <wx/stdpaths.h>
-#include <boost/algorithm/string/case_conv.hpp>
-
 #include "interface/iapp_config.h"
 #include "utility/string_util.h"
+
+#include <wx/stdpaths.h>
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/nowide/fstream.hpp>
+
+#include <fstream>
+#include <string>
 
 using namespace mm;
 
 I18nService::I18nService(const IAppConfig& config)
 {
-	std::ifstream datafile((config.programPath() / "lng" / (config.currentLanguageCode() + ".json")).string());
+	boost::nowide::ifstream datafile(config.programPath() / "lng" / (config.currentLanguageCode() + ".json"));
 
 	if (datafile)
 		build_cache(nlohmann::json::parse(datafile), "");
 }
 
-void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix)
+void I18nService::build_cache(const nlohmann::json& data, const std::string& prefix)
 {
 	wxASSERT_MSG(data.is_object(), "Unexpected type when parsing " + prefix);
 
@@ -36,7 +38,7 @@ void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix
 		switch (it->type())
 		{
 		case nlohmann::json::value_t::string:
-			_data[key] = wxString::FromUTF8(it->get<std::string>());
+			_data[key] = it->get<std::string>();
 			break;
 		case nlohmann::json::value_t::object:
 			build_cache(it.value(), key + "/");
@@ -48,15 +50,15 @@ void I18nService::build_cache(const nlohmann::json& data, const wxString& prefix
 	}
 }
 
-wxString I18nService::category(const wxString& category) const
+std::string I18nService::category(const std::string& category) const
 {
-	if (const auto it = _data.find("category/" + category.Lower()); it != _data.cend())
+	if (const auto it = _data.find("category/" + boost::to_lower_copy(category)); it != _data.cend())
 		return it->second;
 
 	return category;
 }
 
-wxString I18nService::get(const wxString& key) const
+std::string I18nService::get(const std::string& key) const
 {
 	if (const auto it = _data.find(key); it != _data.cend())
 		return it->second;
@@ -66,12 +68,13 @@ wxString I18nService::get(const wxString& key) const
 	return key;
 }
 
-wxString I18nService::languageName(const wxString& code) const
+std::string I18nService::languageName(const std::string& code) const
 {
 	if (code == "en_US")
-		return L"English";
+		return "English";
+
 	if (code == "ru_RU")
-		return L"Русский";
+		return "Русский";
 
 	return code; // TODO: return name from lng file itself
 }
