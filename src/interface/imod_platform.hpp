@@ -21,6 +21,7 @@ namespace mm
 		virtual ~IModPlatform() = default;
 
 		virtual fs::path managedPath() const = 0;
+		virtual void     reload()            = 0;
 
 		virtual ILaunchHelper*    launchHelper() const     = 0;
 		virtual ILocalConfig*     localConfig() const      = 0;

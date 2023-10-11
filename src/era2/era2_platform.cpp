@@ -138,6 +138,11 @@ fs::path Era2Platform::managedPath() const
 	return _rootDir;
 }
 
+void Era2Platform::reload()
+{
+	_modManager->mods(loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath()));
+}
+
 fs::path Era2Platform::getModsDirPath() const
 {
 	return _rootDir / "Mods";

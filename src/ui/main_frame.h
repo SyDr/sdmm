@@ -33,6 +33,7 @@ namespace mm
 		void OnMenuItemSelected(wxCommandEvent& event);
 		void OnAbout();
 		void OnMenuToolsChangeDirectory();
+		void OnMenuToolsReloadDataFromDisk();
 		void OnMenuChangePlatform();
 		void OnMenuToolsLanguageSelected(const wxString& value);
 		void OnMenuCheckForUpdates();

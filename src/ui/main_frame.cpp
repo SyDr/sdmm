@@ -158,6 +158,10 @@ void MainFrame::createMenuBar()
 		_menuItems[changeDirectory->GetId()] = [&] { OnMenuToolsChangeDirectory(); };
 	}
 
+	auto reloadFromDisk = toolsMenu->Append(
+		wxID_ANY, "Reload data from disk"_lng + "\tF5", nullptr, "Reload data from disk"_lng);
+	_menuItems[reloadFromDisk->GetId()] = [&] { OnMenuToolsReloadDataFromDisk(); };
+
 	auto listModFiles =
 		toolsMenu->Append(wxID_ANY, "List active mod files"_lng, nullptr, "List active mod files"_lng);
 	_menuItems[listModFiles->GetId()] = [&] { OnMenuToolsListModFiles(); };
@@ -211,6 +215,16 @@ void MainFrame::OnMenuToolsChangeDirectory()
 
 	_app.appConfig().setDataPath(path.ToStdWstring());
 	wxGetApp().scheduleRestart();
+
+	EX_UNEXPECTED;
+}
+
+void MainFrame::OnMenuToolsReloadDataFromDisk()
+{
+	EX_TRY;
+
+	if (_currentPlatform)
+		_currentPlatform->reload();
 
 	EX_UNEXPECTED;
 }
