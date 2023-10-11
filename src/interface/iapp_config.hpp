@@ -1,16 +1,14 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include "type/filesystem.hpp"
 
-#include <filesystem>
+#include <string>
 #include <vector>
-
-class wxString;
 
 namespace mm
 {
@@ -26,11 +24,11 @@ namespace mm
 
 		virtual void save() = 0;
 
-		virtual auto currentLanguageCode() const -> std::string      = 0;
-		virtual void setCurrentLanguageCode(const wxString& lngCode) = 0;
+		virtual std::string currentLanguageCode() const                        = 0;
+		virtual void        setCurrentLanguageCode(const std::string& lngCode) = 0;
 
-		virtual wxString selectedPlatform() const                             = 0;
-		virtual void     setSelectedPlatformCode(const wxString& newPlatform) = 0;
+		virtual std::string selectedPlatform() const                                = 0;
+		virtual void        setSelectedPlatformCode(const std::string& newPlatform) = 0;
 
 		virtual void                 setMainWindowProperties(const MainWindowProperties& props) = 0;
 		virtual MainWindowProperties mainWindow() const                                         = 0;

@@ -11,7 +11,7 @@
 #include "domain/mod_conflict_resolver.hpp"
 #include "domain/mod_data.hpp"
 #include "image_gallery_view.hpp"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.h"
 #include "interface/ilaunch_helper.h"
 #include "interface/ilocal_config.h"

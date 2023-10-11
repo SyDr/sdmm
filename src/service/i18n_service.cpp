@@ -7,8 +7,7 @@
 
 #include "i18n_service.h"
 
-#include "interface/iapp_config.h"
-#include "utility/string_util.h"
+#include "interface/iapp_config.hpp"
 
 #include <wx/stdpaths.h>
 #include <boost/algorithm/string/case_conv.hpp>

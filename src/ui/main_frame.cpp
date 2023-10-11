@@ -9,7 +9,7 @@
 
 #include "application.h"
 #include "choose_conflict_resolve_mode_view.hpp"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.h"
 #include "interface/ilaunch_helper.h"
@@ -282,7 +282,7 @@ void MainFrame::OnMenuChangePlatform()
 
 void MainFrame::OnMenuToolsLanguageSelected(const wxString& value)
 {
-	_app.appConfig().setCurrentLanguageCode(value);
+	_app.appConfig().setCurrentLanguageCode(value.ToStdString(wxConvUTF8));
 	wxGetApp().scheduleRestart();
 }
 

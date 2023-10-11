@@ -46,7 +46,7 @@ sigslot::signal<>& Era2LaunchHelper::onDataChanged()
 
 std::string Era2LaunchHelper::getExecutable() const
 {
-	return _config.getExecutable().ToStdString();
+	return _config.getExecutable();
 }
 
 void Era2LaunchHelper::setExecutable(const std::string& executable)

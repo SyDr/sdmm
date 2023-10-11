@@ -1,11 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
-#include "app_config.h"
+#include "app_config.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -16,7 +16,6 @@
 
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
-#include "utility/string_util.h"
 #include "system_info.hpp"
 
 using namespace mm;
@@ -27,7 +26,7 @@ namespace
 	{
 		fs::path result(wxStandardPaths::Get().GetDataDir().ToStdString());
 		result = result.parent_path().parent_path() / "_MM_Data";
-		if (std::filesystem::exists(result) && std::filesystem::is_directory(result))
+		if (exists(result) && is_directory(result))
 			return PortableMode(result.make_preferred());
 
 		result = wxStandardPaths::Get().GetUserDataDir().ToStdString();
@@ -69,8 +68,8 @@ namespace
 
 		void operator()(const MainMode& mm)
 		{
-			if (!std::filesystem::exists(mm.programDataPath))
-				std::filesystem::create_directories(mm.programDataPath);
+			if (!exists(mm.programDataPath))
+				create_directories(mm.programDataPath);
 		}
 	};
 }
@@ -80,7 +79,7 @@ AppConfig::AppConfig()
 {
 	std::visit(ValidateMode(), _mode);
 
-	std::ifstream datafile(configFilePath().string());
+	boost::nowide::ifstream datafile(configFilePath());
 
 	if (datafile)
 	{
@@ -128,19 +127,19 @@ constexpr auto sd_game = "game";
 #define SD_TOP       "top"
 #define SD_MAXIMIZED "maximized"
 
-auto AppConfig::currentLanguageCode() const -> std::string
+std::string AppConfig::currentLanguageCode() const
 {
 	return _data[SD_LNG_CODE].get<std::string>();
 }
 
-void AppConfig::setCurrentLanguageCode(const wxString& lngCode)
+void AppConfig::setCurrentLanguageCode(const std::string& lngCode)
 {
-	_data[SD_LNG_CODE] = lngCode.ToStdString();
+	_data[SD_LNG_CODE] = lngCode;
 }
 
 void AppConfig::save()
 {
-	std::ofstream datafile(configFilePath().string());
+	boost::nowide::ofstream datafile(configFilePath());
 	datafile << _data.dump(2);
 }
 
@@ -150,23 +149,21 @@ std::vector<fs::path> AppConfig::getKnownDataPathList() const
 
 	std::vector<fs::path> result;
 	for (const auto& path :
-		 _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN].get<std::vector<std::string>>())
+		 _data[sd_game][selectedPlatform()][SD_KNOWN].get<std::vector<std::string>>())
 		result.emplace_back(path);
 
 	return result;
 }
 
-wxString AppConfig::selectedPlatform() const
+std::string AppConfig::selectedPlatform() const
 {
-	// expects(!portableMode());
-
 	return _data[sd_game][SD_PLATFORM].get<std::string>();
 }
 
 fs::path AppConfig::getDataPath() const
 {
 	if (!portableMode())
-		return _data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED].get<std::string>();
+		return _data[sd_game][selectedPlatform()][SD_SELECTED].get<std::string>();
 
 	return dataPath().parent_path();
 }
@@ -176,12 +173,12 @@ void AppConfig::setDataPath(const fs::path& path)
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
 	const auto newPath    = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN];
+	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
 
 	if (std::find(knownPaths.begin(), knownPaths.end(), newPath) == knownPaths.end())
-		_data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN].emplace_back(newPath);
+		_data[sd_game][selectedPlatform()][SD_KNOWN].emplace_back(newPath);
 
-	_data[sd_game][selectedPlatform().ToStdString()][SD_SELECTED] = newPath;
+	_data[sd_game][selectedPlatform()][SD_SELECTED] = newPath;
 }
 
 void AppConfig::forgetDataPath(const fs::path& path)
@@ -189,7 +186,7 @@ void AppConfig::forgetDataPath(const fs::path& path)
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
 	const auto toRemove   = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_KNOWN];
+	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
 
 	auto it = std::find(knownPaths.begin(), knownPaths.end(), toRemove);
 
@@ -197,11 +194,11 @@ void AppConfig::forgetDataPath(const fs::path& path)
 		knownPaths.erase(it);
 }
 
-void AppConfig::setSelectedPlatformCode(const wxString& newPlatform)
+void AppConfig::setSelectedPlatformCode(const std::string& newPlatform)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	_data[sd_game][SD_PLATFORM] = newPlatform.ToStdString();
+	_data[sd_game][SD_PLATFORM] = newPlatform;
 }
 
 #define SD_MM_DEFAULT_PLATFORM "era2"
@@ -280,7 +277,7 @@ MainWindowProperties AppConfig::mainWindow() const
 bool AppConfig::dataPathHasStar(const fs::path& path) const
 {
 	const auto toStar     = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_FAVS];
+	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
 
 	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
 	return it != knownPaths.end();
@@ -291,7 +288,7 @@ void AppConfig::starDataPath(const fs::path& path, bool star /*= true*/)
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
 	const auto toStar     = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform().ToStdString()][SD_FAVS];
+	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
 
 	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
 

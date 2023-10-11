@@ -8,7 +8,7 @@
 #include "show_file_list_dialog.hpp"
 
 #include "application.h"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"

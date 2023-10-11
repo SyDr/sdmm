@@ -52,7 +52,6 @@
     <ClCompile Include="utility\fs_util.cpp" />
     <ClCompile Include="utility\json_util.cpp" />
     <ClCompile Include="utility\shell_util.cpp" />
-    <ClCompile Include="utility\string_util.cpp" />
     <ClCompile Include="wx\data_view_multiple_icons_renderer.cpp" />
     <ClCompile Include="wx\priority_data_renderer.cpp" />
   </ItemGroup>
@@ -71,12 +70,12 @@
     <ClInclude Include="era2\era2_mod_manager.h" />
     <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="era2\era2_preset_manager.h" />
-    <ClInclude Include="service\app_config.h" />
+    <ClInclude Include="service\app_config.hpp" />
     <ClInclude Include="service\i18n_service.h" />
     <ClInclude Include="service\icon_storage.h" />
     <ClInclude Include="interface\ilaunch_helper.h" />
     <ClInclude Include="interface\imod_manager.hpp" />
-    <ClInclude Include="interface\iapp_config.h" />
+    <ClInclude Include="interface\iapp_config.hpp" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />
     <ClInclude Include="interface\iicon_storage.h" />
@@ -121,7 +120,6 @@
     <ClInclude Include="utility\json_util.h" />
     <ClInclude Include="utility\macro.h" />
     <ClInclude Include="utility\shell_util.h" />
-    <ClInclude Include="utility\string_util.h" />
     <ClInclude Include="wx\data_view_multiple_icons_renderer.h" />
     <ClInclude Include="wx\priority_data_renderer.h" />
   </ItemGroup>

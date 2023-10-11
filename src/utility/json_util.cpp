@@ -8,7 +8,6 @@
 #include "json_util.h"
 
 #include "utility/sdlexcept.h"
-#include "string_util.h"
 
 const nlohmann::json* mm::find_value(const nlohmann::json* data, const std::string& key)
 {

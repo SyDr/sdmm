@@ -1,11 +1,12 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include "type/conflict_resolve_mode.hpp"
+#include "type/filesystem.hpp"
 
 namespace mm
 {
@@ -15,8 +16,8 @@ namespace mm
 
 		virtual void save() = 0;
 
-		virtual std::filesystem::path getDataPath() const = 0;
-		virtual std::filesystem::path getTempPath() const = 0;
+		virtual fs::path getDataPath() const = 0;
+		virtual fs::path getTempPath() const = 0;
 
 		virtual bool showHiddenMods() const     = 0;
 		virtual void showHiddenMods(bool value) = 0;

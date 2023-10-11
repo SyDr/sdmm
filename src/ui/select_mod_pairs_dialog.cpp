@@ -9,7 +9,7 @@
 
 #include "application.h"
 #include "domain/mod_data.hpp"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.h"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"

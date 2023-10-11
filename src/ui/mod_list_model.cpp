@@ -16,7 +16,6 @@
 #include "mod_manager_app.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
-#include "utility/string_util.h"
 
 #include <wx/app.h>
 #include <wx/msgdlg.h>

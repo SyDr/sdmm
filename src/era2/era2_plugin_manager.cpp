@@ -15,7 +15,6 @@
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
-#include "utility/string_util.h"
 
 using namespace mm;
 

@@ -20,7 +20,7 @@
 #include <wx/stattext.h>
 
 #include "application.h"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"

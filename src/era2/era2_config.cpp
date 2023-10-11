@@ -18,7 +18,6 @@
 
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
-#include "utility/string_util.h"
 
 using namespace mm;
 
@@ -99,17 +98,17 @@ std::filesystem::path Era2Config::getConfigFilePath() const
 
 wxString Era2Config::getLaunchString() const
 {
-	return (getDataPath() / getExecutable().ToStdString()).string();
+	return (getDataPath() / getExecutable()).string();
 }
 
-wxString Era2Config::getExecutable() const
+std::string Era2Config::getExecutable() const
 {
-	return utf8_to_wxString(_data[st_executable].get<std::string>());
+	return _data[st_executable].get<std::string>();
 }
 
-void Era2Config::setExecutable(const wxString& executable)
+void Era2Config::setExecutable(const std::string& executable)
 {
-	_data[st_executable] = wxString_to_utf8(executable);
+	_data[st_executable] = executable;
 	save();
 }
 

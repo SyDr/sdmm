@@ -7,7 +7,7 @@
 
 #include "resolve_mod_conflicts_view.hpp"
 
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "application.h"
 #include "utility/sdlexcept.h"
 #include "interface/iicon_storage.h"

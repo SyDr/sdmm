@@ -14,21 +14,20 @@ namespace mm
 {
 	struct Era2ConfigData;
 
-	class Era2Config : public ILocalConfig
+	struct Era2Config : public ILocalConfig
 	{
-	public:
-		explicit Era2Config(const std::filesystem::path& path);
+		explicit Era2Config(const fs::path& path);
 
 		void save() override;
 
-		std::filesystem::path getDataPath() const override;
-		std::filesystem::path getTempPath() const override;
+		fs::path getDataPath() const override;
+		fs::path getTempPath() const override;
 
-		std::filesystem::path getProgramDataPath() const;
-		std::filesystem::path getPresetsPath() const;
+		fs::path getProgramDataPath() const;
+		fs::path getPresetsPath() const;
 
-		wxString getExecutable() const;
-		void     setExecutable(const wxString& executable);
+		std::string getExecutable() const;
+		void        setExecutable(const std::string& executable);
 
 		wxString getLaunchString() const;
 

@@ -25,13 +25,12 @@
 #include "era2_mod_manager.h"
 #include "era2_plugin_manager.hpp"
 #include "era2_preset_manager.h"
-#include "interface/iapp_config.h"
+#include "interface/iapp_config.hpp"
 #include "system_info.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
-#include "utility/string_util.h"
 
 using namespace mm;
 

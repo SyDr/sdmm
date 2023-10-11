@@ -5,10 +5,9 @@
 
 #include "stdafx.h"
 
-#include "interface/iapp_config.h"
 #include "interface/ii18n_service.hpp"
 #include "mod_manager_app.h"
-#include "service/app_config.h"
+#include "service/app_config.hpp"
 #include "service/i18n_service.h"
 #include "service/icon_storage.h"
 #include "service/platform_service.h"
