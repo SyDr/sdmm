@@ -129,7 +129,8 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	if (auto plugins = data.find("plugins"); plugins != data.end())
 		pluginList.managed = Era2PluginManager::loadManagedState(*plugins);
 
-	erase_if(pluginList.available, [&](const PluginSource& item) { return !pluginList.managed.contains(item); });
+	erase_if(
+		pluginList.available, [&](const PluginSource& item) { return !pluginList.managed.contains(item); });
 
 	return { modList, pluginList };
 }
@@ -151,9 +152,8 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list, co
 	auto& ref = data["plugins"] = nlohmann::json::array();
 	for (const auto& source : plugins.managed)
 	{
-		const auto path = (fs::path(source.modId.ToStdString(wxConvUTF8)) / to_string(source.location) /
-						   source.name.ToStdString(wxConvUTF8))
-							  .lexically_normal();
+		const auto path =
+			(fs::path(source.modId) / to_string(source.location) / source.name).lexically_normal();
 		ref.emplace_back(path.string());
 	}
 

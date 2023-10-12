@@ -9,7 +9,7 @@
 
 using namespace mm;
 
-PluginSource::PluginSource(const wxString& modId, PluginLocation location, const wxString& name)
+PluginSource::PluginSource(const std::string& modId, PluginLocation location, const std::string& name)
 	: modId(modId)
 	, location(location)
 	, name(name)

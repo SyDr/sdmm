@@ -35,28 +35,38 @@ namespace mm
 
 	struct PluginSource
 	{
-		wxString       modId;
+		std::string    modId;
 		PluginLocation location = PluginLocation::root;
-		wxString       name;
+		std::string    name;
 
 		PluginSource() = default;
-		PluginSource(const wxString& modId, PluginLocation location, const wxString& name);
+		PluginSource(const std::string& modId, PluginLocation location, const std::string& name);
 
-		wxString toString() const
+		std::string toString() const
 		{
-			wxString result = name;
-			if (result.ends_with(wxString(L".off")))
-				result = result.RemoveLast(std::char_traits<const char>::length(".off"));
+			std::string result =
+				active() ? name : name.substr(0, name.size() - std::char_traits<const char>::length(".off"));
 
 			if (location == PluginLocation::root)
 				return result;
 
-			return result + L" (" + wxString::FromUTF8(mm::to_string(location)) + L")";
+			return result + " (" + mm::to_string(location) + ")";
+		}
+
+		std::string toFileIdenity() const
+		{
+			std::string result =
+				active() ? name : name.substr(0, name.size() - std::char_traits<const char>::length(".off"));
+
+			if (location == PluginLocation::root)
+				return result;
+
+			return mm::to_string(location) + "/" + result;
 		}
 
 		bool active() const
 		{
-			return !name.ends_with(L".off");
+			return !boost::ends_with(name, ".off");
 		}
 
 		auto operator<=>(const PluginSource& other) const
