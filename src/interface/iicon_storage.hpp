@@ -17,6 +17,6 @@ namespace mm
 	{
 		virtual ~IIconStorage() = default;
 
-		virtual wxIcon get(const std::string& name) = 0;
+		[[nodiscard]] virtual wxIcon get(const std::string& name) = 0;
 	};
 }

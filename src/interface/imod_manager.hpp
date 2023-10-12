@@ -19,21 +19,21 @@ namespace mm
 	{
 		virtual ~IModManager() = default;
 
-		virtual ModList const& mods() const       = 0;
+		[[nodiscard]] virtual ModList const& mods() const = 0;
 
-		virtual std::optional<size_t> activePosition(const wxString& item) const = 0;
-		virtual void                  activate(const wxString& item)             = 0;
-		virtual void                  deactivate(const wxString& item)           = 0;
-		virtual void                  switchState(const wxString& item)          = 0;
+		[[nodiscard]] virtual std::optional<size_t> activePosition(const wxString& item) const = 0;
+		virtual void                                activate(const wxString& item)             = 0;
+		virtual void                                deactivate(const wxString& item)           = 0;
+		virtual void                                switchState(const wxString& item)          = 0;
 
-		virtual bool canMove(const wxString& from, const wxString& to) const = 0;
-		virtual void move(const wxString& from, const wxString& to)          = 0;
+		[[nodiscard]] virtual bool canMove(const wxString& from, const wxString& to) const = 0;
+		virtual void               move(const wxString& from, const wxString& to)          = 0;
 
-		virtual bool canMoveUp(const wxString& item) const = 0;
-		virtual void moveUp(const wxString& item)          = 0;
+		[[nodiscard]] virtual bool canMoveUp(const wxString& item) const = 0;
+		virtual void               moveUp(const wxString& item)          = 0;
 
-		virtual bool canMoveDown(const wxString& item) const = 0;
-		virtual void moveDown(const wxString& item)          = 0;
+		[[nodiscard]] virtual bool canMoveDown(const wxString& item) const = 0;
+		virtual void               moveDown(const wxString& item)          = 0;
 
 		virtual void hide(const wxString& item)             = 0;
 		virtual void show(const wxString& item)             = 0;
@@ -41,6 +41,6 @@ namespace mm
 
 		virtual void remove(const wxString& item) = 0;
 
-		virtual sigslot::signal<>& onListChanged() = 0;
+		[[nodiscard]] virtual sigslot::signal<>& onListChanged() = 0;
 	};
 }

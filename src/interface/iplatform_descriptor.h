@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 class wxString;
 class wxIcon;
@@ -20,11 +20,11 @@ namespace mm
 	public:
 		virtual ~IPlatformDescriptor() = default;
 
-		virtual wxString getId() const = 0;
-		virtual wxString getPlatformName() const = 0;
+		[[nodiscard]] virtual wxString getId() const           = 0;
+		[[nodiscard]] virtual wxString getPlatformName() const = 0;
 
-		virtual wxIcon getIcon() const = 0;
+		[[nodiscard]] virtual wxIcon getIcon() const = 0;
 
-		virtual std::unique_ptr<IModPlatform> create() const = 0;
+		[[nodiscard]] virtual std::unique_ptr<IModPlatform> create() const = 0;
 	};
 }

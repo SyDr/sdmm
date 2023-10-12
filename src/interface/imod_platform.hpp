@@ -23,16 +23,16 @@ namespace mm
 	{
 		virtual ~IModPlatform() = default;
 
-		virtual fs::path managedPath() const = 0;
-		virtual void     reload()            = 0;
+		[[nodiscard]] virtual fs::path managedPath() const = 0;
+		virtual void                   reload()            = 0;
 
 		virtual void apply(ModList* mods, PluginList* plugins) = 0;
 
-		virtual ILaunchHelper*    launchHelper() const     = 0;
-		virtual ILocalConfig*     localConfig() const      = 0;
-		virtual IModManager*      modManager() const       = 0;
-		virtual IPluginManager*   pluginManager() const    = 0;
-		virtual IPresetManager*   getPresetManager() const = 0;
-		virtual IModDataProvider* modDataProvider() const  = 0;
+		[[nodiscard]] virtual ILaunchHelper*    launchHelper() const     = 0;
+		[[nodiscard]] virtual ILocalConfig*     localConfig() const      = 0;
+		[[nodiscard]] virtual IModManager*      modManager() const       = 0;
+		[[nodiscard]] virtual IPluginManager*   pluginManager() const    = 0;
+		[[nodiscard]] virtual IPresetManager*   getPresetManager() const = 0;
+		[[nodiscard]] virtual IModDataProvider* modDataProvider() const  = 0;
 	};
 }

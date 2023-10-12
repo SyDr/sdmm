@@ -16,16 +16,16 @@ namespace mm
 
 		virtual void save() = 0;
 
-		virtual fs::path getDataPath() const = 0;
-		virtual fs::path getTempPath() const = 0;
+		[[nodiscard]] virtual fs::path getDataPath() const = 0;
+		[[nodiscard]] virtual fs::path getTempPath() const = 0;
 
-		virtual bool showHiddenMods() const     = 0;
-		virtual void showHiddenMods(bool value) = 0;
+		[[nodiscard]] virtual bool showHiddenMods() const     = 0;
+		virtual void               showHiddenMods(bool value) = 0;
 
-		virtual ConflictResolveMode conflictResolveMode() const                    = 0;
-		virtual void                conflictResolveMode(ConflictResolveMode value) = 0;
+		[[nodiscard]] virtual ConflictResolveMode conflictResolveMode() const                    = 0;
+		virtual void                              conflictResolveMode(ConflictResolveMode value) = 0;
 
-		virtual wxString getAcitvePreset() const                 = 0;
-		virtual void     setActivePreset(const wxString& preset) = 0;
+		[[nodiscard]] virtual wxString getAcitvePreset() const                 = 0;
+		virtual void                   setActivePreset(const wxString& preset) = 0;
 	};
 }

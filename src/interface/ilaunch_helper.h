@@ -16,13 +16,13 @@ namespace mm
 	{
 		virtual ~ILaunchHelper() = default;
 
-		virtual std::string getExecutable() const                 = 0;
+		[[nodiscard]] virtual std::string getExecutable() const                 = 0;
 		virtual void        setExecutable(const std::string& exe) = 0;
 
-		virtual wxIcon   getIcon() const         = 0;
-		virtual wxString getCaption() const      = 0;
-		virtual wxString getLaunchString() const = 0;
+		[[nodiscard]] virtual wxIcon   getIcon() const         = 0;
+		[[nodiscard]] virtual wxString getCaption() const      = 0;
+		[[nodiscard]] virtual wxString getLaunchString() const = 0;
 
-		virtual sigslot::signal<>& onDataChanged() = 0;
+		[[nodiscard]] virtual sigslot::signal<>& onDataChanged() = 0;
 	};
 }

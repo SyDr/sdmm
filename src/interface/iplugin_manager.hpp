@@ -19,12 +19,12 @@ namespace mm
 	{
 		virtual ~IPluginManager() = default;
 
-		virtual PluginList const& plugins() const           = 0;
+		[[nodiscard]] virtual PluginList const& plugins() const = 0;
 
 		virtual void switchState(const PluginSource& plugin) = 0;
 
 		virtual void save() = 0;
 
-		virtual sigslot::signal<>& onListChanged() = 0;
+		[[nodiscard]] virtual sigslot::signal<>& onListChanged() = 0;
 	};
 }

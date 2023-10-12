@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <memory>
 #include <deque>
+#include <memory>
 
 namespace mm
 {
@@ -17,8 +17,8 @@ namespace mm
 	{
 		virtual ~IPlatformService() = default;
 
-		virtual std::deque<IPlatformDescriptor*> availablePlatforms() const = 0;
+		[[nodiscard]] virtual std::deque<IPlatformDescriptor*> availablePlatforms() const = 0;
 
-		virtual std::unique_ptr<IModPlatform> create(const wxString& platformId) const = 0;
+		[[nodiscard]] virtual std::unique_ptr<IModPlatform> create(const wxString& platformId) const = 0;
 	};
 }
