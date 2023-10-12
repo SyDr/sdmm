@@ -113,7 +113,6 @@
     <ClInclude Include="ui\mod_list_view.h" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
     <ClInclude Include="ui\show_file_list_helper.hpp" />
-    <ClInclude Include="utility\non_owning_ptr.hpp" />
     <ClInclude Include="utility\sdlexcept.h" />
     <ClInclude Include="utility\wx_widgets_ptr.hpp" />
     <ClInclude Include="utility\fs_util.h" />

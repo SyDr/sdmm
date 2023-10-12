@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "utility/non_owning_ptr.hpp"
-
 class wxString;
 
 namespace mm
@@ -17,6 +15,6 @@ namespace mm
 	{
 		virtual ~IModDataProvider() = default;
 
-		[[nodiscard]] virtual non_owning_ptr<ModData const> modData(const wxString& id) = 0;
+		[[nodiscard]] virtual const ModData& modData(const wxString& id) = 0;
 	};
 }

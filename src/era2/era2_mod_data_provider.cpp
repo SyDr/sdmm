@@ -21,7 +21,7 @@ Era2ModDataProvider::Era2ModDataProvider(fs::path basePath, wxString preferredLn
 	loadDefaults();
 }
 
-non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
+ const ModData& Era2ModDataProvider::modData(const wxString& id)
 {
 	auto it = _data.find(id);
 
@@ -33,7 +33,7 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
 	}
 
-	return &it->second;
+	return it->second;
 }
 
 void Era2ModDataProvider::loadDefaults()

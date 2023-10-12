@@ -143,7 +143,7 @@ void ResolveModConflictsView::doResolveConflicts()
 		const auto currentId = currentlyActive[i];
 
 		auto modData = modDataProvider->modData(currentId);
-		for (const auto& id : modData->requires_)
+		for (const auto& id : modData.requires_)
 		{
 			activatedInSession.insert(id);
 
@@ -154,7 +154,7 @@ void ResolveModConflictsView::doResolveConflicts()
 			}
 		}
 
-		for (const auto& id : modData->incompatible)
+		for (const auto& id : modData.incompatible)
 		{
 			disabledInSession.insert(id);
 
@@ -181,7 +181,7 @@ void ResolveModConflictsView::doResolveConflicts()
 			if (i == j)
 				continue;
 
-			if (modDataProvider->modData(currentlyActive[j])->load_after.count(candidate))
+			if (modDataProvider->modData(currentlyActive[j]).load_after.count(candidate))
 			{
 				ok = false;
 				_log->AppendText(wxString::Format("fail, must be below %s\n"_lng, currentlyActive[j]));

@@ -131,12 +131,12 @@ void SelectModPairsDialog::fillData()
 			wxIcon     icon;
 			const auto mod = _modDataProvider.modData(item);
 
-			if (!mod->icon_filename.empty())
-				icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());
+			if (!mod.icon_filename.empty())
+				icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
 			else
 				icon = _iconStorage.get(embedded_icon::folder);
 
-			data.push_back(wxVariant(wxDataViewIconText(mod->caption, icon)));
+			data.push_back(wxVariant(wxDataViewIconText(mod.caption, icon)));
 		}
 
 		_list->AppendItem(data);

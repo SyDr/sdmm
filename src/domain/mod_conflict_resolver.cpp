@@ -29,7 +29,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 		const auto currentId = currentlyActive[i];
 
 		auto modData = modDataProvider.modData(currentId);
-		for (const auto& id : modData->requires_)
+		for (const auto& id : modData.requires_)
 		{
 			activatedInSession[id].insert(currentId);
 
@@ -37,7 +37,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 				currentlyActive.end())
 				currentlyActive.emplace_back(id);
 
-			if (modDataProvider.modData(id)->virtual_mod)
+			if (modDataProvider.modData(id).virtual_mod)
 				wxLogWarning(
 					wxString::Format("Mod %s required by %s, "
 									 "but unavailable"_lng,
@@ -50,7 +50,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 									 id, currentId, boost::algorithm::join(it->second, ", ")));
 		}
 
-		for (const auto& id : modData->incompatible)
+		for (const auto& id : modData.incompatible)
 		{
 			disabledInSession[id].insert(currentId);
 
@@ -80,7 +80,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 			if (i == j)
 				continue;
 
-			if (modDataProvider.modData(currentlyActive[j])->load_after.count(candidate))
+			if (modDataProvider.modData(currentlyActive[j]).load_after.contains(candidate))
 				ok = false;
 		}
 

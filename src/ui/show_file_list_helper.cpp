@@ -78,15 +78,15 @@ namespace
 			const auto& item    = result.modList[i];
 			auto        modData = dataProvider.modData(item);
 
-			if (!exists(modData->data_path) || !is_directory(modData->data_path))
+			if (!exists(modData.data_path) || !is_directory(modData.data_path))
 				continue;
 
 			using rdi = fs::recursive_directory_iterator;
-			for (auto it = rdi(modData->data_path), end = rdi(); it != end; ++it)
+			for (auto it = rdi(modData.data_path), end = rdi(); it != end; ++it)
 			{
 				boost::system::error_code ec;
 
-				const auto relative = fs::relative(it->path(), modData->data_path, ec);
+				const auto relative = fs::relative(it->path(), modData.data_path, ec);
 
 				if (ec)
 				{

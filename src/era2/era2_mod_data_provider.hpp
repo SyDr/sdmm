@@ -10,7 +10,6 @@
 #include "type/filesystem.hpp"
 #include "wx/string.h"
 
-
 #include <map>
 #include <set>
 
@@ -22,7 +21,7 @@ namespace mm
 	{
 		Era2ModDataProvider(fs::path basePath, wxString preferredLng);
 
-		non_owning_ptr<ModData const> modData(const wxString& id) override;
+		const ModData& modData(const wxString& id) override;
 
 	private:
 		void loadDefaults();

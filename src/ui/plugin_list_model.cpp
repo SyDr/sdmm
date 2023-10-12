@@ -76,9 +76,9 @@ void PluginListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned c
 		wxString caption;
 
 		const auto mod = _modDataProvider.modData(item.modId);
-		if (!mod->icon_filename.empty())
-			icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());
-		caption = mod->caption;
+		if (!mod.icon_filename.empty())
+			icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
+		caption = mod.caption;
 
 		if (!icon.IsOk())
 			icon = _iconStorage.get(embedded_icon::folder);

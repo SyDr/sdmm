@@ -76,31 +76,31 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 
 		const auto mod = _modDataProvider.modData(item);
 
-		if (!mod->icon_filename.empty())
-			icon = _iconStorage.get((mod->data_path / mod->icon_filename).string());
+		if (!mod.icon_filename.empty())
+			icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
 		else
 			icon = _iconStorage.get(embedded_icon::folder);
 
-		variant = wxVariant(wxDataViewIconText(mod->caption, icon));
+		variant = wxVariant(wxDataViewIconText(mod.caption, icon));
 		break;
 	}
 	case Column::author:
 	{
 		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(mod->authors);
+		variant        = wxVariant(mod.authors);
 		break;
 	}
 	case Column::category:
 	{
 		const auto mod = _modDataProvider.modData(item);
 		variant =
-			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod->category.ToStdString(wxConvUTF8))));
+			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category.ToStdString(wxConvUTF8))));
 		break;
 	}
 	case Column::version:
 	{
 		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(mod->mod_version);
+		variant        = wxVariant(mod.mod_version);
 		break;
 	}
 	case Column::checkbox:
@@ -139,7 +139,7 @@ bool ModListModel::GetAttrByRow(unsigned row, unsigned, wxDataViewItemAttr& attr
 		return true;
 	}
 
-	if (_modDataProvider.modData(mod)->virtual_mod)
+	if (_modDataProvider.modData(mod).virtual_mod)
 	{
 		attr.SetBackgroundColour(wxColour(255, 127, 127));
 	}
@@ -221,7 +221,7 @@ const ModData* ModListModel::findMod(const wxDataViewItem& item) const
 	if (!item.IsOk())
 		return nullptr;
 
-	return _modDataProvider.modData(_displayedItems[GetRow(item)]);
+	return &_modDataProvider.modData(_displayedItems[GetRow(item)]);
 }
 
 wxDataViewItem ModListModel::findItemById(const wxString& id) const

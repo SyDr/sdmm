@@ -277,20 +277,20 @@ void ModListView::updateControlsState()
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(_iconStorage.get(
-		_modManager.activePosition(mod->id).has_value() ? embedded_icon::minus : embedded_icon::plus));
+		_modManager.activePosition(mod.id).has_value() ? embedded_icon::minus : embedded_icon::plus));
 	_changeState->SetLabelText(
-		_modManager.activePosition(mod->id).has_value() ? "Disable"_lng : "Enable"_lng);
+		_modManager.activePosition(mod.id).has_value() ? "Disable"_lng : "Enable"_lng);
 
-	_moveUp->Enable(_modManager.canMoveUp(mod->id));
-	_moveDown->Enable(_modManager.canMoveDown(mod->id));
+	_moveUp->Enable(_modManager.canMoveUp(mod.id));
+	_moveDown->Enable(_modManager.canMoveDown(mod.id));
 
 	auto description = "No description available"_lng;
 
-	if (mod->virtual_mod)
+	if (mod.virtual_mod)
 	{
 		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 	}
-	else if (auto file = boost::nowide::ifstream(mod->data_path / mod->full_description); file)
+	else if (auto file = boost::nowide::ifstream(mod.data_path / mod.full_description); file)
 	{
 		std::stringstream stream;
 		stream << file.rdbuf();
@@ -303,14 +303,14 @@ void ModListView::updateControlsState()
 		if (!string.empty())
 			description = std::move(string);
 	}
-	else if (!mod->short_description.empty())
+	else if (!mod.short_description.empty())
 	{
-		description = mod->short_description;
+		description = mod.short_description;
 	}
 
 	_modDescription->SetValue(description);
-	_openGallery->Enable(fs::exists(mod->data_path / "Screens"));
-	_galleryView->SetPath(mod->data_path / "Screens");
+	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
+	_galleryView->SetPath(mod.data_path / "Screens");
 
 	Layout();
 
@@ -373,9 +373,9 @@ void ModListView::onSwitchSelectedModStateRequested()
 		for (const auto& item : _modManager.mods().active)
 		{
 			auto other = _managedPlatform.modDataProvider()->modData(item);
-			if (modData->incompatible.count(item) || other->incompatible.count(_selectedMod))
+			if (modData.incompatible.count(item) || other.incompatible.count(_selectedMod))
 			{
-				incompatible.emplace_back('"' + other->caption.ToStdString(wxConvUTF8) + '"');
+				incompatible.emplace_back('"' + other.caption.ToStdString(wxConvUTF8) + '"');
 			}
 		}
 
@@ -441,22 +441,22 @@ void ModListView::onRemoveModRequested()
 
 	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
-	if (!mod->virtual_mod)
+	if (!mod.virtual_mod)
 	{
 		const auto formatMessage =
 			"Are you sure want to delete mod \"%s\"?\n\n"
 			"It will be deleted to recycle bin, if possible."_lng;
-		const auto answer = wxMessageBox(wxString::Format(formatMessage, mod->caption),
+		const auto answer = wxMessageBox(wxString::Format(formatMessage, mod.caption),
 			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 		if (answer != wxYES)
 			return;
 
-		if (!shellRemove(mod->data_path.string()))
+		if (!shellRemove(mod.data_path.string()))
 			return;
 	}
 
-	_modManager.remove(mod->id);
+	_modManager.remove(mod.id);
 
 	EX_UNEXPECTED;
 }
@@ -467,7 +467,7 @@ void ModListView::openGalleryRequested()
 
 	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
-	wxLaunchDefaultApplication((mod->data_path / "Screens").string());
+	wxLaunchDefaultApplication(wxString::FromUTF8((mod.data_path / "Screens").string()));
 
 	EX_UNEXPECTED;
 }
