@@ -113,7 +113,10 @@ void ModListView::bindEvents()
 		event.SetDataObject(new wxTextDataObject(id));
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent&) {});
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
+		if (!event.GetItem().IsOk())
+			event.Veto();
+	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
 		wxString         moveFrom;
@@ -278,8 +281,7 @@ void ModListView::updateControlsState()
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(_iconStorage.get(
 		_modManager.activePosition(mod.id).has_value() ? embedded_icon::minus : embedded_icon::plus));
-	_changeState->SetLabelText(
-		_modManager.activePosition(mod.id).has_value() ? "Disable"_lng : "Enable"_lng);
+	_changeState->SetLabelText(_modManager.activePosition(mod.id).has_value() ? "Disable"_lng : "Enable"_lng);
 
 	_moveUp->Enable(_modManager.canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.canMoveDown(mod.id));
