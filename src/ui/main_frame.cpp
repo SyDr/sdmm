@@ -12,8 +12,8 @@
 #include "interface/iapp_config.hpp"
 #include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.hpp"
-#include "interface/ilaunch_helper.h"
-#include "interface/ilocal_config.h"
+#include "interface/ilaunch_helper.hpp"
+#include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/iplatform_service.h"
@@ -83,8 +83,9 @@ MainFrame::MainFrame(Application& app)
 
 		if (auto launchHelper = _currentPlatform->launchHelper())
 		{
-			_launchButton = new wxButton(
-				panel, wxID_ANY, wxString::Format(wxString("Launch (%s)"_lng), launchHelper->getCaption()));
+			_launchButton = new wxButton(panel, wxID_ANY,
+				wxString::Format(
+					wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())));
 			_launchButton->SetBitmap(launchHelper->getIcon());
 
 			wxSize goodSize = _launchButton->GetBestSize();
@@ -394,7 +395,8 @@ void MainFrame::updateExecutableIcon()
 
 	if (auto helper = _currentPlatform->launchHelper())
 	{
-		_launchButton->SetLabelText(wxString::Format(wxString("Launch (%s)"_lng), helper->getCaption()));
+		_launchButton->SetLabelText(
+			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption())));
 		_launchButton->SetBitmap(wxNullBitmap);
 		_launchButton->SetBitmap(helper->getIcon());
 		Layout();

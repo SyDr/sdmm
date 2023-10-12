@@ -12,7 +12,7 @@
 #include "domain/mod_data.hpp"
 #include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.hpp"
-#include "interface/ilocal_config.h"
+#include "interface/ilocal_config.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"

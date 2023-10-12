@@ -1,11 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
-#include "era2_config.h"
+#include "era2_config.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -34,12 +34,8 @@ Era2Config::Era2Config(const fs::path& path)
 {
 	createDirectories();
 
-	if (std::ifstream datafile(getConfigFilePath().wstring()); datafile)
+	if (boost::nowide::ifstream datafile(getConfigFilePath()); datafile)
 	{
-		/* std::stringstream stream;
-		stream << datafile.rdbuf();
-		datafile.close();*/
-
 		try
 		{
 			_data = nlohmann::json::parse(datafile);
@@ -96,9 +92,9 @@ fs::path Era2Config::getConfigFilePath() const
 	return getProgramDataPath() / "config.json";
 }
 
-wxString Era2Config::getLaunchString() const
+std::string Era2Config::getLaunchString() const
 {
-	return (getDataPath() / getExecutable()).wstring();
+	return (getDataPath() / getExecutable()).string();
 }
 
 std::string Era2Config::getExecutable() const
@@ -112,14 +108,14 @@ void Era2Config::setExecutable(const std::string& executable)
 	save();
 }
 
-wxString Era2Config::getAcitvePreset() const
+std::string Era2Config::getAcitvePreset() const
 {
 	return _data[st_active_preset].get<std::string>();
 }
 
-void Era2Config::setActivePreset(const wxString& preset)
+void Era2Config::setActivePreset(const std::string& preset)
 {
-	_data[st_active_preset] = preset.ToStdString(wxConvUTF8);
+	_data[st_active_preset] = preset;
 	save();
 }
 

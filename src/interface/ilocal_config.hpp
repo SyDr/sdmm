@@ -25,7 +25,7 @@ namespace mm
 		[[nodiscard]] virtual ConflictResolveMode conflictResolveMode() const                    = 0;
 		virtual void                              conflictResolveMode(ConflictResolveMode value) = 0;
 
-		[[nodiscard]] virtual wxString getAcitvePreset() const                 = 0;
-		virtual void                   setActivePreset(const wxString& preset) = 0;
+		[[nodiscard]] virtual std::string getAcitvePreset() const                    = 0;
+		virtual void                      setActivePreset(const std::string& preset) = 0;
 	};
 }

@@ -7,7 +7,7 @@
 
 #include "application.h"
 #include "domain/mod_data.hpp"
-#include "era2_config.h"
+#include "era2_config.hpp"
 #include "era2_mod_manager.h"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"

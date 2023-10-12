@@ -11,7 +11,7 @@
 #include "domain/mod_list.hpp"
 #include "error_view.h"
 #include "interface/iicon_storage.hpp"
-#include "interface/ilocal_config.h"
+#include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/iplugin_manager.hpp"
@@ -255,7 +255,7 @@ void ManagePresetListView::onSavePresetRequested(wxString baseName)
 
 	_platform.getPresetManager()->savePreset(
 		baseName, _platform.modManager()->mods(), _platform.pluginManager()->plugins());
-	_platform.localConfig()->setActivePreset(baseName);
+	_platform.localConfig()->setActivePreset(baseName.ToStdString(wxConvUTF8));
 	_selected = baseName;
 
 	refreshListContent();
@@ -277,7 +277,7 @@ void ManagePresetListView::onLoadPresetRequested()
 	plugins.available = _platform.pluginManager()->plugins().available;
 
 	_platform.apply(&mods, &plugins);
-	_platform.localConfig()->setActivePreset(selected);
+	_platform.localConfig()->setActivePreset(selected.ToStdString(wxConvUTF8));
 	_selected = selected;
 
 	refreshListContent();

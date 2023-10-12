@@ -1,17 +1,16 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
-#include "era2_launch_helper.h"
+#include "era2_launch_helper.hpp"
 
 #include <wx/icon.h>
-#include <wx/string.h>
 
+#include "application.h"
 #include "interface/iicon_storage.hpp"
-#include "mod_manager_app.h"
 
 using namespace mm;
 
@@ -22,19 +21,18 @@ Era2LaunchHelper::Era2LaunchHelper(Era2Config& config, IIconStorage& iconStorage
 
 wxIcon Era2LaunchHelper::getIcon() const
 {
-	return _iconStorage.get(_config.getLaunchString().ToStdString(wxConvUTF8));
+	return _iconStorage.get(_config.getLaunchString());
 }
 
-wxString Era2LaunchHelper::getCaption() const
+std::string Era2LaunchHelper::getCaption() const
 {
-	auto result = getExecutable();
-	if (result.empty())
-		result = "not selected"_lng.ToStdString(wxConvUTF8);
+	if (auto result = getExecutable(); !result.empty())
+		return result;
 
-	return wxString::FromUTF8(result);
+	return "not selected"_lng.ToStdString(wxConvUTF8);
 }
 
-wxString Era2LaunchHelper::getLaunchString() const
+std::string Era2LaunchHelper::getLaunchString() const
 {
 	return _config.getLaunchString();
 }

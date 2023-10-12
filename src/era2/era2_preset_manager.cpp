@@ -8,7 +8,7 @@
 #include "era2_preset_manager.h"
 
 #include "application.h"
-#include "era2_config.h"
+#include "era2_config.hpp"
 #include "era2_mod_manager.h"
 #include "era2_platform.h"
 #include "era2_plugin_manager.hpp"

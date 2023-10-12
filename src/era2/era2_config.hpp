@@ -1,14 +1,13 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "interface/ilocal_config.h"
+#include "interface/ilocal_config.hpp"
 
 #include <nlohmann/json.hpp>
-#include <wx/string.h>
 
 namespace mm
 {
@@ -29,10 +28,10 @@ namespace mm
 		std::string getExecutable() const;
 		void        setExecutable(const std::string& executable);
 
-		wxString getLaunchString() const;
+		std::string getLaunchString() const;
 
-		wxString getAcitvePreset() const override;
-		void     setActivePreset(const wxString& preset) override;
+		std::string getAcitvePreset() const override;
+		void        setActivePreset(const std::string& preset) override;
 
 		bool showHiddenMods() const override;
 		void showHiddenMods(bool value) override;
@@ -42,12 +41,12 @@ namespace mm
 
 	private:
 		fs::path getConfigFilePath() const;
-		void                  createDirectories() const;
+		void     createDirectories() const;
 
 		void validate();
 
 	private:
 		const fs::path _path;
-		nlohmann::json              _data;
+		nlohmann::json _data;
 	};
 }

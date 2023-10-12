@@ -18,9 +18,9 @@
 
 #include "application.h"
 #include "domain/mod_data.hpp"
-#include "era2_config.h"
+#include "era2_config.hpp"
 #include "era2_directory_structure.hpp"
-#include "era2_launch_helper.h"
+#include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.h"
 #include "era2_plugin_manager.hpp"

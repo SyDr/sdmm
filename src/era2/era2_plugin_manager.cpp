@@ -7,7 +7,7 @@
 
 #include "application.h"
 #include "domain/mod_data.hpp"
-#include "era2_config.h"
+#include "era2_config.hpp"
 #include "era2_mod_manager.h"
 #include "era2_plugin_manager.hpp"
 #include "system_info.hpp"

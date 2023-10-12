@@ -7,7 +7,7 @@
 
 #include "domain/mod_list.hpp"
 #include "domain/plugin_list.hpp"
-#include "era2_config.h"
+#include "era2_config.hpp"
 #include "interface/imod_platform.hpp"
 #include "type/filesystem.hpp"
 
