@@ -5,9 +5,10 @@
 
 #pragma once
 
+#include "type/filesystem.hpp"
+
 #include <wx/string.h>
 
-#include <filesystem>
 #include <set>
 #include <unordered_map>
 
@@ -17,8 +18,8 @@ namespace mm
 	{
 		wxString caption;
 
-		wxString              short_description;
-		std::filesystem::path full_description;
+		wxString short_description;
+		fs::path full_description;
 
 		std::string icon_filename;
 		size_t      icon_index = 0;

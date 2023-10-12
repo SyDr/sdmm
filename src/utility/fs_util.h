@@ -16,16 +16,15 @@ namespace mm
 {
 	void overwriteFileContent(const fs::path& path, const wxString& content);
 
-	bool createDir(const std::filesystem::path& path);
-	bool copyDir(const wxString& path, const wxString& newPath);
+	bool createDir(const fs::path& path);
 
-	std::vector<wxString> getAllDirs(const std::filesystem::path& path);
-	std::vector<wxString> getAllFiles(const std::filesystem::path& path);
+	std::vector<wxString> getAllDirs(const fs::path& path);
+	std::vector<wxString> getAllFiles(const fs::path& path);
 
 	std::vector<wxString> readFile(const fs::path& path);
 
 	template <typename Container>
-	void overwriteFileFromContainer(std::filesystem::path const& path, Container const& content)
+	void overwriteFileFromContainer(fs::path const& path, Container const& content)
 	{
 		std::stringstream stream;
 

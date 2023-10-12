@@ -45,7 +45,7 @@ namespace
 		if (id == mm::SystemInfo::ManagedMod)
 			return false;
 
-		const auto path = modsPath / id.ToStdWstring();
+		const auto path = modsPath / id.ToStdString(wxConvUTF8);
 		if (!exists(path) || !is_directory(path))
 			return false;
 
@@ -77,8 +77,13 @@ namespace
 				items.hidden.emplace(item);
 
 		// remaining items from directory
-		for (const auto& item : getAllDirs(modsPath))
-			items.available.emplace(item);
+		using di = fs::directory_iterator;
+		for (auto it = di(modsPath), end = di(); it != end; ++it)
+		{
+			if (!it->is_directory())
+				continue;
+			items.available.emplace(it->path().filename().wstring());
+		}
 
 		items.available.erase(mm::SystemInfo::ManagedMod);
 
@@ -96,17 +101,17 @@ namespace
 		overwriteFileFromContainer(activePath, reversed);
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
-		std::filesystem::create_directories(modsPath / mm::SystemInfo::ManagedMod);
-		std::filesystem::copy_file(
-			std::filesystem::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
+		fs::create_directories(modsPath / mm::SystemInfo::ManagedMod);
+		fs::copy_file(
+			fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
 			modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
-			std::filesystem::copy_options::overwrite_existing);
-		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description.txt",
+			fs::copy_options::overwrite_existing);
+		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description.txt",
 			modsPath / mm::SystemInfo::ManagedMod / "description.txt",
-			std::filesystem::copy_options::overwrite_existing);
-		std::filesystem::copy_file(std::filesystem::path(mm::SystemInfo::DataDir) / "description_rus.txt",
+			fs::copy_options::overwrite_existing);
+		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description_rus.txt",
 			modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
-			std::filesystem::copy_options::overwrite_existing);
+			fs::copy_options::overwrite_existing);
 	}
 }
 
@@ -152,7 +157,7 @@ void Era2Platform::apply(ModList* mods, PluginList* plugins)
 		if (plugins)
 			_pluginManager->plugins(*plugins);
 
-		_modManager->onListChanged();
+		_modManager->onListChanged()();
 	}
 	else if (plugins)
 	{

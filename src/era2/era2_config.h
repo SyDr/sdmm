@@ -41,13 +41,13 @@ namespace mm
 		void                conflictResolveMode(ConflictResolveMode value) override;
 
 	private:
-		std::filesystem::path getConfigFilePath() const;
+		fs::path getConfigFilePath() const;
 		void                  createDirectories() const;
 
 		void validate();
 
 	private:
-		const std::filesystem::path _path;
+		const fs::path _path;
 		nlohmann::json              _data;
 	};
 }

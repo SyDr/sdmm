@@ -23,13 +23,13 @@ using namespace mm;
 
 namespace
 {
-	std::filesystem::path toPath(std::filesystem::path const& base, const wxString& name)
+	fs::path toPath(fs::path const& base, const wxString& name)
 	{
-		return base / (name + ".json").ToStdString();
+		return base / (name + ".json").ToStdString(wxConvUTF8);
 	}
 }
 
-Era2PresetManager::Era2PresetManager(std::filesystem::path rootPath, fs::path modsPath)
+Era2PresetManager::Era2PresetManager(fs::path rootPath, fs::path modsPath)
 	: _rootPath(std::move(rootPath))
 	, _modsPath(std::move(modsPath))
 {}
@@ -39,7 +39,7 @@ void Era2PresetManager::copy(const wxString& from, const wxString& to)
 	const auto pathFrom = toPath(_rootPath, from);
 	const auto pathTo   = toPath(_rootPath, to);
 
-	std::filesystem::copy(pathFrom, pathTo);
+	fs::copy(pathFrom, pathTo);
 
 	_listChanged();
 }
@@ -48,7 +48,7 @@ void Era2PresetManager::remove(const wxString& name)
 {
 	const auto path = toPath(_rootPath, name);
 
-	std::filesystem::remove(path);
+	fs::remove(path);
 
 	_listChanged();
 }
@@ -57,12 +57,12 @@ std::set<wxString> Era2PresetManager::list() const
 {
 	std::set<wxString> result;
 
-	std::filesystem::directory_iterator di(_rootPath);
+	fs::directory_iterator di(_rootPath);
 
-	for (const auto end = std::filesystem::directory_iterator(); di != end; ++di)
+	for (const auto end = fs::directory_iterator(); di != end; ++di)
 	{
-		if (std::filesystem::is_regular_file(*di) && di->path().extension() == ".json")
-			result.emplace(di->path().stem());
+		if (fs::is_regular_file(*di) && di->path().extension() == ".json")
+			result.emplace(di->path().stem().wstring());
 	}
 
 	return result;
@@ -73,7 +73,7 @@ void Era2PresetManager::rename(const wxString& from, const wxString& to)
 	const auto pathFrom = toPath(_rootPath, from);
 	const auto pathTo   = toPath(_rootPath, to);
 
-	std::filesystem::rename(pathFrom, pathTo);
+	fs::rename(pathFrom, pathTo);
 
 	_listChanged();
 }
@@ -90,11 +90,11 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 
 	const auto path = toPath(_rootPath, name);
 
-	std::ifstream datafile(path);
+	boost::nowide::ifstream datafile(path);
 
 	if (!datafile)
 	{
-		wxLogError(wxString::Format("Cannot open file %s"_lng, path.string()));
+		wxLogError(wxString::Format("Cannot open file %s"_lng, wxString::FromUTF8(path.string())));
 		return { modList, pluginList };
 	}
 
@@ -107,7 +107,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	catch (nlohmann::json::parse_error const& e)
 	{
 		wxLogError(e.what());
-		wxLogError(wxString::Format("Error while parsing file %s"_lng, path.string()));
+		wxLogError(wxString::Format("Error while parsing file %s"_lng, wxString::FromUTF8(path.string())));
 		return { modList, pluginList };
 	}
 
@@ -143,23 +143,23 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list, co
 	data["mods"]["hidden"] = nlohmann::json::array();
 
 	for (const auto& item : list.active)
-		data["mods"]["active"].emplace_back(item.ToStdString());
+		data["mods"]["active"].emplace_back(item.ToStdString(wxConvUTF8));
 
 	for (const auto& item : list.hidden)
-		data["mods"]["hidden"].emplace_back(item.ToStdString());
+		data["mods"]["hidden"].emplace_back(item.ToStdString(wxConvUTF8));
 
 	auto& ref = data["plugins"] = nlohmann::json::object();
 	for (const auto& source : plugins.managed)
 	{
-		auto& modRef = ref[source.modId.ToStdString()];
+		auto& modRef = ref[source.modId.ToStdString(wxConvUTF8)];
 		auto& keyRef = modRef[toString(source.location)];
-		keyRef.emplace_back(source.name.ToStdString());
+		keyRef.emplace_back(source.name.ToStdString(wxConvUTF8));
 	}
 
 	const auto path          = toPath(_rootPath, name);
-	const bool already_exist = std::filesystem::exists(path);
+	const bool already_exist = fs::exists(path);
 
-	std::ofstream datafile(path);
+	boost::nowide::ofstream datafile(path);
 	datafile << data.dump(2);
 	datafile.close();
 
@@ -169,5 +169,5 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list, co
 
 bool Era2PresetManager::exists(const wxString& name) const
 {
-	return std::filesystem::exists(toPath(_rootPath, name));
+	return fs::exists(toPath(_rootPath, name));
 }

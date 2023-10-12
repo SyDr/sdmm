@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "type/filesystem.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -20,7 +22,7 @@ namespace mm
 	class SelectExe : public wxDialog
 	{
 	public:
-		SelectExe(wxWindow* parent, const std::filesystem::path& basePath,
+		SelectExe(wxWindow* parent, const fs::path& basePath,
 			const wxString& initiallySelectedFile, IIconStorage& iconStorage);
 
 		wxString getSelectedFile() const;
@@ -29,7 +31,7 @@ namespace mm
 		void refreshListContent();
 
 	private:
-		const std::filesystem::path _basePath;
+		const fs::path _basePath;
 		IIconStorage&               _iconStorage;
 		wxString                    _selectedFile;
 

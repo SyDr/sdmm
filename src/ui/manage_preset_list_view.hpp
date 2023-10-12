@@ -6,8 +6,8 @@
 #pragma once
 
 #include "utility/wx_widgets_ptr.hpp"
+#include "type/filesystem.hpp"
 
-#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -52,7 +52,7 @@ namespace mm
 		void onSelectionChanged();
 
 		wxString getSelection() const;
-		void     onFilesystemError(std::filesystem::filesystem_error const& e);
+		void     onFilesystemError(const fs::filesystem_error& e);
 
 	private:
 		const char* _program_name = nullptr;

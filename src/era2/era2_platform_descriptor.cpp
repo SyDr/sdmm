@@ -34,7 +34,7 @@ std::unique_ptr<IModPlatform> Era2PlatfromDescriptor::create() const
 	const auto path = _app.appConfig().getDataPath();
 
 	MM_EXPECTS(!path.empty(), empty_path_error);
-	MM_EXPECTS(std::filesystem::exists(path), not_exist_path_error);
+	MM_EXPECTS(exists(path), not_exist_path_error);
 
 	return std::make_unique<Era2Platform>(_app);
 }

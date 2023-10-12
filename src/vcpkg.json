@@ -5,6 +5,7 @@
     "boost-stacktrace",
     "boost-exception",
     "boost-nowide",
+    "boost-filesystem",
     "nlohmann-json",
     "wxwidgets",
     "palsigslot"

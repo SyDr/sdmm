@@ -22,7 +22,7 @@
 
 using namespace mm;
 
-SelectExe::SelectExe(wxWindow* parent, const std::filesystem::path& basePath,
+SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	const wxString& initiallySelectedFile, IIconStorage& iconStorage)
 	: wxDialog(parent, wxID_ANY, "Select executable"_lng, wxDefaultPosition, wxSize(200, 324))
 	, _basePath(basePath)

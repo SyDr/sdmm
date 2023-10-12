@@ -56,7 +56,7 @@ namespace
 
 	std::set<PluginSource> loadManagedState(const fs::path& pluginPath)
 	{
-		std::ifstream datafile(pluginPath.string());
+		boost::nowide::ifstream datafile(pluginPath.string());
 		if (!datafile)
 			return {};
 
@@ -82,29 +82,29 @@ namespace
 			if (!modList.isActive(source.modId))
 				continue;
 
-			const auto copyFrom = modsPath / source.modId.ToStdString() / PluginSubdir /
-								  toString(source.location).ToStdString() / source.name.ToStdString();
+			const auto copyFrom = modsPath / source.modId.ToStdString(wxConvUTF8) / PluginSubdir /
+								  toString(source.location).ToStdString(wxConvUTF8) / source.name.ToStdString(wxConvUTF8);
 
 			const auto copyTo =
-				targetPath / toFileIdentity(toString(source.location), source.name).ToStdString();
+				targetPath / toFileIdentity(toString(source.location), source.name).ToStdString(wxConvUTF8);
 
 			if (source.name.ends_with(PluginOffExtension))
 			{
 				copy_file(copyFrom, copyTo,
-					std::filesystem::copy_options::overwrite_existing);
+					fs::copy_options::overwrite_existing);
 			}
 			else
 			{
-				std::ofstream unused(copyTo);
+				boost::nowide::ofstream unused(copyTo);
 			}
 		}
 
 		nlohmann::json data = nlohmann::json::object();
 		for (const auto& source : list.managed)
 		{
-			auto& modRef = data[source.modId.ToStdString()];
+			auto& modRef = data[source.modId.ToStdString(wxConvUTF8)];
 			auto& keyRef = modRef[toString(source.location)];
-			keyRef.emplace_back(source.name.ToStdString());
+			keyRef.emplace_back(source.name.ToStdString(wxConvUTF8));
 		}
 
 		overwriteFileContent(pluginPath, wxString::FromUTF8(data.dump(2)));
@@ -158,7 +158,7 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 {
 	std::set<PluginSource> result;
 
-	using di = std::filesystem::directory_iterator;
+	using di = fs::directory_iterator;
 	for (auto it = di(basePath), end = di(); it != end; ++it)
 	{
 		if (!it->is_directory())

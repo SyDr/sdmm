@@ -7,7 +7,7 @@
 
 #include "mod_metadata.hpp"
 
-#include <filesystem>
+
 #include <string>
 
 namespace mm
@@ -16,6 +16,6 @@ namespace mm
 	{
 		wxString              id;
 		bool                  virtual_mod = false;  // does this mod physically exist?
-		std::filesystem::path data_path;
+		fs::path data_path;
 	};
 }

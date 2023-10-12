@@ -52,7 +52,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
-	createControls(managedPlatform.managedPath().string());
+	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
 	_listModel->setModList(_modManager.mods());
 	buildLayout();
 	bindEvents();
@@ -291,7 +291,7 @@ void ModListView::updateControlsState()
 	{
 		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 	}
-	else if (auto file = std::ifstream(mod->data_path / mod->full_description); file)
+	else if (auto file = boost::nowide::ifstream(mod->data_path / mod->full_description); file)
 	{
 		std::stringstream stream;
 		stream << file.rdbuf();

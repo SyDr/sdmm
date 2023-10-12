@@ -10,7 +10,7 @@
 #include "system_info.hpp"
 #include "utility/json_util.h"
 
-#include <filesystem>
+
 
 using namespace mm;
 
@@ -43,7 +43,7 @@ namespace
 	}
 }
 
-ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFrom,
+ModData era2_mod_loader::updateAvailability(fs::path const& loadFrom,
 	const wxString& preferredLng, std::set<wxString> const& defaultIncompatible,
 	std::set<wxString> const& defaultRequires, std::set<wxString> const& defaultLoadAfter)
 {
@@ -54,7 +54,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 	ModData result;
 	result.data_path   = loadFrom;
 	result.id          = loadFrom.filename().wstring();
-	result.virtual_mod = !std::filesystem::is_directory(loadFrom);
+	result.virtual_mod = !fs::is_directory(loadFrom);
 
 	auto supplyResultWithDefaults = [&] {
 		return supplyWithDefaults(std::move(result), defaultIncompatible, defaultRequires, defaultLoadAfter,
@@ -69,7 +69,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 
 	const auto path = loadFrom / mm::SystemInfo::ModInfoFilename;
 
-	std::ifstream datafile(path);
+	boost::nowide::ifstream datafile(path);
 
 	if (!datafile)
 	{
@@ -149,8 +149,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 				if (const auto preferredIt = fullIt->find(preferredLng);
 					preferredIt != fullIt->end() && preferredIt->is_string())
 				{
-					result.full_description =
-						wxString::FromUTF8(preferredIt->get<std::string>()).ToStdWstring();
+					result.full_description = preferredIt->get<std::string>();
 					if (!result.full_description.empty())
 						return;
 				}
@@ -160,8 +159,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 					if (const auto defaultIt = fullIt->find(mm::SystemInfo::DefaultLanguage);
 						defaultIt != fullIt->end() && defaultIt->is_string())
 					{
-						result.full_description =
-							wxString::FromUTF8(defaultIt->get<std::string>()).ToStdWstring();
+						result.full_description = defaultIt->get<std::string>();
 						if (!result.full_description.empty())
 							return;
 					}
@@ -177,8 +175,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 				if (const auto preferredIt = shortIt->find(preferredLng);
 					preferredIt != shortIt->end() && preferredIt->is_string())
 				{
-					result.short_description =
-						wxString::FromUTF8(preferredIt->get<std::string>()).ToStdWstring();
+					result.short_description = wxString::FromUTF8(preferredIt->get<std::string>());
 					if (!result.short_description.empty())
 						return;
 				}
@@ -188,8 +185,7 @@ ModData era2_mod_loader::updateAvailability(std::filesystem::path const& loadFro
 					if (const auto defaultIt = shortIt->find(mm::SystemInfo::DefaultLanguage);
 						defaultIt != shortIt->end() && defaultIt->is_string())
 					{
-						result.short_description =
-							wxString::FromUTF8(defaultIt->get<std::string>()).ToStdWstring();
+						result.short_description = wxString::FromUTF8(defaultIt->get<std::string>());
 						if (!result.short_description.empty())
 							return;
 					}

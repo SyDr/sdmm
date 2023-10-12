@@ -55,7 +55,7 @@ namespace mm
 		std::unique_ptr<I18nService>     _i18nService;
 		std::unique_ptr<PlatformService> _platformService;
 
-		std::unique_ptr<IconStorage> _iconStorage = std::make_unique<IconStorage>();
+		std::unique_ptr<IconStorage> _iconStorage;
 	};
 }
 

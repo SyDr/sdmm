@@ -21,6 +21,7 @@
 #include <wx/image.h>
 #include <wx/snglinst.h>
 #include <wx/stdpaths.h>
+#include <boost/nowide/filesystem.hpp>
 
 using namespace mm;
 
@@ -35,8 +36,9 @@ bool ModManagerApp::OnInit()
 	if (!wxApp::OnInit())
 		return false;
 
-	wxInitAllImageHandlers();
+	boost::nowide::nowide_filesystem();
 
+	wxInitAllImageHandlers();
 	initServices();
 
 	_singleInstanceChecker = std::make_unique<wxSingleInstanceChecker>();
@@ -133,6 +135,7 @@ void ModManagerApp::scheduleRestart()
 
 void ModManagerApp::initServices()
 {
+	_iconStorage     = std::make_unique<IconStorage>();
 	_appConfig       = std::make_unique<AppConfig>();
 	_i18nService     = std::make_unique<I18nService>(*_appConfig);
 	_platformService = std::make_unique<PlatformService>(*this);

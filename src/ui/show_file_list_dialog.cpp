@@ -117,7 +117,7 @@ void ShowFileListDialog::fillData()
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxString(std::to_string(++index))));
-		data.push_back(wxVariant(wxString(path)));
+		data.push_back(wxVariant(wxString::FromUTF8(path.string())));
 		for (const auto& mod : modList)
 		{
 			wxString item;

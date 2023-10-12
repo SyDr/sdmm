@@ -49,7 +49,7 @@ wxString SelectDirectoryDialog::getSelectedPath() const
 void SelectDirectoryDialog::createControls()
 {
 	auto selectedPath = _appConfig.getDataPath();
-	auto dirToSelect  = selectedPath.empty() ? wxDirDialogDefaultFolderStr : selectedPath.string();
+	auto dirToSelect  = selectedPath.empty() ? wxString(wxDirDialogDefaultFolderStr) : wxString(selectedPath.wstring());
 
 	_explorerList = new wxGenericDirCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize,
 		wxDIRCTRL_DIR_ONLY | wxDIRCTRL_3D_INTERNAL);
@@ -59,8 +59,8 @@ void SelectDirectoryDialog::createControls()
 	_recentDirsList->AppendIconTextColumn("Path");
 
 	_selectedLabel    = new wxStaticText(this, wxID_ANY, "Selected:"_lng);
-	_selectedPathEdit = new wxTextCtrl(
-		this, wxID_ANY, _appConfig.getDataPath().string(), wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
+	_selectedPathEdit =
+		new wxTextCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
 	_accept = new wxButton(this, wxID_ANY, "Accept"_lng);
 
 	_menu.starUnstar     = _menu.menu.Append(wxID_ANY, "placeholder");
@@ -147,10 +147,10 @@ void SelectDirectoryDialog::fillData()
 			_appConfig.dataPathHasStar(value) ? embedded_icon::bookmark : embedded_icon::blank);
 
 		wxVector<wxVariant> data;
-		data.push_back(wxVariant(wxDataViewIconText(value.string(), icon)));
+		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(value.string()), icon)));
 
 		_recentDirsList->AppendItem(data);
-		if (value == getSelectedPath().ToStdString())
+		if (value == getSelectedPath().ToStdString(wxConvUTF8))
 			_recentDirsList->SelectRow(_recentDirsList->GetItemCount() - 1);
 	}
 }

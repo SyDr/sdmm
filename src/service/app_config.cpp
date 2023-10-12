@@ -24,12 +24,12 @@ namespace
 {
 	std::variant<PortableMode, MainMode> constructProgramMode()
 	{
-		fs::path result(wxStandardPaths::Get().GetDataDir().ToStdString());
+		fs::path result(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
 		result = result.parent_path().parent_path() / "_MM_Data";
 		if (exists(result) && is_directory(result))
 			return PortableMode(result.make_preferred());
 
-		result = wxStandardPaths::Get().GetUserDataDir().ToStdString();
+		result = wxStandardPaths::Get().GetUserDataDir().ToStdString(wxConvUTF8);
 
 		return MainMode(result.make_preferred());
 	}
@@ -111,7 +111,7 @@ fs::path AppConfig::dataPath() const
 
 fs::path AppConfig::programPath() const
 {
-	return fs::path(wxStandardPaths::Get().GetDataDir().ToStdString());
+	return fs::path(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
 }
 
 #define SD_LNG_CODE "language"
@@ -172,23 +172,21 @@ void AppConfig::setDataPath(const fs::path& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto newPath    = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
+	auto& knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
 
-	if (std::find(knownPaths.begin(), knownPaths.end(), newPath) == knownPaths.end())
-		_data[sd_game][selectedPlatform()][SD_KNOWN].emplace_back(newPath);
+	if (std::find(knownPaths.begin(), knownPaths.end(), path.string()) == knownPaths.end())
+		_data[sd_game][selectedPlatform()][SD_KNOWN].emplace_back(path.string());
 
-	_data[sd_game][selectedPlatform()][SD_SELECTED] = newPath;
+	_data[sd_game][selectedPlatform()][SD_SELECTED] = path.string();
 }
 
 void AppConfig::forgetDataPath(const fs::path& path)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto toRemove   = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
+	auto& knownPaths = _data[sd_game][selectedPlatform()][SD_KNOWN];
 
-	auto it = std::find(knownPaths.begin(), knownPaths.end(), toRemove);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), path.string());
 
 	if (it != knownPaths.end())
 		knownPaths.erase(it);
@@ -276,10 +274,9 @@ MainWindowProperties AppConfig::mainWindow() const
 
 bool AppConfig::dataPathHasStar(const fs::path& path) const
 {
-	const auto toStar     = path.string();
-	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
+	auto& knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
 
-	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), path.string());
 	return it != knownPaths.end();
 }
 
@@ -287,16 +284,15 @@ void AppConfig::starDataPath(const fs::path& path, bool star /*= true*/)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	const auto toStar     = path.string();
 	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
 
-	auto it = std::find(knownPaths.begin(), knownPaths.end(), toStar);
+	auto it = std::find(knownPaths.begin(), knownPaths.end(), path.string());
 
 	MM_EXPECTS(star == (it == knownPaths.end()),
 			   unexpected_error);  // either star non-starred on remove star from starred
 
 	if (star)
-		knownPaths.emplace_back(toStar);
+		knownPaths.emplace_back(path.string());
 	else
 		knownPaths.erase(it);
 }

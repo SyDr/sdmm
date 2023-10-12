@@ -29,12 +29,12 @@ namespace
 	constexpr const auto st_conflict_resolve_mode = "conflict_resolve_mode";
 }
 
-Era2Config::Era2Config(const std::filesystem::path& path)
+Era2Config::Era2Config(const fs::path& path)
 	: _path(path)
 {
 	createDirectories();
 
-	if (std::ifstream datafile(getConfigFilePath().string()); datafile)
+	if (std::ifstream datafile(getConfigFilePath().wstring()); datafile)
 	{
 		/* std::stringstream stream;
 		stream << datafile.rdbuf();
@@ -57,7 +57,7 @@ Era2Config::Era2Config(const std::filesystem::path& path)
 
 void Era2Config::createDirectories() const
 {
-	std::vector<std::filesystem::path> dirs;
+	std::vector<fs::path> dirs;
 	dirs.emplace_back(getProgramDataPath());
 	dirs.emplace_back(getPresetsPath());
 	dirs.emplace_back(getTempPath());
@@ -71,27 +71,27 @@ void Era2Config::save()
 	overwriteFileContent(getConfigFilePath(), wxString::FromUTF8(_data.dump(2)));
 }
 
-std::filesystem::path Era2Config::getDataPath() const
+fs::path Era2Config::getDataPath() const
 {
 	return _path;
 }
 
-std::filesystem::path Era2Config::getProgramDataPath() const
+fs::path Era2Config::getProgramDataPath() const
 {
 	return getDataPath() / "_MM_Data";
 }
 
-std::filesystem::path Era2Config::getPresetsPath() const
+fs::path Era2Config::getPresetsPath() const
 {
 	return getProgramDataPath() / "Profiles";
 }
 
-std::filesystem::path Era2Config::getTempPath() const
+fs::path Era2Config::getTempPath() const
 {
 	return getProgramDataPath() / "Temp";
 }
 
-std::filesystem::path Era2Config::getConfigFilePath() const
+fs::path Era2Config::getConfigFilePath() const
 {
 	return getProgramDataPath() / "config.json";
 }
@@ -119,7 +119,7 @@ wxString Era2Config::getAcitvePreset() const
 
 void Era2Config::setActivePreset(const wxString& preset)
 {
-	_data[st_active_preset] = preset.ToStdString();
+	_data[st_active_preset] = preset.ToStdString(wxConvUTF8);
 	save();
 }
 

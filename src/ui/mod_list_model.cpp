@@ -94,7 +94,7 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	{
 		const auto mod = _modDataProvider.modData(item);
 		variant =
-			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod->category.ToStdString())));
+			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod->category.ToStdString(wxConvUTF8))));
 		break;
 	}
 	case Column::version:

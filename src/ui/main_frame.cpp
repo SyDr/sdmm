@@ -213,7 +213,7 @@ void MainFrame::OnMenuToolsChangeDirectory()
 	wxBusyCursor bc;
 	wxString     path = dialog.getSelectedPath();
 
-	_app.appConfig().setDataPath(path.ToStdWstring());
+	_app.appConfig().setDataPath(path.ToStdString(wxConvUTF8));
 	wxGetApp().scheduleRestart();
 
 	EX_UNEXPECTED;
@@ -357,7 +357,7 @@ void MainFrame::selectExeToLaunch()
 	SelectExe dialog(this, config->getDataPath(), helper->getExecutable(), _app.iconStorage());
 
 	if (dialog.ShowModal() == wxID_OK)
-		helper->setExecutable(dialog.getSelectedFile().ToStdString());
+		helper->setExecutable(dialog.getSelectedFile().ToStdString(wxConvUTF8));
 
 	EX_UNEXPECTED;
 }

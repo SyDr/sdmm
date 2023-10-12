@@ -27,8 +27,8 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 
 	if (it == _data.cend())
 	{
-		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdWstring(), _preferredLng,
-			_defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id]);
+		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdString(wxConvUTF8),
+			_preferredLng, _defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id]);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
 	}
@@ -38,7 +38,7 @@ non_owning_ptr<ModData const> Era2ModDataProvider::modData(const wxString& id)
 
 void Era2ModDataProvider::loadDefaults()
 {
-	std::ifstream datafile(fs::path(mm::SystemInfo::DataDir) / "era2.json");
+	boost::nowide::ifstream datafile(fs::path(mm::SystemInfo::DataDir) / "era2.json");
 
 	auto data = nlohmann::json::parse(datafile);
 	MM_EXPECTS(data.is_object(), unexpected_error);

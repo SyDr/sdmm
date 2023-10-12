@@ -260,7 +260,7 @@ void ManagePresetListView::onSavePresetRequested(wxString baseName)
 
 	refreshListContent();
 
-	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
 }
 
@@ -285,7 +285,7 @@ void ManagePresetListView::onLoadPresetRequested()
 	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, selected));
 	_infoBarTimer.StartOnce(5000);
 
-	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
 }
 
@@ -306,10 +306,10 @@ void ManagePresetListView::onRenamePreset()
 		return;
 	}
 
-	_platform.getPresetManager()->rename(selected.ToStdString(), newName.ToStdString());
+	_platform.getPresetManager()->rename(selected.ToStdString(wxConvUTF8), newName.ToStdString(wxConvUTF8));
 	_selected = newName;
 
-	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
 }
 
@@ -330,9 +330,9 @@ void ManagePresetListView::onCopyPreset()
 		return;
 	}
 
-	_platform.getPresetManager()->copy(selected.ToStdString(), newName.ToStdString());
+	_platform.getPresetManager()->copy(selected.ToStdString(wxConvUTF8), newName.ToStdString(wxConvUTF8));
 
-	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
 }
 
@@ -347,11 +347,11 @@ void ManagePresetListView::onDeletePreset()
 	if (answer == wxYES)
 		_platform.getPresetManager()->remove(selected);
 
-	EX_ON_EXCEPTION(std::filesystem::filesystem_error, onFilesystemError);
+	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
 }
 
-void ManagePresetListView::onFilesystemError(const std::filesystem::filesystem_error& e)
+void ManagePresetListView::onFilesystemError(const fs::filesystem_error& e)
 {
 	wxMessageOutputMessageBox().Printf(
 		"Error happened during execution of operation. "

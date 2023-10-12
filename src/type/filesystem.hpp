@@ -1,13 +1,14 @@
 // SD Mod Manager
 
-// Copyright (c) 2021-2022 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2021-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include <filesystem>
+#include <boost/filesystem.hpp>
+#include <boost/nowide/convert.hpp>
 
 namespace mm
 {
-	namespace fs = std::filesystem;
+	namespace fs = boost::filesystem;
 }

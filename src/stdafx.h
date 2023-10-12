@@ -9,7 +9,6 @@
 #include <atomic>
 #include <compare>
 #include <deque>
-#include <filesystem>
 #include <fstream>
 #include <memory>
 #include <mutex>
@@ -24,6 +23,9 @@
 #include <boost/exception/all.hpp>
 #include <boost/nowide/fstream.hpp>
 #include <boost/nowide/convert.hpp>
+
+#define BOOST_FILESYSTEM_VERSION 4
+#include <boost/filesystem.hpp>
 
 // wxWidgets
 #include <wx/dataview.h>

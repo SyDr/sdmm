@@ -17,7 +17,7 @@
 
 #include <boost/range/algorithm_ext/erase.hpp>
 
-#include <filesystem>
+
 #include <unordered_set>
 
 using namespace mm;
@@ -56,10 +56,10 @@ namespace
 	Era2DirectoryStructure listModFiles(
 		std::unordered_set<wxString> const& mods, mm::IModDataProvider& dataProvider)
 	{
-		std::map<std::filesystem::path, size_t> temp;  // [path] -> index
+		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure                  result;
 
-		auto fileIndex = [&](const std::filesystem::path& path) {
+		auto fileIndex = [&](const fs::path& path) {
 			auto it = temp.find(path);
 			if (it == temp.cend())
 			{
@@ -78,28 +78,28 @@ namespace
 			const auto& item    = result.modList[i];
 			auto        modData = dataProvider.modData(item);
 
-			if (!std::filesystem::exists(modData->data_path) ||
-				!std::filesystem::is_directory(modData->data_path))
+			if (!exists(modData->data_path) || !is_directory(modData->data_path))
 				continue;
 
-			using rdi = std::filesystem::recursive_directory_iterator;
+			using rdi = fs::recursive_directory_iterator;
 			for (auto it = rdi(modData->data_path), end = rdi(); it != end; ++it)
 			{
-				std::error_code ec;
+				boost::system::error_code ec;
 
-				const auto path     = it->path().string();
-				const auto relative = std::filesystem::relative(path, modData->data_path, ec);
+				const auto relative = fs::relative(it->path(), modData->data_path, ec);
 
 				if (ec)
 				{
-					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng), path,
+					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng),
+						it->path().wstring(),
 						ec.message(), ec.value());
 					continue;
 				}
 
 				const bool isFile = it->is_regular_file(ec);
 				if (ec)
-					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), path, ec.message(),
+					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), it->path().wstring(),
+						ec.message(),
 						ec.value());
 
 				if (!isFile)
@@ -130,7 +130,7 @@ namespace
 				if (!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
 					continue;
 
-				std::fstream        file(path, std::fstream::in | std::fstream::binary);
+				boost::nowide::fstream        file(it->path(), std::fstream::in | std::fstream::binary);
 				std::array<char, 4> lodSignature;
 
 				file.read(lodSignature.data(), lodSignature.size());

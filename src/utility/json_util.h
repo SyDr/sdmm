@@ -5,11 +5,13 @@
 
 #pragma once
 
+#include "type/filesystem.hpp"
+
 #include <nlohmann/json.hpp>
 
 #include <string>
 #include <unordered_map>
-#include <filesystem>
+
 #include <optional>
 
 class wxString;
@@ -29,5 +31,5 @@ namespace mm
 	std::optional<bool> get_bool_value(const nlohmann::json* data, const std::string& key);
 	i18n get_i18n_value(const nlohmann::json* data, const std::vector<const char*>& lng_list);
 
-	nlohmann::json loadJsonFromFile(const std::filesystem::path& path);
+	nlohmann::json loadJsonFromFile(const fs::path& path);
 }

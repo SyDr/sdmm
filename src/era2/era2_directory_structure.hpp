@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <filesystem>
+#include "type/filesystem.hpp"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@ namespace mm
 
 	struct Era2DirectoryStructure
 	{
-		std::vector<std::filesystem::path> fileList;
+		std::vector<fs::path> fileList;
 		std::vector<wxString>              modList;
 
 		std::vector<std::vector<Era2DirectoryEntry>> entries;  // [path index][mod index] = entry
