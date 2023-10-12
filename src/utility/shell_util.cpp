@@ -55,38 +55,3 @@ bool mm::shellRemove(const wxString& path)
 
 	return res == 0 && !sfo.fAnyOperationsAborted;
 }
-
-bool mm::shellRename(const wxString& path, const wxString& newPath)
-{
-	SHFILEOPSTRUCT sfo = { 0 };
-
-	auto toRename = createBufferString({ path });
-	auto targetName = createBufferString({ newPath });
-
-	sfo.hwnd = wxTheApp->GetTopWindow()->GetHWND();
-	sfo.wFunc = FO_MOVE;
-	sfo.pFrom = toRename.get();
-	sfo.pTo = targetName.get();
-	sfo.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_WANTNUKEWARNING;
-
-	wxTheApp->GetTopWindow()->Disable(); // TODO: don't lock ui, if not needed
-	int res = SHFileOperation(&sfo);
-	wxTheApp->GetTopWindow()->Enable();
-
-	return res == 0 && !sfo.fAnyOperationsAborted;
-}
-
-bool mm::shellLaunch(const wxString& path)
-{
-	SHELLEXECUTEINFO sei = { 0 };
-
-	sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	sei.hwnd = wxTheApp->GetTopWindow()->GetHWND();
-	sei.lpVerb = L"open";
-	sei.lpFile = path.c_str();
-	sei.nShow = SW_SHOWDEFAULT;
-
-	BOOL res = ShellExecuteEx(&sei);
-
-	return res == 0;
-}

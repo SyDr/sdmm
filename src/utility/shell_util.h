@@ -10,6 +10,4 @@
 namespace mm
 {
 	bool shellRemove(const wxString& path);
-	bool shellRename(const wxString& path, const wxString& newPath);
-	bool shellLaunch(const wxString& path);
 }

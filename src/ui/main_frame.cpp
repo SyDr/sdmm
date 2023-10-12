@@ -363,7 +363,7 @@ void MainFrame::onLaunchGameRequested()
 		const auto currentWorkDir = wxGetCwd();
 
 		wxSetWorkingDirectory(config->getDataPath().wstring());
-		shellLaunch(wxString::FromUTF8(helper->getLaunchString()));
+		wxExecute(wxString::FromUTF8(helper->getLaunchString()));
 		wxSetWorkingDirectory(currentWorkDir);
 	}
 
