@@ -5,10 +5,9 @@
 
 #include "stdafx.h"
 
-#include "era2/era2_platform_descriptor.h"
+#include "era2/era2_platform_descriptor.hpp"
 #include "utility/sdlexcept.h"
 #include "interface/imod_platform.hpp"
-#include "interface/iplatform_descriptor.h"
 #include "platform_service.h"
 
 using namespace mm;
@@ -28,7 +27,7 @@ std::deque<IPlatformDescriptor*> PlatformService::availablePlatforms() const
 	return result;
 }
 
-std::unique_ptr<IModPlatform> PlatformService::create(const wxString& platformId) const
+std::unique_ptr<IModPlatform> PlatformService::create(const std::string& platformId) const
 {
 	const auto it = std::find_if(_platforms.cbegin(), _platforms.cend(), [&](const std::unique_ptr<IPlatformDescriptor>& item) {
 		return item->getId() == platformId;

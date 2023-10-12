@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "interface/iplatform_service.h"
+#include "interface/iplatform_service.hpp"
 
 namespace mm
 {
@@ -16,8 +16,8 @@ namespace mm
 	public:
 		explicit PlatformService(const Application& app);
 
-		std::deque<IPlatformDescriptor*> availablePlatforms() const override;
-		std::unique_ptr<IModPlatform> create(const wxString& platformId) const override;
+		[[nodiscard]] std::deque<IPlatformDescriptor*> availablePlatforms() const override;
+		[[nodiscard]] std::unique_ptr<IModPlatform>    create(const std::string& platformId) const override;
 
 	private:
 		std::deque<std::unique_ptr<IPlatformDescriptor>> _platforms;

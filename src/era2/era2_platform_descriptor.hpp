@@ -1,11 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
-#include "interface/iplatform_descriptor.h"
+#include "interface/iplatform_descriptor.hpp"
 
 namespace mm
 {
@@ -16,10 +16,10 @@ namespace mm
 	public:
 		explicit Era2PlatfromDescriptor(const Application& app);
 
-		wxString getId() const override;
-		wxString getPlatformName() const override;
+		[[nodiscard]] std::string getId() const override;
+		[[nodiscard]] std::string getPlatformName() const override;
 
-		wxIcon getIcon() const override;
+		[[nodiscard]] wxIcon getIcon() const override;
 
 		std::unique_ptr<IModPlatform> create() const override;
 

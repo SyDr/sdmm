@@ -16,7 +16,7 @@
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/iplatform_service.h"
+#include "interface/iplatform_service.hpp"
 #include "license.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
@@ -289,7 +289,7 @@ void MainFrame::reloadModel()
 {
 	EX_TRY;
 
-	_currentPlatform = _app.platformService().create(wxString::FromUTF8(_app.appConfig().selectedPlatform()));
+	_currentPlatform = _app.platformService().create(_app.appConfig().selectedPlatform());
 
 	if (_currentPlatform->localConfig()->conflictResolveMode() == ConflictResolveMode::undefined)
 		CallAfter(&MainFrame::OnMenuToolsChooseConflictResolveMode);

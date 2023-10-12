@@ -81,14 +81,14 @@
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="era2\era2_config.hpp" />
     <ClInclude Include="era2\era2_platform.h" />
-    <ClInclude Include="era2\era2_platform_descriptor.h" />
+    <ClInclude Include="era2\era2_platform_descriptor.hpp" />
     <ClInclude Include="service\platform_service.h" />
     <ClInclude Include="interface\ilocal_config.hpp" />
     <ClInclude Include="domain\mod_data.hpp" />
     <ClInclude Include="interface\imod_platform.hpp" />
-    <ClInclude Include="interface\iplatform_descriptor.h" />
+    <ClInclude Include="interface\iplatform_descriptor.hpp" />
     <ClInclude Include="interface\ipreset_manager.hpp" />
-    <ClInclude Include="interface\iplatform_service.h" />
+    <ClInclude Include="interface\iplatform_service.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system_info.hpp" />
     <ClInclude Include="type\conflict_resolve_mode.hpp" />

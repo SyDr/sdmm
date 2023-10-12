@@ -5,7 +5,7 @@
 
 #include "stdafx.h"
 
-#include "era2_platform_descriptor.h"
+#include "era2_platform_descriptor.hpp"
 
 #include "era2/era2_platform.h"
 #include "interface/iapp_config.hpp"
@@ -19,14 +19,14 @@ Era2PlatfromDescriptor::Era2PlatfromDescriptor(Application const& app)
 	: _app(app)
 {}
 
-wxString Era2PlatfromDescriptor::getId() const
+std::string Era2PlatfromDescriptor::getId() const
 {
-	return L"era2";
+	return "era2";
 }
 
-wxString Era2PlatfromDescriptor::getPlatformName() const
+std::string Era2PlatfromDescriptor::getPlatformName() const
 {
-	return L"Era II (HoMM III: In the Wake of Gods)";
+	return "Era II (HoMM III: In the Wake of Gods)";
 }
 
 std::unique_ptr<IModPlatform> Era2PlatfromDescriptor::create() const
