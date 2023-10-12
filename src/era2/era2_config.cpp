@@ -98,7 +98,7 @@ fs::path Era2Config::getConfigFilePath() const
 
 wxString Era2Config::getLaunchString() const
 {
-	return (getDataPath() / getExecutable()).string();
+	return (getDataPath() / getExecutable()).wstring();
 }
 
 std::string Era2Config::getExecutable() const

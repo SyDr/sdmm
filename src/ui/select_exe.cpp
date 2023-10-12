@@ -95,12 +95,12 @@ void SelectExe::refreshListContent()
 			continue;
 
 		int index = _list->GetItemCount();
-		_list->InsertItem(index, it->path().filename().string());
+		_list->InsertItem(index, it->path().filename().wstring());
 
 		_imageList->Add(_iconStorage.get(it->path().string()));
 		_list->SetItemImage(index, index);
 
-		if (it->path().filename().string() == _selectedFile)
+		if (it->path().filename().wstring() == _selectedFile)
 			_list->Select(index);
 	}
 

@@ -65,7 +65,8 @@ namespace
 		return Era2PluginManager::loadManagedState(data);
 	}
 
-	void saveManagedState(const fs::path& pluginPath, const fs::path& modsPath, const PluginList& list, const ModList& modList)
+	void saveManagedState(
+		const fs::path& pluginPath, const fs::path& modsPath, const PluginList& list, const ModList& modList)
 	{
 		// TODO: improve algorithm and make only required changes
 		const auto targetPath = modsPath / SystemInfo::ManagedMod / PluginSubdir;
@@ -83,15 +84,14 @@ namespace
 				continue;
 
 			const auto copyFrom = modsPath / source.modId.ToStdString(wxConvUTF8) / PluginSubdir /
-								  toString(source.location).ToStdString(wxConvUTF8) / source.name.ToStdString(wxConvUTF8);
+								  to_string(source.location) / source.name.ToStdString(wxConvUTF8);
 
 			const auto copyTo =
-				targetPath / toFileIdentity(toString(source.location), source.name).ToStdString(wxConvUTF8);
+				targetPath / toFileIdentity(to_string(source.location), source.name).ToStdString(wxConvUTF8);
 
 			if (source.name.ends_with(PluginOffExtension))
 			{
-				copy_file(copyFrom, copyTo,
-					fs::copy_options::overwrite_existing);
+				copy_file(copyFrom, copyTo, fs::copy_options::overwrite_existing);
 			}
 			else
 			{
@@ -99,12 +99,13 @@ namespace
 			}
 		}
 
-		nlohmann::json data = nlohmann::json::object();
+		nlohmann::json data = nlohmann::json::array();
 		for (const auto& source : list.managed)
 		{
-			auto& modRef = data[source.modId.ToStdString(wxConvUTF8)];
-			auto& keyRef = modRef[toString(source.location)];
-			keyRef.emplace_back(source.name.ToStdString(wxConvUTF8));
+			const auto path = (fs::path(source.modId.ToStdString(wxConvUTF8)) / to_string(source.location) /
+							   source.name.ToStdString(wxConvUTF8))
+								  .lexically_normal();
+			data.emplace_back(path.string());
 		}
 
 		overwriteFileContent(pluginPath, wxString::FromUTF8(data.dump(2)));
@@ -184,7 +185,8 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 				if (!isPlugin(pluginPath))
 					continue;
 
-				result.emplace(PluginSource(modId, fromPluginDir(dir), pluginPath.filename().string()));
+				result.emplace(PluginSource(
+					modId, fromPluginDir(dir), wxString::FromUTF8(pluginPath.filename().string())));
 			}
 		}
 	}
@@ -194,26 +196,24 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 
 std::set<PluginSource> Era2PluginManager::loadManagedState(const nlohmann::json& from)
 {
-	if (!from.is_object())
+	if (!from.is_array())
 		return {};
 
 	std::set<PluginSource> result;
-	for (const auto& [modId, location] : from.items())
+	for (const auto& item : from)
 	{
-		if (!location.is_object())
+		fs::path asPath(item.get<std::string>());
+
+		std::vector<fs::path> items;
+		for (const auto& path : asPath)
+			items.emplace_back(path);
+
+		if (items.size() != 2 && items.size() != 3)
 			continue;
 
-		for (const auto& [key, source] : location.items())
-		{
-			if (!source.is_array())
-				continue;
-
-			const auto loc = fromPluginDir(key);
-
-			for (const auto& item : source)
-				if (item.is_string())
-					result.emplace(PluginSource(modId, loc, item.get<std::string>()));
-		}
+		result.emplace(PluginSource(wxString::FromUTF8(items.front().string()),
+			items.size() == 3 ? fromPluginDir(items[1].wstring()) : PluginLocation::root,
+			wxString::FromUTF8(items.back().string())));
 	}
 
 	return result;

@@ -21,7 +21,7 @@ namespace mm
 		after_wog  = 2,
 	};
 
-	inline wxString toString(PluginLocation location)
+	inline std::string to_string(PluginLocation location)
 	{
 		switch (location)
 		{
@@ -51,7 +51,7 @@ namespace mm
 			if (location == PluginLocation::root)
 				return result;
 
-			return result + " (" + mm::toString(location) + ")";
+			return result + " (" + mm::to_string(location) + ")";
 		}
 
 		bool active() const

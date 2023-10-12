@@ -126,7 +126,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	}
 
 	pluginList.available = Era2PluginManager::loadAvailablePlugins(_modsPath, modList);
-	if (auto plugins = data.find("plugins"); plugins != data.end() && plugins->is_object())
+	if (auto plugins = data.find("plugins"); plugins != data.end())
 		pluginList.managed = Era2PluginManager::loadManagedState(*plugins);
 
 	erase_if(pluginList.available, [&](const PluginSource& item) { return !pluginList.managed.contains(item); });
@@ -148,12 +148,13 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list, co
 	for (const auto& item : list.hidden)
 		data["mods"]["hidden"].emplace_back(item.ToStdString(wxConvUTF8));
 
-	auto& ref = data["plugins"] = nlohmann::json::object();
+	auto& ref = data["plugins"] = nlohmann::json::array();
 	for (const auto& source : plugins.managed)
 	{
-		auto& modRef = ref[source.modId.ToStdString(wxConvUTF8)];
-		auto& keyRef = modRef[toString(source.location)];
-		keyRef.emplace_back(source.name.ToStdString(wxConvUTF8));
+		const auto path = (fs::path(source.modId.ToStdString(wxConvUTF8)) / to_string(source.location) /
+						   source.name.ToStdString(wxConvUTF8))
+							  .lexically_normal();
+		ref.emplace_back(path.string());
 	}
 
 	const auto path          = toPath(_rootPath, name);
