@@ -129,7 +129,7 @@ void PluginListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto column0 = new wxDataViewColumn("", r0, static_cast<unsigned int>(PluginListModel::Column::state),
+	auto column0 = new wxDataViewColumn(L"", r0, static_cast<unsigned int>(PluginListModel::Column::state),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	auto column1 =

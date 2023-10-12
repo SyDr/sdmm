@@ -45,18 +45,18 @@ namespace mm
 		wxString toString() const
 		{
 			wxString result = name;
-			if (result.ends_with(wxString(".off")))
+			if (result.ends_with(wxString(L".off")))
 				result = result.RemoveLast(std::char_traits<const char>::length(".off"));
 
 			if (location == PluginLocation::root)
 				return result;
 
-			return result + " (" + mm::to_string(location) + ")";
+			return result + L" (" + wxString::FromUTF8(mm::to_string(location)) + L")";
 		}
 
 		bool active() const
 		{
-			return !name.ends_with(".off");
+			return !name.ends_with(L".off");
 		}
 
 		auto operator<=>(const PluginSource& other) const

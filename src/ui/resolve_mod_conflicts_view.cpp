@@ -82,7 +82,7 @@ void ResolveModConflictsView::createListColumns()
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);

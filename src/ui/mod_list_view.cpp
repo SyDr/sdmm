@@ -179,10 +179,10 @@ void ModListView::createControls(const wxString& managedPath)
 	_sort = new wxButton(_group, wxID_ANY, "Sort"_lng);
 	_sort->SetBitmap(_iconStorage.get(embedded_icon::sort));
 
-	_menu.showOrHide     = _menu.menu.Append(wxID_ANY, "placeholder");
+	_menu.showOrHide     = _menu.menu.Append(wxID_ANY, L"placeholder");
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
-	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, "placeholder");
+	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_showGallery = new wxButton(this, wxID_ANY, "Screenshots"_lng);
 	_showGallery->SetBitmap(_iconStorage.get(embedded_icon::double_up));
@@ -230,7 +230,7 @@ void ModListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto column1 =
 		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
@@ -265,7 +265,7 @@ void ModListView::updateControlsState()
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		_modDescription->SetValue("");
+		_modDescription->SetValue(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
@@ -297,8 +297,6 @@ void ModListView::updateControlsState()
 		file.close();
 
 		auto string = wxString::FromUTF8(stream.str());
-		if (string.empty())
-			string = stream.str();
 
 		if (!string.empty())
 			description = std::move(string);
@@ -356,7 +354,7 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 	else if (itemId == _menu.openHomepage->GetId())
 		wxLaunchDefaultBrowser(mod->homepage_link);
 	else if (itemId == _menu.openDir->GetId())
-		wxLaunchDefaultApplication(mod->data_path.string());
+		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
 	else if (itemId == _menu.deleteOrRemove->GetId())
 		onRemoveModRequested();
 }
@@ -452,7 +450,7 @@ void ModListView::onRemoveModRequested()
 		if (answer != wxYES)
 			return;
 
-		if (!shellRemove(mod.data_path.string()))
+		if (!shellRemove(wxString::FromUTF8(mod.data_path.string())))
 			return;
 	}
 

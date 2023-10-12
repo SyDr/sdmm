@@ -92,14 +92,14 @@ namespace
 				{
 					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng),
 						it->path().wstring(),
-						ec.message(), ec.value());
+						wxString::FromUTF8(ec.message()), ec.value());
 					continue;
 				}
 
 				const bool isFile = it->is_regular_file(ec);
 				if (ec)
 					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), it->path().wstring(),
-						ec.message(),
+						wxString::FromUTF8(ec.message()),
 						ec.value());
 
 				if (!isFile)

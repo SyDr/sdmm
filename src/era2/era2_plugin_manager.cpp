@@ -27,9 +27,9 @@ namespace
 
 	PluginLocation fromPluginDir(const wxString& value)
 	{
-		if (value.IsSameAs("BeforeWog", false))
+		if (value.IsSameAs(L"BeforeWog", false))
 			return PluginLocation::before_wog;
-		if (value.IsSameAs("AfterWog", false))
+		if (value.IsSameAs(L"AfterWog", false))
 			return PluginLocation::after_wog;
 
 		return PluginLocation::root;
@@ -45,11 +45,11 @@ namespace
 
 	wxString toFileIdentity(const wxString& source, wxString value)
 	{
-		if (value.ends_with(wxString(PluginOffExtension)))
+		if (value.ends_with(wxString::FromUTF8(PluginOffExtension)))
 			value = value.RemoveLast(std::char_traits<const char>::length(PluginOffExtension));
 
-		if (source != ".")
-			value = source + "/" + value;
+		if (source != L".")
+			value = source + L"/" + value;
 
 		return value;
 	}
@@ -87,9 +87,10 @@ namespace
 								  to_string(source.location) / source.name.ToStdString(wxConvUTF8);
 
 			const auto copyTo =
-				targetPath / toFileIdentity(to_string(source.location), source.name).ToStdString(wxConvUTF8);
+				targetPath / toFileIdentity(wxString::FromUTF8(to_string(source.location)), source.name)
+								 .ToStdString(wxConvUTF8);
 
-			if (source.name.ends_with(PluginOffExtension))
+			if (source.name.ends_with(wxString::FromUTF8(PluginOffExtension)))
 			{
 				copy_file(copyFrom, copyTo, fs::copy_options::overwrite_existing);
 			}
@@ -141,7 +142,6 @@ void Era2PluginManager::switchState(const PluginSource& plugin)
 
 void Era2PluginManager::save()
 {
-	wxLogDebug(__FUNCTION__);
 	saveManagedState(_listPath, _modsDir, _pluginList, _modManager.mods());
 }
 
@@ -166,7 +166,7 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 			continue;
 
 		const auto modId = wxString::FromUTF8(it->path().filename().string());
-		if (modId == mm::SystemInfo::ManagedMod || !mods.isActive(modId))
+		if (modId.ToStdString(wxConvUTF8) == mm::SystemInfo::ManagedMod || !mods.isActive(modId))
 			continue;
 
 		for (const auto& dir : PluginDirs)
@@ -185,8 +185,8 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 				if (!isPlugin(pluginPath))
 					continue;
 
-				result.emplace(PluginSource(
-					modId, fromPluginDir(dir), wxString::FromUTF8(pluginPath.filename().string())));
+				result.emplace(PluginSource(modId, fromPluginDir(wxString::FromUTF8(dir)),
+					wxString::FromUTF8(pluginPath.filename().string())));
 			}
 		}
 	}

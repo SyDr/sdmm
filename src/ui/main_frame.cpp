@@ -25,7 +25,6 @@
 #include "resolve_mod_conflicts_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
-#include "select_platform_view.h"
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
 #include "system_info.hpp"
@@ -48,7 +47,7 @@ namespace
 }
 
 MainFrame::MainFrame(Application& app)
-	: wxFrame(nullptr, wxID_ANY, SystemInfo::ProgramVersion, app.appConfig().mainWindow().position,
+	: wxFrame(nullptr, wxID_ANY, wxString::FromUTF8(SystemInfo::ProgramVersion), app.appConfig().mainWindow().position,
 		  app.appConfig().mainWindow().size)
 	, _app(app)
 {
@@ -137,13 +136,13 @@ MainFrame::MainFrame(Application& app)
 void MainFrame::OnAbout()
 {
 	wxAboutDialogInfo aboutInfo;
-	aboutInfo.SetName(PROGRAM_NAME);
-	aboutInfo.SetVersion(PROGRAM_VERSION);
-	aboutInfo.SetDescription("A mod manager for Era II");
+	aboutInfo.SetName(wxString::FromUTF8(PROGRAM_NAME));
+	aboutInfo.SetVersion(wxString::FromUTF8(PROGRAM_VERSION));
+	aboutInfo.SetDescription(L"A mod manager for Era II");
 	aboutInfo.SetCopyright(L"(C) 2020-2023 Aliaksei Karalenka");
-	aboutInfo.SetWebSite("http://wforum.heroes35.net");
-	aboutInfo.AddDeveloper("Aliaksei SyDr Karalenka");
-	aboutInfo.SetLicence(ProgramLicenseText);
+	aboutInfo.SetWebSite(L"http://wforum.heroes35.net");
+	aboutInfo.AddDeveloper(L"Aliaksei SyDr Karalenka");
+	aboutInfo.SetLicence(wxString::FromUTF8(ProgramLicenseText));
 
 	wxAboutBox(aboutInfo);
 }
@@ -160,7 +159,7 @@ void MainFrame::createMenuBar()
 	}
 
 	auto reloadFromDisk = toolsMenu->Append(
-		wxID_ANY, "Reload data from disk"_lng + "\tF5", nullptr, "Reload data from disk"_lng);
+		wxID_ANY, "Reload data from disk"_lng + L"\tF5", nullptr, "Reload data from disk"_lng);
 	_menuItems[reloadFromDisk->GetId()] = [&] { OnMenuToolsReloadDataFromDisk(); };
 
 	auto listModFiles =
@@ -181,7 +180,7 @@ void MainFrame::createMenuBar()
 
 	for (const auto& lngCode : { "en_US", "ru_RU" })  // let's wait until someone complains
 	{
-		auto lngItem = languageMenu->AppendRadioItem(wxID_ANY, _app.i18nService().languageName(lngCode));
+		auto lngItem = languageMenu->AppendRadioItem(wxID_ANY, wxString::FromUTF8(_app.i18nService().languageName(lngCode)));
 		if (_app.appConfig().currentLanguageCode() == lngCode)
 			lngItem->Check();
 
@@ -196,7 +195,7 @@ void MainFrame::createMenuBar()
 
 	_mainMenu = new wxMenuBar();
 	_mainMenu->Append(toolsMenu, "Tools"_lng);
-	_mainMenu->Append(helpMenu, "?");
+	_mainMenu->Append(helpMenu, L"?");
 	_mainMenu->Bind(wxEVT_MENU, &MainFrame::OnMenuItemSelected, this);
 
 	SetMenuBar(_mainMenu);
@@ -264,26 +263,9 @@ void MainFrame::OnMenuToolsChooseConflictResolveMode()
 	EX_UNEXPECTED;
 }
 
-void MainFrame::OnMenuChangePlatform()
+void MainFrame::OnMenuToolsLanguageSelected(const std::string& value)
 {
-	EX_TRY;
-
-	SelectPlatformView dialog(this);
-
-	if (dialog.ShowModal() != wxID_OK)
-		return;
-
-	wxBusyCursor bc;
-
-	_app.appConfig().setSelectedPlatformCode(dialog.selectedPlatform());
-	wxGetApp().scheduleRestart();
-
-	EX_UNEXPECTED;
-}
-
-void MainFrame::OnMenuToolsLanguageSelected(const wxString& value)
-{
-	_app.appConfig().setCurrentLanguageCode(value.ToStdString(wxConvUTF8));
+	_app.appConfig().setCurrentLanguageCode(value);
 	wxGetApp().scheduleRestart();
 }
 
@@ -307,14 +289,14 @@ void MainFrame::reloadModel()
 {
 	EX_TRY;
 
-	_currentPlatform = _app.platformService().create(_app.appConfig().selectedPlatform());
+	_currentPlatform = _app.platformService().create(wxString::FromUTF8(_app.appConfig().selectedPlatform()));
 
 	if (_currentPlatform->localConfig()->conflictResolveMode() == ConflictResolveMode::undefined)
 		CallAfter(&MainFrame::OnMenuToolsChooseConflictResolveMode);
 
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
 	EX_ON_EXCEPTION(not_exist_path_error, [](not_exist_path_error const&) {
-		wxMessageOutputMessageBox().Printf("Selected path doesn't exists, please choose suitable one");
+		wxMessageOutputMessageBox().Printf(L"Selected path doesn't exists, please choose suitable one");
 	});
 	EX_UNEXPECTED;
 }
@@ -355,7 +337,7 @@ void MainFrame::selectExeToLaunch()
 	auto config = _currentPlatform->localConfig();
 	auto helper = _currentPlatform->launchHelper();
 
-	SelectExe dialog(this, config->getDataPath(), helper->getExecutable(), _app.iconStorage());
+	SelectExe dialog(this, config->getDataPath(), wxString::FromUTF8(helper->getExecutable()), _app.iconStorage());
 
 	if (dialog.ShowModal() == wxID_OK)
 		helper->setExecutable(dialog.getSelectedFile().ToStdString(wxConvUTF8));
@@ -381,7 +363,7 @@ void MainFrame::onLaunchGameRequested()
 		const auto currentWorkDir = wxGetCwd();
 
 		wxSetWorkingDirectory(config->getDataPath().wstring());
-		shellLaunch(helper->getLaunchString());
+		shellLaunch(wxString::FromUTF8(helper->getLaunchString()));
 		wxSetWorkingDirectory(currentWorkDir);
 	}
 

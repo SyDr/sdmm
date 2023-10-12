@@ -84,13 +84,13 @@ void SelectModPairsDialog::createListControl()
 	_list = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
 
-	_list->AppendToggleColumn("", wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE);
+	_list->AppendToggleColumn(L"", wxDATAVIEW_CELL_ACTIVATABLE, wxCOL_WIDTH_AUTOSIZE);
 	_list
-		->AppendIconTextColumn("Mod"_lng + " 1", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
+		->AppendIconTextColumn("Mod"_lng + L" 1", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
 			wxDATAVIEW_COL_SORTABLE)
 		->SetSortOrder(true);
 	_list->AppendIconTextColumn(
-		"Mod"_lng + " 2", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_SORTABLE);
+		"Mod"_lng + L" 2", wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_SORTABLE);
 }
 
 void SelectModPairsDialog::bindEvents()

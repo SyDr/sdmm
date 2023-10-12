@@ -28,7 +28,7 @@ I18nService::I18nService(const IAppConfig& config)
 
 void I18nService::build_cache(const nlohmann::json& data, const std::string& prefix)
 {
-	wxASSERT_MSG(data.is_object(), "Unexpected type when parsing " + prefix);
+	wxASSERT_MSG(data.is_object(), wxString::FromUTF8("Unexpected type when parsing " + prefix));
 
 	for (auto it = data.begin(); it != data.end(); ++it)
 	{
@@ -43,7 +43,7 @@ void I18nService::build_cache(const nlohmann::json& data, const std::string& pre
 			build_cache(it.value(), key + "/");
 			break;
 		default:
-			wxFAIL_MSG("Unexpected type when parsing " + prefix);
+			wxFAIL_MSG(wxString::FromUTF8("Unexpected type when parsing " + prefix));
 			break;
 		}
 	}
@@ -62,7 +62,7 @@ std::string I18nService::get(const std::string& key) const
 	if (const auto it = _data.find(key); it != _data.cend())
 		return it->second;
 
-	wxLogDebug("Translation string not found \"%s\"", key);
+	wxLogDebug(L"Translation string not found \"%s\"", wxString::FromUTF8(key));
 
 	return key;
 }
@@ -73,7 +73,7 @@ std::string I18nService::languageName(const std::string& code) const
 		return "English";
 
 	if (code == "ru_RU")
-		return "Русский";
+		return boost::nowide::narrow(L"Русский");
 
 	return code; // TODO: return name from lng file itself
 }

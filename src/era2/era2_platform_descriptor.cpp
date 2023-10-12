@@ -21,12 +21,12 @@ Era2PlatfromDescriptor::Era2PlatfromDescriptor(Application const& app)
 
 wxString Era2PlatfromDescriptor::getId() const
 {
-	return "era2";
+	return L"era2";
 }
 
 wxString Era2PlatfromDescriptor::getPlatformName() const
 {
-	return "Era II (HoMM III: In the Wake of Gods)";
+	return L"Era II (HoMM III: In the Wake of Gods)";
 }
 
 std::unique_ptr<IModPlatform> Era2PlatfromDescriptor::create() const

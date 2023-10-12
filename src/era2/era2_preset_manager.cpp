@@ -25,7 +25,7 @@ namespace
 {
 	fs::path toPath(fs::path const& base, const wxString& name)
 	{
-		return base / (name + ".json").ToStdString(wxConvUTF8);
+		return base / (name + L".json").ToStdString(wxConvUTF8);
 	}
 }
 
@@ -106,7 +106,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	}
 	catch (nlohmann::json::parse_error const& e)
 	{
-		wxLogError(e.what());
+		wxLogError(wxString::FromUTF8(e.what()));
 		wxLogError(wxString::Format("Error while parsing file %s"_lng, wxString::FromUTF8(path.string())));
 		return { modList, pluginList };
 	}

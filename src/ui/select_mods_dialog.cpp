@@ -87,10 +87,10 @@ void SelectModsDialog::createListColumns()
 	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
 	auto column0 =
-		new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::checkbox),
+		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::checkbox),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1 =
-		new wxDataViewColumn(" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
+		new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column2 = new wxDataViewColumn("Mod"_lng, r2,
 										static_cast<unsigned int>(ModListModel::Column::caption),

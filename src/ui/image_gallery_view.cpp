@@ -141,7 +141,7 @@ void ImageGalleryView::backgroundThread()
 		std::lock_guard<std::mutex> lock(_dataAccess);
 
 		wxImage item;
-		item.LoadFile(_images[i].first.string());
+		item.LoadFile(wxString::FromUTF8(_images[i].first.string()));
 
 		if (!item.IsOk())
 			continue;

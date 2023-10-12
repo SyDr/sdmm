@@ -38,8 +38,8 @@ void ErrorView::createControls()
 	_ok = new wxButton(_panel, wxID_OK, "Ok"_lng);
 	_label = new wxStaticText(_panel, wxID_ANY, "Internal error happened (only if you didn't wanted to to get exactly "
 		"this result). Please, make report, describing your actions and include following information:"_lng);
-	_link = new wxHyperlinkCtrl(_panel, wxID_ANY, "http://wforum.heroes35.net/showthread.php?tid=4246",
-		"http://wforum.heroes35.net/showthread.php?tid=4246&action=newpost");
+	_link = new wxHyperlinkCtrl(_panel, wxID_ANY, L"http://wforum.heroes35.net/showthread.php?tid=4246",
+		L"http://wforum.heroes35.net/showthread.php?tid=4246&action=newpost");
 }
 
 void ErrorView::buildLayout()
@@ -77,16 +77,16 @@ void ErrorView::fillData()
 		}
 		catch (const std::exception& e)
 		{
-			exceptionInfo = e.what();
+			exceptionInfo = wxString::FromUTF8(e.what());
 			const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(e);
 			if (st)
 				stacktrace << *st << '\n';
 		}
 		catch (...)
 		{
-			exceptionInfo = "Unknown exception";
+			exceptionInfo = L"Unknown exception";
 		}
 	}
 
-	_text->SetValue(exceptionInfo + "\r\n\r\n" + stacktrace.str());
+	_text->SetValue(exceptionInfo + L"\r\n\r\n" + wxString::FromUTF8(stacktrace.str()));
 }

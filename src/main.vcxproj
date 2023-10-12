@@ -45,7 +45,6 @@
     <ClCompile Include="ui\select_exe.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
     <ClCompile Include="ui\select_mod_pairs_dialog.cpp" />
-    <ClCompile Include="ui\select_platform_view.cpp" />
     <ClCompile Include="ui\mod_list_view.cpp" />
     <ClCompile Include="ui\show_file_list_dialog.cpp" />
     <ClCompile Include="ui\show_file_list_helper.cpp" />
@@ -109,7 +108,6 @@
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\select_mods_dialog.hpp" />
     <ClInclude Include="ui\select_mod_pairs_dialog.hpp" />
-    <ClInclude Include="ui\select_platform_view.h" />
     <ClInclude Include="ui\mod_list_view.h" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
     <ClInclude Include="ui\show_file_list_helper.hpp" />
@@ -197,7 +195,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;wxNO_IMPLICIT_WXSTRING_ENCODING;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <AdditionalOptions>
       </AdditionalOptions>
@@ -252,7 +250,7 @@
       <WarningLevel>Level4</WarningLevel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;wxUSE_GUI;__WXMSW__;NDEBUG;_WINDOWS;CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;wxUSE_GUI;wxNO_IMPLICIT_WXSTRING_ENCODING;__WXMSW__;NDEBUG;_WINDOWS;CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(ProjectName)\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>

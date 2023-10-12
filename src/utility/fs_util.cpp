@@ -32,7 +32,7 @@ bool mm::createDir(const fs::path& path)
 	bool                      created = fs::create_directories(path, ec);
 
 	if (ec)
-		wxLogError(wxString("Can't create dir '%s'\r\n\r\n%s (code: %d)"_lng), path.wstring(), ec.message(),
+		wxLogError(wxString("Can't create dir '%s'\r\n\r\n%s (code: %d)"_lng), path.wstring(), wxString::FromUTF8(ec.message()),
 			ec.value());
 
 	return created && !ec;
@@ -42,12 +42,12 @@ std::vector<wxString> mm::getAllDirs(const fs::path& path)
 {
 	std::vector<wxString> result;
 
-	wxDir dir(path.string());
+	wxDir dir(wxString::FromUTF8(path.string()));
 	if (!dir.IsOpened())
 		return result;
 
 	wxString tmp;
-	if (dir.GetFirst(&tmp, "", wxDIR_DIRS | wxDIR_HIDDEN))
+	if (dir.GetFirst(&tmp, L"", wxDIR_DIRS | wxDIR_HIDDEN))
 	{
 		result.push_back(tmp);
 
@@ -62,12 +62,12 @@ std::vector<wxString> mm::getAllFiles(const fs::path& path)
 {
 	std::vector<wxString> result;
 
-	wxDir dir(path.string());
+	wxDir dir(wxString::FromUTF8(path.string()));
 	if (!dir.IsOpened())
 		return result;
 
 	wxString tmp;
-	if (dir.GetFirst(&tmp, "", wxDIR_FILES | wxDIR_HIDDEN))
+	if (dir.GetFirst(&tmp, L"", wxDIR_FILES | wxDIR_HIDDEN))
 	{
 		result.push_back(tmp);
 
@@ -83,7 +83,7 @@ std::vector<wxString> mm::readFile(const fs::path& path)
 	wxLogNull noLogging;  // suppress wxWidgets messages about inability to open file
 
 	wxTextFile file;
-	if (!file.Open(path.wstring()))
+	if (!file.Open(wxString::FromUTF8(path.string())))
 		return {};
 
 	std::vector<wxString> result;

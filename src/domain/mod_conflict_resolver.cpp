@@ -47,7 +47,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 				wxLogWarning(
 					wxString::Format("Mod %s required by %s, "
 									 "but incompatible with (%s)"_lng,
-									 id, currentId, boost::algorithm::join(it->second, ", ")));
+									 id, currentId, boost::join(it->second, L", ")));
 		}
 
 		for (const auto& id : modData.incompatible)
@@ -62,7 +62,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 				wxLogWarning(
 					wxString::Format("Mod %s incompatible with %s, "
 									 "but required by (%s)"_lng,
-									 id, currentId, boost::algorithm::join(it->second, ", ")));
+									 id, currentId, boost::join(it->second, L", ")));
 		}
 
 		i++;
@@ -98,7 +98,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 				wxLogWarning(wxString::Format(
 					"No mods from (%s) can be placed above each other, "
 					"%s placed at the top"_lng,
-					boost::algorithm::join(currentlyActive, ", "), currentlyActive.front()));
+					boost::join(currentlyActive, L", "), currentlyActive.front()));
 				sortedActive.emplace_back(currentlyActive.front());
 				currentlyActive.erase(currentlyActive.begin());
 				i = 0;

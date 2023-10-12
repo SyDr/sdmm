@@ -42,7 +42,7 @@ namespace
 		if (id.empty())
 			return false;
 
-		if (id == mm::SystemInfo::ManagedMod)
+		if (id == wxString::FromUTF8(mm::SystemInfo::ManagedMod))
 			return false;
 
 		const auto path = modsPath / id.ToStdString(wxConvUTF8);
@@ -65,7 +65,7 @@ namespace
 				items.active.emplace_back(item);
 				items.available.emplace(item);
 			}
-			else if (!item.empty() && item != SystemInfo::ManagedMod)
+			else if (!item.empty() && item != wxString::FromUTF8(SystemInfo::ManagedMod))
 			{
 				items.invalid.emplace_back(item);
 			}
@@ -85,7 +85,7 @@ namespace
 			items.available.emplace(it->path().filename().wstring());
 		}
 
-		items.available.erase(mm::SystemInfo::ManagedMod);
+		items.available.erase(wxString::FromUTF8(mm::SystemInfo::ManagedMod));
 
 		return items;
 	}
@@ -95,7 +95,7 @@ namespace
 	{
 		auto                 reversedRange = mods.active | boost::adaptors::reversed;
 		std::deque<wxString> reversed(reversedRange.begin(), reversedRange.end());
-		reversed.emplace_back(mm::SystemInfo::ManagedMod);
+		reversed.emplace_back(wxString::FromUTF8(mm::SystemInfo::ManagedMod));
 		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
 
 		overwriteFileFromContainer(activePath, reversed);
@@ -123,7 +123,7 @@ Era2Platform::Era2Platform(Application const& app)
 	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
 	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig, app.iconStorage());
 	_modDataProvider =
-		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode());
+		std::make_unique<Era2ModDataProvider>(getModsDirPath(), wxString::FromUTF8(_app.appConfig().currentLanguageCode()));
 
 	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
 	_modManager    = std::make_unique<Era2ModManager>(_modList);
@@ -221,7 +221,6 @@ fs::path Era2Platform::getPluginListPath() const
 
 void Era2Platform::save()
 {
-	wxLogDebug(__FUNCTION__);
 	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
 	_pluginManager->save();
 }

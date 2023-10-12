@@ -34,8 +34,7 @@ namespace mm
 		void OnAbout();
 		void OnMenuToolsChangeDirectory();
 		void OnMenuToolsReloadDataFromDisk();
-		void OnMenuChangePlatform();
-		void OnMenuToolsLanguageSelected(const wxString& value);
+		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
 		void OnMenuToolsListModFiles();
 		void OnMenuToolsSortMods();

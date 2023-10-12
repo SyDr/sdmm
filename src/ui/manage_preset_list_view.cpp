@@ -45,7 +45,7 @@ namespace
 	{
 		wxTextEntryDialog ted(parent, message, caption, name);
 		ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
-		ted.GetTextValidator()->SetCharExcludes("\\/:*?\"<>|");
+		ted.GetTextValidator()->SetCharExcludes(L"\\/:*?\"<>|");
 
 		if (ted.ShowModal() != wxID_OK)
 			return {};
@@ -58,7 +58,7 @@ ManagePresetListView::ManagePresetListView(
 	wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage)
 	: wxPanel(parent, wxID_ANY)
 	, _platform(platform)
-	, _selected(platform.localConfig()->getAcitvePreset())
+	, _selected(wxString::FromUTF8(platform.localConfig()->getAcitvePreset()))
 	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage, true))
 	, _pluginListModel(new PluginListModel(*platform.modDataProvider(), iconStorage))
 	, _iconStorage(iconStorage)
@@ -140,7 +140,7 @@ void ManagePresetListView::createListColumns()
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	auto column0 = new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1 = new wxDataViewColumn("Mod"_lng, r1,
 		static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
@@ -163,7 +163,7 @@ void ManagePresetListView::createPluginsListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto column0 = new wxDataViewColumn("", r0, static_cast<unsigned int>(PluginListModel::Column::state),
+	auto column0 = new wxDataViewColumn(L"", r0, static_cast<unsigned int>(PluginListModel::Column::state),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	auto column1 =
@@ -306,7 +306,7 @@ void ManagePresetListView::onRenamePreset()
 		return;
 	}
 
-	_platform.getPresetManager()->rename(selected.ToStdString(wxConvUTF8), newName.ToStdString(wxConvUTF8));
+	_platform.getPresetManager()->rename(selected, newName);
 	_selected = newName;
 
 	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
@@ -330,7 +330,7 @@ void ManagePresetListView::onCopyPreset()
 		return;
 	}
 
-	_platform.getPresetManager()->copy(selected.ToStdString(wxConvUTF8), newName.ToStdString(wxConvUTF8));
+	_platform.getPresetManager()->copy(selected, newName);
 
 	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
 	EX_UNEXPECTED;
@@ -356,7 +356,7 @@ void ManagePresetListView::onFilesystemError(const fs::filesystem_error& e)
 	wxMessageOutputMessageBox().Printf(
 		"Error happened during execution of operation. "
 		"Details:\n\n %s"_lng,
-		e.what());
+		wxString::FromUTF8(e.what()));
 }
 
 void ManagePresetListView::updatePreview()

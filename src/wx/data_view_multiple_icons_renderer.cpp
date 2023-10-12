@@ -10,7 +10,7 @@
 #include <wx/dc.h>
 
 mmDataViewMultipleIconsRenderer::mmDataViewMultipleIconsRenderer()
-	: wxDataViewCustomRenderer("list")
+	: wxDataViewCustomRenderer(L"list")
 {
 	_data.NullList();
 }
@@ -55,7 +55,7 @@ wxSize mmDataViewMultipleIconsRenderer::GetSize() const
 
 bool mmDataViewMultipleIconsRenderer::SetValue(const wxVariant& value)
 {
-	if (value.GetType() != "list")
+	if (value.GetType() != L"list")
 		return false;
 
 	_data = value;

@@ -49,21 +49,21 @@ wxString SelectDirectoryDialog::getSelectedPath() const
 void SelectDirectoryDialog::createControls()
 {
 	auto selectedPath = _appConfig.getDataPath();
-	auto dirToSelect  = selectedPath.empty() ? wxString(wxDirDialogDefaultFolderStr) : wxString(selectedPath.wstring());
+	auto dirToSelect  = selectedPath.empty() ? wxString::FromUTF8(wxDirDialogDefaultFolderStr) : wxString(selectedPath.wstring());
 
 	_explorerList = new wxGenericDirCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize,
 		wxDIRCTRL_DIR_ONLY | wxDIRCTRL_3D_INTERNAL);
 
 	_recentDirsList = new wxDataViewListCtrl(
 		this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES | wxDV_ROW_LINES | wxDV_NO_HEADER);
-	_recentDirsList->AppendIconTextColumn("Path");
+	_recentDirsList->AppendIconTextColumn("Path"_lng);
 
 	_selectedLabel    = new wxStaticText(this, wxID_ANY, "Selected:"_lng);
 	_selectedPathEdit =
 		new wxTextCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
 	_accept = new wxButton(this, wxID_ANY, "Accept"_lng);
 
-	_menu.starUnstar     = _menu.menu.Append(wxID_ANY, "placeholder");
+	_menu.starUnstar     = _menu.menu.Append(wxID_ANY, L"placeholder");
 	_menu.removeFromList = _menu.menu.Append(wxID_ANY, "Remove from list"_lng);
 }
 
@@ -76,7 +76,7 @@ void SelectDirectoryDialog::bindEvents()
 		auto pathList = _appConfig.getKnownDataPathList();
 		for (size_t i = 0; i < pathList.size(); ++i)
 		{
-			if (pathList[i].string() == selected)
+			if (wxString::FromUTF8(pathList[i].string()) == selected)
 			{
 				_recentDirsList->SelectRow(i);
 				return;
@@ -91,7 +91,7 @@ void SelectDirectoryDialog::bindEvents()
 		if (row < 0)
 			return;
 
-		auto path = wxString(_appConfig.getKnownDataPathList().at(row).string());
+		auto path = wxString::FromUTF8(_appConfig.getKnownDataPathList().at(row).string());
 		_selectedPathEdit->SetValue(path);
 		_explorerList->SetPath(path);
 	});

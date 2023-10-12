@@ -88,12 +88,12 @@ AppConfig::AppConfig()
 		if (_data.is_discarded())
 		{
 			_data = {};
-			wxLogDebug("Can't parse config file. Default config is used instead");
+			wxLogDebug(L"Can't parse config file. Default config is used instead");
 		}
 	}
 	else
 	{
-		wxLogDebug("Can't load config file. Default config is used instead");
+		wxLogDebug(L"Can't load config file. Default config is used instead");
 	}
 
 	validate();

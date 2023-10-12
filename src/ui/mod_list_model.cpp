@@ -63,7 +63,7 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 
 		if (bool const active = _list.isActive(item))
 		{
-			text = wxString::Format("%u", row);
+			text = wxString::Format(L"%u", row);
 			icon = _iconStorage.get(embedded_icon::tick);
 		}
 

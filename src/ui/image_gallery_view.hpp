@@ -21,7 +21,7 @@ namespace mm
 	public:
 		ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs::path& directory = {},
 			const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
-			const wxString& name = "mmGalleryWidget");
+			const wxString& name = L"mmGalleryWidget");
 		~ImageGalleryView();
 
 		void SetPath(const fs::path& directory);

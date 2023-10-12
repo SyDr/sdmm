@@ -42,11 +42,11 @@ Era2Config::Era2Config(const fs::path& path)
 		}
 		catch (...)
 		{
-			wxLogDebug("Can't parse config file. Default config is used instead");
+			wxLogDebug(L"Can't parse config file. Default config is used instead");
 		}
 	}
 	else
-		wxLogDebug("Can't load config file. Default config is used instead");
+		wxLogDebug(L"Can't load config file. Default config is used instead");
 
 	validate();
 }

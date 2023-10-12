@@ -27,8 +27,8 @@ using namespace mm;
 
 ModManagerApp::ModManagerApp()
 {
-	SetAppDisplayName(SystemInfo::ProgramVersion);
-	SetAppName(PROGRAM_NAME);
+	SetAppDisplayName(wxString::FromUTF8(SystemInfo::ProgramVersion));
+	SetAppName(wxString::FromUTF8(PROGRAM_NAME));
 }
 
 bool ModManagerApp::OnInit()
@@ -44,7 +44,7 @@ bool ModManagerApp::OnInit()
 	_singleInstanceChecker = std::make_unique<wxSingleInstanceChecker>();
 	if (_singleInstanceChecker->IsAnotherRunning())
 	{
-		wxLogError("Application is already running...");
+		wxLogError(L"Application is already running...");
 		return false;
 	}
 
@@ -73,11 +73,11 @@ void ModManagerApp::OnUnhandledException()
 	}
 	catch (...)
 	{
-		what = "Unknown exception";
+		what = L"Unknown exception";
 	}
 
 	wxMessageOutputBest().Printf(
-		"There is no good unhandled exception handling for now. \n"
+		L"There is no good unhandled exception handling for now. \n"
 		"Program will be closed now. Sorry :( \n\n"
 		"Exception info: \n%s",
 		what);

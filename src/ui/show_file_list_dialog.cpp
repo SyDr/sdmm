@@ -69,7 +69,7 @@ void ShowFileListDialog::createControls()
 		std::max(200l, 400l - static_cast<long>(40l * _data.modList.size())));
 
 	for (size_t i = 0; i < _data.modList.size(); ++i)
-		_fileList->AppendTextColumn(std::to_string(i), wxDATAVIEW_CELL_INERT, 40);
+		_fileList->AppendTextColumn(std::to_wstring(i), wxDATAVIEW_CELL_INERT, 40);
 }
 
 void ShowFileListDialog::createListColumns()
@@ -81,7 +81,7 @@ void ShowFileListDialog::createListColumns()
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
 	auto column0 =
-		new wxDataViewColumn(" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1= new wxDataViewColumn("Mod"_lng, r1,
 										static_cast<unsigned int>(ModListModel::Column::caption),
@@ -116,7 +116,7 @@ void ShowFileListDialog::fillData()
 		const auto& modList = _data.entries[i];
 
 		wxVector<wxVariant> data;
-		data.push_back(wxVariant(wxString(std::to_string(++index))));
+		data.push_back(wxVariant(wxString(std::to_wstring(++index))));
 		data.push_back(wxVariant(wxString::FromUTF8(path.string())));
 		for (const auto& mod : modList)
 		{

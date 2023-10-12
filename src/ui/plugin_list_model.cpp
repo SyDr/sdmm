@@ -62,7 +62,7 @@ void PluginListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned c
 				return item.active() ? tick_gray : minus_gray;
 		}();
 
-		variant = wxVariant(wxDataViewIconText("", _iconStorage.get(iconRef)));
+		variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(iconRef)));
 		break;
 	}
 	case Column::caption:
