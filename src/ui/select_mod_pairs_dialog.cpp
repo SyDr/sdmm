@@ -19,6 +19,7 @@
 #include "utility/sdlexcept.h"
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "wx/priority_data_renderer.h"
+#include "icon_helper.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <wx/button.h>
@@ -128,15 +129,10 @@ void SelectModPairsDialog::fillData()
 		data.push_back(wxVariant(false));
 		for (const auto& item : { mod1, mod2 })
 		{
-			wxIcon     icon;
 			const auto mod = _modDataProvider.modData(item);
 
-			if (!mod.icon_filename.empty())
-				icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
-			else
-				icon = _iconStorage.get(embedded_icon::folder);
-
-			data.push_back(wxVariant(wxDataViewIconText(mod.caption, icon)));
+			data.push_back(wxVariant(wxDataViewIconText(
+				mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename))));
 		}
 
 		_list->AppendItem(data);

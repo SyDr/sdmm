@@ -10,6 +10,7 @@
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
+#include "icon_helper.hpp"
 #include "interface/iicon_storage.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
@@ -72,16 +73,10 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	}
 	case Column::caption:
 	{
-		wxIcon icon;
-
 		const auto mod = _modDataProvider.modData(item);
 
-		if (!mod.icon_filename.empty())
-			icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
-		else
-			icon = _iconStorage.get(embedded_icon::folder);
-
-		variant = wxVariant(wxDataViewIconText(mod.caption, icon));
+		variant = wxVariant(
+			wxDataViewIconText(mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
 		break;
 	}
 	case Column::author:
@@ -93,8 +88,8 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	case Column::category:
 	{
 		const auto mod = _modDataProvider.modData(item);
-		variant =
-			wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category.ToStdString(wxConvUTF8))));
+		variant        = wxVariant(
+            wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category.ToStdString(wxConvUTF8))));
 		break;
 	}
 	case Column::version:

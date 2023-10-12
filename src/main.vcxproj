@@ -34,6 +34,7 @@
     </ClCompile>
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\error_view.cpp" />
+    <ClCompile Include="ui\icon_helper.cpp" />
     <ClCompile Include="ui\image_gallery_view.cpp" />
     <ClCompile Include="ui\main_frame.cpp" />
     <ClCompile Include="ui\manage_preset_list_view.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="ui\error_view.h" />
+    <ClInclude Include="ui\icon_helper.hpp" />
     <ClInclude Include="ui\image_gallery_view.hpp" />
     <ClInclude Include="ui\main_frame.h" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />

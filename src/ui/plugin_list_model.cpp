@@ -10,6 +10,7 @@
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
+#include "icon_helper.hpp"
 #include "interface/iicon_storage.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
@@ -56,7 +57,7 @@ void PluginListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned c
 	{
 		const auto& iconRef = [&] {
 			using namespace embedded_icon;
- 			if (_items.managed.contains(item))
+			if (_items.managed.contains(item))
 				return !item.active() ? tick : minus;
 			else
 				return item.active() ? tick_gray : minus_gray;
@@ -72,18 +73,10 @@ void PluginListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned c
 	}
 	case Column::mod:
 	{
-		wxIcon   icon;
-		wxString caption;
-
 		const auto mod = _modDataProvider.modData(item.modId);
-		if (!mod.icon_filename.empty())
-			icon = _iconStorage.get((mod.data_path / mod.icon_filename).string());
-		caption = mod.caption;
 
-		if (!icon.IsOk())
-			icon = _iconStorage.get(embedded_icon::folder);
-
-		variant = wxVariant(wxDataViewIconText(caption, icon));
+		variant = wxVariant(
+			wxDataViewIconText(mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
 		break;
 	}
 	}
