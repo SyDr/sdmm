@@ -21,7 +21,7 @@
 
 #include "application.h"
 #include "interface/iapp_config.hpp"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 

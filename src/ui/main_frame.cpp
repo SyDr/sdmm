@@ -11,7 +11,7 @@
 #include "choose_conflict_resolve_mode_view.hpp"
 #include "interface/iapp_config.hpp"
 #include "interface/ii18n_service.hpp"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "interface/ilaunch_helper.h"
 #include "interface/ilocal_config.h"
 #include "interface/imod_manager.hpp"

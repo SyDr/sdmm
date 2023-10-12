@@ -10,7 +10,7 @@
 #include "application.h"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "interface/ilocal_config.h"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"

@@ -10,7 +10,7 @@
 #include "interface/iapp_config.hpp"
 #include "application.h"
 #include "utility/sdlexcept.h"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "type/embedded_icon.h"
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "mod_list_model.h"

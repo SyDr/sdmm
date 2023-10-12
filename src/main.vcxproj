@@ -72,13 +72,13 @@
     <ClInclude Include="era2\era2_preset_manager.h" />
     <ClInclude Include="service\app_config.hpp" />
     <ClInclude Include="service\i18n_service.h" />
-    <ClInclude Include="service\icon_storage.h" />
+    <ClInclude Include="service\icon_storage.hpp" />
     <ClInclude Include="interface\ilaunch_helper.h" />
     <ClInclude Include="interface\imod_manager.hpp" />
     <ClInclude Include="interface\iapp_config.hpp" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />
-    <ClInclude Include="interface\iicon_storage.h" />
+    <ClInclude Include="interface\iicon_storage.hpp" />
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="era2\era2_config.h" />
     <ClInclude Include="era2\era2_platform.h" />

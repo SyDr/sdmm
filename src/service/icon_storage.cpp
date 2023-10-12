@@ -1,11 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
-#include "icon_storage.h"
+#include "icon_storage.hpp"
 
 #include <wx/log.h>
 #include <wx/icon.h>
@@ -14,7 +14,7 @@
 
 using namespace mm;
 
-wxIcon IconStorage::get(const wxString& name)
+wxIcon IconStorage::get(const std::string& name)
 {
 	if (name.empty())
 		return get(embedded_icon::blank);
@@ -26,9 +26,11 @@ wxIcon IconStorage::get(const wxString& name)
 
 	wxLogNull noLogging; // suppress wxWidgets messages about inability to load icon
 
-	wxIcon icon(name, wxBITMAP_TYPE_PNG);
+	const auto path = wxString::FromUTF8(name);
+
+	wxIcon icon(path, wxBITMAP_TYPE_PNG);
 	if (!icon.IsOk())
-		icon = wxIcon(name, wxBITMAP_TYPE_ICO);
+		icon = wxIcon(path, wxBITMAP_TYPE_ICO);
 
 	if (!icon.IsOk())
 	{
@@ -42,9 +44,4 @@ wxIcon IconStorage::get(const wxString& name)
 		icon.CopyFromBitmap(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(16, 16, wxIMAGE_QUALITY_NEAREST)));
 
 	return _cache[name] = icon;
-}
-
-void IconStorage::remove(const wxString& name)
-{
-	_cache.erase(name);
 }

@@ -10,7 +10,7 @@
 #include <wx/icon.h>
 #include <wx/string.h>
 
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "mod_manager_app.h"
 
 using namespace mm;
@@ -22,16 +22,16 @@ Era2LaunchHelper::Era2LaunchHelper(Era2Config& config, IIconStorage& iconStorage
 
 wxIcon Era2LaunchHelper::getIcon() const
 {
-	return _iconStorage.get(getLaunchString());
+	return _iconStorage.get(_config.getLaunchString().ToStdString(wxConvUTF8));
 }
 
 wxString Era2LaunchHelper::getCaption() const
 {
 	auto result = getExecutable();
 	if (result.empty())
-		result = "not selected"_lng.ToStdString();
+		result = "not selected"_lng.ToStdString(wxConvUTF8);
 
-	return result;
+	return wxString::FromUTF8(result);
 }
 
 wxString Era2LaunchHelper::getLaunchString() const

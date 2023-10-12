@@ -9,7 +9,7 @@
 #include "mod_manager_app.h"
 #include "service/app_config.hpp"
 #include "service/i18n_service.h"
-#include "service/icon_storage.h"
+#include "service/icon_storage.hpp"
 #include "service/platform_service.h"
 #include "system_info.hpp"
 #include "ui/main_frame.h"

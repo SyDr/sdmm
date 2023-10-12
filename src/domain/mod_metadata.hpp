@@ -20,8 +20,8 @@ namespace mm
 		wxString              short_description;
 		std::filesystem::path full_description;
 
-		std::filesystem::path icon_filename;
-		size_t                icon_index = 0;
+		std::string icon_filename;
+		size_t      icon_index = 0;
 
 		wxString authors;
 		wxString homepage_link;

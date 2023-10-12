@@ -10,7 +10,7 @@
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
 #include "mod_manager_app.h"

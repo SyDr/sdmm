@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -16,8 +16,9 @@
 #include <wx/sizer.h>
 
 #include "application.h"
-#include "interface/iicon_storage.h"
+#include "interface/iicon_storage.hpp"
 #include "type/embedded_icon.h"
+#include "type/filesystem.hpp"
 
 using namespace mm;
 
@@ -83,44 +84,26 @@ wxString SelectExe::getSelectedFile() const
 
 void SelectExe::refreshListContent()
 {
-	const auto files = getFileList();
 	_list->Freeze();
 	_list->DeleteAllItems();
 	_imageList->RemoveAll();
 
-	for (const auto& item : files)
+	using di = fs::directory_iterator;
+	for (auto it = di(_basePath), end = di(); it != end; ++it)
 	{
-		int index = _list->GetItemCount();
-		_list->InsertItem(index, item);
+		if (!is_regular_file(it->path()) || it->path().extension() != ".exe")
+			continue;
 
-		_imageList->Add(_iconStorage.get(_basePath.string() + L"/" + item));
+		int index = _list->GetItemCount();
+		_list->InsertItem(index, it->path().filename().string());
+
+		_imageList->Add(_iconStorage.get(it->path().string()));
 		_list->SetItemImage(index, index);
 
-		if (item == _selectedFile)
+		if (it->path().filename().string() == _selectedFile)
 			_list->Select(index);
 	}
 
 	_list->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	_list->Thaw();
-}
-
-std::vector<wxString> SelectExe::getFileList()
-{
-	std::vector<wxString> result;
-
-	wxDir dir(_basePath.string());
-	if (!dir.IsOpened())
-		return result;
-
-	wxString tmp;
-	if (dir.GetFirst(&tmp, "*.exe", wxDIR_FILES | wxDIR_HIDDEN))
-	{
-		result.push_back(tmp);
-		while (dir.GetNext(&tmp))
-			result.push_back(tmp);
-	}
-
-	dir.Close();
-
-	return result;
 }
