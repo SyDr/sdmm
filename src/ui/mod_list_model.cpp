@@ -54,6 +54,7 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col) const
 {
 	const auto& item = _displayedItems[row];
+	const auto& mod  = _modDataProvider.modData(item);
 
 	switch (static_cast<Column>(col))
 	{
@@ -73,29 +74,23 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	}
 	case Column::caption:
 	{
-		const auto mod = _modDataProvider.modData(item);
-
-		variant = wxVariant(
-			wxDataViewIconText(mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
+		variant = wxVariant(wxDataViewIconText(
+			wxString::FromUTF8(mod.caption), loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
 		break;
 	}
 	case Column::author:
 	{
-		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(mod.authors);
+		variant = wxVariant(wxString::FromUTF8(mod.authors));
 		break;
 	}
 	case Column::category:
 	{
-		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(
-            wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category.ToStdString(wxConvUTF8))));
+		variant = wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category)));
 		break;
 	}
 	case Column::version:
 	{
-		const auto mod = _modDataProvider.modData(item);
-		variant        = wxVariant(mod.mod_version);
+		variant = wxVariant(wxString::FromUTF8(mod.mod_version));
 		break;
 	}
 	case Column::checkbox:

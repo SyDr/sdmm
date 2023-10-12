@@ -102,13 +102,11 @@ namespace
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
 		fs::create_directories(modsPath / mm::SystemInfo::ManagedMod);
-		fs::copy_file(
-			fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
+		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
 			modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
 			fs::copy_options::overwrite_existing);
 		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description.txt",
-			modsPath / mm::SystemInfo::ManagedMod / "description.txt",
-			fs::copy_options::overwrite_existing);
+			modsPath / mm::SystemInfo::ManagedMod / "description.txt", fs::copy_options::overwrite_existing);
 		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description_rus.txt",
 			modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
 			fs::copy_options::overwrite_existing);
@@ -123,7 +121,7 @@ Era2Platform::Era2Platform(Application const& app)
 	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
 	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig, app.iconStorage());
 	_modDataProvider =
-		std::make_unique<Era2ModDataProvider>(getModsDirPath(), wxString::FromUTF8(_app.appConfig().currentLanguageCode()));
+		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode());
 
 	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
 	_modManager    = std::make_unique<Era2ModManager>(_modList);

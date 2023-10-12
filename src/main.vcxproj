@@ -41,7 +41,6 @@
     <ClCompile Include="ui\mod_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_view.cpp" />
-    <ClCompile Include="ui\resolve_mod_conflicts_view.cpp" />
     <ClCompile Include="ui\select_directory_view.cpp" />
     <ClCompile Include="ui\select_exe.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
@@ -105,7 +104,6 @@
     <ClInclude Include="ui\mod_list_model.h" />
     <ClInclude Include="ui\plugin_list_model.hpp" />
     <ClInclude Include="ui\plugin_list_view.hpp" />
-    <ClInclude Include="ui\resolve_mod_conflicts_view.hpp" />
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\select_mods_dialog.hpp" />

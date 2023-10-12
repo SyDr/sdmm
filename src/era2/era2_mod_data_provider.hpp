@@ -19,7 +19,7 @@ namespace mm
 
 	struct Era2ModDataProvider : IModDataProvider
 	{
-		Era2ModDataProvider(fs::path basePath, wxString preferredLng);
+		Era2ModDataProvider(fs::path basePath, std::string preferredLng);
 
 		const ModData& modData(const wxString& id) override;
 
@@ -27,13 +27,13 @@ namespace mm
 		void loadDefaults();
 
 	private:
-		const fs::path _basePath;
-		const wxString _preferredLng;
+		const fs::path    _basePath;
+		const std::string _preferredLng;
 
 		std::map<wxString, ModData> _data;
 
-		std::map<wxString, std::set<wxString>> _defaultIncompatible;
-		std::map<wxString, std::set<wxString>> _defaultRequires;
-		std::map<wxString, std::set<wxString>> _defaultLoadAfter;
+		std::map<std::string, std::set<std::string>> _defaultIncompatible;
+		std::map<std::string, std::set<std::string>> _defaultRequires;
+		std::map<std::string, std::set<std::string>> _defaultLoadAfter;
 	};
 }

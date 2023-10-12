@@ -44,13 +44,6 @@ const nlohmann::json* mm::find_object_value(const nlohmann::json* data, const st
 	return result && result->is_object() ? result : nullptr;
 }
 
-std::string mm::get_string_value(const nlohmann::json* data, const std::string& key, const std::string& default_ /* = */ )
-{
-	const auto result = find_string_value(data, key);
-
-	return result ? result->get<std::string>() : default_;
-}
-
 std::optional<bool> mm::get_bool_value(const nlohmann::json* data, const std::string& key)
 {
 	const auto result = find_value(data, key);

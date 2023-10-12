@@ -31,38 +31,38 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 		auto modData = modDataProvider.modData(currentId);
 		for (const auto& id : modData.requires_)
 		{
-			activatedInSession[id].insert(currentId);
+			activatedInSession[wxString::FromUTF8(id)].insert(currentId);
 
-			if (std::find(currentlyActive.begin(), currentlyActive.end(), id) ==
+			if (std::find(currentlyActive.begin(), currentlyActive.end(), wxString::FromUTF8(id)) ==
 				currentlyActive.end())
-				currentlyActive.emplace_back(id);
+				currentlyActive.emplace_back(wxString::FromUTF8(id));
 
-			if (modDataProvider.modData(id).virtual_mod)
+			if (modDataProvider.modData(wxString::FromUTF8(id)).virtual_mod)
 				wxLogWarning(
 					wxString::Format("Mod %s required by %s, "
 									 "but unavailable"_lng,
-									 id, currentId));
+						wxString::FromUTF8(id), currentId));
 
-			if (auto it = disabledInSession.find(id); it != disabledInSession.end())
+			if (auto it = disabledInSession.find(wxString::FromUTF8(id)); it != disabledInSession.end())
 				wxLogWarning(
 					wxString::Format("Mod %s required by %s, "
 									 "but incompatible with (%s)"_lng,
-									 id, currentId, boost::join(it->second, L", ")));
+						wxString::FromUTF8(id), currentId, boost::join(it->second, L", ")));
 		}
 
 		for (const auto& id : modData.incompatible)
 		{
-			disabledInSession[id].insert(currentId);
+			disabledInSession[wxString::FromUTF8(id)].insert(currentId);
 
-			if (auto it = std::find(currentlyActive.begin(), currentlyActive.end(), id);
+			if (auto it = std::find(currentlyActive.begin(), currentlyActive.end(), wxString::FromUTF8(id));
 				it != currentlyActive.end())
 				currentlyActive.erase(it);
 
-			if (auto it = activatedInSession.find(id); it != activatedInSession.end())
+			if (auto it = activatedInSession.find(wxString::FromUTF8(id)); it != activatedInSession.end())
 				wxLogWarning(
 					wxString::Format("Mod %s incompatible with %s, "
 									 "but required by (%s)"_lng,
-									 id, currentId, boost::join(it->second, L", ")));
+						wxString::FromUTF8(id), currentId, boost::join(it->second, L", ")));
 		}
 
 		i++;
@@ -80,7 +80,7 @@ ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvide
 			if (i == j)
 				continue;
 
-			if (modDataProvider.modData(currentlyActive[j]).load_after.contains(candidate))
+			if (modDataProvider.modData(currentlyActive[j]).load_after.contains(candidate.ToStdString(wxConvUTF8)))
 				ok = false;
 		}
 

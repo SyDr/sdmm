@@ -73,10 +73,10 @@ void PluginListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned c
 	}
 	case Column::mod:
 	{
-		const auto mod = _modDataProvider.modData(item.modId);
+		const auto& mod = _modDataProvider.modData(item.modId);
 
-		variant = wxVariant(
-			wxDataViewIconText(mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
+		variant = wxVariant(wxDataViewIconText(
+			wxString::FromUTF8(mod.caption), loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
 		break;
 	}
 	}

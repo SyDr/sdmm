@@ -14,21 +14,22 @@
 
 using namespace mm;
 
-Era2ModDataProvider::Era2ModDataProvider(fs::path basePath, wxString preferredLng)
+Era2ModDataProvider::Era2ModDataProvider(fs::path basePath, std::string preferredLng)
 	: _basePath(std::move(basePath))
 	, _preferredLng(std::move(preferredLng))
 {
 	loadDefaults();
 }
 
- const ModData& Era2ModDataProvider::modData(const wxString& id)
+const ModData& Era2ModDataProvider::modData(const wxString& id)
 {
 	auto it = _data.find(id);
 
 	if (it == _data.cend())
 	{
 		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdString(wxConvUTF8),
-			_preferredLng, _defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id]);
+			_preferredLng, _defaultIncompatible[id.ToStdString(wxConvUTF8)],
+			_defaultRequires[id.ToStdString(wxConvUTF8)], _defaultLoadAfter[id.ToStdString(wxConvUTF8)]);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
 	}
@@ -45,26 +46,18 @@ void Era2ModDataProvider::loadDefaults()
 
 	for (const auto& [modId, modData] : data.items())
 	{
-		auto wxKey = wxString::FromUTF8(modId);
-
 		for (const auto& item : modData["incompatible"])
 		{
-			auto wxValue = wxString::FromUTF8(item.get<std::string>());
+			auto value = item.get<std::string>();
 
-			_defaultIncompatible[wxKey].emplace(wxValue);
-			_defaultIncompatible[wxValue].emplace(wxKey);
+			_defaultIncompatible[modId].emplace(value);
+			_defaultIncompatible[value].emplace(modId);
 		}
 
 		for (const auto& item : modData["requires"])
-		{
-			auto wxValue = wxString::FromUTF8(item.get<std::string>());
-			_defaultRequires[wxKey].emplace(wxValue);
-		}
+			_defaultRequires[modId].emplace(item.get<std::string>());
 
 		for (const auto& item : modData["load_after"])
-		{
-			auto wxValue = wxString::FromUTF8(item.get<std::string>());
-			_defaultLoadAfter[wxKey].emplace(wxValue);
-		}
+			_defaultLoadAfter[modId].emplace(item.get<std::string>());
 	}
 }

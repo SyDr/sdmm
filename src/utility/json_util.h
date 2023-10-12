@@ -27,7 +27,6 @@ namespace mm
 	const nlohmann::json* find_object_value(const nlohmann::json* data, const std::string& key);
 	const nlohmann::json* find_string_value(const nlohmann::json* data, const std::string& key);
 
-	std::string get_string_value(const nlohmann::json* data, const std::string& key, const std::string& default_ = {});
 	std::optional<bool> get_bool_value(const nlohmann::json* data, const std::string& key);
 	i18n get_i18n_value(const nlohmann::json* data, const std::vector<const char*>& lng_list);
 

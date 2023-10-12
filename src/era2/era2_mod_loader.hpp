@@ -7,13 +7,12 @@
 
 #include "domain/mod_data.hpp"
 
-#include <wx/string.h>
-
-
+#include <set>
+#include <string>
 
 namespace mm::era2_mod_loader
 {
-	ModData updateAvailability(fs::path const& loadFrom, const wxString& preferredLng,
-		std::set<wxString> const& defaultIncompatible, std::set<wxString> const& defaultRequires,
-		std::set<wxString> const& defaultLoadAfter);
+	ModData updateAvailability(const fs::path& loadFrom, const std::string& preferredLng,
+		const std::set<std::string>& defaultIncompatible, const std::set<std::string>& defaultRequires,
+		const std::set<std::string>& defaultLoadAfter);
 }

@@ -37,7 +37,6 @@ namespace mm
 		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
 		void OnMenuToolsListModFiles();
-		void OnMenuToolsSortMods();
 		void OnMenuToolsChooseConflictResolveMode();
 		void OnCloseWindow(wxCloseEvent& event);
 

@@ -1,50 +1,49 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include "type/filesystem.hpp"
 
-#include <wx/string.h>
-
 #include <set>
 #include <unordered_map>
+#include <string>
 
 namespace mm
 {
 	struct ModMetadata
 	{
-		wxString caption;
+		std::string caption;
 
-		wxString short_description;
+		std::string short_description;
 		fs::path full_description;
 
 		std::string icon_filename;
 		size_t      icon_index = 0;
 
-		wxString authors;
-		wxString homepage_link;
-		// wxString video_link;
+		std::string authors;
+		std::string homepage_link;
+		// std::string video_link;
 
-		wxString category;
+		std::string category;
 
-		wxString mod_platform;  // era?
-		wxString mod_version;
-		wxString info_version;
+		std::string mod_platform;  // era?
+		std::string mod_version;
+		std::string info_version;
 
 		struct Package
 		{
-			wxString filename;
-			wxString caption;
-			wxString description;
+			std::string filename;
+			std::string caption;
+			std::string description;
 		};
 
 		std::unordered_map<std::string, Package> plugins;
 
-		std::set<wxString> incompatible;
-		std::set<wxString> requires_;
-		std::set<wxString> load_after;
+		std::set<std::string> incompatible;
+		std::set<std::string> requires_;
+		std::set<std::string> load_after;
 	};
 }

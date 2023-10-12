@@ -22,7 +22,6 @@
 #include "mod_list_view.h"
 #include "mod_manager_app.h"
 #include "plugin_list_view.hpp"
-#include "resolve_mod_conflicts_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
 #include "show_file_list_dialog.hpp"
@@ -166,10 +165,6 @@ void MainFrame::createMenuBar()
 		toolsMenu->Append(wxID_ANY, "List active mod files"_lng, nullptr, "List active mod files"_lng);
 	_menuItems[listModFiles->GetId()] = [&] { OnMenuToolsListModFiles(); };
 
-	auto sortMods =
-		toolsMenu->Append(wxID_ANY, "Resolve mods conflicts"_lng, nullptr, "Resolve mods conflicts"_lng);
-	_menuItems[sortMods->GetId()] = [&] { OnMenuToolsSortMods(); };
-
 	auto conflictResolveMode =
 		toolsMenu->Append(wxID_ANY, "conflicts/caption"_lng, nullptr, "conflicts/caption"_lng);
 	_menuItems[conflictResolveMode->GetId()] = [&] { OnMenuToolsChooseConflictResolveMode(); };
@@ -235,16 +230,6 @@ void MainFrame::OnMenuToolsListModFiles()
 
 	showModFileList(
 		*this, _app, *_currentPlatform->modDataProvider(), _currentPlatform->modManager()->mods());
-
-	EX_UNEXPECTED;
-}
-
-void MainFrame::OnMenuToolsSortMods()
-{
-	EX_TRY;
-
-	ResolveModConflictsView view(this, _app.appConfig(), _app.iconStorage(), *_currentPlatform);
-	view.ShowModal();
 
 	EX_UNEXPECTED;
 }

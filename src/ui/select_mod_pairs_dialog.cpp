@@ -129,10 +129,10 @@ void SelectModPairsDialog::fillData()
 		data.push_back(wxVariant(false));
 		for (const auto& item : { mod1, mod2 })
 		{
-			const auto mod = _modDataProvider.modData(item);
+			const auto& mod = _modDataProvider.modData(item);
 
 			data.push_back(wxVariant(wxDataViewIconText(
-				mod.caption, loadModIcon(_iconStorage, mod.data_path, mod.icon_filename))));
+				wxString::FromUTF8(mod.caption), loadModIcon(_iconStorage, mod.data_path, mod.icon_filename))));
 		}
 
 		_list->AppendItem(data);

@@ -303,7 +303,7 @@ void ModListView::updateControlsState()
 	}
 	else if (!mod.short_description.empty())
 	{
-		description = mod.short_description;
+		description = wxString::FromUTF8(mod.short_description);
 	}
 
 	_modDescription->SetValue(description);
@@ -352,7 +352,7 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 	if (itemId == _menu.showOrHide->GetId())
 		_modManager.switchVisibility(_selectedMod);
 	else if (itemId == _menu.openHomepage->GetId())
-		wxLaunchDefaultBrowser(mod->homepage_link);
+		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage_link));
 	else if (itemId == _menu.openDir->GetId())
 		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
 	else if (itemId == _menu.deleteOrRemove->GetId())
@@ -365,15 +365,16 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	if (!_modManager.activePosition(_selectedMod).has_value())
 	{
-		auto modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
+		const auto& modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 		std::vector<std::string> incompatible;
 		for (const auto& item : _modManager.mods().active)
 		{
 			auto other = _managedPlatform.modDataProvider()->modData(item);
-			if (modData.incompatible.count(item) || other.incompatible.count(_selectedMod))
+			if (modData.incompatible.contains(item.ToStdString(wxConvUTF8)) ||
+				other.incompatible.contains(_selectedMod.ToStdString(wxConvUTF8)))
 			{
-				incompatible.emplace_back('"' + other.caption.ToStdString(wxConvUTF8) + '"');
+				incompatible.emplace_back('"' + other.caption + '"');
 			}
 		}
 
@@ -444,7 +445,7 @@ void ModListView::onRemoveModRequested()
 		const auto formatMessage =
 			"Are you sure want to delete mod \"%s\"?\n\n"
 			"It will be deleted to recycle bin, if possible."_lng;
-		const auto answer = wxMessageBox(wxString::Format(formatMessage, mod.caption),
+		const auto answer = wxMessageBox(wxString::Format(formatMessage, wxString::FromUTF8(mod.caption)),
 			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 		if (answer != wxYES)
