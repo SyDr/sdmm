@@ -7,8 +7,8 @@
 
 #include <stdexcept>
 #include <type_traits>
+#include <wx/cpp.h>
 
-#include "macro.h"
 #include "ui/error_view.h"
 
 namespace mm
@@ -41,11 +41,11 @@ namespace mm
 
 #define MM_EXPECTS(what, exception_type) \
 	if (!(what))                         \
-		throw_with_trace(exception_type(STR(what)));
+		throw_with_trace(exception_type(wxSTRINGIZE(what)));
 
 #define MM_PRECONDTION(what) \
 	if (!(what))             \
-		throw_with_trace(mm::condtion_error(STR(what)));
+		throw_with_trace(mm::condtion_error(wxSTRINGIZE(what)));
 
 #define EX_TRY \
 	try        \
