@@ -54,37 +54,76 @@ namespace
 		return Era2PluginManager::loadManagedState(data);
 	}
 
+	std::set<PluginSource> loadAvailablePlugins(const fs::path& basePath, const std::string& modId)
+	{
+		std::set<PluginSource> result;
+
+		using di = fs::directory_iterator;
+		for (const auto& dir : PluginDirs)
+		{
+			const auto subPath = basePath / modId / PluginSubdir / dir;
+			if (!is_directory(subPath))
+				continue;
+
+			for (auto it = di(subPath), end = di(); it != end; ++it)
+			{
+				auto& pluginPath = it->path();
+
+				if (!is_regular_file(pluginPath))
+					continue;
+
+				if (!isPlugin(pluginPath))
+					continue;
+
+				result.emplace(PluginSource(modId, fromPluginDir(dir), pluginPath.filename().string()));
+			}
+		}
+
+		return result;
+	}
+
 	void saveManagedState(
 		const fs::path& pluginPath, const fs::path& modsPath, const PluginList& list, const ModList& modList)
 	{
-		// TODO: improve algorithm and make only required changes
 		const auto targetPath = modsPath / SystemInfo::ManagedMod / PluginSubdir;
 		for (const auto& dir : PluginDirs)
 		{
 			const auto subPath = targetPath / dir;
-
-			remove_all(subPath);
 			create_directories(subPath);
+		}
+
+		//const auto currentState = ::loadAvailablePlugins(modsPath, SystemInfo::ManagedMod);
+		const auto managedState = ::loadManagedState(pluginPath);
+
+		boost::system::error_code ec;
+		for (const auto& source : managedState)
+		{
+			const auto target = targetPath / source.toFileIdenity();
+			if (!exists(target))
+				continue;
+
+			// remove if not managed anymore
+			// or parent mod is not active
+			if (list.managed.contains(source) && modList.isActive(source.modId))
+				continue;
+
+			remove(target, ec);
 		}
 
 		for (const auto& source : list.managed)
 		{
-			if (!modList.isActive(source.modId))
-				continue;
-
 			const auto copyFrom =
 				modsPath / source.modId / PluginSubdir / to_string(source.location) / source.name;
-
 			const auto copyTo = targetPath / source.toFileIdenity();
 
+			// assume already copied
+			if (exists(copyTo) && managedState.contains(source))
+				continue;
+
 			if (!source.active())
-			{
 				copy_file(copyFrom, copyTo, fs::copy_options::overwrite_existing);
-			}
 			else
-			{
 				boost::nowide::ofstream unused(copyTo);
-			}
 		}
 
 		nlohmann::json data = nlohmann::json::array();
@@ -155,26 +194,8 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 		if (modId == mm::SystemInfo::ManagedMod || !mods.isActive(modId))
 			continue;
 
-		for (const auto& dir : PluginDirs)
-		{
-			const auto subPath = it->path() / PluginSubdir / dir;
-			if (!is_directory(subPath))
-				continue;
-
-			for (auto subIt = di(subPath), subEnd = di(); subIt != end; ++subIt)
-			{
-				auto& pluginPath = subIt->path();
-
-				if (!is_regular_file(pluginPath))
-					continue;
-
-				if (!isPlugin(pluginPath))
-					continue;
-
-				result.emplace(PluginSource(
-					modId, fromPluginDir(dir), pluginPath.filename().string()));
-			}
-		}
+		const auto fromMod = ::loadAvailablePlugins(basePath, modId);
+		result.insert(fromMod.cbegin(), fromMod.cend());
 	}
 
 	return result;
