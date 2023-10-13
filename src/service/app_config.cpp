@@ -17,6 +17,7 @@
 #include "system_info.hpp"
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
+#include "utility/json_util.h"
 
 using namespace mm;
 
@@ -77,19 +78,11 @@ AppConfig::AppConfig()
 {
 	std::visit(ValidateMode(), _mode);
 
-	boost::nowide::ifstream datafile(configFilePath());
-
-	if (datafile)
+	try
 	{
-		_data = nlohmann::json::parse(datafile, nullptr, false);
-
-		if (_data.is_discarded())
-		{
-			_data = {};
-			wxLogDebug(L"Can't parse config file. Default config is used instead");
-		}
+		_data = loadJsonFromFile(configFilePath());
 	}
-	else
+	catch (...) // TODO: only parse/load errors
 	{
 		wxLogDebug(L"Can't load config file. Default config is used instead");
 	}

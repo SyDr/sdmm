@@ -18,6 +18,7 @@
 
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
+#include "utility/json_util.h"
 
 using namespace mm;
 
@@ -34,19 +35,14 @@ Era2Config::Era2Config(const fs::path& path)
 {
 	createDirectories();
 
-	if (boost::nowide::ifstream datafile(getConfigFilePath()); datafile)
+	try
 	{
-		try
-		{
-			_data = nlohmann::json::parse(datafile);
-		}
-		catch (...)
-		{
-			wxLogDebug(L"Can't parse config file. Default config is used instead");
-		}
+		_data = loadJsonFromFile(getConfigFilePath());
 	}
-	else
+	catch (...)  // TODO: only parse/load errors
+	{
 		wxLogDebug(L"Can't load config file. Default config is used instead");
+	}
 
 	validate();
 }

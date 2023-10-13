@@ -15,6 +15,7 @@
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
+#include "utility/json_util.h"
 
 #include <wx/dir.h>
 #include <wx/file.h>
@@ -89,27 +90,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const std::string& 
 	PluginList pluginList;
 
 	const auto path = toPath(_rootPath, name);
-
-	boost::nowide::ifstream datafile(path);
-
-	if (!datafile)
-	{
-		wxLogError(wxString::Format("Cannot open file %s"_lng, wxString::FromUTF8(path.string())));
-		return { modList, pluginList };
-	}
-
-	nlohmann::json data;
-
-	try
-	{
-		data = nlohmann::json::parse(datafile);
-	}
-	catch (nlohmann::json::parse_error const& e)
-	{
-		wxLogError(wxString::FromUTF8(e.what()));
-		wxLogError(wxString::Format("Error while parsing file %s"_lng, wxString::FromUTF8(path.string())));
-		return { modList, pluginList };
-	}
+	const auto data = loadJsonFromFile(path);
 
 	if (!data.is_object())
 		return { modList, pluginList };
