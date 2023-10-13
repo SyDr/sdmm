@@ -22,6 +22,7 @@ namespace mm
 		Era2ModDataProvider(fs::path basePath, std::string preferredLng);
 
 		const ModData& modData(const std::string& id) override;
+		void           clear();
 
 	private:
 		void loadDefaults();

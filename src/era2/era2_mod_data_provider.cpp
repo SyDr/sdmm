@@ -36,6 +36,11 @@ const ModData& Era2ModDataProvider::modData(const std::string& id)
 	return it->second;
 }
 
+void Era2ModDataProvider::clear()
+{
+	_data.clear();
+}
+
 void Era2ModDataProvider::loadDefaults()
 {
 	boost::nowide::ifstream datafile(fs::path(mm::SystemInfo::DataDir) / "era2.json");

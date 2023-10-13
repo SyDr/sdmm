@@ -141,6 +141,7 @@ fs::path Era2Platform::managedPath() const
 
 void Era2Platform::reload()
 {
+	_modDataProvider->clear();
 	auto block = _modListChanged.blocker();
 
 	_modManager->mods(loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath()));
