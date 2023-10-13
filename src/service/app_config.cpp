@@ -78,14 +78,7 @@ AppConfig::AppConfig()
 {
 	std::visit(ValidateMode(), _mode);
 
-	try
-	{
-		_data = loadJsonFromFile(configFilePath());
-	}
-	catch (...) // TODO: only parse/load errors
-	{
-		wxLogDebug(L"Can't load config file. Default config is used instead");
-	}
+	_data = loadJsonFromFile(configFilePath(), true);
 
 	validate();
 }

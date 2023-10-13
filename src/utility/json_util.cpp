@@ -68,9 +68,14 @@ mm::i18n mm::get_i18n_value(const nlohmann::json* data, const std::vector<const 
 	return result;
 }
 
-nlohmann::json mm::loadJsonFromFile(const fs::path& path)
+nlohmann::json mm::loadJsonFromFile(const fs::path& path, bool ignoreErrors)
 {
-	boost::nowide::ifstream datafile(path);
+	boost::nowide::ifstream f(path);
+	if (!ignoreErrors)
+		return nlohmann::json::parse(f);
 
-	return nlohmann::json::parse(datafile);
+	if (!f)
+		return {};
+
+	return nlohmann::json::parse(f, nullptr, false);
 }

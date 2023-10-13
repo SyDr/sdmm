@@ -35,15 +35,7 @@ Era2Config::Era2Config(const fs::path& path)
 {
 	createDirectories();
 
-	try
-	{
-		_data = loadJsonFromFile(getConfigFilePath());
-	}
-	catch (...)  // TODO: only parse/load errors
-	{
-		wxLogDebug(L"Can't load config file. Default config is used instead");
-	}
-
+	_data = loadJsonFromFile(getConfigFilePath(), true);
 	validate();
 }
 

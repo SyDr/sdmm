@@ -98,23 +98,7 @@ ModData era2_mod_loader::updateAvailability(const fs::path& loadFrom, const std:
 		return supplyResultWithDefaults();
 
 	const auto path = loadFrom / mm::SystemInfo::ModInfoFilename;
-
-	boost::nowide::ifstream datafile(path);
-
-	if (!datafile)
-		return supplyResultWithDefaults();
-
-	nlohmann::json data;
-
-	try
-	{
-		data = nlohmann::json::parse(datafile);
-	}
-	catch (const nlohmann::json::parse_error& e)
-	{
-		wxLogError(wxString::FromUTF8(e.what()));
-		wxLogError(wxString::Format("Error while parsing file %s"_lng, wxString::FromUTF8(path.string())));
-	}
+	const auto data = loadJsonFromFile(path, true);
 
 	if (!data.is_object())
 		return supplyResultWithDefaults();

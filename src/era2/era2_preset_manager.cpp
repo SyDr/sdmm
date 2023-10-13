@@ -90,7 +90,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const std::string& 
 	PluginList pluginList;
 
 	const auto path = toPath(_rootPath, name);
-	const auto data = loadJsonFromFile(path);
+	const auto data = loadJsonFromFile(path, true);
 
 	if (!data.is_object())
 		return { modList, pluginList };

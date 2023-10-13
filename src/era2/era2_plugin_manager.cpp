@@ -25,11 +25,11 @@ namespace
 	constexpr const auto        PluginSubdir       = "EraPlugins";
 	constexpr const std::array  PluginDirs         = { ".", "BeforeWog", "AfterWog" };
 
-	PluginLocation fromPluginDir(const wxString& value)
+	PluginLocation fromPluginDir(const std::string& value)
 	{
-		if (value.IsSameAs(L"BeforeWog", false))
+		if (boost::iequals(value, "BeforeWog"))
 			return PluginLocation::before_wog;
-		if (value.IsSameAs(L"AfterWog", false))
+		if (boost::iequals(value, "AfterWog"))
 			return PluginLocation::after_wog;
 
 		return PluginLocation::root;
@@ -172,7 +172,7 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 					continue;
 
 				result.emplace(PluginSource(
-					modId, fromPluginDir(wxString::FromUTF8(dir)), pluginPath.filename().string()));
+					modId, fromPluginDir(dir), pluginPath.filename().string()));
 			}
 		}
 	}
@@ -198,7 +198,7 @@ std::set<PluginSource> Era2PluginManager::loadManagedState(const nlohmann::json&
 			continue;
 
 		result.emplace(PluginSource(items.front().string(),
-			items.size() == 3 ? fromPluginDir(items[1].wstring()) : PluginLocation::root,
+			items.size() == 3 ? fromPluginDir(items[1].string()) : PluginLocation::root,
 			items.back().string()));
 	}
 
