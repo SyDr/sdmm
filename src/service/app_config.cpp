@@ -14,9 +14,9 @@
 #include <wx/log.h>
 #include <wx/stdpaths.h>
 
+#include "system_info.hpp"
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
-#include "system_info.hpp"
 
 using namespace mm;
 
@@ -62,9 +62,7 @@ namespace
 
 	struct ValidateMode
 	{
-		void operator()(const PortableMode&)
-		{
-		}
+		void operator()(const PortableMode&) {}
 
 		void operator()(const MainMode& mm)
 		{
@@ -148,8 +146,7 @@ std::vector<fs::path> AppConfig::getKnownDataPathList() const
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
 	std::vector<fs::path> result;
-	for (const auto& path :
-		 _data[sd_game][selectedPlatform()][SD_KNOWN].get<std::vector<std::string>>())
+	for (const auto& path : _data[sd_game][selectedPlatform()][SD_KNOWN].get<std::vector<std::string>>())
 		result.emplace_back(path);
 
 	return result;
@@ -232,7 +229,7 @@ void AppConfig::validate()
 	if (!_data[sd_game].count(SD_PLATFORM) || !_data[sd_game][SD_PLATFORM].is_string())
 		_data[sd_game][SD_PLATFORM] = SD_MM_DEFAULT_PLATFORM;
 
-	const std::string selectedPlatform = _data[sd_game][SD_PLATFORM];
+	const auto selectedPlatform = _data[sd_game][SD_PLATFORM].get<std::string>();
 
 	if (!_data[sd_game][selectedPlatform].count(SD_SELECTED) ||
 		!_data[sd_game][selectedPlatform][SD_SELECTED].is_string())
@@ -263,11 +260,11 @@ MainWindowProperties AppConfig::mainWindow() const
 {
 	MainWindowProperties result;
 
-	result.maximized = _data[SD_WINDOW][SD_MAXIMIZED];
-	result.size.SetWidth(_data[SD_WINDOW][SD_WIDTH]);
-	result.size.SetHeight(_data[SD_WINDOW][SD_HEIGHT]);
-	result.position.x = _data[SD_WINDOW][SD_LEFT];
-	result.position.y = _data[SD_WINDOW][SD_TOP];
+	result.maximized = _data[SD_WINDOW][SD_MAXIMIZED].get<bool>();
+	result.size.SetWidth(_data[SD_WINDOW][SD_WIDTH].get<unsigned>());
+	result.size.SetHeight(_data[SD_WINDOW][SD_HEIGHT].get<unsigned>());
+	result.position.x = _data[SD_WINDOW][SD_LEFT].get<int>();
+	result.position.y = _data[SD_WINDOW][SD_TOP].get<int>();
 
 	return result;
 }
@@ -284,12 +281,12 @@ void AppConfig::starDataPath(const fs::path& path, bool star /*= true*/)
 {
 	MM_EXPECTS(!portableMode(), unexpected_error);
 
-	auto&      knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
+	auto& knownPaths = _data[sd_game][selectedPlatform()][SD_FAVS];
 
 	auto it = std::find(knownPaths.begin(), knownPaths.end(), path.string());
 
 	MM_EXPECTS(star == (it == knownPaths.end()),
-			   unexpected_error);  // either star non-starred on remove star from starred
+		unexpected_error);  // either star non-starred on remove star from starred
 
 	if (star)
 		knownPaths.emplace_back(path.string());

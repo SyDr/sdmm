@@ -101,15 +101,15 @@ namespace
 		overwriteFileFromContainer(activePath, reversed);
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
 
-		fs::create_directories(modsPath / mm::SystemInfo::ManagedMod);
-		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
-			modsPath / mm::SystemInfo::ManagedMod / SystemInfo::ModInfoFilename,
+		const auto managedPath = modsPath / mm::SystemInfo::ManagedMod;
+
+		create_directories(modsPath / mm::SystemInfo::ManagedMod);
+		copy_file(fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
+			managedPath / SystemInfo::ModInfoFilename, fs::copy_options::overwrite_existing);
+		copy_file(fs::path(mm::SystemInfo::DataDir) / "description.txt", managedPath / "description.txt",
 			fs::copy_options::overwrite_existing);
-		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description.txt",
-			modsPath / mm::SystemInfo::ManagedMod / "description.txt", fs::copy_options::overwrite_existing);
-		fs::copy_file(fs::path(mm::SystemInfo::DataDir) / "description_rus.txt",
-			modsPath / mm::SystemInfo::ManagedMod / "description_rus.txt",
-			fs::copy_options::overwrite_existing);
+		copy_file(fs::path(mm::SystemInfo::DataDir) / "description_rus.txt",
+			managedPath / "description_rus.txt", fs::copy_options::overwrite_existing);
 	}
 }
 

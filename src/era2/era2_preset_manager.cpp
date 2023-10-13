@@ -118,11 +118,11 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	{
 		if (auto active = mods->find("active"); active != mods->end() && active->is_array())
 			for (const auto& item : *active)
-				modList.active.emplace_back(wxString::FromUTF8(item));
+				modList.active.emplace_back(wxString::FromUTF8(item.get<std::string>()));
 
 		if (auto hidden = mods->find("hidden"); hidden != mods->end() && hidden->is_array())
 			for (const auto& item : *hidden)
-				modList.hidden.emplace(wxString::FromUTF8(item));
+				modList.hidden.emplace(wxString::FromUTF8(item.get<std::string>()));
 	}
 
 	pluginList.available = Era2PluginManager::loadAvailablePlugins(_modsPath, modList);
