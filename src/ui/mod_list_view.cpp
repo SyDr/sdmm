@@ -298,7 +298,11 @@ void ModListView::updateControlsState()
 		stream << file.rdbuf();
 		file.close();
 
-		auto string = wxString::FromUTF8(stream.str());
+		auto tmp    = stream.str();
+		auto string = wxString::FromUTF8(tmp);
+
+		if (string.empty())
+			string = wxString(tmp.c_str(), wxConvLocal, tmp.size());
 
 		if (!string.empty())
 			description = std::move(string);
