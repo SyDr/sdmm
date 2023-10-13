@@ -17,25 +17,40 @@
 #include <wx/log.h>
 #include <wx/textfile.h>
 
-void mm::overwriteFileContent(const fs::path& path, const wxString& content)
+std::string mm::readFile(const mm::fs::path& path)
 {
-	wxTempFile target(path.wstring());
+	boost::nowide::ifstream f(path);
 
-	MM_PRECONDTION(target.IsOpened());
-	MM_PRECONDTION(target.Write(content));
-	MM_PRECONDTION(target.Commit());
+	if (!f)
+		return {};
+
+	std::stringstream s;
+	s << f.rdbuf();
+
+	return s.str();
 }
 
-bool mm::createDir(const fs::path& path)
+void mm::overwriteFileIfNeeded(const fs::path& path, const std::string& content)
 {
-	boost::system::error_code ec;
-	bool                      created = fs::create_directories(path, ec);
+	const auto current = readFile(path);
+	if (current == content)
+		return;
 
-	if (ec)
-		wxLogError(wxString("Can't create dir '%s'\r\n\r\n%s (code: %d)"_lng), path.wstring(), wxString::FromUTF8(ec.message()),
-			ec.value());
+	overwriteFile(path, content);
+}
 
-	return created && !ec;
+void mm::overwriteFile(const fs::path& path, const std::string& content)
+{
+	const auto tmp = path.parent_path() / (path.extension().string() + ".tmp");
+	const auto org = path.parent_path() / (path.extension().string() + ".org");
+
+	boost::nowide::ofstream f(tmp, std::ios_base::out | std::ios_base::binary);
+	f << content;
+	f.close();
+
+	rename(path, org);
+	rename(tmp, path);
+	remove(org);
 }
 
 std::vector<wxString> mm::getAllDirs(const fs::path& path)
@@ -74,23 +89,6 @@ std::vector<wxString> mm::getAllFiles(const fs::path& path)
 		while (dir.GetNext(&tmp))
 			result.push_back(tmp);
 	}
-
-	return result;
-}
-
-std::vector<wxString> mm::readFile(const fs::path& path)
-{
-	wxLogNull noLogging;  // suppress wxWidgets messages about inability to open file
-
-	wxTextFile file;
-	if (!file.Open(wxString::FromUTF8(path.string())))
-		return {};
-
-	std::vector<wxString> result;
-	for (auto& str = file.GetFirstLine(); !file.Eof(); str = file.GetNextLine())
-		result.emplace_back(str);
-
-	file.Close();
 
 	return result;
 }

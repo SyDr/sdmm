@@ -38,7 +38,7 @@
 using namespace mm;
 
 SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, Application& application,
-	IModDataProvider& dataProvider, std::vector<std::pair<wxString, wxString>> values)
+	IModDataProvider& dataProvider, std::vector<std::pair<std::string, std::string>> values)
 	: wxDialog(&parent, wxID_ANY, "Select mod pairs to potentially remove from result"_lng, wxDefaultPosition,
 		  wxSize(800, 444), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(application.iconStorage())
@@ -53,9 +53,9 @@ SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, Application& applic
 	bindEvents();
 }
 
-std::set<std::pair<wxString, wxString>> SelectModPairsDialog::getSelected() const
+std::set<std::pair<std::string, std::string>> SelectModPairsDialog::getSelected() const
 {
-	std::set<std::pair<wxString, wxString>> result;
+	std::set<std::pair<std::string, std::string>> result;
 
 	for (size_t i = 0; i < _values.size(); ++i)
 	{

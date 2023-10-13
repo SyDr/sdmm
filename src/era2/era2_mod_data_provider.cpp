@@ -21,15 +21,14 @@ Era2ModDataProvider::Era2ModDataProvider(fs::path basePath, std::string preferre
 	loadDefaults();
 }
 
-const ModData& Era2ModDataProvider::modData(const wxString& id)
+const ModData& Era2ModDataProvider::modData(const std::string& id)
 {
 	auto it = _data.find(id);
 
 	if (it == _data.cend())
 	{
-		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id.ToStdString(wxConvUTF8),
-			_preferredLng, _defaultIncompatible[id.ToStdString(wxConvUTF8)],
-			_defaultRequires[id.ToStdString(wxConvUTF8)], _defaultLoadAfter[id.ToStdString(wxConvUTF8)]);
+		auto modData = mm::era2_mod_loader::updateAvailability(_basePath / id, _preferredLng,
+			_defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id]);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
 	}

@@ -64,7 +64,7 @@
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
     <ClInclude Include="interface\imod_manager.hpp" />
     <ClInclude Include="era2\era2_directory_structure.hpp" />
-    <ClInclude Include="era2\era2_mod_manager.h" />
+    <ClInclude Include="era2\era2_mod_manager.hpp" />
     <ClInclude Include="era2\era2_platform.h" />
     <ClInclude Include="era2\era2_preset_manager.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />

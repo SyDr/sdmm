@@ -22,7 +22,7 @@
 #include "era2_directory_structure.hpp"
 #include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
-#include "era2_mod_manager.h"
+#include "era2_mod_manager.hpp"
 #include "era2_plugin_manager.hpp"
 #include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
@@ -36,16 +36,16 @@ using namespace mm;
 
 namespace
 {
-	bool validateModId(const fs::path& modsPath, wxString& id)
+	bool validateModId(const fs::path& modsPath, std::string& id)
 	{
-		id.Trim();
+		boost::trim(id);
 		if (id.empty())
 			return false;
 
-		if (id == wxString::FromUTF8(mm::SystemInfo::ManagedMod))
+		if (id == mm::SystemInfo::ManagedMod)
 			return false;
 
-		const auto path = modsPath / id.ToStdString(wxConvUTF8);
+		const auto path = modsPath / id;
 		if (!exists(path) || !is_directory(path))
 			return false;
 
@@ -57,7 +57,8 @@ namespace
 		ModList items;
 
 		// active mods / ignore mm_managed_mod
-		auto activeMods = readFile(activePath);
+		std::vector<std::string> activeMods;
+		boost::split(activeMods, readFile(activePath), boost::is_any_of("\r\n"));
 		for (auto item : boost::adaptors::reverse(activeMods))
 		{
 			if (validateModId(modsPath, item))
@@ -65,14 +66,16 @@ namespace
 				items.active.emplace_back(item);
 				items.available.emplace(item);
 			}
-			else if (!item.empty() && item != wxString::FromUTF8(SystemInfo::ManagedMod))
+			else if (!item.empty() && item != SystemInfo::ManagedMod)
 			{
 				items.invalid.emplace_back(item);
 			}
 		}
 
 		// hidden mods in data dir
-		for (auto item : readFile(hiddenPath))
+		std::vector<std::string> hiddenMods;
+		boost::split(hiddenMods, readFile(hiddenPath), boost::is_any_of("\\n"));
+		for (auto item : hiddenMods)
 			if (validateModId(modsPath, item))
 				items.hidden.emplace(item);
 
@@ -82,10 +85,10 @@ namespace
 		{
 			if (!it->is_directory())
 				continue;
-			items.available.emplace(it->path().filename().wstring());
+			items.available.emplace(it->path().filename().string());
 		}
 
-		items.available.erase(wxString::FromUTF8(mm::SystemInfo::ManagedMod));
+		items.available.erase(mm::SystemInfo::ManagedMod);
 
 		return items;
 	}
@@ -94,8 +97,8 @@ namespace
 		const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath, const ModList& mods)
 	{
 		auto                 reversedRange = mods.active | boost::adaptors::reversed;
-		std::deque<wxString> reversed(reversedRange.begin(), reversedRange.end());
-		reversed.emplace_back(wxString::FromUTF8(mm::SystemInfo::ManagedMod));
+		std::deque<std::string> reversed(reversedRange.begin(), reversedRange.end());
+		reversed.emplace_back(mm::SystemInfo::ManagedMod);
 		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
 
 		overwriteFileFromContainer(activePath, reversed);

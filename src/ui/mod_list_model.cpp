@@ -179,13 +179,13 @@ void ModListModel::setModList(ModList const& mods)
 	reload();
 }
 
-void ModListModel::setChecked(std::unordered_set<wxString> items)
+void ModListModel::setChecked(std::unordered_set<std::string> items)
 {
 	_checked = std::move(items);
 	Reset(_displayedItems.size());
 }
 
-std::unordered_set<wxString> const& ModListModel::getChecked() const
+std::unordered_set<std::string> const& ModListModel::getChecked() const
 {
 	return _checked;
 }
@@ -214,7 +214,7 @@ const ModData* ModListModel::findMod(const wxDataViewItem& item) const
 	return &_modDataProvider.modData(_displayedItems[GetRow(item)]);
 }
 
-wxDataViewItem ModListModel::findItemById(const wxString& id) const
+wxDataViewItem ModListModel::findItemById(const std::string& id) const
 {
 	for (size_t i = 0; i < _displayedItems.size(); ++i)
 		if (_displayedItems[i] == id)
@@ -223,10 +223,10 @@ wxDataViewItem ModListModel::findItemById(const wxString& id) const
 	return {};
 }
 
-wxString ModListModel::findIdByItem(wxDataViewItem const& item) const
+std::string ModListModel::findIdByItem(wxDataViewItem const& item) const
 {
 	if (!item.IsOk())
-		return wxEmptyString;
+		return {};
 
 	return _displayedItems[GetRow(item)];
 }

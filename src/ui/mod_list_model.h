@@ -24,8 +24,7 @@ namespace mm
 	class ModListModel : public wxDataViewIndexListModel
 	{
 	public:
-		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
-							  bool showHidden);
+		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden);
 
 		enum class Column
 		{
@@ -47,26 +46,26 @@ namespace mm
 		bool GetAttrByRow(unsigned row, unsigned col, wxDataViewItemAttr& attr) const override;
 
 		int Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column,
-					bool ascending) const override;
+			bool ascending) const override;
 
-		void                                setModList(ModList const& mods);
-		void                                setChecked(std::unordered_set<wxString> items);
-		std::unordered_set<wxString> const& getChecked() const;
+		void                                   setModList(ModList const& mods);
+		void                                   setChecked(std::unordered_set<std::string> items);
+		std::unordered_set<std::string> const& getChecked() const;
 
 		void showHidden(bool show);
 		void showInactive(bool show);
 
 		const ModData* findMod(const wxDataViewItem& item) const;
-		wxDataViewItem findItemById(const wxString& id) const;
-		wxString       findIdByItem(wxDataViewItem const& item) const;
+		wxDataViewItem findItemById(const std::string& id) const;
+		std::string    findIdByItem(wxDataViewItem const& item) const;
 
 	private:
 		void reload();
 
 	private:
-		ModList                      _list;
-		std::vector<wxString>        _displayedItems;
-		std::unordered_set<wxString> _checked;
+		ModList                         _list;
+		std::vector<std::string>        _displayedItems;
+		std::unordered_set<std::string> _checked;
 
 		IModDataProvider& _modDataProvider;
 		IIconStorage&     _iconStorage;

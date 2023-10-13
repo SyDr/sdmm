@@ -67,24 +67,24 @@ ModData era2_mod_loader::updateAvailability(const fs::path& loadFrom, const std:
 
 	ModData result;
 	result.data_path   = loadFrom;
-	result.id          = loadFrom.filename().wstring();
+	result.id          = loadFrom.filename().string();
 	result.virtual_mod = !is_directory(loadFrom);
 
 	auto supplyResultWithDefaults = [&] {
 		if (result.caption.empty())
-			result.caption = result.id.ToStdString(wxConvUTF8);
+			result.caption = result.id;
 
 		if (!hasRequires)
 		{
 			result.requires_ = defaultRequires;
-			if (result.id != L"WoG")
+			if (result.id != "WoG")
 				result.requires_.emplace("WoG");
 		}
 
 		if (!hasLoadAfter)
 		{
 			result.load_after = defaultLoadAfter;
-			if (result.id != L"WoG")
+			if (result.id != "WoG")
 				result.load_after.emplace("WoG");
 		}
 

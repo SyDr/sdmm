@@ -33,8 +33,8 @@ namespace mm
 
 	struct Era2DirectoryStructure
 	{
-		std::vector<fs::path> fileList;
-		std::vector<wxString>              modList;
+		std::vector<fs::path>    fileList;
+		std::vector<std::string> modList;
 
 		std::vector<std::vector<Era2DirectoryEntry>> entries;  // [path index][mod index] = entry
 	};

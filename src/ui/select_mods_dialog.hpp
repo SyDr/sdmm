@@ -29,7 +29,7 @@ namespace mm
 		SelectModsDialog(wxWindow& parent, Application& application, IModDataProvider& dataProvider,
 						 ModList list);
 
-		std::unordered_set<wxString> const& getSelected() const;
+		std::unordered_set<std::string> const& getSelected() const;
 
 	private:
 		void createControls();

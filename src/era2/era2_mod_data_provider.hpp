@@ -21,7 +21,7 @@ namespace mm
 	{
 		Era2ModDataProvider(fs::path basePath, std::string preferredLng);
 
-		const ModData& modData(const wxString& id) override;
+		const ModData& modData(const std::string& id) override;
 
 	private:
 		void loadDefaults();
@@ -30,7 +30,7 @@ namespace mm
 		const fs::path    _basePath;
 		const std::string _preferredLng;
 
-		std::map<wxString, ModData> _data;
+		std::map<std::string, ModData> _data;
 
 		std::map<std::string, std::set<std::string>> _defaultIncompatible;
 		std::map<std::string, std::set<std::string>> _defaultRequires;

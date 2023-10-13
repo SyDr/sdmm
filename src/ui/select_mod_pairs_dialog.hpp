@@ -25,11 +25,10 @@ namespace mm
 	class SelectModPairsDialog : public wxDialog
 	{
 	public:
-		SelectModPairsDialog(wxWindow& parent, Application& application,
-							 IModDataProvider&                          dataProvider,
-						 std::vector<std::pair<wxString, wxString>> values);
+		SelectModPairsDialog(wxWindow& parent, Application& application, IModDataProvider& dataProvider,
+			std::vector<std::pair<std::string, std::string>> values);
 
-		std::set<std::pair<wxString, wxString>> getSelected() const;
+		std::set<std::pair<std::string, std::string>> getSelected() const;
 
 	private:
 		void createControls();
@@ -40,9 +39,9 @@ namespace mm
 
 	private:
 		IModDataProvider& _modDataProvider;
-		IIconStorage& _iconStorage;
+		IIconStorage&     _iconStorage;
 
-		std::vector<std::pair<wxString, wxString>> _values;
+		std::vector<std::pair<std::string, std::string>> _values;
 
 		wxWidgetsPtr<wxDataViewListCtrl> _list = nullptr;
 

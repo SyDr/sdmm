@@ -13,8 +13,8 @@ namespace mm
 {
 	struct ModData : ModMetadata
 	{
-		wxString id;
-		bool     virtual_mod = false;  // does this mod physically exist?
-		fs::path data_path;
+		std::string id;
+		bool        virtual_mod = false;  // does this mod physically exist?
+		fs::path    data_path;
 	};
 }

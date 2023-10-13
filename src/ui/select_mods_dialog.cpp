@@ -54,7 +54,7 @@ SelectModsDialog::SelectModsDialog(wxWindow& parent, Application& application,
 	_listModel->setChecked({ _mods.active.cbegin(), _mods.active.cend() });
 }
 
-std::unordered_set<wxString> const& SelectModsDialog::getSelected() const
+std::unordered_set<std::string> const& SelectModsDialog::getSelected() const
 {
 	return _listModel->getChecked();
 }

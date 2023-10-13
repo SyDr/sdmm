@@ -62,7 +62,7 @@ namespace mm
 		IModManager&  _modManager;
 		IIconStorage& _iconStorage;
 
-		wxString _selectedMod;
+		std::string _selectedMod;
 
 	private:
 		wxObjectDataPtr<ModListModel> _listModel;

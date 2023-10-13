@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,7 +8,7 @@
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "era2_config.hpp"
-#include "era2_mod_manager.h"
+#include "era2_mod_manager.hpp"
 #include "era2_plugin_manager.hpp"
 #include "system_info.hpp"
 #include "utility/fs_util.h"
@@ -69,7 +69,7 @@ namespace
 
 		for (const auto& source : list.managed)
 		{
-			if (!modList.isActive(wxString::FromUTF8(source.modId)))
+			if (!modList.isActive(source.modId))
 				continue;
 
 			const auto copyFrom =
@@ -95,7 +95,7 @@ namespace
 			data.emplace_back(path.string());
 		}
 
-		overwriteFileContent(pluginPath, wxString::FromUTF8(data.dump(2)));
+		overwriteFile(pluginPath, data.dump(2));
 	}
 }
 
@@ -152,7 +152,7 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 			continue;
 
 		const auto modId = it->path().filename().string();
-		if (modId == mm::SystemInfo::ManagedMod || !mods.isActive(wxString::FromUTF8(modId)))
+		if (modId == mm::SystemInfo::ManagedMod || !mods.isActive(modId))
 			continue;
 
 		for (const auto& dir : PluginDirs)

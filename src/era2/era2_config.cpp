@@ -49,18 +49,14 @@ Era2Config::Era2Config(const fs::path& path)
 
 void Era2Config::createDirectories() const
 {
-	std::vector<fs::path> dirs;
-	dirs.emplace_back(getProgramDataPath());
-	dirs.emplace_back(getPresetsPath());
-	dirs.emplace_back(getTempPath());
-
-	for (const auto& dir : dirs)
-		createDir(dir);
+	create_directories(getProgramDataPath());
+	create_directories(getPresetsPath());
+	create_directories(getTempPath());
 }
 
 void Era2Config::save()
 {
-	overwriteFileContent(getConfigFilePath(), wxString::FromUTF8(_data.dump(2)));
+	overwriteFile(getConfigFilePath(), _data.dump(2));
 }
 
 fs::path Era2Config::getDataPath() const

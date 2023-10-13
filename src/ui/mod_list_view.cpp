@@ -101,7 +101,7 @@ void ModListView::bindEvents()
 
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
 		const auto item = _list->GetSelection();
-		_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : wxString();
+		_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : "";
 		updateControlsState();
 	});
 
@@ -110,7 +110,7 @@ void ModListView::bindEvents()
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [=](wxDataViewEvent& event) {
 		auto id = _listModel->findIdByItem(event.GetItem());
-		event.SetDataObject(new wxTextDataObject(id));
+		event.SetDataObject(new wxTextDataObject(wxString::FromUTF8(id)));
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
@@ -119,11 +119,10 @@ void ModListView::bindEvents()
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
-		wxString         moveFrom;
 		wxTextDataObject from;
 		from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
-		moveFrom = from.GetText();
 
+		const auto moveFrom = from.GetText().utf8_string();
 		_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
 	});
 
@@ -377,8 +376,8 @@ void ModListView::onSwitchSelectedModStateRequested()
 		for (const auto& item : _modManager.mods().active)
 		{
 			auto other = _managedPlatform.modDataProvider()->modData(item);
-			if (modData.incompatible.contains(item.ToStdString(wxConvUTF8)) ||
-				other.incompatible.contains(_selectedMod.ToStdString(wxConvUTF8)))
+			if (modData.incompatible.contains(item) ||
+				other.incompatible.contains(_selectedMod))
 			{
 				incompatible.emplace_back('"' + other.caption + '"');
 			}

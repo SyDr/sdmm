@@ -54,7 +54,7 @@ namespace
 	}
 
 	Era2DirectoryStructure listModFiles(
-		std::unordered_set<wxString> const& mods, mm::IModDataProvider& dataProvider)
+		std::unordered_set<std::string> const& mods, mm::IModDataProvider& dataProvider)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure                  result;
@@ -175,9 +175,9 @@ namespace
 		return removeDeadMods(std::move(result));
 	}
 
-	std::vector<std::pair<wxString, wxString>> resolveCombinations(Era2DirectoryStructure const& data)
+	std::vector<std::pair<std::string, std::string>> resolveCombinations(Era2DirectoryStructure const& data)
 	{
-		std::set<std::pair<wxString, wxString>> result;
+		std::set<std::pair<std::string, std::string>> result;
 		for (size_t i = 0; i < data.modList.size(); ++i)
 			for (size_t j = i + 1; j < data.modList.size(); ++j)
 				for (const auto& row : data.entries)
@@ -192,7 +192,7 @@ namespace
 	}
 
 	Era2DirectoryStructure removeCombinationsIfPossible(
-		Era2DirectoryStructure data, std::set<std::pair<wxString, wxString>> remove)
+		Era2DirectoryStructure data, std::set<std::pair<std::string, std::string>> remove)
 	{
 		if (remove.empty())
 			return data;
@@ -206,7 +206,7 @@ namespace
 					for (size_t j = k + 1; j < data.entries[i].size(); ++j)
 					{
 						if (data.entries[i][k].any() && data.entries[i][j].any() &&
-							!remove.count({ data.modList[k], data.modList[j] }))
+							!remove.contains(std::pair(data.modList[k], data.modList[j])))
 						{
 							return false;
 						}

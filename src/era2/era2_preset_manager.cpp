@@ -9,7 +9,7 @@
 
 #include "application.h"
 #include "era2_config.hpp"
-#include "era2_mod_manager.h"
+#include "era2_mod_manager.hpp"
 #include "era2_platform.h"
 #include "era2_plugin_manager.hpp"
 #include "utility/fs_util.h"
@@ -99,11 +99,11 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const std::string& 
 	{
 		if (auto active = mods->find("active"); active != mods->end() && active->is_array())
 			for (const auto& item : *active)
-				modList.active.emplace_back(wxString::FromUTF8(item.get<std::string>()));
+				modList.active.emplace_back(item.get<std::string>());
 
 		if (auto hidden = mods->find("hidden"); hidden != mods->end() && hidden->is_array())
 			for (const auto& item : *hidden)
-				modList.hidden.emplace(wxString::FromUTF8(item.get<std::string>()));
+				modList.hidden.emplace(item.get<std::string>());
 	}
 
 	pluginList.available = Era2PluginManager::loadAvailablePlugins(_modsPath, modList);
@@ -125,10 +125,10 @@ void Era2PresetManager::savePreset(const std::string& name, const ModList& list,
 	data["mods"]["hidden"] = nlohmann::json::array();
 
 	for (const auto& item : list.active)
-		data["mods"]["active"].emplace_back(item.ToStdString(wxConvUTF8));
+		data["mods"]["active"].emplace_back(item);
 
 	for (const auto& item : list.hidden)
-		data["mods"]["hidden"].emplace_back(item.ToStdString(wxConvUTF8));
+		data["mods"]["hidden"].emplace_back(item);
 
 	auto& ref = data["plugins"] = nlohmann::json::array();
 	for (const auto& source : plugins.managed)

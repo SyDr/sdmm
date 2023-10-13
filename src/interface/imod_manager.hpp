@@ -1,12 +1,11 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 #include <sigslot/signal.hpp>
-#include <wx/string.h>
 
 #include <optional>
 
@@ -21,25 +20,25 @@ namespace mm
 
 		[[nodiscard]] virtual ModList const& mods() const = 0;
 
-		[[nodiscard]] virtual std::optional<size_t> activePosition(const wxString& item) const = 0;
-		virtual void                                activate(const wxString& item)             = 0;
-		virtual void                                deactivate(const wxString& item)           = 0;
-		virtual void                                switchState(const wxString& item)          = 0;
+		[[nodiscard]] virtual std::optional<size_t> activePosition(const std::string& item) const = 0;
+		virtual void                                activate(const std::string& item)             = 0;
+		virtual void                                deactivate(const std::string& item)           = 0;
+		virtual void                                switchState(const std::string& item)          = 0;
 
-		[[nodiscard]] virtual bool canMove(const wxString& from, const wxString& to) const = 0;
-		virtual void               move(const wxString& from, const wxString& to)          = 0;
+		[[nodiscard]] virtual bool canMove(const std::string& from, const std::string& to) const = 0;
+		virtual void               move(const std::string& from, const std::string& to)          = 0;
 
-		[[nodiscard]] virtual bool canMoveUp(const wxString& item) const = 0;
-		virtual void               moveUp(const wxString& item)          = 0;
+		[[nodiscard]] virtual bool canMoveUp(const std::string& item) const = 0;
+		virtual void               moveUp(const std::string& item)          = 0;
 
-		[[nodiscard]] virtual bool canMoveDown(const wxString& item) const = 0;
-		virtual void               moveDown(const wxString& item)          = 0;
+		[[nodiscard]] virtual bool canMoveDown(const std::string& item) const = 0;
+		virtual void               moveDown(const std::string& item)          = 0;
 
-		virtual void hide(const wxString& item)             = 0;
-		virtual void show(const wxString& item)             = 0;
-		virtual void switchVisibility(const wxString& item) = 0;
+		virtual void hide(const std::string& item)             = 0;
+		virtual void show(const std::string& item)             = 0;
+		virtual void switchVisibility(const std::string& item) = 0;
 
-		virtual void remove(const wxString& item) = 0;
+		virtual void remove(const std::string& item) = 0;
 
 		[[nodiscard]] virtual sigslot::signal<>& onListChanged() = 0;
 	};

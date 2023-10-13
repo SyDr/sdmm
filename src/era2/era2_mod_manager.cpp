@@ -5,16 +5,15 @@
 
 #include "stdafx.h"
 
+#include "era2_mod_manager.hpp"
+
 #include "application.h"
 #include "domain/mod_data.hpp"
 #include "era2_config.hpp"
-#include "era2_mod_manager.h"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
-
-#include <wx/dir.h>
 
 #include <unordered_set>
 
@@ -39,12 +38,12 @@ void Era2ModManager::mods(ModList mods)
 	_list = std::move(mods);
 }
 
-std::optional<size_t> Era2ModManager::activePosition(const wxString& item) const
+std::optional<size_t> Era2ModManager::activePosition(const std::string& item) const
 {
 	return _list.activePosition(item);
 }
 
-void Era2ModManager::activate(const wxString& item)
+void Era2ModManager::activate(const std::string& item)
 {
 	const auto size = _list.active.size();
 
@@ -54,7 +53,7 @@ void Era2ModManager::activate(const wxString& item)
 		_listChanged();
 }
 
-void Era2ModManager::deactivate(const wxString& item)
+void Era2ModManager::deactivate(const std::string& item)
 {
 	const auto size = _list.active.size();
 
@@ -64,7 +63,7 @@ void Era2ModManager::deactivate(const wxString& item)
 		_listChanged();
 }
 
-void Era2ModManager::switchState(const wxString& item)
+void Era2ModManager::switchState(const std::string& item)
 {
 	if (!_list.isActive(item))
 		activate(item);
@@ -72,12 +71,12 @@ void Era2ModManager::switchState(const wxString& item)
 		deactivate(item);
 }
 
-bool Era2ModManager::canMove(const wxString& from, const wxString& to) const
+bool Era2ModManager::canMove(const std::string& from, const std::string& to) const
 {
 	return _list.canMove(from, to);
 }
 
-void Era2ModManager::move(const wxString& from, const wxString& to)
+void Era2ModManager::move(const std::string& from, const std::string& to)
 {
 	if (from == to)
 		return;
@@ -87,31 +86,31 @@ void Era2ModManager::move(const wxString& from, const wxString& to)
 	_listChanged();
 }
 
-bool Era2ModManager::canMoveUp(const wxString& item) const
+bool Era2ModManager::canMoveUp(const std::string& item) const
 {
 	return _list.canMoveUp(item);
 }
 
-void Era2ModManager::moveUp(const wxString& item)
+void Era2ModManager::moveUp(const std::string& item)
 {
 	_list.moveUp(item);
 
 	_listChanged();
 }
 
-bool Era2ModManager::canMoveDown(const wxString& item) const
+bool Era2ModManager::canMoveDown(const std::string& item) const
 {
 	return _list.canMoveDown(item);
 }
 
-void Era2ModManager::moveDown(const wxString& item)
+void Era2ModManager::moveDown(const std::string& item)
 {
 	_list.moveDown(item);
 
 	_listChanged();
 }
 
-void Era2ModManager::hide(const wxString& item)
+void Era2ModManager::hide(const std::string& item)
 {
 	const auto size = _list.hidden.size();
 
@@ -121,7 +120,7 @@ void Era2ModManager::hide(const wxString& item)
 		_listChanged();
 }
 
-void Era2ModManager::show(const wxString& item)
+void Era2ModManager::show(const std::string& item)
 {
 	const auto size = _list.hidden.size();
 
@@ -131,7 +130,7 @@ void Era2ModManager::show(const wxString& item)
 		_listChanged();
 }
 
-void Era2ModManager::switchVisibility(const wxString& item)
+void Era2ModManager::switchVisibility(const std::string& item)
 {
 	if (_list.isHidden(item))
 		show(item);
@@ -139,7 +138,7 @@ void Era2ModManager::switchVisibility(const wxString& item)
 		hide(item);
 }
 
-void Era2ModManager::remove(const wxString& item)
+void Era2ModManager::remove(const std::string& item)
 {
 	_list.remove(item);
 
