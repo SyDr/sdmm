@@ -24,7 +24,7 @@
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.h"
 #include "era2_plugin_manager.hpp"
-#include "era2_preset_manager.h"
+#include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
 #include "system_info.hpp"
 #include "utility/fs_util.h"

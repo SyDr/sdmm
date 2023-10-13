@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "utility/wx_widgets_ptr.hpp"
 #include "type/filesystem.hpp"
+#include "utility/wx_widgets_ptr.hpp"
 
 #include <memory>
 #include <vector>
@@ -33,7 +33,7 @@ namespace mm
 	{
 	public:
 		explicit ManagePresetListView(wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage);
-		void onSavePresetRequested(wxString baseName);
+		void onSavePresetRequested(std::string baseName);
 
 	private:
 		void createControls();
@@ -51,20 +51,20 @@ namespace mm
 		void onDeletePreset();
 		void onSelectionChanged();
 
-		wxString getSelection() const;
-		void     onFilesystemError(const fs::filesystem_error& e);
+		std::string getSelection() const;
+		void        onFilesystemError(const fs::filesystem_error& e);
 
 	private:
 		const char* _program_name = nullptr;
 
 		IModPlatform& _platform;
 		IIconStorage& _iconStorage;
-		wxString      _selected;
+		std::string   _selected;
 
 		wxWidgetsPtr<wxStaticBox> _presets = nullptr;
 
 		wxWidgetsPtr<wxDataViewListCtrl> _list = nullptr;
-		std::vector<wxString>            _profiles;
+		std::vector<std::string>         _profiles;
 
 		wxWidgetsPtr<wxButton> _load = nullptr;
 		wxWidgetsPtr<wxButton> _save = nullptr;

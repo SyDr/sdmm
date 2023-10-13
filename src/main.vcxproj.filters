@@ -13,12 +13,10 @@
     <ClCompile Include="ui\mod_list_model.cpp" />
     <ClCompile Include="ui\select_directory_view.cpp" />
     <ClCompile Include="ui\select_exe.cpp" />
-    <ClCompile Include="ui\select_platform_view.cpp" />
     <ClCompile Include="ui\mod_list_view.cpp" />
     <ClCompile Include="utility\fs_util.cpp" />
     <ClCompile Include="utility\json_util.cpp" />
     <ClCompile Include="utility\shell_util.cpp" />
-    <ClCompile Include="utility\string_util.cpp" />
     <ClCompile Include="wx\data_view_multiple_icons_renderer.cpp" />
     <ClCompile Include="wx\priority_data_renderer.cpp" />
     <ClCompile Include="ui\show_file_list_dialog.cpp" />
@@ -31,7 +29,6 @@
     <ClCompile Include="era2\era2_mod_loader.cpp" />
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
-    <ClCompile Include="ui\resolve_mod_conflicts_view.cpp" />
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\show_file_list_helper.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
@@ -42,20 +39,13 @@
     <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="domain\mod_conflict_resolver.cpp" />
     <ClCompile Include="ui\image_gallery_view.cpp" />
+    <ClCompile Include="ui\icon_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="service\app_config.h" />
     <ClInclude Include="service\i18n_service.h" />
-    <ClInclude Include="service\icon_storage.h" />
-    <ClInclude Include="interface\ilaunch_helper.h" />
-    <ClInclude Include="interface\iapp_config.h" />
-    <ClInclude Include="interface\iicon_storage.h" />
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="service\platform_service.h" />
-    <ClInclude Include="interface\ilocal_config.h" />
-    <ClInclude Include="interface\iplatform_descriptor.h" />
-    <ClInclude Include="interface\iplatform_service.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="type\embedded_icon.h" />
     <ClInclude Include="type\main_window_properties.h" />
@@ -64,25 +54,19 @@
     <ClInclude Include="ui\mod_list_model.h" />
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />
-    <ClInclude Include="ui\select_platform_view.h" />
     <ClInclude Include="ui\mod_list_view.h" />
     <ClInclude Include="utility\sdlexcept.h" />
     <ClInclude Include="utility\fs_util.h" />
     <ClInclude Include="utility\json_util.h" />
-    <ClInclude Include="utility\macro.h" />
     <ClInclude Include="utility\shell_util.h" />
-    <ClInclude Include="utility\string_util.h" />
     <ClInclude Include="wx\data_view_multiple_icons_renderer.h" />
     <ClInclude Include="wx\priority_data_renderer.h" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
     <ClInclude Include="interface\imod_manager.hpp" />
-    <ClInclude Include="era2\era2_config.h" />
     <ClInclude Include="era2\era2_directory_structure.hpp" />
-    <ClInclude Include="era2\era2_launch_helper.h" />
     <ClInclude Include="era2\era2_mod_manager.h" />
     <ClInclude Include="era2\era2_platform.h" />
-    <ClInclude Include="era2\era2_platform_descriptor.h" />
-    <ClInclude Include="era2\era2_preset_manager.h" />
+    <ClInclude Include="era2\era2_preset_manager.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />
     <ClInclude Include="system_info.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
@@ -90,11 +74,9 @@
     <ClInclude Include="era2\era2_mod_loader.hpp" />
     <ClInclude Include="interface\imod_platform.hpp" />
     <ClInclude Include="interface\imod_data_provider.hpp" />
-    <ClInclude Include="utility\non_owning_ptr.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
     <ClInclude Include="era2\era2_mod_data_provider.hpp" />
     <ClInclude Include="utility\wx_widgets_ptr.hpp" />
-    <ClInclude Include="ui\resolve_mod_conflicts_view.hpp" />
     <ClInclude Include="domain\mod_conflict_resolver.hpp" />
     <ClInclude Include="type\conflict_resolve_mode.hpp" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
@@ -111,8 +93,23 @@
     <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="ui\image_gallery_view.hpp" />
+    <ClInclude Include="era2\era2_launch_helper.hpp" />
+    <ClInclude Include="service\app_config.hpp" />
+    <ClInclude Include="service\icon_storage.hpp" />
+    <ClInclude Include="interface\ilaunch_helper.hpp" />
+    <ClInclude Include="interface\iapp_config.hpp" />
+    <ClInclude Include="interface\iicon_storage.hpp" />
+    <ClInclude Include="era2\era2_config.hpp" />
+    <ClInclude Include="era2\era2_platform_descriptor.hpp" />
+    <ClInclude Include="interface\ilocal_config.hpp" />
+    <ClInclude Include="interface\iplatform_descriptor.hpp" />
+    <ClInclude Include="interface\iplatform_service.hpp" />
+    <ClInclude Include="ui\icon_helper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vcpkg.json" />
   </ItemGroup>
 </Project>

@@ -58,7 +58,7 @@ ManagePresetListView::ManagePresetListView(
 	wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage)
 	: wxPanel(parent, wxID_ANY)
 	, _platform(platform)
-	, _selected(wxString::FromUTF8(platform.localConfig()->getAcitvePreset()))
+	, _selected(platform.localConfig()->getAcitvePreset())
 	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage, true))
 	, _pluginListModel(new PluginListModel(*platform.modDataProvider(), iconStorage))
 	, _iconStorage(iconStorage)
@@ -81,8 +81,8 @@ void ManagePresetListView::refreshListContent()
 	for (const auto& preset : list)
 	{
 		wxVector<wxVariant> data;
-		data.push_back(wxVariant(wxDataViewIconText(
-			preset, _iconStorage.get(preset == _selected ? embedded_icon::tick : embedded_icon::blank))));
+		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(preset),
+			_iconStorage.get(preset == _selected ? embedded_icon::tick : embedded_icon::blank))));
 		_list->AppendItem(data);
 
 		_profiles.emplace_back(preset);
@@ -233,21 +233,23 @@ void ManagePresetListView::bindEvents()
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
 }
 
-void ManagePresetListView::onSavePresetRequested(wxString baseName)
+void ManagePresetListView::onSavePresetRequested(std::string baseName)
 {
 	EX_TRY;
 
 	if (baseName.empty())
-		baseName = showEnterNameDialog(this, "Enter profile name"_lng, "Create"_lng, baseName);
+		baseName =
+			showEnterNameDialog(this, "Enter profile name"_lng, "Create"_lng, wxString::FromUTF8(baseName))
+				.ToStdString(wxConvUTF8);
 
 	if (baseName.empty())
 		return;
 
 	if (_platform.getPresetManager()->exists(baseName))
 	{
-		int const answer =
-			wxMessageBox(wxString::Format(wxString("'%s' already exists, overwrite?"_lng), baseName),
-				wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+		int const answer = wxMessageBox(
+			wxString::Format("'%s' already exists, overwrite?"_lng, wxString::FromUTF8(baseName)),
+			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 		if (answer != wxYES)
 			return;
@@ -255,7 +257,7 @@ void ManagePresetListView::onSavePresetRequested(wxString baseName)
 
 	_platform.getPresetManager()->savePreset(
 		baseName, _platform.modManager()->mods(), _platform.pluginManager()->plugins());
-	_platform.localConfig()->setActivePreset(baseName.ToStdString(wxConvUTF8));
+	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
 	refreshListContent();
@@ -277,12 +279,12 @@ void ManagePresetListView::onLoadPresetRequested()
 	plugins.available = _platform.pluginManager()->plugins().available;
 
 	_platform.apply(&mods, &plugins);
-	_platform.localConfig()->setActivePreset(selected.ToStdString(wxConvUTF8));
+	_platform.localConfig()->setActivePreset(selected);
 	_selected = selected;
 
 	refreshListContent();
 
-	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, selected));
+	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, wxString::FromUTF8(selected)));
 	_infoBarTimer.StartOnce(5000);
 
 	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
@@ -293,15 +295,18 @@ void ManagePresetListView::onRenamePreset()
 {
 	EX_TRY;
 
-	const wxString selected = getSelection();
-	const wxString newName  = showEnterNameDialog(this, "Enter profile name"_lng, "Rename"_lng, selected);
+	const auto selected = getSelection();
+	const auto newName =
+		showEnterNameDialog(this, "Enter profile name"_lng, "Rename"_lng, wxString::FromUTF8(selected))
+			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())
 		return;
 
 	if (_platform.getPresetManager()->exists(newName))
 	{
-		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		_infoBar->ShowMessage(
+			wxString::Format("Profile \"%s\" already exists."_lng, wxString::FromUTF8(newName)));
 		_infoBarTimer.StartOnce(5000);
 		return;
 	}
@@ -317,15 +322,18 @@ void ManagePresetListView::onCopyPreset()
 {
 	EX_TRY;
 
-	const wxString selected = getSelection();
-	const wxString newName  = showEnterNameDialog(this, "Enter profile name"_lng, "Copy"_lng, selected);
+	const auto selected = getSelection();
+	const auto newName =
+		showEnterNameDialog(this, "Enter profile name"_lng, "Copy"_lng, wxString::FromUTF8(selected))
+			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())
 		return;
 
 	if (_platform.getPresetManager()->exists(newName))
 	{
-		_infoBar->ShowMessage(wxString::Format("Profile \"%s\" already exists."_lng, newName));
+		_infoBar->ShowMessage(
+			wxString::Format("Profile \"%s\" already exists."_lng, wxString::FromUTF8(newName)));
 		_infoBarTimer.StartOnce(5000);
 		return;
 	}
@@ -341,7 +349,7 @@ void ManagePresetListView::onDeletePreset()
 	EX_TRY;
 
 	auto      selected = getSelection();
-	const int answer   = wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), selected),
+	const int answer   = wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), wxString::FromUTF8(selected)),
 		  wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 	if (answer == wxYES)
@@ -384,7 +392,7 @@ void ManagePresetListView::updatePreview()
 	EX_UNEXPECTED;
 }
 
-wxString ManagePresetListView::getSelection() const
+std::string ManagePresetListView::getSelection() const
 {
 	if (auto index = _list->GetSelectedRow(); index != wxNOT_FOUND)
 		return _profiles.at(index);

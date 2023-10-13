@@ -68,7 +68,7 @@
     <ClInclude Include="era2\era2_launch_helper.hpp" />
     <ClInclude Include="era2\era2_mod_manager.h" />
     <ClInclude Include="era2\era2_plugin_manager.hpp" />
-    <ClInclude Include="era2\era2_preset_manager.h" />
+    <ClInclude Include="era2\era2_preset_manager.hpp" />
     <ClInclude Include="service\app_config.hpp" />
     <ClInclude Include="service\i18n_service.h" />
     <ClInclude Include="service\icon_storage.hpp" />

@@ -5,7 +5,7 @@
 
 #include "stdafx.h"
 
-#include "era2_preset_manager.h"
+#include "era2_preset_manager.hpp"
 
 #include "application.h"
 #include "era2_config.hpp"
@@ -23,9 +23,9 @@ using namespace mm;
 
 namespace
 {
-	fs::path toPath(fs::path const& base, const wxString& name)
+	fs::path toPath(const fs::path& base, const std::string& name)
 	{
-		return base / (name + L".json").ToStdString(wxConvUTF8);
+		return base / (name + ".json");
 	}
 }
 
@@ -34,7 +34,7 @@ Era2PresetManager::Era2PresetManager(fs::path rootPath, fs::path modsPath)
 	, _modsPath(std::move(modsPath))
 {}
 
-void Era2PresetManager::copy(const wxString& from, const wxString& to)
+void Era2PresetManager::copy(const std::string& from, const std::string& to)
 {
 	const auto pathFrom = toPath(_rootPath, from);
 	const auto pathTo   = toPath(_rootPath, to);
@@ -44,7 +44,7 @@ void Era2PresetManager::copy(const wxString& from, const wxString& to)
 	_listChanged();
 }
 
-void Era2PresetManager::remove(const wxString& name)
+void Era2PresetManager::remove(const std::string& name)
 {
 	const auto path = toPath(_rootPath, name);
 
@@ -53,22 +53,22 @@ void Era2PresetManager::remove(const wxString& name)
 	_listChanged();
 }
 
-std::set<wxString> Era2PresetManager::list() const
+std::set<std::string> Era2PresetManager::list() const
 {
-	std::set<wxString> result;
+	std::set<std::string> result;
 
 	fs::directory_iterator di(_rootPath);
 
 	for (const auto end = fs::directory_iterator(); di != end; ++di)
 	{
 		if (fs::is_regular_file(*di) && di->path().extension() == ".json")
-			result.emplace(di->path().stem().wstring());
+			result.emplace(di->path().stem().string());
 	}
 
 	return result;
 }
 
-void Era2PresetManager::rename(const wxString& from, const wxString& to)
+void Era2PresetManager::rename(const std::string& from, const std::string& to)
 {
 	const auto pathFrom = toPath(_rootPath, from);
 	const auto pathTo   = toPath(_rootPath, to);
@@ -83,7 +83,7 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 	return _listChanged;
 }
 
-std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& name)
+std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const std::string& name)
 {
 	ModList    modList;
 	PluginList pluginList;
@@ -135,7 +135,7 @@ std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const wxString& nam
 	return { modList, pluginList };
 }
 
-void Era2PresetManager::savePreset(const wxString& name, const ModList& list, const PluginList& plugins)
+void Era2PresetManager::savePreset(const std::string& name, const ModList& list, const PluginList& plugins)
 {
 	nlohmann::json data;
 
@@ -168,7 +168,7 @@ void Era2PresetManager::savePreset(const wxString& name, const ModList& list, co
 		_listChanged();
 }
 
-bool Era2PresetManager::exists(const wxString& name) const
+bool Era2PresetManager::exists(const std::string& name) const
 {
 	return fs::exists(toPath(_rootPath, name));
 }
