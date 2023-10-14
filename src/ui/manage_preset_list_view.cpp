@@ -13,6 +13,7 @@
 #include "interface/iicon_storage.hpp"
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
+#include "interface/ilaunch_helper.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/iplugin_manager.hpp"
 #include "interface/ipreset_manager.hpp"
@@ -21,6 +22,7 @@
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
+#include "export_preset_dialog.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -106,7 +108,6 @@ void ManagePresetListView::createControls()
 	_save = new wxButton(_presets, wxID_ANY, "Save"_lng);
 
 	_export = new wxButton(_presets, wxID_ANY, "Export"_lng);
-	_export->Hide();
 	_import = new wxButton(_presets, wxID_ANY, "Import"_lng);
 	_import->Hide();
 
@@ -225,6 +226,8 @@ void ManagePresetListView::bindEvents()
 	_load->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLoadPresetRequested(); });
 	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(getSelection()); });
 
+	_export->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onExportPresetRequested(getSelection()); });
+
 	_rename->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onRenamePreset(); });
 	_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
 
@@ -256,7 +259,8 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 	}
 
 	_platform.getPresetManager()->savePreset(
-		baseName, _platform.modManager()->mods(), _platform.pluginManager()->plugins());
+		baseName, { _platform.modManager()->mods(), _platform.pluginManager()->plugins(),
+					  _platform.launchHelper()->getExecutable() });
 	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
@@ -266,19 +270,29 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 	EX_UNEXPECTED;
 }
 
+void ManagePresetListView::onExportPresetRequested(std::string baseName)
+{
+	EX_TRY;
+
+	ExportPresetDialog epf(this, _platform, _iconStorage, baseName);
+	epf.ShowModal();
+
+	EX_UNEXPECTED;
+}
+
 void ManagePresetListView::onLoadPresetRequested()
 {
 	EX_TRY;
 
-	auto selected        = getSelection();
-	auto [mods, plugins] = _platform.getPresetManager()->loadPreset(selected);
+	auto selected = getSelection();
+	auto preset   = _platform.getPresetManager()->loadPreset(selected);
 
-	mods.available = _platform.modManager()->mods().available;
-	mods.invalid   = _platform.modManager()->mods().invalid;
+	preset.mods.available = _platform.modManager()->mods().available;
+	preset.mods.invalid   = _platform.modManager()->mods().invalid;
 
-	plugins.available = _platform.pluginManager()->plugins().available;
+	preset.plugins.available = _platform.pluginManager()->plugins().available;
 
-	_platform.apply(&mods, &plugins);
+	_platform.apply(&preset.mods, &preset.plugins);
 	_platform.localConfig()->setActivePreset(selected);
 	_selected = selected;
 
@@ -375,18 +389,17 @@ void ManagePresetListView::updatePreview()
 
 	auto selected = getSelection();
 
-	ModList    mods;
-	PluginList plugins;
+	PresetData preset;
 	if (!selected.empty())
 	{
-		std::tie(mods, plugins) = _platform.getPresetManager()->loadPreset(selected);
+		preset = _platform.getPresetManager()->loadPreset(selected);
 		// mods.available = _platform.modManager()->mods().available;
 	}
 
-	_listModel->setModList(mods);
-	_pluginListModel->setList(plugins);
+	_listModel->setModList(preset.mods);
+	_pluginListModel->setList(preset.plugins);
 
-	_plugins->Show(!plugins.managed.empty());
+	_plugins->Show(!preset.plugins.managed.empty());
 	Layout();
 
 	EX_UNEXPECTED;
@@ -409,7 +422,6 @@ void ManagePresetListView::onSelectionChanged()
 	_save->SetLabel(selected.empty() ? "Save as"_lng : "Save"_lng);
 
 	_load->Enable(!selected.empty());
-	_export->Enable(!selected.empty());
 	_rename->Enable(!selected.empty());
 	_copy->Enable(!selected.empty());
 	_remove->Enable(!selected.empty());

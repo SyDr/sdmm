@@ -9,6 +9,8 @@
 
 #include <sigslot/signal.hpp>
 
+#include "domain/preset_data.hpp"
+
 namespace mm
 {
 	struct ModList;
@@ -20,8 +22,10 @@ namespace mm
 
 		[[nodiscard]] virtual std::set<std::string> list() const = 0;
 
-		[[nodiscard]] virtual std::pair<ModList, PluginList> loadPreset(const std::string& name)         = 0;
-		virtual void savePreset(const std::string& name, const ModList& list, const PluginList& plugins) = 0;
+		[[nodiscard]] virtual PresetData loadPreset(const std::string& name) = 0;
+
+		[[nodiscard]] virtual nlohmann::json savePreset(const PresetData& preset)  = 0;
+		virtual void savePreset(const std::string& name, const PresetData& preset) = 0;
 
 		[[nodiscard]] virtual bool exists(const std::string& name) const                  = 0;
 		virtual void               copy(const std::string& from, const std::string& to)   = 0;

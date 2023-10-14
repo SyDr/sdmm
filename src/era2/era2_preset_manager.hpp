@@ -17,8 +17,9 @@ namespace mm
 	{
 		explicit Era2PresetManager(fs::path rootPath, fs::path modsPath);
 
-		std::pair<ModList, PluginList> loadPreset(const std::string& name) override;
-		void savePreset(const std::string& name, const ModList& list, const PluginList& plugins) override;
+		PresetData     loadPreset(const std::string& name) override;
+		nlohmann::json savePreset(const PresetData& preset) override;
+		void           savePreset(const std::string& name, const PresetData& preset) override;
 
 		std::set<std::string> list() const override;
 

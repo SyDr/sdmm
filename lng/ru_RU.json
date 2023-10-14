@@ -89,6 +89,10 @@
 	"Screenshots" : "Скриншоты",
 	"Reload data from disk" : "Перезагрузить данные с диска",
 	"Show all" : "Показать все",
+	"Save selected executable" : "Сохранить выбранный файл запуска",
+	"Save selected plugins" : "Сохранить выбранные плагины",
+	"Copied" : "Скопировано",
+	"Cannot open clipboard" : "Не получилось открыть буфер обмена",
 
 	"category" : {
 		"gameplay" : "Геймплей",

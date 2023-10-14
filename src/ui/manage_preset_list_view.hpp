@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <wx/dialog.h>
+#include <wx/timer.h>
 
 class wxListView;
 class wxImageList;
@@ -33,7 +34,6 @@ namespace mm
 	{
 	public:
 		explicit ManagePresetListView(wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage);
-		void onSavePresetRequested(std::string baseName);
 
 	private:
 		void createControls();
@@ -46,6 +46,8 @@ namespace mm
 		void refreshListContent();
 
 		void onLoadPresetRequested();
+		void onSavePresetRequested(std::string baseName);
+		void onExportPresetRequested(std::string baseName);
 		void onRenamePreset();
 		void onCopyPreset();
 		void onDeletePreset();
@@ -55,8 +57,6 @@ namespace mm
 		void        onFilesystemError(const fs::filesystem_error& e);
 
 	private:
-		const char* _program_name = nullptr;
-
 		IModPlatform& _platform;
 		IIconStorage& _iconStorage;
 		std::string   _selected;

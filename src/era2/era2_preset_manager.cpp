@@ -16,6 +16,7 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "utility/json_util.h"
+#include "system_info.hpp"
 
 #include <wx/dir.h>
 #include <wx/file.h>
@@ -84,59 +85,76 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 	return _listChanged;
 }
 
-std::pair<ModList, PluginList> Era2PresetManager::loadPreset(const std::string& name)
+PresetData Era2PresetManager::loadPreset(const std::string& name)
 {
-	ModList    modList;
-	PluginList pluginList;
+	PresetData result;
 
 	const auto path = toPath(_rootPath, name);
 	const auto data = loadJsonFromFile(path, true);
 
 	if (!data.is_object())
-		return { modList, pluginList };
+		return result;
 
-	if (auto mods = data.find("mods"); mods != data.end() && mods->is_object())
-	{
-		if (auto active = mods->find("active"); active != mods->end() && active->is_array())
-			for (const auto& item : *active)
-				modList.active.emplace_back(item.get<std::string>());
+	if (auto active = data.find("list"); active != data.end() && active->is_array())
+		for (const auto& item : *active)
+			result.mods.active.emplace_back(item.get<std::string>());
 
-		if (auto hidden = mods->find("hidden"); hidden != mods->end() && hidden->is_array())
-			for (const auto& item : *hidden)
-				modList.hidden.emplace(item.get<std::string>());
-	}
+	if (auto hidden = data.find("hidden"); hidden != data.end() && hidden->is_array())
+		for (const auto& item : *hidden)
+			result.mods.hidden.emplace(item.get<std::string>());
 
-	pluginList.available = Era2PluginManager::loadAvailablePlugins(_modsPath, modList);
+	result.plugins.available = Era2PluginManager::loadAvailablePlugins(_modsPath, result.mods);
 	if (auto plugins = data.find("plugins"); plugins != data.end())
-		pluginList.managed = Era2PluginManager::loadManagedState(*plugins);
+		result.plugins.managed = Era2PluginManager::loadManagedState(*plugins);
 
-	erase_if(
-		pluginList.available, [&](const PluginSource& item) { return !pluginList.managed.contains(item); });
+	erase_if(result.plugins.available,
+		[&](const PluginSource& item) { return !result.plugins.managed.contains(item); });
 
-	return { modList, pluginList };
+	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
+		result.executable = exe->get<std::string>();
+
+	return result;
 }
 
-void Era2PresetManager::savePreset(const std::string& name, const ModList& list, const PluginList& plugins)
+nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 {
 	nlohmann::json data;
 
-	data["mods"]           = nlohmann::json::object();
-	data["mods"]["active"] = nlohmann::json::array();
-	data["mods"]["hidden"] = nlohmann::json::array();
+	data["mm_version"]     = PROGRAM_VERSION;
 
-	for (const auto& item : list.active)
-		data["mods"]["active"].emplace_back(item);
-
-	for (const auto& item : list.hidden)
-		data["mods"]["hidden"].emplace_back(item);
-
-	auto& ref = data["plugins"] = nlohmann::json::array();
-	for (const auto& source : plugins.managed)
+	if (!preset.mods.active.empty())
 	{
-		const auto path =
-			(fs::path(source.modId) / to_string(source.location) / source.name).lexically_normal();
-		ref.emplace_back(path.string());
+		auto& ref = data["list"] = nlohmann::json::array();
+		for (const auto& item : preset.mods.active)
+			ref.emplace_back(item);
 	}
+	if (!preset.mods.hidden.empty())
+	{
+		auto& ref = data["hidden"] = nlohmann::json::array();
+		for (const auto& item : preset.mods.hidden)
+			ref.emplace_back(item);
+	}
+
+	if (!preset.plugins.managed.empty())
+	{
+		auto& ref = data["plugins"] = nlohmann::json::array();
+		for (const auto& source : preset.plugins.managed)
+		{
+			const auto path =
+				(fs::path(source.modId) / to_string(source.location) / source.name).lexically_normal();
+			ref.emplace_back(path.string());
+		}
+	}
+
+	if (!preset.executable.empty())
+		data["exe"] = preset.executable;
+
+	return data;
+}
+
+void Era2PresetManager::savePreset(const std::string& name, const PresetData& preset)
+{
+	nlohmann::json data = savePreset(preset);
 
 	const auto path          = toPath(_rootPath, name);
 	const bool already_exist = fs::exists(path);

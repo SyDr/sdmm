@@ -41,6 +41,7 @@
     <ClCompile Include="ui\mod_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_model.cpp" />
     <ClCompile Include="ui\plugin_list_view.cpp" />
+    <ClCompile Include="ui\export_preset_dialog.cpp" />
     <ClCompile Include="ui\select_directory_view.cpp" />
     <ClCompile Include="ui\select_exe.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
@@ -57,6 +58,7 @@
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="domain\mod_conflict_resolver.hpp" />
+    <ClInclude Include="domain\preset_data.hpp" />
     <ClInclude Include="interface\imod_data_provider.hpp" />
     <ClInclude Include="interface\iplugin_manager.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
@@ -104,6 +106,7 @@
     <ClInclude Include="ui\mod_list_model.h" />
     <ClInclude Include="ui\plugin_list_model.hpp" />
     <ClInclude Include="ui\plugin_list_view.hpp" />
+    <ClInclude Include="ui\export_preset_dialog.hpp" />
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\select_mods_dialog.hpp" />
