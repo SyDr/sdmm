@@ -139,12 +139,16 @@ fs::path Era2Platform::managedPath() const
 	return _rootDir;
 }
 
-void Era2Platform::reload()
+void Era2Platform::reload(bool force)
 {
+	auto mods = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
+	if (!force && mods == _modManager->mods())
+		return;
+
 	_modDataProvider->clear();
 	auto block = _modListChanged.blocker();
 
-	_modManager->mods(loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath()));
+	_modManager->mods(mods);
 	_modManager->onListChanged()();
 }
 

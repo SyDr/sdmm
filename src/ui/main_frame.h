@@ -26,6 +26,8 @@ namespace mm
 	public:
 		explicit MainFrame(Application& app);
 
+		void reloadModelIfNeeded();
+
 	private:
 		void createMenuBar();
 		void reloadModel();

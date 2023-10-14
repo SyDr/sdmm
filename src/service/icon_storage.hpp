@@ -11,9 +11,8 @@
 
 namespace mm
 {
-	class IconStorage : public IIconStorage
+	struct IconStorage : public IIconStorage
 	{
-	public:
 		wxIcon get(const std::string& name) override;
 
 	private:

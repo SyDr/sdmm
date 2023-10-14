@@ -130,6 +130,15 @@ MainFrame::MainFrame(Application& app)
 			_launchManageButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { selectExeToLaunch(); });
 		}
 	}
+}
+void MainFrame::reloadModelIfNeeded()
+{
+	EX_TRY;
+
+	if (_currentPlatform)
+		_currentPlatform->reload();
+
+	EX_UNEXPECTED;
 };
 
 void MainFrame::OnAbout()
@@ -219,7 +228,7 @@ void MainFrame::OnMenuToolsReloadDataFromDisk()
 	EX_TRY;
 
 	if (_currentPlatform)
-		_currentPlatform->reload();
+		_currentPlatform->reload(true);
 
 	EX_UNEXPECTED;
 }

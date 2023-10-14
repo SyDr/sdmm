@@ -11,9 +11,8 @@ namespace mm
 {
 	struct Application;
 
-	class PlatformService : public IPlatformService
+	struct PlatformService : public IPlatformService
 	{
-	public:
 		explicit PlatformService(const Application& app);
 
 		[[nodiscard]] std::deque<IPlatformDescriptor*> availablePlatforms() const override;

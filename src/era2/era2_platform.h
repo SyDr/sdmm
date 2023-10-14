@@ -30,7 +30,7 @@ namespace mm
 		explicit Era2Platform(Application const& app);
 
 		fs::path managedPath() const override;
-		void     reload() override;
+		void     reload(bool force) override;
 
 		void apply(ModList* mods, PluginList* plugins) override;
 

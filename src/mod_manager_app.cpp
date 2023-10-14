@@ -50,6 +50,11 @@ bool ModManagerApp::OnInit()
 
 	initView();
 
+	Bind(wxEVT_ACTIVATE_APP, [=](wxActivateEvent& event) {
+		if (event.GetActive())
+			_mainFrame->reloadModelIfNeeded();
+	});
+
 	return true;
 }
 

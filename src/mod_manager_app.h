@@ -16,8 +16,9 @@ namespace mm
 {
 	struct AppConfig;
 	struct I18nService;
-	class PlatformService;
-	class IconStorage;
+	struct IPlatformService;
+	struct IIconStorage;
+	class MainFrame;
 
 	class ModManagerApp : public wxApp, public Application
 	{
@@ -46,16 +47,16 @@ namespace mm
 		void initView();
 
 	private:
-		wxWidgetsPtr<wxFrame> _mainFrame = nullptr;
+		wxWidgetsPtr<MainFrame> _mainFrame = nullptr;
 
 		std::unique_ptr<wxSingleInstanceChecker> _singleInstanceChecker;
 
 		std::unique_ptr<AppConfig> _appConfig;
 
 		std::unique_ptr<I18nService>     _i18nService;
-		std::unique_ptr<PlatformService> _platformService;
+		std::unique_ptr<IPlatformService> _platformService;
 
-		std::unique_ptr<IconStorage> _iconStorage;
+		std::unique_ptr<IIconStorage> _iconStorage;
 	};
 }
 
