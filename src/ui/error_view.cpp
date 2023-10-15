@@ -35,7 +35,7 @@ void ErrorView::createControls()
 {
 	_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 	_text = new wxTextCtrl(_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	_ok = new wxButton(_panel, wxID_OK, "Ok"_lng);
+	_ok = new wxButton(_panel, wxID_OK, "OK"_lng);
 	_label = new wxStaticText(_panel, wxID_ANY, "Internal error happened (only if you didn't wanted to to get exactly "
 		"this result). Please, make report, describing your actions and include following information:"_lng);
 	_link = new wxHyperlinkCtrl(_panel, wxID_ANY, L"http://wforum.heroes35.net/showthread.php?tid=4246",

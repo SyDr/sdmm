@@ -1,6 +1,6 @@
 {
 	"Unexpected error occurred" : "Произошла непредвиденная ошибка",
-	"Ok" : "Ок",
+	"OK" : "ОК",
 	"Error details" : "Детали ошибки",
 	"Internal error happened (only if you didn't wanted to to get exactly this result). Please, make report, describing your actions and include following information:" : "Произошла внутренная необработаная ошибка (если только вы не добивались именно этого результата). Пожалуйста, сообщите о ней, описав ваши действия и включив в сообщение следующую информацию:",
 	"Change managed directory" : "Сменить управляемый каталог",

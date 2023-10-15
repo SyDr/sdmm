@@ -51,7 +51,7 @@ SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	wxBoxSizer* bHorizontal = new wxBoxSizer(wxHORIZONTAL);
 	bVertical->Add(bHorizontal, 0, wxSTRETCH_NOT, 5);
 
-	wxButton* buttonOk = new wxButton(mainPanel, wxID_ANY, "Ok"_lng);
+	wxButton* buttonOk = new wxButton(mainPanel, wxID_ANY, "OK"_lng);
 	buttonOk->Enable(!_selectedFile.empty());
 
 	bHorizontal->AddStretchSpacer(1);
