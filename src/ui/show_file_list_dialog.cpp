@@ -38,8 +38,6 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, Application& applicatio
 	, _data(std::move(data))
 	, _listModel(new ModListModel(dataProvider, application.iconStorage(), true))
 {
-	SetIcon(application.iconStorage().get(embedded_icon::main_icon));
-
 	createControls();
 	buildLayout();
 	fillData();

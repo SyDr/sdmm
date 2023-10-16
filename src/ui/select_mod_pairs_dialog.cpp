@@ -45,8 +45,6 @@ SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, Application& applic
 	, _modDataProvider(dataProvider)
 	, _values(std::move(values))
 {
-	SetIcon(_iconStorage.get(embedded_icon::main_icon));
-
 	createControls();
 	buildLayout();
 	fillData();

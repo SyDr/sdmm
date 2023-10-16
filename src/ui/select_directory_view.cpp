@@ -33,8 +33,6 @@ SelectDirectoryDialog::SelectDirectoryDialog(wxWindow* parent, IAppConfig& confi
 	, _appConfig(config)
 	, _iconStorage(iconStorage)
 {
-	SetIcon(_iconStorage.get(embedded_icon::main_icon));
-
 	createControls();
 	buildLayout();
 	fillData();

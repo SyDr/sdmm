@@ -29,7 +29,6 @@ SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	, _selectedFile(initiallySelectedFile)
 	, _iconStorage(iconStorage)
 {
-	SetIcon(_iconStorage.get(embedded_icon::main_icon));
 	this->SetSizeHints(wxSize(200, 324), wxDefaultSize);
 
 	_imageList = std::make_unique<wxImageList>(16, 16, true);

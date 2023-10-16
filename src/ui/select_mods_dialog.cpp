@@ -44,8 +44,6 @@ SelectModsDialog::SelectModsDialog(wxWindow& parent, Application& application,
 	, _listModel(new ModListModel(dataProvider, application.iconStorage(), true))
 	, _mods(std::move(list))
 {
-	SetIcon(_iconStorage.get(embedded_icon::main_icon));
-
 	createControls();
 	buildLayout();
 	bindEvents();
