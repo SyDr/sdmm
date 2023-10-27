@@ -12,9 +12,6 @@
 
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
-#include <boost/range/combine.hpp>
-#include <wx/dir.h>
-#include <wx/textfile.h>
 
 #include "application.h"
 #include "domain/mod_data.hpp"
@@ -30,7 +27,6 @@
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
-#include "utility/shell_util.h"
 
 using namespace mm;
 

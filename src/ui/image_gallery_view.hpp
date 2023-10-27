@@ -12,7 +12,6 @@
 
 #include <wx/sizer.h>
 #include <wx/vscroll.h>
-#include <wx/wx.h>
 
 namespace mm
 {

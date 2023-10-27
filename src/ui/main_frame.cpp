@@ -30,7 +30,6 @@
 #include "type/embedded_icon.h"
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
-#include "utility/shell_util.h"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>

@@ -21,17 +21,7 @@ namespace mm
 		after_wog  = 2,
 	};
 
-	inline std::string to_string(PluginLocation location)
-	{
-		switch (location)
-		{
-		case PluginLocation::root: return ".";
-		case PluginLocation::before_wog: return "BeforeWoG";
-		case PluginLocation::after_wog: return "AfterWoG";
-		}
-
-		return "";
-	}
+	std::string to_string(PluginLocation location);
 
 	struct PluginSource
 	{
@@ -40,41 +30,19 @@ namespace mm
 		std::string    name;
 
 		PluginSource() = default;
-		PluginSource(const std::string& modId, PluginLocation location, const std::string& name);
+		PluginSource(const std::string& modId, PluginLocation location, const std::string& name)
+			: modId(modId)
+			, location(location)
+			, name(name)
+		{}
 
-		std::string toString() const
-		{
-			std::string result =
-				active() ? name : name.substr(0, name.size() - std::char_traits<const char>::length(".off"));
+		std::string toString() const;
+		std::string toFileIdenity() const;
 
-			if (location == PluginLocation::root)
-				return result;
+		bool active() const;
 
-			return result + " (" + mm::to_string(location) + ")";
-		}
-
-		std::string toFileIdenity() const
-		{
-			std::string result =
-				active() ? name : name.substr(0, name.size() - std::char_traits<const char>::length(".off"));
-
-			if (location == PluginLocation::root)
-				return result;
-
-			return mm::to_string(location) + "/" + result;
-		}
-
-		bool active() const
-		{
-			return !boost::ends_with(name, ".off");
-		}
-
-		auto operator<=>(const PluginSource& other) const
-		{
-			return std::tie(location, name, modId) <=> std::tie(other.location, other.name, other.modId);
-		}
-
-		bool operator==(const PluginSource& other) const = default;
+		std::strong_ordering operator<=>(const PluginSource& other) const;
+		bool                 operator==(const PluginSource& other) const = default;
 	};
 
 	struct PluginList
@@ -82,18 +50,9 @@ namespace mm
 		std::set<PluginSource> available;
 		std::set<PluginSource> managed;
 
-		bool active(const PluginSource& item) const
-		{
-			return item.active() xor managed.contains(item);
-		}
+		bool active(const PluginSource& item) const;
 
-		void switchState(const PluginSource& item)
-		{
-			if (managed.contains(item))
-				managed.erase(item);
-			else
-				managed.emplace(item);
-		}
+		void switchState(const PluginSource& item);
 
 		std::weak_ordering operator<=>(const PluginList& other) const = default;
 	};

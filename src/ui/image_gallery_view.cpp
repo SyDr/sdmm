@@ -9,7 +9,7 @@
 
 #include "application.h"
 
-#include <algorithm>
+
 #include <wx/dcbuffer.h>
 
 using namespace mm;

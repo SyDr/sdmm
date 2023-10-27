@@ -23,7 +23,6 @@
 #include "select_exe.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
-#include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
 
 #include <wx/app.h>
