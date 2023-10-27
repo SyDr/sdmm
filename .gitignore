@@ -13,3 +13,6 @@
 /setup/Output/*
 /setup/to_archive/*
 /src/vcpkg_installed/
+/compileData.scor*
+/StructLayoutSettings.json
+/CompileScoreSettings.json
