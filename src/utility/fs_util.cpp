@@ -41,16 +41,24 @@ void mm::overwriteFileIfNeeded(const fs::path& path, const std::string& content)
 
 void mm::overwriteFile(const fs::path& path, const std::string& content)
 {
-	const auto tmp = path.parent_path() / (path.extension().string() + ".tmp");
-	const auto org = path.parent_path() / (path.extension().string() + ".org");
+	// To be safe enough, do following:
+	//	write content to temp file
+	//	rename original file to other name
+	//	rename temp file to original name
+	//	now remove other name, it's not needed anymore
+
+	const auto tmp = path.parent_path() / (path.filename().string() + ".tmp");
+	const auto org = path.parent_path() / (path.filename().string() + ".mmorg");
 
 	boost::nowide::ofstream f(tmp, std::ios_base::out | std::ios_base::binary);
 	f << content;
 	f.close();
 
-	rename(path, org);
-	rename(tmp, path);
-	remove(org);
+	boost::system::error_code ec;
+	remove(org, ec);        // if temp original exist -> remove it
+	rename(path, org, ec);  // maybe there is no original yet
+	rename(tmp, path);      // this must succeed
+	remove(org, ec);        // remove original one if we have it
 }
 
 std::vector<wxString> mm::getAllDirs(const fs::path& path)

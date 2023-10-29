@@ -20,6 +20,7 @@
 #include "mod_list_model.h"
 #include "plugin_list_model.hpp"
 #include "type/embedded_icon.h"
+#include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 
@@ -52,6 +53,8 @@ ExportPresetDialog::ExportPresetDialog(
 
 	createControls();
 
+	_exportName->SetValue(wxString::FromUTF8(_selected));
+
 	updateLayout();
 	bindEvents();
 	updatePreview();
@@ -59,46 +62,57 @@ ExportPresetDialog::ExportPresetDialog(
 
 void ExportPresetDialog::createControls()
 {
-	_exportInfo = new wxStaticBox(this, wxID_ANY, "Export"_lng);
+	_previewGroup = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
 
-	_exportData = new wxTextCtrl(_exportInfo, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+	_exportData = new wxTextCtrl(_previewGroup, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
 
-	_saveExecutable = new wxCheckBox(_exportInfo, wxID_ANY, "Save selected executable"_lng);
+	_optionsBox     = new wxStaticBox(this, wxID_ANY, "Export options"_lng);
+	_saveExecutable = new wxCheckBox(_optionsBox, wxID_ANY, "Save selected executable"_lng);
 	_saveExecutable->SetValue(true);
-	_savePlugins = new wxCheckBox(_exportInfo, wxID_ANY, "Save selected plugins"_lng);
+	_savePlugins = new wxCheckBox(_optionsBox, wxID_ANY, "Save selected plugins"_lng);
 	_savePlugins->SetValue(true);
+	_exportNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "Profile name:"_lng);
+	_exportName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 
-	_copyToClipboard = new wxButton(_exportInfo, wxID_ANY, "Copy"_lng);
+	_copyToClipboard = new wxButton(this, wxID_ANY, "Copy"_lng);
 	_copyToClipboard->SetBitmap(_iconStorage.get(embedded_icon::copy));
-	_saveToFile = new wxButton(_exportInfo, wxID_ANY, "Save"_lng);
+	_saveToFile = new wxButton(this, wxID_ANY, "Save to file"_lng);
 	_saveToFile->SetBitmap(_iconStorage.get(embedded_icon::save_to_file));
-	_saveToFile->Hide();
-
-	_ok = new wxButton(_exportInfo, wxID_ANY, "OK"_lng);
 
 	_infoBar = new wxInfoBar(this);
+	_ok      = new wxButton(this, wxID_ANY, "OK"_lng);
+
 	_infoBarTimer.SetOwner(this);
 }
 
 void ExportPresetDialog::updateLayout()
 {
-	auto controls = new wxBoxSizer(wxHORIZONTAL);
-	controls->Add(_copyToClipboard, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	controls->Add(_saveToFile, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	controls->AddStretchSpacer();
-	controls->Add(_ok, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	auto previewGroup = new wxStaticBoxSizer(_previewGroup, wxVERTICAL);
+	previewGroup->Add(_exportData, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	auto mainSpacer = new wxStaticBoxSizer(_exportInfo, wxVERTICAL);
-	mainSpacer->Add(_exportData, wxSizerFlags(1).Expand().Border(wxALL, 5));
-	mainSpacer->AddSpacer(16);
-	mainSpacer->Add(_saveExecutable, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	mainSpacer->Add(_savePlugins, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	mainSpacer->AddSpacer(16);
-	mainSpacer->Add(_infoBar, wxSizerFlags(0).Expand().Border(wxALL, 5));
-	mainSpacer->Add(controls, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	auto exportName = new wxBoxSizer(wxHORIZONTAL);
+	exportName->Add(_exportNameLabel, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	exportName->Add(_exportName, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	SetSizer(mainSpacer);
+	auto optionGroup = new wxStaticBoxSizer(_optionsBox, wxVERTICAL);
+	optionGroup->Add(_saveExecutable, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	optionGroup->Add(_savePlugins, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	optionGroup->Add(exportName, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	auto bottomControls = new wxBoxSizer(wxHORIZONTAL);
+	bottomControls->Add(_copyToClipboard, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	bottomControls->Add(_saveToFile, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	bottomControls->AddStretchSpacer();
+	bottomControls->Add(_ok, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	mainSizer->Add(previewGroup, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	mainSizer->Add(optionGroup, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	mainSizer->Add(_infoBar, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	mainSizer->Add(bottomControls, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	SetSizer(mainSizer);
 	Layout();
 }
 
@@ -106,6 +120,7 @@ void ExportPresetDialog::bindEvents()
 {
 	_saveExecutable->Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { updatePreview(); });
 	_savePlugins->Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { updatePreview(); });
+	_exportName->Bind(wxEVT_TEXT, [=](wxCommandEvent&) { updatePreview(); });
 
 	_copyToClipboard->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyToClipboardRequested(); });
 	_saveToFile->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSaveToFileRequested(); });
@@ -138,7 +153,10 @@ void ExportPresetDialog::updatePreview()
 	if (!_savePlugins->IsChecked())
 		preset.plugins.managed.clear();
 
-	const auto data = _platform.getPresetManager()->savePreset(preset);
+	auto data = _platform.getPresetManager()->savePreset(preset);
+
+	if (!_exportName->IsEmpty())
+		data["name"] = _exportName->GetValue().utf8_string();
 
 	_exportData->SetValue(wxString::FromUTF8(data.dump(2)));
 
@@ -168,4 +186,28 @@ void ExportPresetDialog::onCopyToClipboardRequested()
 	EX_UNEXPECTED;
 }
 
-void ExportPresetDialog::onSaveToFileRequested() {}
+void ExportPresetDialog::onSaveToFileRequested()
+{
+	EX_TRY;
+
+	wxString filename = _exportName->GetValue();
+	if (!filename.empty())
+		filename += L".json";
+
+	wxFileDialog saveFileDialog(
+		this, {}, {}, filename, "json files (*.json)|*json"_lng, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+	if (saveFileDialog.ShowModal() != wxID_OK)
+		return;
+
+	fs::path targetPath = saveFileDialog.GetPath().utf8_string();
+	if (!targetPath.has_extension())
+		targetPath.replace_extension(".json");
+
+	overwriteFile(targetPath, _exportData->GetValue().utf8_string());
+
+	_infoBar->ShowMessage("Saved"_lng);
+	_infoBarTimer.StartOnce(5000);
+
+	EX_UNEXPECTED;
+}

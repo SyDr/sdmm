@@ -93,6 +93,11 @@
 	"Save selected plugins" : "Сохранить выбранные плагины",
 	"Copied" : "Скопировано",
 	"Cannot open clipboard" : "Не получилось открыть буфер обмена",
+	"Export options" : "Опции экспорта",
+	"Profile name:" : "Имя профиля:",
+	"Save to file" : "Сохранить в файл",
+	"json files (*.json)|*json" : "Файлы json (*.json)|*json",
+	"Saved" : "Сохранено",
 
 	"category" : {
 		"gameplay" : "Геймплей",

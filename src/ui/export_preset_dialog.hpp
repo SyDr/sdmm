@@ -49,11 +49,14 @@ namespace mm
 		IIconStorage& _iconStorage;
 		std::string   _selected;
 
-		wxWidgetsPtr<wxStaticBox> _exportInfo = nullptr;
-		wxWidgetsPtr<wxTextCtrl>  _exportData = nullptr;
+		wxWidgetsPtr<wxStaticBox> _previewGroup = nullptr;
+		wxWidgetsPtr<wxTextCtrl>  _exportData   = nullptr;
 
-		wxWidgetsPtr<wxCheckBox> _saveExecutable = nullptr;
-		wxWidgetsPtr<wxCheckBox> _savePlugins    = nullptr;
+		wxWidgetsPtr<wxStaticBox>  _optionsBox      = nullptr;
+		wxWidgetsPtr<wxCheckBox>   _saveExecutable  = nullptr;
+		wxWidgetsPtr<wxCheckBox>   _savePlugins     = nullptr;
+		wxWidgetsPtr<wxStaticText> _exportNameLabel = nullptr;
+		wxWidgetsPtr<wxTextCtrl>   _exportName      = nullptr;
 
 		wxWidgetsPtr<wxButton> _copyToClipboard = nullptr;
 		wxWidgetsPtr<wxButton> _saveToFile      = nullptr;
