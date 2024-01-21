@@ -36,6 +36,7 @@
     <ClCompile Include="ui\error_view.cpp" />
     <ClCompile Include="ui\icon_helper.cpp" />
     <ClCompile Include="ui\image_gallery_view.cpp" />
+    <ClCompile Include="ui\import_preset_dialog.cpp" />
     <ClCompile Include="ui\main_frame.cpp" />
     <ClCompile Include="ui\manage_preset_list_view.cpp" />
     <ClCompile Include="ui\mod_list_model.cpp" />
@@ -101,6 +102,7 @@
     <ClInclude Include="ui\error_view.h" />
     <ClInclude Include="ui\icon_helper.hpp" />
     <ClInclude Include="ui\image_gallery_view.hpp" />
+    <ClInclude Include="ui\import_preset_dialog.hpp" />
     <ClInclude Include="ui\main_frame.h" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
     <ClInclude Include="ui\mod_list_model.h" />
@@ -213,6 +215,7 @@
       <AssemblerListingLocation>$(SolutionDir)$(Configuration)\$(ProjectName)\</AssemblerListingLocation>
       <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
       <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -268,6 +271,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>

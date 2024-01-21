@@ -98,6 +98,17 @@
 	"Save to file" : "Сохранить в файл",
 	"json files (*.json)|*json" : "Файлы json (*.json)|*json",
 	"Saved" : "Сохранено",
+	"Import options" : "Опции импорта",
+	"Import with name:" : "Сохранить с именем:",
+	"Paste" : "Из буфера",
+	"Load from file" : "Загрузить из файла",
+	"Apply immediately" : "Сразу применить",
+	"Select option" : "Следует выбрать опции",
+	"Save and apply" : "Сохранить и применить",
+	"Save only" : "Только сохранить",
+	"Apply only" : "Только применить",
+	"Copied from clipboard" : "Скопировано из буфера",
+	"Loaded from file" : "Загружено из файла",
 
 	"category" : {
 		"gameplay" : "Геймплей",

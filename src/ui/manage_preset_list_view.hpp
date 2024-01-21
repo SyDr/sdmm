@@ -48,6 +48,7 @@ namespace mm
 		void onLoadPresetRequested();
 		void onSavePresetRequested(std::string baseName);
 		void onExportPresetRequested(std::string baseName);
+		void onImportPresetRequested();
 		void onRenamePreset();
 		void onCopyPreset();
 		void onDeletePreset();

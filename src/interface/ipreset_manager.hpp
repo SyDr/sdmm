@@ -22,7 +22,8 @@ namespace mm
 
 		[[nodiscard]] virtual std::set<std::string> list() const = 0;
 
-		[[nodiscard]] virtual PresetData loadPreset(const std::string& name) = 0;
+		[[nodiscard]] virtual PresetData loadPreset(const std::string& name)    = 0;
+		[[nodiscard]] virtual PresetData loadPreset(const nlohmann::json& data) = 0;
 
 		[[nodiscard]] virtual nlohmann::json savePreset(const PresetData& preset)  = 0;
 		virtual void savePreset(const std::string& name, const PresetData& preset) = 0;

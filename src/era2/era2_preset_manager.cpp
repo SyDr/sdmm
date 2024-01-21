@@ -12,10 +12,10 @@
 #include "era2_mod_manager.hpp"
 #include "era2_platform.h"
 #include "era2_plugin_manager.hpp"
-#include "utility/fs_util.h"
-#include "utility/sdlexcept.h"
-#include "utility/json_util.h"
 #include "system_info.hpp"
+#include "utility/fs_util.h"
+#include "utility/json_util.h"
+#include "utility/sdlexcept.h"
 
 #include <wx/dir.h>
 #include <wx/file.h>
@@ -86,10 +86,15 @@ sigslot::signal<>& Era2PresetManager::onListChanged()
 
 PresetData Era2PresetManager::loadPreset(const std::string& name)
 {
-	PresetData result;
-
 	const auto path = toPath(_rootPath, name);
 	const auto data = loadJsonFromFile(path, true);
+
+	return loadPreset(data);
+}
+
+PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
+{
+	PresetData result;
 
 	if (!data.is_object())
 		return result;
@@ -119,7 +124,7 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 {
 	nlohmann::json data;
 
-	data["mm_version"]     = PROGRAM_VERSION;
+	data["mm_version"] = PROGRAM_VERSION;
 
 	if (!preset.mods.active.empty())
 	{

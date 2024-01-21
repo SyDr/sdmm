@@ -41,6 +41,7 @@
     <ClCompile Include="ui\image_gallery_view.cpp" />
     <ClCompile Include="ui\icon_helper.cpp" />
     <ClCompile Include="ui\export_preset_dialog.cpp" />
+    <ClCompile Include="ui\import_preset_dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -108,6 +109,7 @@
     <ClInclude Include="ui\icon_helper.hpp" />
     <ClInclude Include="ui\export_preset_dialog.hpp" />
     <ClInclude Include="domain\preset_data.hpp" />
+    <ClInclude Include="ui\import_preset_dialog.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

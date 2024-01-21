@@ -65,7 +65,7 @@ void ExportPresetDialog::createControls()
 	_previewGroup = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
 
 	_exportData = new wxTextCtrl(_previewGroup, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
+		wxTE_MULTILINE | wxTE_READONLY | wxTE_BESTWRAP);
 
 	_optionsBox     = new wxStaticBox(this, wxID_ANY, "Export options"_lng);
 	_saveExecutable = new wxCheckBox(_optionsBox, wxID_ANY, "Save selected executable"_lng);
@@ -159,8 +159,6 @@ void ExportPresetDialog::updatePreview()
 		data["name"] = _exportName->GetValue().utf8_string();
 
 	_exportData->SetValue(wxString::FromUTF8(data.dump(2)));
-
-	Layout();
 
 	EX_UNEXPECTED;
 }

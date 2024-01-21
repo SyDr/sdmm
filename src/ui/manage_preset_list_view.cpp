@@ -23,6 +23,7 @@
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 #include "export_preset_dialog.hpp"
+#include "import_preset_dialog.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -109,7 +110,6 @@ void ManagePresetListView::createControls()
 
 	_export = new wxButton(_presets, wxID_ANY, "Export"_lng);
 	_import = new wxButton(_presets, wxID_ANY, "Import"_lng);
-	_import->Hide();
 
 	_rename = new wxButton(_presets, wxID_ANY, "Rename"_lng);
 	_copy   = new wxButton(_presets, wxID_ANY, "Copy"_lng);
@@ -227,6 +227,7 @@ void ManagePresetListView::bindEvents()
 	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSavePresetRequested(getSelection()); });
 
 	_export->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onExportPresetRequested(getSelection()); });
+	_import->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onImportPresetRequested(); });
 
 	_rename->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onRenamePreset(); });
 	_copy->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyPreset(); });
@@ -276,6 +277,18 @@ void ManagePresetListView::onExportPresetRequested(std::string baseName)
 
 	ExportPresetDialog epf(this, _platform, _iconStorage, baseName);
 	epf.ShowModal();
+
+	EX_UNEXPECTED;
+}
+
+void ManagePresetListView::onImportPresetRequested()
+{
+	EX_TRY;
+
+	ImportPresetDialog epf(this, _platform, _iconStorage);
+	epf.ShowModal();
+
+	refreshListContent();
 
 	EX_UNEXPECTED;
 }
