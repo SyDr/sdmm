@@ -76,12 +76,15 @@ namespace
 				items.hidden.emplace(item);
 
 		// remaining items from directory
-		using di = fs::directory_iterator;
-		for (auto it = di(modsPath), end = di(); it != end; ++it)
+		if (exists(modsPath))
 		{
-			if (!it->is_directory())
-				continue;
-			items.available.emplace(it->path().filename().string());
+			using di = fs::directory_iterator;
+			for (auto it = di(modsPath), end = di(); it != end; ++it)
+			{
+				if (!it->is_directory())
+					continue;
+				items.available.emplace(it->path().filename().string());
+			}
 		}
 
 		items.available.erase(mm::SystemInfo::ManagedMod);

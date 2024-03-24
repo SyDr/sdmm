@@ -183,6 +183,9 @@ std::set<PluginSource> Era2PluginManager::loadAvailablePlugins(const fs::path& b
 {
 	std::set<PluginSource> result;
 
+	if (!exists(basePath))
+		return result;
+
 	using di = fs::directory_iterator;
 	for (auto it = di(basePath), end = di(); it != end; ++it)
 	{
