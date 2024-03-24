@@ -35,14 +35,14 @@ namespace mm
 	private:
 		void resetThread();
 		void start();
-		void backgroundThread();
+		void loadInBackground();
 
 	private:
 		fs::path _path;
 		bool     _expanded = false;
 
 		mutable std::mutex _dataAccess;
-		std::future<void>  _thread;
+		std::future<void>  _future;
 		std::atomic_bool   _canceled   = false;
 		std::atomic_size_t _bestHeight = 0;
 

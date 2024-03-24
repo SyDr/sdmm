@@ -495,7 +495,7 @@ void ModListView::updateGalleryState(bool show, bool expand)
 	_galleryView->Expand(expand);
 
 	if (auto topWindow = dynamic_cast<wxTopLevelWindow*>(wxTheApp->GetTopWindow()))
-		topWindow->ShowFullScreen(expand, wxFULLSCREEN_NOBORDER);
+		topWindow->ShowFullScreen(expand, wxFULLSCREEN_ALL);
 
 	Layout();
 

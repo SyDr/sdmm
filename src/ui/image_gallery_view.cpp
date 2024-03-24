@@ -119,17 +119,17 @@ void ImageGalleryView::Reload()
 
 void ImageGalleryView::start()
 {
-	_thread = std::async(std::launch::async, [=] { backgroundThread(); });
+	_future = std::async(std::launch::async, [=] { loadInBackground(); });
 }
 
 void ImageGalleryView::resetThread()
 {
 	_canceled = true;
-	if (_thread.valid())
-		_thread.wait();
+	if (_future.valid())
+		_future.wait();
 }
 
-void ImageGalleryView::backgroundThread()
+void ImageGalleryView::loadInBackground()
 {
 	_canceled = false;
 
