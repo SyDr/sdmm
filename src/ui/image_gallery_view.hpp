@@ -33,7 +33,7 @@ namespace mm
 		void   OnPaint(wxPaintEvent&);
 
 	private:
-		void resetThread();
+		void stopWork();
 		void start();
 		void loadInBackground();
 

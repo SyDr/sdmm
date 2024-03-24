@@ -41,7 +41,7 @@ ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs:
 
 ImageGalleryView::~ImageGalleryView()
 {
-	resetThread();
+	stopWork();
 }
 
 void ImageGalleryView::SetPath(const fs::path& directory)
@@ -106,13 +106,16 @@ void ImageGalleryView::Reload()
 {
 	Reset();
 
-	if (fs::exists(_path))
+	if (!fs::exists(_path) || !_bestHeight)
 	{
-		using di = fs::directory_iterator;
-		for (di it(_path); it != di(); ++it)
-			if (!is_directory(it->status()))
-				_images.emplace_back(it->path(), wxNullBitmap);
+		CallAfter([=] { Refresh(false); });
+		return;
 	}
+
+	using di = fs::directory_iterator;
+	for (di it(_path); it != di(); ++it)
+		if (!is_directory(it->status()))
+			_images.emplace_back(it->path(), wxNullBitmap);
 
 	start();
 }
@@ -122,7 +125,7 @@ void ImageGalleryView::start()
 	_future = std::async(std::launch::async, [=] { loadInBackground(); });
 }
 
-void ImageGalleryView::resetThread()
+void ImageGalleryView::stopWork()
 {
 	_canceled = true;
 	if (_future.valid())
@@ -159,7 +162,7 @@ void ImageGalleryView::loadInBackground()
 
 void ImageGalleryView::Reset()
 {
-	resetThread();
+	stopWork();
 	_images.clear();
 
 	SetVirtualSize(0, 0);
