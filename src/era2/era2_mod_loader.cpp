@@ -111,6 +111,9 @@ ModData era2_mod_loader::updateAvailability(const fs::path& loadFrom, const std:
 	result.mod_version  = get_string_from_json_object(*version, "mod").value_or("");
 	result.info_version = get_string_from_json_object(*version, "info").value_or("");
 
+	if (result.mod_version.empty())
+		result.mod_version = get_string_from_json_object(data, "mod_version").value_or("");
+
 	result.caption =
 		get_i18n_string_from_json_object(data, "caption", preferredLng, mm::SystemInfo::DefaultLanguage)
 			.value_or("");
