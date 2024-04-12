@@ -24,19 +24,16 @@ using namespace mm;
 
 SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	const wxString& initiallySelectedFile, IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Select executable"_lng, wxDefaultPosition, wxSize(200, 324))
+	: wxDialog(parent, wxID_ANY, "Select executable"_lng, wxDefaultPosition, wxSize(300, 450))
 	, _basePath(basePath)
 	, _selectedFile(initiallySelectedFile)
 	, _iconStorage(iconStorage)
 {
-	this->SetSizeHints(wxSize(200, 324), wxDefaultSize);
+	this->SetSizeHints(wxSize(300, 450), wxDefaultSize);
 
 	_imageList = std::make_unique<wxImageList>(16, 16, true);
 
-	wxPanel* mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
-
-	wxBoxSizer* bVertical = new wxBoxSizer(wxVERTICAL);
-	mainPanel->SetSizer(bVertical);
+	auto mainPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
 	_list = new wxListView(
 		mainPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_SMALL_ICON | wxLC_SINGLE_SEL);
@@ -45,16 +42,16 @@ SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	wxBusyCursor busy;
 	refreshListContent();
 
-	bVertical->Add(_list, 1, wxEXPAND | static_cast<wxStretch>(wxALL), 5);
-
-	wxBoxSizer* bHorizontal = new wxBoxSizer(wxHORIZONTAL);
-	bVertical->Add(bHorizontal, 0, wxSTRETCH_NOT, 5);
-
-	wxButton* buttonOk = new wxButton(mainPanel, wxID_ANY, "OK"_lng);
+	auto buttonOk = new wxButton(mainPanel, wxID_ANY, "OK"_lng);
 	buttonOk->Enable(!_selectedFile.empty());
 
+	auto bHorizontal = new wxBoxSizer(wxHORIZONTAL);
 	bHorizontal->AddStretchSpacer(1);
-	bHorizontal->Add(buttonOk, 1, wxALL, 5);
+	bHorizontal->Add(buttonOk, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
+	auto bVertical = new wxBoxSizer(wxVERTICAL);
+	bVertical->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	bVertical->Add(bHorizontal, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 	_list->Bind(wxEVT_LIST_ITEM_SELECTED, [=](wxListEvent&) {
 		_selectedFile = _list->GetItemText(_list->GetFirstSelected());
@@ -69,6 +66,8 @@ SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	_list->Bind(wxEVT_LIST_ITEM_ACTIVATED, [=](wxListEvent&) { this->EndModal(wxID_OK); });
 
 	buttonOk->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { this->EndModal(wxID_OK); });
+
+	mainPanel->SetSizer(bVertical);
 
 	wxBoxSizer* bSizerMain = new wxBoxSizer(wxHORIZONTAL);
 	bSizerMain->Add(mainPanel, 1, wxEXPAND | static_cast<wxStretch>(wxALL));
