@@ -121,6 +121,7 @@
     <ClInclude Include="utility\fs_util.h" />
     <ClInclude Include="utility\json_util.h" />
     <ClInclude Include="utility\shell_util.h" />
+    <ClInclude Include="version.hpp" />
     <ClInclude Include="wx\data_view_multiple_icons_renderer.h" />
     <ClInclude Include="wx\priority_data_renderer.h" />
   </ItemGroup>
