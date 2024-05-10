@@ -21,6 +21,6 @@ namespace mm
 		ConflictResolveMode conflictResolveMode() const;
 
 	private:
-		ConflictResolveMode _conflictResolveMode = ConflictResolveMode::undefined;
+		ConflictResolveMode _conflictResolveMode = ConflictResolveMode::automatic;
 	};
 }

@@ -284,9 +284,6 @@ void MainFrame::reloadModel()
 
 	_currentPlatform = _app.platformService().create(_app.appConfig().selectedPlatform());
 
-	if (_currentPlatform->localConfig()->conflictResolveMode() == ConflictResolveMode::undefined)
-		CallAfter(&MainFrame::OnMenuToolsChooseConflictResolveMode);
-
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
 	EX_ON_EXCEPTION(not_exist_path_error, [](not_exist_path_error const&) {
 		wxMessageOutputMessageBox().Printf(L"Selected path doesn't exists, please choose suitable one");

@@ -9,7 +9,6 @@ namespace mm
 {
 	enum class ConflictResolveMode
 	{
-		undefined = -1,
 		automatic = 0,
 		manual    = 1,
 	};

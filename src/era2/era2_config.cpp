@@ -118,12 +118,11 @@ ConflictResolveMode Era2Config::conflictResolveMode() const
 {
 	switch (auto mode = static_cast<ConflictResolveMode>(_data[st_conflict_resolve_mode].get<int>()))
 	{
-	case ConflictResolveMode::undefined:
 	case ConflictResolveMode::automatic:
 	case ConflictResolveMode::manual: return mode;
 	}
 
-	return ConflictResolveMode::undefined;
+	return ConflictResolveMode::automatic;
 }
 
 void Era2Config::conflictResolveMode(ConflictResolveMode value)
@@ -144,5 +143,5 @@ void Era2Config::validate()
 		_data[st_show_hidden] = false;
 
 	if (!_data.count(st_conflict_resolve_mode) || !_data[st_conflict_resolve_mode].is_number_integer())
-		_data[st_conflict_resolve_mode] = ConflictResolveMode::undefined;
+		_data[st_conflict_resolve_mode] = ConflictResolveMode::automatic;
 }
