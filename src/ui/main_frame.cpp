@@ -124,7 +124,7 @@ MainFrame::MainFrame(Application& app)
 	{
 		if (auto launchHelper = _currentPlatform->launchHelper())
 		{
-			launchHelper->onDataChanged().connect([this] { updateExecutableIcon(); });
+			launchHelper->onDataChanged().connect([this] { updateExecutableRelatedData(); });
 			_launchButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLaunchGameRequested(); });
 			_launchManageButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { selectExeToLaunch(); });
 		}
@@ -156,6 +156,32 @@ void MainFrame::OnAbout()
 
 void MainFrame::createMenuBar()
 {
+	wxMenu* gameMenu = nullptr;
+
+	if (auto launchHelper = _currentPlatform->launchHelper())
+	{
+		gameMenu      = new wxMenu();
+
+		_launchMenuItem = gameMenu->Append(wxID_ANY,
+			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())),
+			nullptr,
+			"Launch game with selected executable"_lng);
+
+		_launchMenuItem->SetBitmap(launchHelper->getIcon());
+
+		gameMenu->AppendSeparator();
+
+		auto launchManage = gameMenu->Append(wxID_ANY,
+			wxString::Format(wxString("Change executable for launch"_lng),
+				wxString::FromUTF8(launchHelper->getCaption())),
+			nullptr, "Change executable for launch"_lng);
+
+		launchManage->SetBitmap(_app.iconStorage().get(embedded_icon::cog));
+
+		_menuItems[_launchMenuItem->GetId()] = [&] { onLaunchGameRequested(); };
+		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
+	}
+
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
 	{
@@ -197,6 +223,8 @@ void MainFrame::createMenuBar()
 	_menuItems[about->GetId()] = [&] { OnAbout(); };
 
 	_mainMenu = new wxMenuBar();
+	if (gameMenu)
+		_mainMenu->Append(gameMenu, "Game"_lng);
 	_mainMenu->Append(toolsMenu, "Tools"_lng);
 	_mainMenu->Append(helpMenu, L"?");
 	_mainMenu->Bind(wxEVT_MENU, &MainFrame::OnMenuItemSelected, this);
@@ -360,7 +388,7 @@ void MainFrame::onLaunchGameRequested()
 	EX_UNEXPECTED;
 }
 
-void MainFrame::updateExecutableIcon()
+void MainFrame::updateExecutableRelatedData()
 {
 	if (!_currentPlatform)
 		return;
@@ -372,5 +400,9 @@ void MainFrame::updateExecutableIcon()
 		_launchButton->SetBitmap(wxNullBitmap);
 		_launchButton->SetBitmap(helper->getIcon());
 		Layout();
+
+		_launchMenuItem->SetItemLabel(
+			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption())));
+		_launchMenuItem->SetBitmap(helper->getIcon());
 	}
 }

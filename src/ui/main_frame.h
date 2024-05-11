@@ -45,7 +45,7 @@ namespace mm
 		void saveWindowProperties();
 
 		void selectExeToLaunch();
-		void updateExecutableIcon();
+		void updateExecutableRelatedData();
 		void onLaunchGameRequested();
 
 	private:
@@ -58,5 +58,7 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _launchButton       = nullptr;
 		wxWidgetsPtr<wxButton> _launchManageButton = nullptr;
+
+		wxWidgetsPtr<wxMenuItem> _launchMenuItem = nullptr;
 	};
 }
