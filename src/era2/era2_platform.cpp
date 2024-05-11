@@ -121,7 +121,7 @@ Era2Platform::Era2Platform(Application const& app)
 {
 	_localConfig   = std::make_unique<Era2Config>(_rootDir);
 	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
-	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig, app.iconStorage());
+	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig);
 	_modDataProvider =
 		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode());
 

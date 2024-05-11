@@ -17,7 +17,6 @@
 
 #include <boost/range/algorithm_ext/erase.hpp>
 
-
 #include <unordered_set>
 
 using namespace mm;
@@ -57,7 +56,7 @@ namespace
 		std::unordered_set<std::string> const& mods, mm::IModDataProvider& dataProvider)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
-		Era2DirectoryStructure                  result;
+		Era2DirectoryStructure     result;
 
 		auto fileIndex = [&](const fs::path& path) {
 			auto it = temp.find(path);
@@ -91,16 +90,14 @@ namespace
 				if (ec)
 				{
 					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng),
-						it->path().wstring(),
-						wxString::FromUTF8(ec.message()), ec.value());
+						it->path().wstring(), wxString::FromUTF8(ec.message()), ec.value());
 					continue;
 				}
 
 				const bool isFile = it->is_regular_file(ec);
 				if (ec)
 					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), it->path().wstring(),
-						wxString::FromUTF8(ec.message()),
-						ec.value());
+						wxString::FromUTF8(ec.message()), ec.value());
 
 				if (!isFile)
 					continue;
@@ -130,8 +127,8 @@ namespace
 				if (!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
 					continue;
 
-				boost::nowide::fstream        file(it->path(), std::fstream::in | std::fstream::binary);
-				std::array<char, 4> lodSignature;
+				boost::nowide::fstream file(it->path(), std::fstream::in | std::fstream::binary);
+				std::array<char, 4>    lodSignature;
 
 				file.read(lodSignature.data(), lodSignature.size());
 
@@ -232,20 +229,20 @@ namespace
 }
 
 void mm::showModFileList(
-	wxWindow& parent, Application& application, IModDataProvider& dataProvider, ModList list)
+	wxWindow& parent, IIconStorage& iconStorage, IModDataProvider& dataProvider, ModList list)
 {
-	SelectModsDialog smd(parent, application, dataProvider, list);
+	SelectModsDialog smd(parent, iconStorage, dataProvider, list);
 	if (smd.ShowModal() != wxID_OK)
 		return;
 
 	auto files = listModFiles(smd.getSelected(), dataProvider);
 
-	SelectModPairsDialog smpd(parent, application, dataProvider, resolveCombinations(files));
+	SelectModPairsDialog smpd(parent, iconStorage, dataProvider, resolveCombinations(files));
 	if (smpd.ShowModal() != wxID_OK)
 		return;
 
 	files = removeCombinationsIfPossible(std::move(files), smpd.getSelected());
 
-	ShowFileListDialog dialog(&parent, application, dataProvider, std::move(files));
+	ShowFileListDialog dialog(&parent, iconStorage, dataProvider, std::move(files));
 	dialog.ShowModal();
 }

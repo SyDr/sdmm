@@ -15,19 +15,17 @@ namespace mm
 
 	struct Era2LaunchHelper : ILaunchHelper
 	{
-		Era2LaunchHelper(Era2Config& config, IIconStorage& iconStorage);
+		Era2LaunchHelper(Era2Config& config);
 
 		[[nodiscard]] std::string getExecutable() const override;
 		void                      setExecutable(const std::string& executable) override;
 
-		[[nodiscard]] wxIcon      getIcon() const override;
 		[[nodiscard]] std::string getCaption() const override;
 		[[nodiscard]] std::string getLaunchString() const override;
 
 		[[nodiscard]] sigslot::signal<>& onDataChanged() override;
 
 	private:
-		IIconStorage& _iconStorage;
 		Era2Config&   _config;
 
 		sigslot::signal<> _dataChanged;

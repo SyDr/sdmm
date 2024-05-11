@@ -31,12 +31,12 @@
 
 using namespace mm;
 
-ShowFileListDialog::ShowFileListDialog(wxWindow* parent, Application& application,
+ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStorage,
 									   IModDataProvider& dataProvider, Era2DirectoryStructure data)
 	: wxDialog(parent, wxID_ANY, "Mod file list"_lng, wxDefaultPosition, wxSize(800, 444),
 			   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _data(std::move(data))
-	, _listModel(new ModListModel(dataProvider, application.iconStorage(), true))
+	, _listModel(new ModListModel(dataProvider, iconStorage, true))
 {
 	createControls();
 	buildLayout();

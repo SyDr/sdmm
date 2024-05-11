@@ -8,12 +8,12 @@
 #include "select_mods_dialog.hpp"
 
 #include "application.h"
-#include "interface/imod_data_provider.hpp"
-#include "interface/imod_manager.hpp"
-#include "interface/imod_platform.hpp"
 #include "domain/mod_data.hpp"
 #include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.hpp"
+#include "interface/imod_data_provider.hpp"
+#include "interface/imod_manager.hpp"
+#include "interface/imod_platform.hpp"
 #include "mod_list_model.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
@@ -36,12 +36,12 @@
 
 using namespace mm;
 
-SelectModsDialog::SelectModsDialog(wxWindow& parent, Application& application,
-								   IModDataProvider& dataProvider, ModList list)
+SelectModsDialog::SelectModsDialog(
+	wxWindow& parent, IIconStorage& iconStorage, IModDataProvider& dataProvider, ModList list)
 	: wxDialog(&parent, wxID_ANY, "Select mods"_lng, wxDefaultPosition, wxSize(800, 444),
-			   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
-	, _iconStorage(application.iconStorage())
-	, _listModel(new ModListModel(dataProvider, application.iconStorage(), true))
+		  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+	, _iconStorage(iconStorage)
+	, _listModel(new ModListModel(dataProvider, iconStorage, true))
 	, _mods(std::move(list))
 {
 	createControls();
@@ -67,8 +67,8 @@ void SelectModsDialog::createControls()
 
 void SelectModsDialog::createListControl()
 {
-	_list = new wxDataViewCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-							   wxDV_ROW_LINES | wxDV_VERT_RULES);
+	_list = new wxDataViewCtrl(
+		this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_ROW_LINES | wxDV_VERT_RULES);
 	_list->AssociateModel(_listModel.get());
 
 	createListColumns();
@@ -76,23 +76,20 @@ void SelectModsDialog::createListControl()
 
 void SelectModsDialog::createListColumns()
 {
-	auto r0 = new wxDataViewToggleRenderer(wxDataViewToggleRenderer::GetDefaultType(),
-										   wxDATAVIEW_CELL_ACTIVATABLE);
+	auto r0 =
+		new wxDataViewToggleRenderer(wxDataViewToggleRenderer::GetDefaultType(), wxDATAVIEW_CELL_ACTIVATABLE);
 	auto r1 = new mmPriorityDataRenderer();
 	auto r2 = new wxDataViewIconTextRenderer();
 
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	auto column0 =
-		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::checkbox),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 =
-		new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
-							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::checkbox),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	auto column1 = new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column2 = new wxDataViewColumn("Mod"_lng, r2,
-										static_cast<unsigned int>(ModListModel::Column::caption),
-										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+		static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);
 	_list->AppendColumn(column1);

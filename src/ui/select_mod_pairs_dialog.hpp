@@ -17,7 +17,6 @@ class wxDataViewListCtrl;
 
 namespace mm
 {
-	struct Application;
 	struct IIconStorage;
 	struct IModDataProvider;
 	struct IModPlatform;
@@ -25,7 +24,7 @@ namespace mm
 	class SelectModPairsDialog : public wxDialog
 	{
 	public:
-		SelectModPairsDialog(wxWindow& parent, Application& application, IModDataProvider& dataProvider,
+		SelectModPairsDialog(wxWindow& parent, IIconStorage& iconStorage, IModDataProvider& dataProvider,
 			std::vector<std::pair<std::string, std::string>> values);
 
 		std::set<std::pair<std::string, std::string>> getSelected() const;

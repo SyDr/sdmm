@@ -11,7 +11,6 @@ namespace mm
 {
 	struct IAppConfig;
 	struct II18nService;
-	struct IIconStorage;
 	struct IPlatformService;
 
 	struct Application
@@ -20,7 +19,6 @@ namespace mm
 
 		virtual IAppConfig&       appConfig() const       = 0;
 		virtual II18nService&     i18nService() const     = 0;
-		virtual IIconStorage&     iconStorage() const     = 0;
 		virtual IPlatformService& platformService() const = 0;
 	};
 }

@@ -14,15 +14,9 @@
 
 using namespace mm;
 
-Era2LaunchHelper::Era2LaunchHelper(Era2Config& config, IIconStorage& iconStorage)
+Era2LaunchHelper::Era2LaunchHelper(Era2Config& config)
 	: _config(config)
-	, _iconStorage(iconStorage)
 {}
-
-wxIcon Era2LaunchHelper::getIcon() const
-{
-	return _iconStorage.get(_config.getLaunchString());
-}
 
 std::string Era2LaunchHelper::getCaption() const
 {

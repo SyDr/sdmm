@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -24,6 +24,7 @@
 #include "plugin_list_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
+#include "service/icon_storage.hpp"
 #include "show_file_list_dialog.hpp"
 #include "show_file_list_helper.hpp"
 #include "system_info.hpp"
@@ -45,9 +46,10 @@ namespace
 }
 
 MainFrame::MainFrame(Application& app)
-	: wxFrame(nullptr, wxID_ANY, wxString::FromUTF8(SystemInfo::ProgramVersion), app.appConfig().mainWindow().position,
-		  app.appConfig().mainWindow().size)
+	: wxFrame(nullptr, wxID_ANY, wxString::FromUTF8(SystemInfo::ProgramVersion),
+		  app.appConfig().mainWindow().position, app.appConfig().mainWindow().size)
 	, _app(app)
+	, _iconStorage(std::make_unique<IconStorage>())
 {
 	SetIcon(wxICON(MainMMIcon));
 	SetSizeHints(minFrameSize, wxDefaultSize);
@@ -62,19 +64,19 @@ MainFrame::MainFrame(Application& app)
 
 	if (_currentPlatform)
 	{
-		auto modListView = new ModListView(pages, *_currentPlatform, _app.iconStorage());
+		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
 		pages->AddPage(modListView, "Mods"_lng);
 
 		if (auto pluginManager = _currentPlatform->pluginManager())
 		{
 			auto pluginListView = new PluginListView(
-				pages, *pluginManager, *_currentPlatform->modDataProvider(), app.iconStorage());
+				pages, *pluginManager, *_currentPlatform->modDataProvider(), *_iconStorage);
 			pages->AddPage(pluginListView, "Plugins"_lng);
 		}
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{
-			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, app.iconStorage());
+			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, *_iconStorage);
 			pages->AddPage(presetManagerView, "Profiles"_lng);
 		}
 
@@ -83,13 +85,13 @@ MainFrame::MainFrame(Application& app)
 			_launchButton = new wxButton(panel, wxID_ANY,
 				wxString::Format(
 					wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())));
-			_launchButton->SetBitmap(launchHelper->getIcon());
+			_launchButton->SetBitmap(_iconStorage->get(launchHelper->getLaunchString()));
 
 			wxSize goodSize = _launchButton->GetBestSize();
 			goodSize.SetWidth(goodSize.GetHeight());
 			_launchManageButton =
 				new wxButton(panel, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
-			_launchManageButton->SetBitmap(_app.iconStorage().get(embedded_icon::cog));
+			_launchManageButton->SetBitmap(_iconStorage->get(embedded_icon::cog));
 			_launchManageButton->SetToolTip("Change executable for launch"_lng);
 		}
 	}
@@ -160,23 +162,22 @@ void MainFrame::createMenuBar()
 
 	if (auto launchHelper = _currentPlatform->launchHelper())
 	{
-		gameMenu      = new wxMenu();
+		gameMenu = new wxMenu();
 
 		_launchMenuItem = gameMenu->Append(wxID_ANY,
 			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())),
-			nullptr,
-			"Launch game with selected executable"_lng);
+			nullptr, "Launch game with selected executable"_lng);
 
-		_launchMenuItem->SetBitmap(launchHelper->getIcon());
+		_launchMenuItem->SetBitmap(_iconStorage->get(launchHelper->getLaunchString()));
 
 		gameMenu->AppendSeparator();
 
 		auto launchManage = gameMenu->Append(wxID_ANY,
-			wxString::Format(wxString("Change executable for launch"_lng),
-				wxString::FromUTF8(launchHelper->getCaption())),
+			wxString::Format(
+				wxString("Change executable for launch"_lng), wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "Change executable for launch"_lng);
 
-		launchManage->SetBitmap(_app.iconStorage().get(embedded_icon::cog));
+		launchManage->SetBitmap(_iconStorage->get(embedded_icon::cog));
 
 		_menuItems[_launchMenuItem->GetId()] = [&] { onLaunchGameRequested(); };
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
@@ -209,7 +210,8 @@ void MainFrame::createMenuBar()
 
 	for (const auto& lngCode : { "en_US", "ru_RU" })  // let's wait until someone complains
 	{
-		auto lngItem = languageMenu->AppendRadioItem(wxID_ANY, wxString::FromUTF8(_app.i18nService().languageName(lngCode)));
+		auto lngItem = languageMenu->AppendRadioItem(
+			wxID_ANY, wxString::FromUTF8(_app.i18nService().languageName(lngCode)));
 		if (_app.appConfig().currentLanguageCode() == lngCode)
 			lngItem->Check();
 
@@ -236,7 +238,7 @@ void MainFrame::OnMenuToolsChangeDirectory()
 {
 	EX_TRY;
 
-	SelectDirectoryDialog dialog(this, _app.appConfig(), _app.iconStorage());
+	SelectDirectoryDialog dialog(this, _app.appConfig(), *_iconStorage);
 
 	if (dialog.ShowModal() != wxID_OK)
 		return;
@@ -265,7 +267,7 @@ void MainFrame::OnMenuToolsListModFiles()
 	EX_TRY;
 
 	showModFileList(
-		*this, _app, *_currentPlatform->modDataProvider(), _currentPlatform->modManager()->mods());
+		*this, *_iconStorage, *_currentPlatform->modDataProvider(), _currentPlatform->modManager()->mods());
 
 	EX_UNEXPECTED;
 }
@@ -355,7 +357,7 @@ void MainFrame::selectExeToLaunch()
 	auto config = _currentPlatform->localConfig();
 	auto helper = _currentPlatform->launchHelper();
 
-	SelectExe dialog(this, config->getDataPath(), wxString::FromUTF8(helper->getExecutable()), _app.iconStorage());
+	SelectExe dialog(this, config->getDataPath(), wxString::FromUTF8(helper->getExecutable()), *_iconStorage);
 
 	if (dialog.ShowModal() == wxID_OK)
 		helper->setExecutable(dialog.getSelectedFile().ToStdString(wxConvUTF8));
@@ -395,14 +397,15 @@ void MainFrame::updateExecutableRelatedData()
 
 	if (auto helper = _currentPlatform->launchHelper())
 	{
-		_launchButton->SetLabelText(
-			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption())));
-		_launchButton->SetBitmap(wxNullBitmap);
-		_launchButton->SetBitmap(helper->getIcon());
-		Layout();
+		auto text = wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption()));
+		auto icon = _iconStorage->get(helper->getLaunchString());
 
-		_launchMenuItem->SetItemLabel(
-			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption())));
-		_launchMenuItem->SetBitmap(helper->getIcon());
+		_launchButton->SetLabelText(text);
+		_launchMenuItem->SetItemLabel(text);
+
+		_launchButton->SetBitmap(icon);
+		_launchMenuItem->SetBitmap(icon);
+
+		Layout();
 	}
 }

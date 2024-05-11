@@ -19,15 +19,14 @@ class wxDataViewCtrl;
 
 namespace mm
 {
-	struct Application;
 	struct IIconStorage;
 	struct IModPlatform;
 
 	class SelectModsDialog : public wxDialog
 	{
 	public:
-		SelectModsDialog(wxWindow& parent, Application& application, IModDataProvider& dataProvider,
-						 ModList list);
+		SelectModsDialog(
+			wxWindow& parent, IIconStorage& iconStorage, IModDataProvider& dataProvider, ModList list);
 
 		std::unordered_set<std::string> const& getSelected() const;
 

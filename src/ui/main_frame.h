@@ -13,11 +13,11 @@
 
 #include "utility/wx_widgets_ptr.hpp"
 
-
 namespace mm
 {
 	struct Application;
 	struct IModPlatform;
+	struct IIconStorage;
 	class IPanelView;
 	class ModListView;
 
@@ -49,7 +49,8 @@ namespace mm
 		void onLaunchGameRequested();
 
 	private:
-		Application& _app;
+		Application&                  _app;
+		std::unique_ptr<IIconStorage> _iconStorage;
 
 		std::unique_ptr<IModPlatform> _currentPlatform;
 

@@ -18,7 +18,6 @@ class wxDataViewCtrl;
 
 namespace mm
 {
-	struct Application;
 	struct IIconStorage;
 	struct IModDataProvider;
 	class ModListModel;
@@ -26,7 +25,7 @@ namespace mm
 	class ShowFileListDialog : public wxDialog
 	{
 	public:
-		ShowFileListDialog(wxWindow* parent, Application& application,
+		ShowFileListDialog(wxWindow* parent, IIconStorage& iconStorage,
 						   IModDataProvider& dataProvider, Era2DirectoryStructure data);
 
 	private:

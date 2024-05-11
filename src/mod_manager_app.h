@@ -41,7 +41,6 @@ namespace mm
 		IAppConfig&       appConfig() const override;
 		II18nService&     i18nService() const override;
 		IPlatformService& platformService() const override;
-		IIconStorage&     iconStorage() const override;
 
 	private:
 		void initView();
@@ -55,8 +54,6 @@ namespace mm
 
 		std::unique_ptr<I18nService>     _i18nService;
 		std::unique_ptr<IPlatformService> _platformService;
-
-		std::unique_ptr<IIconStorage> _iconStorage;
 	};
 }
 

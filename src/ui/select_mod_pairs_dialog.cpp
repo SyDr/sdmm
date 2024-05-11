@@ -37,11 +37,11 @@
 
 using namespace mm;
 
-SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, Application& application,
+SelectModPairsDialog::SelectModPairsDialog(wxWindow& parent, IIconStorage& iconStorage,
 	IModDataProvider& dataProvider, std::vector<std::pair<std::string, std::string>> values)
 	: wxDialog(&parent, wxID_ANY, "Select mod pairs to potentially remove from result"_lng, wxDefaultPosition,
 		  wxSize(800, 444), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
-	, _iconStorage(application.iconStorage())
+	, _iconStorage(iconStorage)
 	, _modDataProvider(dataProvider)
 	, _values(std::move(values))
 {

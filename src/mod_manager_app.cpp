@@ -120,11 +120,6 @@ IPlatformService& ModManagerApp::platformService() const
 	return *_platformService;
 }
 
-IIconStorage& ModManagerApp::iconStorage() const
-{
-	return *_iconStorage;
-}
-
 void ModManagerApp::scheduleRestart()
 {
 	CallAfter([this] {
@@ -140,7 +135,6 @@ void ModManagerApp::scheduleRestart()
 
 void ModManagerApp::initServices()
 {
-	_iconStorage     = std::make_unique<IconStorage>();
 	_appConfig       = std::make_unique<AppConfig>();
 	_i18nService     = std::make_unique<I18nService>(*_appConfig);
 	_platformService = std::make_unique<PlatformService>(*this);
