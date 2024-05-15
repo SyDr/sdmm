@@ -109,6 +109,8 @@
 	"Apply only" : "Только применить",
 	"Copied from clipboard" : "Скопировано из буфера",
 	"Loaded from file" : "Загружено из файла",
+	"Launch game with selected executable" : "Запустить игру (выбранным файлом)",
+	"Game" : "Игра",
 
 	"category" : {
 		"gameplay" : "Геймплей",
