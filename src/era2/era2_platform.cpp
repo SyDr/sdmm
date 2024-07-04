@@ -70,7 +70,7 @@ namespace
 
 		// hidden mods in data dir
 		std::vector<std::string> hiddenMods;
-		boost::split(hiddenMods, readFile(hiddenPath), boost::is_any_of("\\n"));
+		boost::split(hiddenMods, readFile(hiddenPath), boost::is_any_of("\r\n"));
 		for (auto item : hiddenMods)
 			if (validateModId(modsPath, item))
 				items.hidden.emplace(item);
