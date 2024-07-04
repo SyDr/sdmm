@@ -21,7 +21,7 @@ namespace mm
 	struct IModDataProvider;
 	struct ModData;
 
-	class ModListModel : public wxDataViewIndexListModel
+	class ModListModel : public wxDataViewModel
 	{
 	public:
 		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden);
@@ -41,9 +41,12 @@ namespace mm
 		unsigned int GetColumnCount() const override;
 		wxString     GetColumnType(unsigned int col) const override;
 
-		void GetValueByRow(wxVariant& variant, unsigned row, unsigned col) const override;
-		bool SetValueByRow(const wxVariant& variant, unsigned row, unsigned col) override;
-		bool GetAttrByRow(unsigned row, unsigned col, wxDataViewItemAttr& attr) const override;
+		bool           IsContainer(const wxDataViewItem& item) const override;
+		wxDataViewItem GetParent(const wxDataViewItem& item) const override;
+		unsigned int   GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const override;
+		void GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const override;
+		bool SetValue(const wxVariant& variant, const wxDataViewItem& item, unsigned int col) override;
+		bool GetAttr(const wxDataViewItem& item, unsigned int col, wxDataViewItemAttr& attr) const override;
 
 		int Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column,
 			bool ascending) const override;

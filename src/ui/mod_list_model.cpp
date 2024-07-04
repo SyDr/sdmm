@@ -51,10 +51,36 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	return wxEmptyString;
 }
 
-void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col) const
+bool ModListModel::IsContainer(const wxDataViewItem& item) const
 {
-	const auto& item = _displayedItems[row];
-	const auto& mod  = _modDataProvider.modData(item);
+	return !item.IsOk();
+}
+
+wxDataViewItem ModListModel::GetParent(const wxDataViewItem&) const
+{
+	return wxDataViewItem();
+}
+
+unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const
+{
+	if (item.IsOk())
+		return 0;
+
+	for (size_t i = 0; i < _displayedItems.size(); ++i)
+		children.push_back(wxDataViewItem(reinterpret_cast<void*>(i+1)));
+
+	return _displayedItems.size();
+}
+
+void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const
+{
+	if (!item.IsOk())
+		return;
+
+	auto row = reinterpret_cast<size_t>(item.GetID()) - 1;
+
+	const auto& rowData = _displayedItems[row];
+	const auto& mod     = _modDataProvider.modData(rowData);
 
 	switch (static_cast<Column>(col))
 	{
@@ -63,7 +89,7 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 		wxIcon   icon;
 		wxString text;
 
-		if (bool const active = _list.isActive(item))
+		if (bool const active = _list.isActive(rowData))
 		{
 			text = wxString::Format(L"%u", row);
 			icon = _iconStorage.get(embedded_icon::tick);
@@ -95,23 +121,24 @@ void ModListModel::GetValueByRow(wxVariant& variant, unsigned row, unsigned col)
 	}
 	case Column::checkbox:
 	{
-		variant = wxVariant(_checked.contains(item));
+		variant = wxVariant(_checked.contains(rowData));
 		break;
 	}
 	}
 }
 
-bool ModListModel::SetValueByRow(const wxVariant&, unsigned row, unsigned col)
+bool ModListModel::SetValue(const wxVariant&, const wxDataViewItem& item, unsigned int col)
 {
 	switch (static_cast<Column>(col))
 	{
 	case Column::checkbox:
-		const auto& item = _displayedItems[row];
+		auto        row  = reinterpret_cast<size_t>(item.GetID()) - 1;
+		const auto& myItem = _displayedItems[row];
 
-		if (auto it = _checked.find(item); it != _checked.cend())
+		if (auto it = _checked.find(myItem); it != _checked.cend())
 			_checked.erase(it);
 		else
-			_checked.emplace(item);
+			_checked.emplace(myItem);
 
 		return true;
 	}
@@ -119,8 +146,9 @@ bool ModListModel::SetValueByRow(const wxVariant&, unsigned row, unsigned col)
 	return false;
 }
 
-bool ModListModel::GetAttrByRow(unsigned row, unsigned, wxDataViewItemAttr& attr) const
+bool ModListModel::GetAttr(const wxDataViewItem& item, unsigned int, wxDataViewItemAttr& attr) const
 {
+	auto        row = reinterpret_cast<size_t>(item.GetID()) - 1;
 	const auto& mod = _displayedItems[row];
 
 	if (_list.hidden.count(mod))
@@ -141,7 +169,7 @@ int ModListModel::Compare(
 	const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column, bool ascending) const
 {
 	auto compareRest = [&](unsigned int col) {
-		return wxDataViewIndexListModel::Compare(item1, item2, col, ascending);
+		return wxDataViewModel::Compare(item1, item2, col, ascending);
 	};
 
 	if (static_cast<Column>(column) == Column::caption)
@@ -149,11 +177,11 @@ int ModListModel::Compare(
 
 	if (static_cast<Column>(column) == Column::priority)
 	{
-		const auto row1 = GetRow(item1);
-		const auto row2 = GetRow(item2);
+		const auto row1 = reinterpret_cast<size_t>(item1.GetID()) - 1;
+		const auto row2 = reinterpret_cast<size_t>(item2.GetID()) - 1;
 
-		bool const active1 = _list.isActive(_displayedItems[GetRow(item1)]);
-		bool const active2 = _list.isActive(_displayedItems[GetRow(item2)]);
+		bool const active1 = _list.isActive(_displayedItems[row1]);
+		bool const active2 = _list.isActive(_displayedItems[row2]);
 
 		if (!active1 && !active2)
 			return Compare(item1, item2, static_cast<unsigned int>(Column::category), ascending);
@@ -182,7 +210,7 @@ void ModListModel::setModList(ModList const& mods)
 void ModListModel::setChecked(std::unordered_set<std::string> items)
 {
 	_checked = std::move(items);
-	Reset(_displayedItems.size());
+	Cleared();
 }
 
 std::unordered_set<std::string> const& ModListModel::getChecked() const
@@ -203,7 +231,7 @@ void ModListModel::reload()
 		}
 	}
 
-	Reset(_displayedItems.size());
+	Cleared();
 }
 
 const ModData* ModListModel::findMod(const wxDataViewItem& item) const
@@ -211,14 +239,14 @@ const ModData* ModListModel::findMod(const wxDataViewItem& item) const
 	if (!item.IsOk())
 		return nullptr;
 
-	return &_modDataProvider.modData(_displayedItems[GetRow(item)]);
+	return &_modDataProvider.modData(_displayedItems[reinterpret_cast<size_t>(item.GetID()) - 1]);
 }
 
 wxDataViewItem ModListModel::findItemById(const std::string& id) const
 {
 	for (size_t i = 0; i < _displayedItems.size(); ++i)
 		if (_displayedItems[i] == id)
-			return GetItem(i);
+			return wxDataViewItem(reinterpret_cast<void*>(i + 1));
 
 	return {};
 }
@@ -228,7 +256,7 @@ std::string ModListModel::findIdByItem(wxDataViewItem const& item) const
 	if (!item.IsOk())
 		return {};
 
-	return _displayedItems[GetRow(item)];
+	return _displayedItems[reinterpret_cast<size_t>(item.GetID()) - 1];
 }
 
 void ModListModel::showHidden(bool show)
