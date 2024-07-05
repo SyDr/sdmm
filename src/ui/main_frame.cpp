@@ -148,8 +148,8 @@ void MainFrame::OnAbout()
 	aboutInfo.SetName(wxString::FromUTF8(PROGRAM_NAME));
 	aboutInfo.SetVersion(wxString::FromUTF8(PROGRAM_VERSION));
 	aboutInfo.SetDescription(L"A mod manager for Era II");
-	aboutInfo.SetCopyright(L"(C) 2020-2023 Aliaksei Karalenka");
-	aboutInfo.SetWebSite(L"http://wforum.heroes35.net");
+	aboutInfo.SetCopyright(L"(C) 2020-2024 Aliaksei Karalenka");
+	aboutInfo.SetWebSite(L"https://github.com/SyDr/sdmm/");
 	aboutInfo.AddDeveloper(L"Aliaksei SyDr Karalenka");
 	aboutInfo.SetLicence(wxString::FromUTF8(ProgramLicenseText));
 
