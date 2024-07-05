@@ -28,7 +28,7 @@ wxIcon IconStorage::get(const std::string& name)
 
 	const auto path = wxString::FromUTF8(name);
 
-	wxIcon icon(path, wxBITMAP_TYPE_PNG);
+	wxIcon icon(path, wxBITMAP_TYPE_ANY);
 	if (!icon.IsOk())
 		icon = wxIcon(path, wxBITMAP_TYPE_ICO);
 
