@@ -110,6 +110,7 @@
     <ClInclude Include="ui\export_preset_dialog.hpp" />
     <ClInclude Include="domain\preset_data.hpp" />
     <ClInclude Include="ui\import_preset_dialog.hpp" />
+    <ClInclude Include="version.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />
