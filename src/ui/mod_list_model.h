@@ -34,6 +34,8 @@ namespace mm
 			category,
 			version,
 			checkbox,
+			activity,
+			load_order,
 
 			total,
 		};

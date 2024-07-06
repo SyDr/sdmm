@@ -215,13 +215,17 @@ void ModListView::createListControl()
 
 void ModListView::createListColumns()
 {
-	auto r0 = new mmPriorityDataRenderer();
+	auto rActivity = new wxDataViewBitmapRenderer();
+	auto rLoadOrder = new wxDataViewTextRenderer();
+
 	auto r1 = new wxDataViewIconTextRenderer();
 	auto r2 = new wxDataViewTextRenderer();
 	auto r3 = new wxDataViewTextRenderer();
 	auto r4 = new wxDataViewTextRenderer();
 
-	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	rActivity->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	rLoadOrder->SetAlignment(wxALIGN_CENTER_VERTICAL);
+
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r3->SetAlignment(wxALIGN_CENTER_VERTICAL);
@@ -232,8 +236,13 @@ void ModListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+	auto columnActivity =
+		new wxDataViewColumn("Status"_lng, rActivity, static_cast<unsigned int>(ModListModel::Column::activity),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+	auto columnLoadOrder =
+		new wxDataViewColumn("Load order"_lng, rLoadOrder, static_cast<unsigned int>(ModListModel::Column::load_order),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
 	auto column1 =
 		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
@@ -247,13 +256,12 @@ void ModListView::createListColumns()
 		new wxDataViewColumn("Author"_lng, r4, static_cast<unsigned int>(ModListModel::Column::author),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
-	_list->AppendColumn(column0);
+	_list->AppendColumn(columnActivity);
 	_list->AppendColumn(column1);
 	_list->AppendColumn(column2);
+	_list->AppendColumn(columnLoadOrder);
 	_list->AppendColumn(column3);
 	_list->AppendColumn(column4);
-
-	column0->SetSortOrder(true);
 }
 
 void ModListView::updateControlsState()

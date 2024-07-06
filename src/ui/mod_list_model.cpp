@@ -44,8 +44,10 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	case Column::caption: return wxDataViewIconTextRenderer::GetDefaultType();
 	case Column::author:
 	case Column::category:
+	case Column::load_order:
 	case Column::version: return wxDataViewTextRenderer::GetDefaultType();
 	case Column::checkbox: return wxDataViewToggleRenderer::GetDefaultType();
+	case Column::activity: return wxDataViewBitmapRenderer::GetDefaultType();
 	}
 
 	return wxEmptyString;
@@ -122,6 +124,16 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	case Column::checkbox:
 	{
 		variant = wxVariant(_checked.contains(rowData));
+		break;
+	}
+	case Column::activity:
+	{
+		variant = wxVariant(_iconStorage.get(_list.isActive(rowData) ? embedded_icon::tick : embedded_icon::cross_gray));
+		break;
+	}
+	case Column::load_order:
+	{
+		variant = wxVariant(_list.isActive(rowData) ? wxString::Format(L"%u", row) : wxString());
 		break;
 	}
 	}
