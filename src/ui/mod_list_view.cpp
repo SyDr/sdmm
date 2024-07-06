@@ -147,7 +147,7 @@ void ModListView::bindEvents()
 	_moveUp->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
-	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested(); });
+	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}); });
 
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
@@ -410,7 +410,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
 	{
-		onSortModsRequested();
+		onSortModsRequested(_modManager.mods().isActive(_selectedMod) ? std::string() : _selectedMod);
 
 		static bool messageWasShown = false;
 		if (!messageWasShown)
@@ -434,13 +434,13 @@ void ModListView::OnEventCheckboxShowHidden(const wxCommandEvent&)
 	EX_UNEXPECTED;
 }
 
-void ModListView::onSortModsRequested()
+void ModListView::onSortModsRequested(const std::string& disablingMod)
 {
 	wxBusyCursor bc;
 
 	EX_TRY;
 
-	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider());
+	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider(), disablingMod);
 	if (mods != _modManager.mods())
 		_managedPlatform.apply(&mods, nullptr);
 

@@ -51,7 +51,7 @@ namespace mm
 
 		void followSelection();
 		void updateControlsState();
-		void onSortModsRequested();
+		void onSortModsRequested(const std::string& disablingMod);
 		void onRemoveModRequested();
 		void openGalleryRequested();
 

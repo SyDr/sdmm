@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,99 +8,110 @@
 #include <wx/string.h>
 
 #include "application.h"
-#include "interface/imod_data_provider.hpp"
 #include "domain/mod_data.hpp"
 #include "domain/mod_list.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "mod_conflict_resolver.hpp"
 
 #include <set>
+#include <boost/range/algorithm_ext/erase.hpp>
 
 using namespace mm;
 
-ModList mm::resolve_mod_conflicts(ModList mods, IModDataProvider& modDataProvider)
+namespace
 {
-	auto currentlyActive = mods.active;
-
-	std::map<std::string, std::set<std::string>> activatedInSession;
-	std::map<std::string, std::set<std::string>> disabledInSession;
-
-	for (size_t i = 0; i < currentlyActive.size();)
+	void expandRequirements(
+		std::vector<std::string>& where, IModDataProvider& modDataProvider, const std::string& currentId)
 	{
-		const auto currentId = currentlyActive[i];
+		if (std::find(where.begin(), where.end(), currentId) == where.end())
+			where.emplace_back(currentId);
 
 		const auto& modData = modDataProvider.modData(currentId);
 		for (const auto& id : modData.requires_)
-		{
-			activatedInSession[id].insert(currentId);
-
-			if (std::find(currentlyActive.begin(), currentlyActive.end(), id) ==
-				currentlyActive.end())
-				currentlyActive.emplace_back(id);
-
-			if (modDataProvider.modData(id).virtual_mod)
-				wxLogWarning(
-					wxString::Format("Mod %s required by %s, "
-									 "but unavailable"_lng,
-						wxString::FromUTF8(id), wxString::FromUTF8(currentId)));
-
-			if (auto it = disabledInSession.find(id); it != disabledInSession.end())
-				wxLogWarning(
-					wxString::Format("Mod %s required by %s, "
-									 "but incompatible with (%s)"_lng,
-						wxString::FromUTF8(id), wxString::FromUTF8(currentId), wxString::FromUTF8(boost::join(it->second, ", "))));
-		}
-
-		for (const auto& id : modData.incompatible)
-		{
-			disabledInSession[id].insert(currentId);
-
-			if (auto it = std::find(currentlyActive.begin(), currentlyActive.end(), id);
-				it != currentlyActive.end())
-				currentlyActive.erase(it);
-
-			if (auto it = activatedInSession.find(id); it != activatedInSession.end())
-				wxLogWarning(
-					wxString::Format("Mod %s incompatible with %s, "
-									 "but required by (%s)"_lng,
-						wxString::FromUTF8(id), wxString::FromUTF8(currentId), wxString::FromUTF8(boost::join(it->second, ", "))));
-		}
-
-		i++;
+			expandRequirements(where, modDataProvider, id);
 	}
+
+	void reduceRequirements(std::set<std::string>&           where,
+		const std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
+	{
+		if (where.contains(currentId))
+			return;
+
+		where.emplace(currentId);
+
+		for (const auto& id : active)
+		{
+			const auto& modData = modDataProvider.modData(id);
+			if (modData.requires_.contains(currentId))
+				reduceRequirements(where, active, modDataProvider, id);
+		}
+	}
+
+	void reduceRequirementsTop(std::vector<std::string>& active,
+		IModDataProvider& modDataProvider, const std::string& currentId)
+	{
+		if (currentId.empty())
+			return;
+
+		std::set<std::string> reducedRequirements;
+		reduceRequirements(reducedRequirements, active, modDataProvider, currentId);
+
+		boost::range::remove_erase_if(
+			active,
+			[&](const std::string& item) { return reducedRequirements.contains(item); });
+	}
+}
+
+ModList mm::resolve_mod_conflicts(
+	ModList mods, IModDataProvider& modDataProvider, const std::string& disablingMod)
+{
+	// expand current mod list to contain all mods, required by active mods
+	std::vector<std::string> expandedRequirements;
+	for (const auto& id : mods.active)
+		expandRequirements(expandedRequirements, modDataProvider, id);
+
+	// remove mods if user disables mod
+	// then remove mods, incompatible with top mods
+	reduceRequirementsTop(expandedRequirements, modDataProvider, disablingMod);
+
+	for (size_t i = 0; i < expandedRequirements.size(); ++i)
+		for (const auto& id : modDataProvider.modData(expandedRequirements[i]).incompatible)
+			reduceRequirementsTop(expandedRequirements, modDataProvider, id);
 
 	std::vector<std::string> sortedActive;
 
-	for (size_t i = 0; !currentlyActive.empty();)
+	for (size_t i = 0; !expandedRequirements.empty();)
 	{
-		const auto& candidate = currentlyActive[i];
+		const auto& candidate = expandedRequirements[i];
 
 		bool ok = true;
-		for (size_t j = 0; ok && j < currentlyActive.size(); ++j)
+		for (size_t j = 0; ok && j < expandedRequirements.size(); ++j)
 		{
 			if (i == j)
 				continue;
 
-			if (modDataProvider.modData(currentlyActive[j]).load_after.contains(candidate))
+			if (modDataProvider.modData(expandedRequirements[j]).load_after.contains(candidate))
 				ok = false;
 		}
 
 		if (ok)
 		{
 			sortedActive.emplace_back(candidate);
-			currentlyActive.erase(currentlyActive.begin() + i);
+			expandedRequirements.erase(expandedRequirements.begin() + i);
 			i = 0;
 		}
 		else
 		{
 			++i;
-			if (i == currentlyActive.size())
+			if (i == expandedRequirements.size())
 			{
-				wxLogWarning(wxString::Format(
-					"No mods from (%s) can be placed above each other, "
-					"%s placed at the top"_lng,
-					wxString::FromUTF8(boost::join(currentlyActive, ", ")), wxString::FromUTF8(currentlyActive.front())));
-				sortedActive.emplace_back(currentlyActive.front());
-				currentlyActive.erase(currentlyActive.begin());
+				wxLogWarning(
+					wxString::Format("No mods from (%s) can be placed above each other, "
+									 "%s placed at the top"_lng,
+						wxString::FromUTF8(boost::join(expandedRequirements, ", ")),
+						wxString::FromUTF8(expandedRequirements.front())));
+				sortedActive.emplace_back(expandedRequirements.front());
+				expandedRequirements.erase(expandedRequirements.begin());
 				i = 0;
 			}
 		}
