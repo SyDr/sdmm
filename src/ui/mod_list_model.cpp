@@ -128,7 +128,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case Column::activity:
 	{
-		variant = wxVariant(_iconStorage.get(_list.isActive(rowData) ? embedded_icon::tick : embedded_icon::cross_gray));
+		variant = wxVariant(_iconStorage.get(_list.isActive(rowData) ? embedded_icon::tick_green : embedded_icon::cross_gray));
 		break;
 	}
 	case Column::load_order:

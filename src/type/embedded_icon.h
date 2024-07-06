@@ -25,6 +25,7 @@ namespace mm::embedded_icon
 	constexpr const auto sort         = "icons/sort.png";
 	constexpr const auto tick         = "icons/tick.png";
 	constexpr const auto tick_gray    = "icons/tick-gray.png";
+	constexpr const auto tick_green   = "icons/tick-green.png";
 	constexpr const auto cross_gray   = "icons/cross-gray.png";
 	constexpr const auto up           = "icons/up.png";
 }
