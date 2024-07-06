@@ -186,6 +186,9 @@ void AppConfig::setSelectedPlatformCode(const std::string& newPlatform)
 
 void AppConfig::validate()
 {
+	if (_data.is_discarded())
+		_data = {};
+
 	if (!_data.count(SD_LNG_CODE) || !_data[SD_LNG_CODE].is_string())
 		_data[SD_LNG_CODE] = SystemInfo::DefaultLanguage;
 
