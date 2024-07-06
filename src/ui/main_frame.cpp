@@ -160,7 +160,8 @@ void MainFrame::createMenuBar()
 {
 	wxMenu* gameMenu = nullptr;
 
-	if (auto launchHelper = _currentPlatform->launchHelper())
+
+	if (auto launchHelper = _currentPlatform ? _currentPlatform->launchHelper() : nullptr)
 	{
 		gameMenu = new wxMenu();
 
