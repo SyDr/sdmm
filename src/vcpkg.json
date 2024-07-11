@@ -7,8 +7,13 @@
     "boost-nowide",
     "boost-filesystem",
     "nlohmann-json",
-    "wxwidgets",
-    "palsigslot"
+    {
+      "name": "wxwidgets",
+      "features": [ "webview" ]
+    },
+    "palsigslot",
+    "maddy",
+    "webview2"
   ],
-  "builtin-baseline": "2b681d95e08447fde261b4404fbeab324f7d1e5b"
+  "builtin-baseline": "5312e9f976e89b256954f571433e34f783dd2d12"
 }

@@ -36,8 +36,11 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
+#include <wx/webview.h>
 
 #include <algorithm>
+
+#include <maddy/parser.h>
 
 using namespace mm;
 
@@ -166,8 +169,8 @@ void ModListView::createControls(const wxString& managedPath)
 	_checkboxShowHidden = new wxCheckBox(_group, wxID_ANY, "Show hidden"_lng);
 	_checkboxShowHidden->SetValue(_managedPlatform.localConfig()->showHiddenMods());
 
-	_modDescription = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
+	_modDescription = wxWebView::New();
+	_modDescription->Create(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize);
 
 	_moveUp = new wxButton(_group, wxID_ANY, "Move Up"_lng);
 	_moveUp->SetBitmap(_iconStorage.get(embedded_icon::up));
@@ -275,7 +278,7 @@ void ModListView::updateControlsState()
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		_modDescription->SetValue(L"");
+		_modDescription->SetPage(L"", L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
@@ -313,13 +316,21 @@ void ModListView::updateControlsState()
 
 		if (!string.empty())
 			description = std::move(string);
+
+		if (mod.full_description.extension() == ".md")
+		{
+			std::stringstream markdownInput;
+			markdownInput << description;
+
+			description = wxString::FromUTF8(maddy::Parser().Parse(markdownInput));
+		}
 	}
 	else if (!mod.short_description.empty())
 	{
 		description = wxString::FromUTF8(mod.short_description);
 	}
 
-	_modDescription->SetValue(description);
+	_modDescription->SetPage(description, L"");
 	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
 	_galleryView->SetPath(mod.data_path / "Screens");
 

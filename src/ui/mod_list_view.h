@@ -19,6 +19,7 @@ class wxDataViewEvent;
 class wxStaticBox;
 class wxCheckBox;
 class wxStaticText;
+class wxWebView;
 
 namespace mm
 {
@@ -77,7 +78,7 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
-		wxWidgetsPtr<wxTextCtrl> _modDescription = nullptr;
+		wxWidgetsPtr<wxWebView> _modDescription = nullptr;
 
 		struct  // Menu
 		{
