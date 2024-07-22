@@ -22,10 +22,12 @@
 #include "mod_list_model.h"
 #include "select_exe.h"
 #include "type/embedded_icon.h"
+#include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
 
+#include <cmark.h>
 #include <wx/app.h>
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -39,8 +41,6 @@
 #include <wx/webview.h>
 
 #include <algorithm>
-
-#include <maddy/parser.h>
 
 using namespace mm;
 
@@ -218,7 +218,7 @@ void ModListView::createListControl()
 
 void ModListView::createListColumns()
 {
-	auto rActivity = new wxDataViewBitmapRenderer();
+	auto rActivity  = new wxDataViewBitmapRenderer();
 	auto rLoadOrder = new wxDataViewTextRenderer();
 
 	auto r1 = new wxDataViewIconTextRenderer();
@@ -239,12 +239,12 @@ void ModListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto columnActivity =
-		new wxDataViewColumn("Status"_lng, rActivity, static_cast<unsigned int>(ModListModel::Column::activity),
-		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
-	auto columnLoadOrder =
-		new wxDataViewColumn("Load order"_lng, rLoadOrder, static_cast<unsigned int>(ModListModel::Column::load_order),
-		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+	auto columnActivity  = new wxDataViewColumn("Status"_lng, rActivity,
+		 static_cast<unsigned int>(ModListModel::Column::activity), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		 columnFlags);
+	auto columnLoadOrder = new wxDataViewColumn("Load order"_lng, rLoadOrder,
+		static_cast<unsigned int>(ModListModel::Column::load_order), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		columnFlags);
 
 	auto column1 =
 		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
@@ -302,28 +302,23 @@ void ModListView::updateControlsState()
 	{
 		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 	}
-	else if (auto file = boost::nowide::ifstream(mod.data_path / mod.full_description); file)
+	else if (auto desc = readFile(mod.data_path / mod.full_description); !desc.empty())
 	{
-		std::stringstream stream;
-		stream << file.rdbuf();
-		file.close();
-
-		auto tmp    = stream.str();
-		auto string = wxString::FromUTF8(tmp);
-
-		if (string.empty())
-			string = wxString(tmp.c_str(), wxConvLocal, tmp.size());
-
-		if (!string.empty())
-			description = std::move(string);
-
 		if (mod.full_description.extension() == ".md")
 		{
-			std::stringstream markdownInput;
-			markdownInput << description;
+			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
+				cmark_markdown_to_html(desc.c_str(), desc.size(), 0), &std::free);
 
-			description = wxString::FromUTF8(maddy::Parser().Parse(markdownInput));
+			desc = cnvt.get();
 		}
+
+		auto asString = wxString::FromUTF8(desc);
+
+		if (asString.empty())
+			asString = wxString(desc.c_str(), wxConvLocal, desc.size());
+
+		if (!asString.empty())
+			std::swap(asString, description);
 	}
 	else if (!mod.short_description.empty())
 	{
@@ -395,8 +390,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 		for (const auto& item : _modManager.mods().active)
 		{
 			auto other = _managedPlatform.modDataProvider()->modData(item);
-			if (modData.incompatible.contains(item) ||
-				other.incompatible.contains(_selectedMod))
+			if (modData.incompatible.contains(item) || other.incompatible.contains(_selectedMod))
 			{
 				incompatible.emplace_back('"' + other.caption + '"');
 			}

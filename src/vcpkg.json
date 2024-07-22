@@ -12,7 +12,7 @@
       "features": [ "webview" ]
     },
     "palsigslot",
-    "maddy",
+    "cmark",
     "webview2"
   ],
   "builtin-baseline": "5312e9f976e89b256954f571433e34f783dd2d12"
