@@ -209,7 +209,7 @@ void MainFrame::createMenuBar()
 
 	auto languageMenu = new wxMenu();
 
-	for (const auto& lngCode : { "en_US", "ru_RU" })  // let's wait until someone complains
+	for (const auto& lngCode : _app.i18nService().available())
 	{
 		auto lngItem = languageMenu->AppendRadioItem(
 			wxID_ANY, wxString::FromUTF8(_app.i18nService().languageName(lngCode)));

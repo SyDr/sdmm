@@ -19,6 +19,8 @@ namespace mm
 	{
 		explicit I18nService(const IAppConfig& config);
 
+		std::vector<std::string> available() const override;
+
 		std::string category(const std::string& category) const override;
 		std::string get(const std::string& key) const override;
 		std::string languageName(const std::string& code) const override;
@@ -29,6 +31,8 @@ namespace mm
 		void build_cache(const nlohmann::json& data, const std::string& prefix);
 
 	private:
+		std::vector<std::pair<std::string, std::string>> _availableLanguages;
+
 		std::map<std::string, std::string> _data;
 	};
 }

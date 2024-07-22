@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,22 +8,48 @@
 #include "i18n_service.h"
 
 #include "interface/iapp_config.hpp"
+#include "system_info.hpp"
+#include "utility/json_util.h"
 
-#include <wx/stdpaths.h>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/nowide/fstream.hpp>
+#include <wx/stdpaths.h>
 
 #include <fstream>
 #include <string>
 
 using namespace mm;
 
+namespace
+{
+	std::vector<std::pair<std::string, std::string>> loadAvailable(const fs::path& path)
+	{
+		std::vector<std::pair<std::string, std::string>> result;
+
+		for (const auto& item : loadJsonFromFile(path, false))
+			result.emplace_back(item["code"], item["name"]);
+
+		return result;
+	}
+}
+
 I18nService::I18nService(const IAppConfig& config)
+	: _availableLanguages(loadAvailable(config.programPath() / "lng/_.json"))
 {
 	boost::nowide::ifstream datafile(config.programPath() / "lng" / (config.currentLanguageCode() + ".json"));
 
 	if (datafile)
 		build_cache(nlohmann::json::parse(datafile), "");
+}
+
+std::vector<std::string> mm::I18nService::available() const
+{
+	std::vector<std::string> result;
+
+	for (const auto& [code, value] : _availableLanguages)
+		result.emplace_back(code);
+
+	return result;
 }
 
 void I18nService::build_cache(const nlohmann::json& data, const std::string& prefix)
@@ -36,15 +62,9 @@ void I18nService::build_cache(const nlohmann::json& data, const std::string& pre
 
 		switch (it->type())
 		{
-		case nlohmann::json::value_t::string:
-			_data[key] = it->get<std::string>();
-			break;
-		case nlohmann::json::value_t::object:
-			build_cache(it.value(), key + "/");
-			break;
-		default:
-			wxFAIL_MSG(wxString::FromUTF8("Unexpected type when parsing " + prefix));
-			break;
+		case nlohmann::json::value_t::string: _data[key] = it->get<std::string>(); break;
+		case nlohmann::json::value_t::object: build_cache(it.value(), key + "/"); break;
+		default: wxFAIL_MSG(wxString::FromUTF8("Unexpected type when parsing " + prefix)); break;
 		}
 	}
 }
@@ -69,13 +89,11 @@ std::string I18nService::get(const std::string& key) const
 
 std::string I18nService::languageName(const std::string& code) const
 {
-	if (code == "en_US")
-		return "English";
+	for (const auto& [code_, value] : _availableLanguages)
+		if (code_ == code)
+			return value;
 
-	if (code == "ru_RU")
-		return boost::nowide::narrow(L"Русский");
-
-	return code; // TODO: return name from lng file itself
+	return code;
 }
 
 std::string I18nService::legacyCode(const std::string& code) const
