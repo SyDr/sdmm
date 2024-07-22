@@ -247,7 +247,7 @@ void ModListView::createListColumns()
 		columnFlags);
 
 	auto column1 =
-		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::caption),
+		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 	auto column2 =
 		new wxDataViewColumn("Category"_lng, r2, static_cast<unsigned int>(ModListModel::Column::category),
@@ -302,9 +302,9 @@ void ModListView::updateControlsState()
 	{
 		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 	}
-	else if (auto desc = readFile(mod.data_path / mod.full_description); !desc.empty())
+	else if (auto desc = readFile(mod.data_path / mod.description); !desc.empty())
 	{
-		if (mod.full_description.extension() == ".md")
+		if (mod.description.extension() == ".md")
 		{
 			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
 				cmark_markdown_to_html(desc.c_str(), desc.size(), 0), &std::free);
@@ -319,10 +319,6 @@ void ModListView::updateControlsState()
 
 		if (!asString.empty())
 			std::swap(asString, description);
-	}
-	else if (!mod.short_description.empty())
-	{
-		description = wxString::FromUTF8(mod.short_description);
 	}
 
 	_modDescription->SetPage(description, L"");
@@ -355,7 +351,7 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 	if (const auto mod = _listModel->findMod(item))
 	{
 		_menu.showOrHide->SetItemLabel(_modManager.mods().hidden.count(mod->id) ? "Show"_lng : "Hide"_lng);
-		_menu.openHomepage->Enable(!mod->homepage_link.empty());
+		_menu.openHomepage->Enable(!mod->homepage.empty());
 		_menu.openDir->Enable(!mod->virtual_mod);
 		_menu.deleteOrRemove->SetItemLabel(mod->virtual_mod ? "Remove from list"_lng : "Delete"_lng);
 		_list->PopupMenu(&_menu.menu);
@@ -371,7 +367,7 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 	if (itemId == _menu.showOrHide->GetId())
 		_modManager.switchVisibility(_selectedMod);
 	else if (itemId == _menu.openHomepage->GetId())
-		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage_link));
+		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage));
 	else if (itemId == _menu.openDir->GetId())
 		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
 	else if (itemId == _menu.deleteOrRemove->GetId())
@@ -392,7 +388,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 			auto other = _managedPlatform.modDataProvider()->modData(item);
 			if (modData.incompatible.contains(item) || other.incompatible.contains(_selectedMod))
 			{
-				incompatible.emplace_back('"' + other.caption + '"');
+				incompatible.emplace_back('"' + other.name + '"');
 			}
 		}
 
@@ -463,7 +459,7 @@ void ModListView::onRemoveModRequested()
 		const auto formatMessage =
 			"Are you sure want to delete mod \"%s\"?\n\n"
 			"It will be deleted to recycle bin, if possible."_lng;
-		const auto answer = wxMessageBox(wxString::Format(formatMessage, wxString::FromUTF8(mod.caption)),
+		const auto answer = wxMessageBox(wxString::Format(formatMessage, wxString::FromUTF8(mod.name)),
 			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 		if (answer != wxYES)

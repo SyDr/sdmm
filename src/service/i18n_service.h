@@ -23,6 +23,8 @@ namespace mm
 		std::string get(const std::string& key) const override;
 		std::string languageName(const std::string& code) const override;
 
+		std::string legacyCode(const std::string& code) const override;
+
 	private:
 		void build_cache(const nlohmann::json& data, const std::string& prefix);
 

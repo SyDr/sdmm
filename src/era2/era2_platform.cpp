@@ -123,7 +123,7 @@ Era2Platform::Era2Platform(Application const& app)
 	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
 	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig);
 	_modDataProvider =
-		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode());
+		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode(), _app.i18nService());
 
 	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
 	_modManager    = std::make_unique<Era2ModManager>(_modList);

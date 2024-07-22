@@ -26,7 +26,7 @@
     <ClCompile Include="era2\era2_platform.cpp" />
     <ClCompile Include="era2\era2_platform_descriptor.cpp" />
     <ClCompile Include="era2\era2_preset_manager.cpp" />
-    <ClCompile Include="era2\era2_mod_loader.cpp" />
+    <ClCompile Include="era2\era2_mod_data_loader.cpp" />
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
@@ -73,7 +73,7 @@
     <ClInclude Include="system_info.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
     <ClInclude Include="domain\mod_data.hpp" />
-    <ClInclude Include="era2\era2_mod_loader.hpp" />
+    <ClInclude Include="era2\era2_mod_data_loader.hpp" />
     <ClInclude Include="interface\imod_platform.hpp" />
     <ClInclude Include="interface\imod_data_provider.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />

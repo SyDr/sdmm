@@ -144,7 +144,7 @@ void ManagePresetListView::createListColumns()
 	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1 = new wxDataViewColumn("Mod"_lng, r1,
-		static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+		static_cast<unsigned int>(ModListModel::Column::name), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_mods->AppendColumn(column0);
 	_mods->AppendColumn(column1);

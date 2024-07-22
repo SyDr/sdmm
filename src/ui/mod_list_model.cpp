@@ -41,7 +41,7 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	switch (static_cast<Column>(col))
 	{
 	case Column::priority:
-	case Column::caption: return wxDataViewIconTextRenderer::GetDefaultType();
+	case Column::name: return wxDataViewIconTextRenderer::GetDefaultType();
 	case Column::author:
 	case Column::category:
 	case Column::load_order:
@@ -100,15 +100,15 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 		variant = wxVariant(wxDataViewIconText(text, icon));
 		break;
 	}
-	case Column::caption:
+	case Column::name:
 	{
 		variant = wxVariant(wxDataViewIconText(
-			wxString::FromUTF8(mod.caption), loadModIcon(_iconStorage, mod.data_path, mod.icon_filename)));
+			wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon)));
 		break;
 	}
 	case Column::author:
 	{
-		variant = wxVariant(wxString::FromUTF8(mod.authors));
+		variant = wxVariant(wxString::FromUTF8(mod.author));
 		break;
 	}
 	case Column::category:
@@ -118,7 +118,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case Column::version:
 	{
-		variant = wxVariant(wxString::FromUTF8(mod.mod_version));
+		variant = wxVariant(wxString::FromUTF8(mod.version));
 		break;
 	}
 	case Column::checkbox:
@@ -184,7 +184,7 @@ int ModListModel::Compare(
 		return wxDataViewModel::Compare(item1, item2, col, ascending);
 	};
 
-	if (static_cast<Column>(column) == Column::caption)
+	if (static_cast<Column>(column) == Column::name)
 		return compareRest(column);
 
 	if (static_cast<Column>(column) == Column::priority)
@@ -210,7 +210,7 @@ int ModListModel::Compare(
 	if (auto res = compareRest(column))
 		return res;
 
-	return compareRest(static_cast<unsigned int>(Column::caption));
+	return compareRest(static_cast<unsigned int>(Column::name));
 }
 
 void ModListModel::setModList(ModList const& mods)

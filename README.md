@@ -31,7 +31,6 @@ TODO
 - Update icons.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
-- Update mod.json file format.
 - Use IE7 mode for preview, if Edge is not available (or ignore?).
 - Implement mod installtion from archives.
 - Add settings dialog and move/copy all settings here.

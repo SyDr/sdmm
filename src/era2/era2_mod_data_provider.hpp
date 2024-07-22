@@ -16,10 +16,11 @@
 namespace mm
 {
 	struct Application;
+	struct II18nService;
 
 	struct Era2ModDataProvider : IModDataProvider
 	{
-		Era2ModDataProvider(fs::path basePath, std::string preferredLng);
+		Era2ModDataProvider(fs::path basePath, std::string preferredLng, const II18nService& i18Service);
 
 		const ModData& modData(const std::string& id) override;
 		void           clear();
@@ -28,8 +29,9 @@ namespace mm
 		void loadDefaults();
 
 	private:
-		const fs::path    _basePath;
-		const std::string _preferredLng;
+		const fs::path      _basePath;
+		const std::string   _preferredLng;
+		const II18nService& _i18Service;
 
 		std::map<std::string, ModData> _data;
 

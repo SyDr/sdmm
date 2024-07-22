@@ -89,7 +89,7 @@ void SelectModsDialog::createListColumns()
 	auto column1 = new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column2 = new wxDataViewColumn("Mod"_lng, r2,
-		static_cast<unsigned int>(ModListModel::Column::caption), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+		static_cast<unsigned int>(ModListModel::Column::name), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);
 	_list->AppendColumn(column1);

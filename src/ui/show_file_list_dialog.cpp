@@ -82,7 +82,7 @@ void ShowFileListDialog::createListColumns()
 		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1= new wxDataViewColumn("Mod"_lng, r1,
-										static_cast<unsigned int>(ModListModel::Column::caption),
+										static_cast<unsigned int>(ModListModel::Column::name),
 										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);

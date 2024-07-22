@@ -77,3 +77,14 @@ std::string I18nService::languageName(const std::string& code) const
 
 	return code; // TODO: return name from lng file itself
 }
+
+std::string I18nService::legacyCode(const std::string& code) const
+{
+	if (code == "en")
+		return "en_US";
+
+	if (code == "ru")
+		return "ru_RU";
+
+	return {};
+}

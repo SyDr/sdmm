@@ -16,5 +16,7 @@ namespace mm
 		[[nodiscard]] virtual std::string category(const std::string& category) const = 0;
 		[[nodiscard]] virtual std::string get(const std::string& key) const           = 0;
 		[[nodiscard]] virtual std::string languageName(const std::string& code) const = 0;
+
+		[[nodiscard]] virtual std::string legacyCode(const std::string& code) const = 0;
 	};
 }

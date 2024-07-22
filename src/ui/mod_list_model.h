@@ -29,7 +29,7 @@ namespace mm
 		enum class Column
 		{
 			priority,
-			caption,
+			name,
 			author,
 			category,
 			version,
