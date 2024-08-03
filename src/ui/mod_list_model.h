@@ -28,13 +28,13 @@ namespace mm
 
 		enum class Column
 		{
+			activity,
 			priority,
 			name,
 			author,
 			category,
 			version,
 			checkbox,
-			activity,
 			load_order,
 
 			total,
@@ -44,6 +44,7 @@ namespace mm
 		wxString     GetColumnType(unsigned int col) const override;
 
 		bool           IsContainer(const wxDataViewItem& item) const override;
+
 		wxDataViewItem GetParent(const wxDataViewItem& item) const override;
 		unsigned int   GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const override;
 		void GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const override;
@@ -64,12 +65,25 @@ namespace mm
 		wxDataViewItem findItemById(const std::string& id) const;
 		std::string    findIdByItem(wxDataViewItem const& item) const;
 
+		struct DisplayedData
+		{
+			std::vector<std::string> items;
+
+			// std::string -> category as in info file or empty string
+			// std::monostate -> Active group
+			using category_type    = std::variant<std::string, std::monostate>;
+			using cat_plus_display = std::pair<category_type, wxString>;
+
+			std::vector<cat_plus_display> categories;
+		};
+
 	private:
 		void reload();
 
 	private:
-		ModList                         _list;
-		std::vector<std::string>        _displayedItems;
+		ModList       _list;
+		DisplayedData _displayed;
+
 		std::unordered_set<std::string> _checked;
 
 		IModDataProvider& _modDataProvider;

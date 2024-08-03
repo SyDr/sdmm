@@ -50,6 +50,7 @@ namespace mm
 
 		void onSwitchSelectedModStateRequested();
 
+		void expandChildren();
 		void followSelection();
 		void updateControlsState();
 		void onSortModsRequested(const std::string& disablingMod);

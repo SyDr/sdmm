@@ -56,6 +56,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 
 	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
 	_listModel->setModList(_modManager.mods());
+	expandChildren();
 	buildLayout();
 	bindEvents();
 	updateControlsState();
@@ -104,7 +105,8 @@ void ModListView::bindEvents()
 
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
 		const auto item = _list->GetSelection();
-		_selectedMod    = item.IsOk() ? _listModel->findMod(item)->id : "";
+		const auto mod  = _listModel->findMod(item);
+		_selectedMod    = mod ? mod->id : "";
 		updateControlsState();
 	});
 
@@ -143,6 +145,8 @@ void ModListView::bindEvents()
 
 	_modManager.onListChanged().connect([this] {
 		_listModel->setModList(_modManager.mods());
+
+		expandChildren();
 		followSelection();
 		updateControlsState();
 	});
@@ -218,7 +222,7 @@ void ModListView::createListControl()
 
 void ModListView::createListColumns()
 {
-	auto rActivity  = new wxDataViewBitmapRenderer();
+	auto rActivity  = new wxDataViewIconTextRenderer();
 	auto rLoadOrder = new wxDataViewTextRenderer();
 
 	auto r1 = new wxDataViewIconTextRenderer();
@@ -328,6 +332,15 @@ void ModListView::updateControlsState()
 	Layout();
 
 	EX_UNEXPECTED;
+}
+
+void ModListView::expandChildren()
+{
+	wxDataViewItemArray children;
+	_listModel->GetChildren(wxDataViewItem(), children);
+
+	for (const auto& item : children)
+		_list->ExpandChildren(item);
 }
 
 void ModListView::followSelection()

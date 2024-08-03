@@ -111,6 +111,11 @@
 	"Loaded from file" : "Загружено из файла",
 	"Launch game with selected executable" : "Запустить игру (выбранным файлом)",
 	"Game" : "Игра",
+	"Without category" : "Без категории",
+	"Load order" : "Порядок загрузки",
+	"Status" : "Статус",
+	"Active" : "Активные",
+	"Active (%s)" : "Активные (%s)",
 
 	"category" : {
 		"gameplay" : "Геймплей",
