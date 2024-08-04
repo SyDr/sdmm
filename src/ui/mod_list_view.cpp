@@ -391,6 +391,9 @@ void ModListView::onSwitchSelectedModStateRequested()
 {
 	EX_TRY;
 
+	if (_selectedMod.empty())
+		return;
+
 	if (!_modManager.activePosition(_selectedMod).has_value())
 	{
 		const auto& modData = _managedPlatform.modDataProvider()->modData(_selectedMod);
