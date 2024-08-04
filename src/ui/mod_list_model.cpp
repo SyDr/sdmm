@@ -29,8 +29,8 @@ namespace
 
 	enum class ItemType
 	{
-		container,
-		item,
+		container = 0,
+		item      = 1,
 	};
 
 	wxDataViewItem toDataViewItem(size_t index, ItemType type)
@@ -102,9 +102,9 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 				[&](auto&& arg) {
 					using T = std::decay_t<decltype(arg)>;
 					if constexpr (std::is_same_v<T, std::monostate>)
-						return _list.activePosition(_displayed.items[i]).has_value();
+						return _list.activePosition(_displayed.items[row]).has_value();
 					else  // T == std::string
-						return _modDataProvider.modData(_displayed.items[i]).category == arg;
+						return _modDataProvider.modData(_displayed.items[row]).category == arg;
 				},
 				_displayed.categories[i].first))
 			return toDataViewItem(i, ItemType::container);
