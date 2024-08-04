@@ -297,7 +297,7 @@ int ModListModel::Compare(
 		return type1 < type2;
 
 	if (type1 == ItemType::container)
-		return index1 < index2;
+		return static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2);
 
 	if (static_cast<Column>(column) == Column::priority)
 	{
@@ -308,7 +308,8 @@ int ModListModel::Compare(
 			return Compare(item1, item2, static_cast<unsigned int>(Column::category), ascending);
 
 		if (active1 && active2)
-			return ascending ? index1 - index2 : index2 - index1;
+			return ascending ? static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2)
+							 : static_cast<ssize_t>(index2) - static_cast<ssize_t>(index1);
 
 		if (active1)
 			return -1;
