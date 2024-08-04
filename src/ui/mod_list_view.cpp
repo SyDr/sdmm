@@ -244,7 +244,7 @@ void ModListView::createListColumns()
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
 	auto columnActivity  = new wxDataViewColumn("Status"_lng, rActivity,
-		 static_cast<unsigned int>(ModListModel::Column::activity), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		 static_cast<unsigned int>(ModListModel::Column::status), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
 		 columnFlags);
 	auto columnLoadOrder = new wxDataViewColumn("Load order"_lng, rLoadOrder,
 		static_cast<unsigned int>(ModListModel::Column::load_order), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
@@ -269,6 +269,8 @@ void ModListView::createListColumns()
 	_list->AppendColumn(columnLoadOrder);
 	_list->AppendColumn(column3);
 	_list->AppendColumn(column4);
+
+	columnActivity->SetSortOrder(true);
 }
 
 void ModListView::updateControlsState()

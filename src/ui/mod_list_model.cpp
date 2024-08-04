@@ -44,23 +44,6 @@ namespace
 
 		return { static_cast<ItemType>(casted / categoryLimit), casted % categoryLimit };
 	}
-
-	bool categorySort(const std::string& left, const std::string& right)
-	{
-		if (left == right)
-			return false;
-
-		if (left.empty())
-			return false;
-
-		if (right.empty())
-			return true;
-
-		auto t1 = wxString::FromUTF8(wxGetApp().categoryTranslationString(left));
-		auto t2 = wxString::FromUTF8(wxGetApp().categoryTranslationString(right));
-
-		return t1 < t2;
-	}
 }
 
 ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden)
@@ -87,7 +70,7 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	case Column::load_order:
 	case Column::version: return wxDataViewTextRenderer::GetDefaultType();
 	case Column::checkbox: return wxDataViewToggleRenderer::GetDefaultType();
-	case Column::activity: return wxDataViewBitmapRenderer::GetDefaultType();
+	case Column::status: return wxDataViewBitmapRenderer::GetDefaultType();
 	}
 
 	return wxEmptyString;
@@ -223,7 +206,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 		variant = wxVariant(_checked.contains(rowData));
 		break;
 	}
-	case Column::activity:
+	case Column::status:
 	{
 		variant = wxVariant(
 			wxDataViewIconText(L"", _iconStorage.get(_list.isActive(rowData) ? embedded_icon::tick_green
@@ -289,8 +272,8 @@ int ModListModel::Compare(
 	const auto [type1, index1] = fromDataViewItem(item1);
 	const auto [type2, index2] = fromDataViewItem(item2);
 
-	auto compareRest = [&](unsigned int col) {
-		return wxDataViewModel::Compare(item1, item2, col, ascending);
+	auto compareRest = [&](Column col) {
+		return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(col), ascending);
 	};
 
 	if (type1 != type2)
@@ -299,13 +282,14 @@ int ModListModel::Compare(
 	if (type1 == ItemType::container)
 		return static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2);
 
-	if (static_cast<Column>(column) == Column::priority)
+	if (static_cast<Column>(column) == Column::priority || static_cast<Column>(column) == Column::status ||
+		static_cast<Column>(column) == Column::load_order)
 	{
-		bool const active1 = _list.isActive(_displayed.items[index1]);
-		bool const active2 = _list.isActive(_displayed.items[index2]);
+		const bool active1 = _list.isActive(_displayed.items[index1]);
+		const bool active2 = _list.isActive(_displayed.items[index2]);
 
 		if (!active1 && !active2)
-			return Compare(item1, item2, static_cast<unsigned int>(Column::category), ascending);
+			return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(Column::name), true);
 
 		if (active1 && active2)
 			return ascending ? static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2)
@@ -317,10 +301,10 @@ int ModListModel::Compare(
 		return 1;
 	}
 
-	if (auto res = compareRest(column))
+	if (auto res = wxDataViewModel::Compare(item1, item2, column, ascending); res != 0)
 		return res;
 
-	return compareRest(static_cast<unsigned int>(Column::name));
+	return compareRest(Column::name);
 }
 
 void ModListModel::setModList(ModList const& mods)

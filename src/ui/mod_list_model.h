@@ -28,7 +28,7 @@ namespace mm
 
 		enum class Column
 		{
-			activity,
+			status,
 			priority,
 			name,
 			author,
