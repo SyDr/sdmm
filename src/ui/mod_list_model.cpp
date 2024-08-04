@@ -46,12 +46,19 @@ namespace
 	}
 }
 
-ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden)
+ModListModel::ModListModel(
+	IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden, bool groupShow)
 	: _modDataProvider(modDataProvider)
 	, _iconStorage(iconStorage)
 	, _showHidden(showHidden)
+	, _groupShow(groupShow)
 {
 	reload();
+}
+
+bool ModListModel::IsListModel() const
+{
+	return !_groupShow;
 }
 
 unsigned int ModListModel::GetColumnCount() const
@@ -117,8 +124,16 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 {
 	if (!item.IsOk())
 	{
-		for (size_t i = 0; i < _displayed.categories.size(); ++i)
-			children.push_back(toDataViewItem(i, ItemType::container));
+		if (_groupShow)
+		{
+			for (size_t i = 0; i < _displayed.categories.size(); ++i)
+				children.push_back(toDataViewItem(i, ItemType::container));
+		}
+		else
+		{
+			for (size_t i = 0; i < _displayed.items.size(); ++i)
+				children.push_back(toDataViewItem(i, ItemType::item));
+		}
 
 		return children.size();
 	}

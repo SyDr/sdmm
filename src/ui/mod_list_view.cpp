@@ -48,7 +48,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(
-		  *managedPlatform.modDataProvider(), iconStorage, managedPlatform.localConfig()->showHiddenMods()))
+		  *managedPlatform.modDataProvider(), iconStorage, managedPlatform.localConfig()->showHiddenMods(), true))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);

@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -24,7 +24,8 @@ namespace mm
 	class ModListModel : public wxDataViewModel
 	{
 	public:
-		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden);
+		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden,
+			bool groupShow = false);
 
 		enum class Column
 		{
@@ -40,10 +41,12 @@ namespace mm
 			total,
 		};
 
+		bool IsListModel() const override;
+
 		unsigned int GetColumnCount() const override;
 		wxString     GetColumnType(unsigned int col) const override;
 
-		bool           IsContainer(const wxDataViewItem& item) const override;
+		bool IsContainer(const wxDataViewItem& item) const override;
 
 		wxDataViewItem GetParent(const wxDataViewItem& item) const override;
 		unsigned int   GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const override;
@@ -81,6 +84,8 @@ namespace mm
 		void reload();
 
 	private:
+		const bool _groupShow = false;
+
 		ModList       _list;
 		DisplayedData _displayed;
 
