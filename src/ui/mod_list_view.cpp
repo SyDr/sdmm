@@ -126,12 +126,33 @@ void ModListView::bindEvents()
 		wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [=](wxDataViewEvent& event) {
-		auto id = _listModel->findIdByItem(event.GetItem());
-		event.SetDataObject(new wxTextDataObject(wxString::FromUTF8(id)));
+		auto moveFrom = _listModel->findIdByItem(event.GetItem());
+		if (moveFrom.empty())
+		{
+			event.Veto();
+			return;
+		}
+
+		event.SetDataObject(new wxTextDataObject(wxString::FromUTF8(moveFrom)));
+		event.SetDragFlags(wxDrag_DefaultMove);
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
 		if (!event.GetItem().IsOk())
+		{
+			event.Veto();
+			return;
+		}
+
+		auto moveTo = _listModel->findIdByItem(event.GetItem());
+		if (moveTo.empty())
+		{
+			event.Veto();
+			return;
+		}
+
+		if (!_modManager.activePosition(_selectedMod).has_value() &&
+			!_modManager.activePosition(moveTo).has_value())
 			event.Veto();
 	});
 
