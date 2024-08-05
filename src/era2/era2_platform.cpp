@@ -92,25 +92,14 @@ namespace
 	}
 
 	void saveMods(
-		const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath, const ModList& mods)
+		const fs::path& activePath, const fs::path& hiddenPath, const ModList& mods)
 	{
-		auto                 reversedRange = mods.active | boost::adaptors::reversed;
+		auto                    reversedRange = mods.active | boost::adaptors::reversed;
 		std::deque<std::string> reversed(reversedRange.begin(), reversedRange.end());
-		reversed.emplace_back(mm::SystemInfo::ManagedMod);
 		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
 
 		overwriteFileFromContainer(activePath, reversed);
 		overwriteFileFromContainer(hiddenPath, mods.hidden);
-
-		const auto managedPath = modsPath / mm::SystemInfo::ManagedMod;
-
-		create_directories(modsPath / mm::SystemInfo::ManagedMod);
-		copy_file(fs::path(mm::SystemInfo::DataDir) / SystemInfo::ModInfoFilename,
-			managedPath / SystemInfo::ModInfoFilename, fs::copy_options::overwrite_existing);
-		copy_file(fs::path(mm::SystemInfo::DataDir) / "description.txt", managedPath / "description.txt",
-			fs::copy_options::overwrite_existing);
-		copy_file(fs::path(mm::SystemInfo::DataDir) / "description_rus.txt",
-			managedPath / "description_rus.txt", fs::copy_options::overwrite_existing);
 	}
 }
 
@@ -118,16 +107,16 @@ Era2Platform::Era2Platform(Application const& app)
 	: _app(app)
 	, _rootDir(app.appConfig().getDataPath())
 {
-	_localConfig   = std::make_unique<Era2Config>(_rootDir);
-	_presetManager = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
-	_launchHelper  = std::make_unique<Era2LaunchHelper>(*_localConfig);
-	_modDataProvider =
-		std::make_unique<Era2ModDataProvider>(getModsDirPath(), _app.appConfig().currentLanguageCode(), _app.i18nService());
+	_localConfig     = std::make_unique<Era2Config>(_rootDir);
+	_presetManager   = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
+	_launchHelper    = std::make_unique<Era2LaunchHelper>(*_localConfig);
+	_modDataProvider = std::make_unique<Era2ModDataProvider>(
+		getModsDirPath(), _app.appConfig().currentLanguageCode(), _app.i18nService());
 
-	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
-	_modManager    = std::make_unique<Era2ModManager>(_modList);
+	_modList    = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
+	_modManager = std::make_unique<Era2ModManager>(_modList);
 
-	_modListChanged    = _modManager->onListChanged().connect([this] { save(); });
+	_modListChanged = _modManager->onListChanged().connect([this] { save(); });
 }
 
 fs::path Era2Platform::managedPath() const
@@ -207,5 +196,5 @@ fs::path Era2Platform::getPluginListPath() const
 
 void Era2Platform::save()
 {
-	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
+	saveMods(getActiveListPath(), getHiddenListPath(), _modManager->mods());
 }
