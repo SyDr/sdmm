@@ -106,6 +106,8 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
 		if (auto item = _listModel->categoryByItem(event.GetItem()); item.has_value())
 			_hiddenCategories.emplace(*item);
+		else
+			event.Veto();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
