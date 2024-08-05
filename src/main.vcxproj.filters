@@ -33,10 +33,6 @@
     <ClCompile Include="ui\show_file_list_helper.cpp" />
     <ClCompile Include="ui\select_mods_dialog.cpp" />
     <ClCompile Include="ui\select_mod_pairs_dialog.cpp" />
-    <ClCompile Include="domain\plugin_list.cpp" />
-    <ClCompile Include="era2\era2_plugin_manager.cpp" />
-    <ClCompile Include="ui\plugin_list_model.cpp" />
-    <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="domain\mod_conflict_resolver.cpp" />
     <ClCompile Include="ui\image_gallery_view.cpp" />
     <ClCompile Include="ui\icon_helper.cpp" />
@@ -87,11 +83,6 @@
     <ClInclude Include="ui\select_mod_pairs_dialog.hpp" />
     <ClInclude Include="interface\ipreset_manager.hpp" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
-    <ClInclude Include="domain\plugin_list.hpp" />
-    <ClInclude Include="interface\iplugin_manager.hpp" />
-    <ClInclude Include="era2\era2_plugin_manager.hpp" />
-    <ClInclude Include="ui\plugin_list_model.hpp" />
-    <ClInclude Include="ui\plugin_list_view.hpp" />
     <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="ui\image_gallery_view.hpp" />

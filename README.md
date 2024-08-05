@@ -24,7 +24,6 @@ TODO
 - Unify build scripts for release and release-static configuration. No, this line is not copied from above.
 - For portable build, include empty settings.json in archive and use it as detect for portable mode.
 - Use UPX or something else to reduce release binary size.
-- Remove plugin support completely.
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).
 - Update icons.
 - Use FromDIP instead of fixed sizes.

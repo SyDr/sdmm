@@ -14,7 +14,6 @@
 namespace mm
 {
 	struct ModList;
-	struct PluginList;
 
 	struct IPresetManager
 	{

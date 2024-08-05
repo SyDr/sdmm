@@ -26,7 +26,6 @@ namespace mm
 {
 	struct IModPlatform;
 	class ModListModel;
-	class PluginListModel;
 	struct IIconStorage;
 
 	class ExportPresetDialog : public wxDialog
@@ -54,7 +53,6 @@ namespace mm
 
 		wxWidgetsPtr<wxStaticBox>  _optionsBox      = nullptr;
 		wxWidgetsPtr<wxCheckBox>   _saveExecutable  = nullptr;
-		wxWidgetsPtr<wxCheckBox>   _savePlugins     = nullptr;
 		wxWidgetsPtr<wxStaticText> _exportNameLabel = nullptr;
 		wxWidgetsPtr<wxTextCtrl>   _exportName      = nullptr;
 

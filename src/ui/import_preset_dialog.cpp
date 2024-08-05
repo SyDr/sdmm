@@ -15,10 +15,8 @@
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
-#include "interface/iplugin_manager.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
-#include "plugin_list_model.hpp"
 #include "type/embedded_icon.h"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
@@ -181,12 +179,12 @@ void ImportPresetDialog::doImportAndClose()
 	auto presetData = _platform.getPresetManager()->loadPreset(parsed);
 
 	if (_loadNow->IsChecked())
-		_platform.apply(&presetData.mods, &presetData.plugins);
+		_platform.apply(&presetData.mods);
 
 	if (!_importName->IsEmpty())
 	{
 		_platform.getPresetManager()->savePreset(_importName->GetValue().ToStdString(wxConvUTF8),
-			{ presetData.mods, presetData.plugins, presetData.executable });
+			{ presetData.mods, presetData.executable });
 		_platform.launchHelper()->setExecutable(presetData.executable);
 		if (_loadNow->IsChecked())
 			_platform.localConfig()->setActivePreset(_importName->GetValue().ToStdString(wxConvUTF8));

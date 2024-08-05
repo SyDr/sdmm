@@ -21,7 +21,6 @@
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
 #include "mod_manager_app.h"
-#include "plugin_list_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
 #include "service/icon_storage.hpp"
@@ -66,13 +65,6 @@ MainFrame::MainFrame(Application& app)
 	{
 		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
 		pages->AddPage(modListView, "Mods"_lng);
-
-		if (auto pluginManager = _currentPlatform->pluginManager())
-		{
-			auto pluginListView = new PluginListView(
-				pages, *pluginManager, *_currentPlatform->modDataProvider(), *_iconStorage);
-			pages->AddPage(pluginListView, "Plugins"_lng);
-		}
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{

@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -11,7 +11,6 @@
 #include "era2_config.hpp"
 #include "era2_mod_manager.hpp"
 #include "era2_platform.h"
-#include "era2_plugin_manager.hpp"
 #include "system_info.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
@@ -107,13 +106,6 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 		for (const auto& item : *hidden)
 			result.mods.hidden.emplace(item.get<std::string>());
 
-	result.plugins.available = Era2PluginManager::loadAvailablePlugins(_modsPath, result.mods);
-	if (auto plugins = data.find("plugins"); plugins != data.end())
-		result.plugins.managed = Era2PluginManager::loadManagedState(*plugins);
-
-	erase_if(result.plugins.available,
-		[&](const PluginSource& item) { return !result.plugins.managed.contains(item); });
-
 	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
 		result.executable = exe->get<std::string>();
 
@@ -137,17 +129,6 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 		auto& ref = data["hidden"] = nlohmann::json::array();
 		for (const auto& item : preset.mods.hidden)
 			ref.emplace_back(item);
-	}
-
-	if (!preset.plugins.managed.empty())
-	{
-		auto& ref = data["plugins"] = nlohmann::json::array();
-		for (const auto& source : preset.plugins.managed)
-		{
-			const auto path =
-				(fs::path(source.modId) / to_string(source.location) / source.name).lexically_normal();
-			ref.emplace_back(path.string());
-		}
 	}
 
 	if (!preset.executable.empty())

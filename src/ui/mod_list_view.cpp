@@ -498,7 +498,7 @@ void ModListView::onSortModsRequested(const std::string& disablingMod)
 
 	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider(), disablingMod);
 	if (mods != _modManager.mods())
-		_managedPlatform.apply(&mods, nullptr);
+		_managedPlatform.apply(&mods);
 
 	EX_UNEXPECTED;
 }

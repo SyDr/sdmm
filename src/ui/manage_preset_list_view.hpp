@@ -38,7 +38,6 @@ namespace mm
 	private:
 		void createControls();
 		void createListColumns();
-		void createPluginsListColumns();
 		void updateLayout();
 		void bindEvents();
 		void updatePreview();
@@ -81,9 +80,6 @@ namespace mm
 		wxWidgetsPtr<wxStaticBox>     _preview = nullptr;
 		wxObjectDataPtr<ModListModel> _listModel;
 		wxWidgetsPtr<wxDataViewCtrl>  _mods = nullptr;
-
-		wxObjectDataPtr<PluginListModel> _pluginListModel;
-		wxWidgetsPtr<wxDataViewCtrl>     _plugins = nullptr;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;

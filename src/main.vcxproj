@@ -17,12 +17,10 @@
   <ItemGroup>
     <ClCompile Include="domain\mod_conflict_resolver.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
-    <ClCompile Include="domain\plugin_list.cpp" />
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
     <ClCompile Include="era2\era2_mod_data_loader.cpp" />
     <ClCompile Include="era2\era2_launch_helper.cpp" />
     <ClCompile Include="era2\era2_mod_manager.cpp" />
-    <ClCompile Include="era2\era2_plugin_manager.cpp" />
     <ClCompile Include="era2\era2_preset_manager.cpp" />
     <ClCompile Include="service\app_config.cpp" />
     <ClCompile Include="service\i18n_service.cpp" />
@@ -45,8 +43,6 @@
     <ClCompile Include="ui\main_frame.cpp" />
     <ClCompile Include="ui\manage_preset_list_view.cpp" />
     <ClCompile Include="ui\mod_list_model.cpp" />
-    <ClCompile Include="ui\plugin_list_model.cpp" />
-    <ClCompile Include="ui\plugin_list_view.cpp" />
     <ClCompile Include="ui\export_preset_dialog.cpp" />
     <ClCompile Include="ui\select_directory_view.cpp" />
     <ClCompile Include="ui\select_exe.cpp" />
@@ -66,16 +62,13 @@
     <ClInclude Include="domain\mod_conflict_resolver.hpp" />
     <ClInclude Include="domain\preset_data.hpp" />
     <ClInclude Include="interface\imod_data_provider.hpp" />
-    <ClInclude Include="interface\iplugin_manager.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
-    <ClInclude Include="domain\plugin_list.hpp" />
     <ClInclude Include="era2\era2_mod_data_provider.hpp" />
     <ClInclude Include="era2\era2_mod_data_loader.hpp" />
     <ClInclude Include="era2\era2_directory_structure.hpp" />
     <ClInclude Include="era2\era2_launch_helper.hpp" />
     <ClInclude Include="era2\era2_mod_manager.hpp" />
-    <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="era2\era2_preset_manager.hpp" />
     <ClInclude Include="service\app_config.hpp" />
     <ClInclude Include="service\i18n_service.h" />
@@ -111,8 +104,6 @@
     <ClInclude Include="ui\main_frame.h" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
     <ClInclude Include="ui\mod_list_model.h" />
-    <ClInclude Include="ui\plugin_list_model.hpp" />
-    <ClInclude Include="ui\plugin_list_view.hpp" />
     <ClInclude Include="ui\export_preset_dialog.hpp" />
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />

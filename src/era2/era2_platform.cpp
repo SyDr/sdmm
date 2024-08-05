@@ -20,7 +20,6 @@
 #include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.hpp"
-#include "era2_plugin_manager.hpp"
 #include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
 #include "system_info.hpp"
@@ -127,10 +126,8 @@ Era2Platform::Era2Platform(Application const& app)
 
 	_modList       = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
 	_modManager    = std::make_unique<Era2ModManager>(_modList);
-	_pluginManager = std::make_unique<Era2PluginManager>(*_modManager, getModsDirPath(), getPluginListPath());
 
 	_modListChanged    = _modManager->onListChanged().connect([this] { save(); });
-	_pluginListChanged = _pluginManager->onListChanged().connect([this] { _pluginManager->save(); });
 }
 
 fs::path Era2Platform::managedPath() const
@@ -151,27 +148,16 @@ void Era2Platform::reload(bool force)
 	_modManager->onListChanged()();
 }
 
-void Era2Platform::apply(ModList* mods, PluginList* plugins)
+void Era2Platform::apply(ModList* mods)
 {
 	auto block1 = _modListChanged.blocker();
-	auto block2 = _pluginListChanged.blocker();
 
 	if (mods)
 	{
 		_modManager->mods(*mods);
-		if (plugins)
-			_pluginManager->plugins(*plugins);
-
 		_modManager->onListChanged()();
-	}
-	else if (plugins)
-	{
-		_pluginManager->plugins(*plugins);
-		_pluginManager->onListChanged()();
-	}
-
-	if (mods || plugins)
 		save();
+	}
 }
 
 fs::path Era2Platform::getModsDirPath() const
@@ -214,11 +200,6 @@ fs::path Era2Platform::getHiddenListPath() const
 	return _localConfig->getProgramDataPath() / "hidden_mods.txt";
 }
 
-IPluginManager* Era2Platform::pluginManager() const
-{
-	return _pluginManager.get();
-}
-
 fs::path Era2Platform::getPluginListPath() const
 {
 	return _localConfig->getProgramDataPath() / "plugins.json";
@@ -227,5 +208,4 @@ fs::path Era2Platform::getPluginListPath() const
 void Era2Platform::save()
 {
 	saveMods(getActiveListPath(), getHiddenListPath(), getModsDirPath(), _modManager->mods());
-	_pluginManager->save();
 }

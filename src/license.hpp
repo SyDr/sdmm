@@ -1,13 +1,13 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
 namespace mm
 {
-	constexpr const auto ProgramLicenseText = R"LICENSE(Copyright (c) 2020-2023 Aliaksei Karalenka
+	constexpr const auto ProgramLicenseText = R"LICENSE(Copyright (c) 2020-2024 Aliaksei Karalenka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files(the "Software"), to deal
