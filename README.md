@@ -25,7 +25,6 @@ TODO
 - For portable build, include empty settings.json in archive and use it as detect for portable mode.
 - Use UPX or something else to reduce release binary size.
 - Remove plugin support completely.
-- Remember collapsed/expanded categories and don't expand them automatically
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).
 - Update icons.
 - Use FromDIP instead of fixed sizes.
