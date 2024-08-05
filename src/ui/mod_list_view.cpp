@@ -47,8 +47,8 @@ using namespace mm;
 ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
-	, _listModel(new ModListModel(
-		  *managedPlatform.modDataProvider(), iconStorage, managedPlatform.localConfig()->showHiddenMods(), true))
+	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
+		  managedPlatform.localConfig()->showHiddenMods(), true))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
@@ -102,6 +102,16 @@ void ModListView::bindEvents()
 	_checkboxShowHidden->Bind(wxEVT_CHECKBOX, &ModListView::OnEventCheckboxShowHidden, this);
 
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
+
+	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
+		if (auto item = _listModel->categoryByItem(event.GetItem()); item.has_value())
+			_hiddenCategories.emplace(*item);
+	});
+
+	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
+		if (auto item = _listModel->categoryByItem(event.GetItem()); item.has_value())
+			_hiddenCategories.erase(*item);
+	});
 
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
 		const auto item = _list->GetSelection();
@@ -243,16 +253,15 @@ void ModListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto columnActivity  = new wxDataViewColumn("Status"_lng, rActivity,
-		 static_cast<unsigned int>(ModListModel::Column::status), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		 columnFlags);
+	auto columnActivity =
+		new wxDataViewColumn("Status"_lng, rActivity, static_cast<unsigned int>(ModListModel::Column::status),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto columnLoadOrder = new wxDataViewColumn("Load order"_lng, rLoadOrder,
 		static_cast<unsigned int>(ModListModel::Column::load_order), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
 		columnFlags);
 
-	auto column1 =
-		new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
+	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 	auto column2 =
 		new wxDataViewColumn("Category"_lng, r2, static_cast<unsigned int>(ModListModel::Column::category),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
@@ -342,7 +351,12 @@ void ModListView::expandChildren()
 	_listModel->GetChildren(wxDataViewItem(), children);
 
 	for (const auto& item : children)
-		_list->ExpandChildren(item);
+	{
+		auto cat = _listModel->categoryByItem(item);
+
+		if (!cat.has_value() || !_hiddenCategories.contains(*cat))
+			_list->ExpandChildren(item);
+	}
 }
 
 void ModListView::followSelection()

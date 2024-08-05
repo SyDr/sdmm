@@ -67,7 +67,8 @@ namespace mm
 		std::string _selectedMod;
 
 	private:
-		wxObjectDataPtr<ModListModel> _listModel;
+		wxObjectDataPtr<ModListModel>   _listModel;
+		std::unordered_set<std::string> _hiddenCategories;
 
 		wxWidgetsPtr<wxStaticBox>    _group              = nullptr;
 		wxWidgetsPtr<wxDataViewCtrl> _list               = nullptr;

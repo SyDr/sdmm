@@ -410,7 +410,7 @@ wxDataViewItem ModListModel::findItemById(const std::string& id) const
 	return {};
 }
 
-std::string ModListModel::findIdByItem(wxDataViewItem const& item) const
+std::string ModListModel::findIdByItem(const wxDataViewItem& item) const
 {
 	if (!item.IsOk())
 		return {};
@@ -420,6 +420,21 @@ std::string ModListModel::findIdByItem(wxDataViewItem const& item) const
 		return {};
 
 	return _displayed.items[index];
+}
+
+std::optional<std::string> ModListModel::categoryByItem(const wxDataViewItem& item) const
+{
+	if (!item.IsOk())
+		return {};
+
+	const auto [type, index] = fromDataViewItem(item);
+	if (type != ItemType::container)
+		return {};
+
+	if (auto s = std::get_if<std::string>(&_displayed.categories[index].first))
+		return *s;
+
+	return {};
 }
 
 void ModListModel::showHidden(bool show)

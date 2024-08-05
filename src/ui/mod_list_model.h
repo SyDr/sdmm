@@ -64,9 +64,10 @@ namespace mm
 		void showHidden(bool show);
 		void showInactive(bool show);
 
-		const ModData* findMod(const wxDataViewItem& item) const;
-		wxDataViewItem findItemById(const std::string& id) const;
-		std::string    findIdByItem(wxDataViewItem const& item) const;
+		const ModData*             findMod(const wxDataViewItem& item) const;
+		wxDataViewItem             findItemById(const std::string& id) const;
+		std::string                findIdByItem(const wxDataViewItem& item) const;
+		std::optional<std::string> categoryByItem(const wxDataViewItem& item) const;
 
 		struct DisplayedData
 		{
