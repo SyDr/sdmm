@@ -9,9 +9,12 @@
 
 namespace mm::SystemInfo
 {
-	constexpr const auto DataDir               = "data";
-	constexpr const auto ModInfoFilename       = "mod.json";
-	constexpr const auto DefaultLanguage       = "en";
+	constexpr const auto AppDataDirectory = "_MM_Data";
+	constexpr const auto SettingsFile     = "settings.json";
+
+	constexpr const auto DataDir         = "data";
+	constexpr const auto ModInfoFilename = "mod.json";
+	constexpr const auto DefaultLanguage = "en";
 
 	constexpr const auto ManagedMod = "_MM_Managed_";
 

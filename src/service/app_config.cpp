@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -16,8 +16,8 @@
 
 #include "system_info.hpp"
 #include "type/main_window_properties.h"
-#include "utility/sdlexcept.h"
 #include "utility/json_util.h"
+#include "utility/sdlexcept.h"
 
 using namespace mm;
 
@@ -25,14 +25,17 @@ namespace
 {
 	std::variant<PortableMode, MainMode> constructProgramMode()
 	{
-		fs::path result(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
-		result = result.parent_path().parent_path() / "_MM_Data";
-		if (exists(result) && is_directory(result))
-			return PortableMode(result.make_preferred());
+		fs::path myDir(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
 
-		result = wxStandardPaths::Get().GetUserDataDir().ToStdString(wxConvUTF8);
+		if (exists(myDir / SystemInfo::SettingsFile) && is_regular_file(myDir / SystemInfo::SettingsFile))
+		{
+			return PortableMode(
+				(myDir.parent_path().parent_path() / SystemInfo::AppDataDirectory).make_preferred(),
+				myDir / SystemInfo::SettingsFile);
+		}
 
-		return MainMode(result.make_preferred());
+		myDir = wxStandardPaths::Get().GetUserDataDir().ToStdString(wxConvUTF8);
+		return MainMode(myDir.make_preferred());
 	}
 
 	struct IsPortable
@@ -63,12 +66,29 @@ namespace
 
 	struct ValidateMode
 	{
-		void operator()(const PortableMode&) {}
+		void operator()(const PortableMode& mm)
+		{
+			if (!exists(mm.managedPath))
+				create_directories(mm.managedPath);
+		}
 
 		void operator()(const MainMode& mm)
 		{
 			if (!exists(mm.programDataPath))
 				create_directories(mm.programDataPath);
+		}
+	};
+
+	struct ConfigPath
+	{
+		fs::path operator()(const PortableMode& mm)
+		{
+			return mm.configLocation;
+		}
+
+		fs::path operator()(const MainMode& mm)
+		{
+			return mm.programDataPath / SystemInfo::SettingsFile;
 		}
 	};
 }
@@ -290,5 +310,5 @@ void AppConfig::unstarDataPath(const fs::path& path)
 
 fs::path AppConfig::configFilePath() const
 {
-	return dataPath() / "settings.json";
+	return std::visit(ConfigPath(), _mode);
 }

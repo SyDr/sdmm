@@ -19,6 +19,7 @@
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/json_util.h"
+#include "system_info.hpp"
 
 using namespace mm;
 
@@ -58,7 +59,7 @@ fs::path Era2Config::getDataPath() const
 
 fs::path Era2Config::getProgramDataPath() const
 {
-	return getDataPath() / "_MM_Data";
+	return getDataPath() / SystemInfo::AppDataDirectory;
 }
 
 fs::path Era2Config::getPresetsPath() const

@@ -22,7 +22,7 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 TODO
 ----
 - Unify build scripts for release and release-static configuration. No, this line is not copied from above.
-- For portable build, include empty settings.json in archive and use it as detect for portable mode.
+- For portable build, include empty settings.json in archive and maybe allow to use just parent dir instead of 2 inderections (like <root>/MM instead of <root>/Tools/MM).
 - Use UPX or something else to reduce release binary size.
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).
 - Update icons.

@@ -16,6 +16,7 @@ namespace mm
 	struct PortableMode
 	{
 		fs::path managedPath;
+		fs::path configLocation;
 	};
 
 	struct MainMode
