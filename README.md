@@ -7,7 +7,6 @@ TODO: write here more information.
 Installing
 ----------
 Download and install from [releases](./releases) page.
-- TODO: unify build scripts for release and release-static configuration.
 - TODO: get WebView2Loader.dll from VCPKG location (and check, why it's not copied automatically).
 
 Development
@@ -21,7 +20,7 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
 TODO
 ----
-- Unify build scripts for release and release-static configuration. No, this line is not copied from above.
+- Make portable build automatic
 - For portable build, include empty settings.json in archive and maybe allow to use just parent dir instead of 2 inderections (like <root>/MM instead of <root>/Tools/MM).
 - Use UPX or something else to reduce release binary size.
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).

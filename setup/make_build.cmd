@@ -1,2 +1,2 @@
-luajit make_build.lua
+pwsh make_build.ps1
 pause

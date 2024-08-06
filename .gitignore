@@ -5,8 +5,7 @@
 /sdmm-cppcheck-build-dir/
 /src/main.aps
 /src/main.vcxproj.user
-/setup/Output/mm_setup.exe
-/setup/log.txt
+/setup/Output/
 /SD MM.sdf
 /SD MM.VC.db
 /setup/mm_release_files_old/
@@ -17,3 +16,4 @@
 /StructLayoutSettings.json
 /CompileScoreSettings.json
 /release-static/
+/setup/log*.txt

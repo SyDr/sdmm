@@ -44,6 +44,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\Release\main.exe"; DestDir: "{app}"
 Source: "..\LICENSE"; DestDir: "{app}"
+Source: "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\lng\*.json"; DestDir: "{app}\lng"
 Source: "..\icons\*.png"; DestDir: "{app}\icons"

@@ -1,2 +1,0 @@
-luajit make_static_build.lua
-pause
