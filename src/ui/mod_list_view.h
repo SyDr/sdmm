@@ -80,7 +80,8 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
-		wxWidgetsPtr<wxWebView> _modDescription = nullptr;
+		wxWidgetsPtr<wxWebView>  _modDescription      = nullptr;
+		wxWidgetsPtr<wxTextCtrl> _modDescriptionPlain = nullptr;
 
 		struct  // Menu
 		{

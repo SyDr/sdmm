@@ -87,6 +87,7 @@ void ModListView::buildLayout()
 
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
 	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	rightSizer->Add(_modDescriptionPlain, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	rightSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand());
 	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
@@ -208,6 +209,13 @@ void ModListView::createControls(const wxString& managedPath)
 
 	_modDescription = wxWebView::New();
 	_modDescription->Create(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize);
+	_modDescription->EnableContextMenu(false);
+	_modDescription->EnableHistory(false);
+	_modDescription->SetPage(L"", L"");
+	_modDescription->Hide();
+
+	_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
 
 	_moveUp = new wxButton(_group, wxID_ANY, "Move Up"_lng);
 	_moveUp->SetBitmap(_iconStorage.get(embedded_icon::up));
@@ -317,6 +325,7 @@ void ModListView::updateControlsState()
 		_moveDown->Disable();
 		_changeState->Disable();
 		_modDescription->SetPage(L"", L"");
+		_modDescriptionPlain->SetValue(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
@@ -334,6 +343,7 @@ void ModListView::updateControlsState()
 	_moveUp->Enable(_modManager.canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.canMoveDown(mod.id));
 
+	bool useRichDescription = false;
 	auto description = "No description available"_lng;
 
 	if (mod.virtual_mod)
@@ -348,6 +358,7 @@ void ModListView::updateControlsState()
 				cmark_markdown_to_html(desc.c_str(), desc.size(), 0), &std::free);
 
 			desc = cnvt.get();
+			useRichDescription = true;
 		}
 
 		auto asString = wxString::FromUTF8(desc);
@@ -359,7 +370,18 @@ void ModListView::updateControlsState()
 			std::swap(asString, description);
 	}
 
-	_modDescription->SetPage(description, L"");
+	if (useRichDescription)
+	{
+		_modDescription->Show();
+		_modDescription->SetPage(description, L"");
+		_modDescriptionPlain->Hide();
+	}
+	else
+	{
+		_modDescriptionPlain->Show();
+		_modDescriptionPlain->SetValue(description);
+		_modDescription->Hide();
+	}
 	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
 	_galleryView->SetPath(mod.data_path / "Screens");
 
