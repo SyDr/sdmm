@@ -21,7 +21,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={pf}\{#MyAppName}
+DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=..\LICENSE
@@ -86,7 +86,7 @@ var
 
 function IsRedistInstallRequired() : boolean;
 begin
-  Result := IsComponentSelected('redist');
+  Result := WizardIsComponentSelected('redist');
 end;
 
 function InstallRedist(var NeedsRestart: boolean): String;
@@ -132,7 +132,6 @@ begin
 end;
 
 function NextButtonClick(CurPageID: Integer): boolean;
-var Version: TWindowsVersion;
 begin
 	Result := true;
 
