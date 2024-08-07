@@ -18,8 +18,6 @@ namespace mm
 	struct Application;
 	struct IModPlatform;
 	struct IIconStorage;
-	class IPanelView;
-	class ModListView;
 
 	class MainFrame : public wxFrame
 	{

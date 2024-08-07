@@ -33,7 +33,7 @@ namespace mm
 	class ModListView : public wxPanel
 	{
 	public:
-		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage);
+		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, bool groupMods = true);
 
 	private:
 		void createControls(const wxString& managedPath);

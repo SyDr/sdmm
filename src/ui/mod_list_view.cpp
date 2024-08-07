@@ -44,11 +44,12 @@
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
+ModListView::ModListView(
+	wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, bool groupMods)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
-		  managedPlatform.localConfig()->showHiddenMods(), true))
+		  managedPlatform.localConfig()->showHiddenMods(), groupMods))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
@@ -508,6 +509,10 @@ void ModListView::OnEventCheckboxShowHidden(const wxCommandEvent&)
 
 	_listModel->showHidden(_checkboxShowHidden->IsChecked());
 	_managedPlatform.localConfig()->showHiddenMods(_checkboxShowHidden->IsChecked());
+
+	expandChildren();
+	followSelection();
+	updateControlsState();
 
 	EX_UNEXPECTED;
 }
