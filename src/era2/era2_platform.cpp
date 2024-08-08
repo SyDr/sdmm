@@ -54,12 +54,16 @@ namespace
 		// active mods / ignore mm_managed_mod
 		std::vector<std::string> activeMods;
 		boost::split(activeMods, readFile(activePath), boost::is_any_of("\r\n"));
+
 		for (auto item : boost::adaptors::reverse(activeMods))
 		{
 			if (validateModId(modsPath, item))
 			{
-				items.active.emplace_back(item);
-				items.available.emplace(item);
+				if (!items.available.contains(item))
+				{
+					items.active.emplace_back(item);
+					items.available.emplace(item);
+				}
 			}
 			else if (!item.empty() && item != SystemInfo::ManagedMod)
 			{
