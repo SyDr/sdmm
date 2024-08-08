@@ -41,7 +41,7 @@ using namespace mm;
 
 namespace
 {
-	const wxSize minFrameSize(930, 575);
+	const wxSize minFrameSize(1240, 760);
 }
 
 MainFrame::MainFrame(Application& app)
