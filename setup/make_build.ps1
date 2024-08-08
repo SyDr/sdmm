@@ -1,16 +1,17 @@
 $MSBuild = &"${Env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
 $InnoSetup = "C:\Program Files (x86)\Inno Setup 6\iscc.exe"
-$MMVersion = (Get-Item -Path '..\Release\main.exe').VersionInfo.ProductVersion
 $StaticDirBuild = ".\Portable\SD Mod Manager"
 
 &"$MSBuild" /noconsolelogger /fileLogger /flp:logfile=log-release.txt /property:Configuration=release "..\\SD MM.sln"
+&"$MSBuild" /noconsolelogger /fileLogger /flp:logfile=log-release-static.txt /property:Configuration=release-static "..\\SD MM.sln"
 &"$InnoSetup" setup.iss
+
+$MMVersion = (Get-Item -Path '..\Release\main.exe').VersionInfo.ProductVersion
 Remove-Item -Path "Output\sdmm_setup_v_$MMVersion.exe" -ErrorAction Ignore
 Rename-Item -Path "Output\mm_setup.exe" -NewName "sdmm_setup_v_$MMVersion.exe"
-
-&"$MSBuild" /noconsolelogger /fileLogger /flp:logfile=log-release-static.txt /property:Configuration=release-static "..\\SD MM.sln"
 Remove-Item -Path "$StaticDirBuild" -Recurse -ErrorAction Ignore
 Remove-Item -Path "Output\sdmm_v_$MMVersion.zip" -ErrorAction Ignore
+
 New-Item -ItemType Directory -Path "$StaticDirBuild" | Out-Null
 New-Item -ItemType File -Path "$StaticDirBuild\settings.json" | Out-Null
 Copy-Item -Path "..\release-static\main.exe" -Destination "$StaticDirBuild" -Recurse
