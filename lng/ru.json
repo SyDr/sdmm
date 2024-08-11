@@ -132,7 +132,10 @@
 		"utilities" : "Утилиты",
 		"personal mods" : "Собственные разработки",
 		"localization" : "Перевод",
-		"mapeditor" : "Редактор карт"
+		"mapeditor" : "Редактор карт",
+		"music" : "Музыка",
+		"sounds" : "Звуки",
+		"plugins" : "Плагины"
 	},
 	"main_frame" : {
 		"revert" : "Сброс",

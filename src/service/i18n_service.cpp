@@ -71,10 +71,13 @@ void I18nService::build_cache(const nlohmann::json& data, const std::string& pre
 
 std::string I18nService::category(const std::string& category) const
 {
+	if (category.empty())
+		return {};
+
 	if (const auto it = _data.find("category/" + boost::to_lower_copy(category)); it != _data.cend())
 		return it->second;
 
-	return category;
+	return boost::to_upper_copy(category.substr(0, 1)) + category.substr(1);
 }
 
 std::string I18nService::get(const std::string& key) const
