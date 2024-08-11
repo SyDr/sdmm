@@ -8,6 +8,7 @@
 namespace mm::embedded_icon
 {
 	constexpr const auto blank          = "icons/blank.png";
+	constexpr const auto circle         = "icons/circle.png";
 	constexpr const auto bookmark       = "icons/bookmark.png";
 	constexpr const auto clear          = "icons/clear.png";
 	constexpr const auto cog            = "icons/cog.png";
