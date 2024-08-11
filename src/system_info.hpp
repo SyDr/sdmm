@@ -16,7 +16,5 @@ namespace mm::SystemInfo
 	constexpr const auto ModInfoFilename = "mod.json";
 	constexpr const auto DefaultLanguage = "en";
 
-	constexpr const auto ManagedMod = "_MM_Managed_";
-
 	constexpr const auto ProgramVersion = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
 }

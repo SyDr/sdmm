@@ -26,18 +26,13 @@ namespace mm
 
 		ModList const& mods() const override;
 
-		std::optional<size_t> activePosition(const std::string& item) const override;
-		void                  activate(const std::string& item) override;
-		void                  deactivate(const std::string& item) override;
-		void                  switchState(const std::string& item) override;
+		void activate(const std::string& item) override;
+		void deactivate(const std::string& item) override;
+		void switchState(const std::string& item) override;
+		void reset(const std::string& item) override;
 
-		bool canMove(const std::string& from, const std::string& to) const override;
 		void move(const std::string& from, const std::string& to) override;
-
-		bool canMoveUp(const std::string& item) const override;
 		void moveUp(const std::string& item) override;
-
-		bool canMoveDown(const std::string& item) const override;
 		void moveDown(const std::string& item) override;
 
 		void hide(const std::string& item) override;

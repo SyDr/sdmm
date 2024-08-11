@@ -59,15 +59,19 @@ MainFrame::MainFrame(Application& app)
 	CreateStatusBar();
 
 	auto panel = new wxPanel(this);
-	auto pages = new wxAuiNotebook(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize);
+	auto pages = new wxAuiNotebook(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+		wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS);
 
 	if (_currentPlatform)
 	{
 		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
-		pages->AddPage(modListView, "Mods"_lng);
+		pages->AddPage(modListView, "Mods"_lng + L" (flat)");
 
-		auto modListViewClassic = new ModListView(pages, *_currentPlatform, *_iconStorage, false);
-		pages->AddPage(modListViewClassic, "Mods"_lng);
+		auto modListViewClassic = new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::classic);
+		pages->AddPage(modListViewClassic, "Mods"_lng + L" (classic)");
+
+		auto modListViewModern = new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::modern);
+		pages->AddPage(modListViewModern, "Mods"_lng + L" (new)");
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{

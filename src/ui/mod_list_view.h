@@ -12,12 +12,14 @@
 #include <wx/dataview.h>
 #include <wx/menu.h>
 
+#include "mod_list_model_mode.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
+class wxCheckBox;
 class wxDataViewCtrl;
 class wxDataViewEvent;
+class wxInfoBarGeneric;
 class wxStaticBox;
-class wxCheckBox;
 class wxStaticText;
 class wxWebView;
 
@@ -33,7 +35,8 @@ namespace mm
 	class ModListView : public wxPanel
 	{
 	public:
-		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, bool groupMods = true);
+		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
+			ModListModelMode listMode = ModListModelMode::flat);
 
 	private:
 		void createControls(const wxString& managedPath);
@@ -49,6 +52,7 @@ namespace mm
 		void OnEventCheckboxShowHidden(const wxCommandEvent& event);
 
 		void onSwitchSelectedModStateRequested();
+		void onResetSelectedModStateRequested();
 
 		void expandChildren();
 		void followSelection();
@@ -77,6 +81,7 @@ namespace mm
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;
 		wxWidgetsPtr<wxButton> _changeState = nullptr;
+		wxWidgetsPtr<wxButton> _resetState  = nullptr;
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
@@ -92,12 +97,14 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 
-		wxWidgetsPtr<wxButton>         _showGallery   = nullptr;
-		wxWidgetsPtr<wxButton>         _openGallery   = nullptr;
-		wxWidgetsPtr<wxButton>         _expandGallery = nullptr;
-		wxWidgetsPtr<ImageGalleryView> _galleryView   = nullptr;
+		wxWidgetsPtr<wxButton>         _showGallery     = nullptr;
+		wxWidgetsPtr<wxButton>         _openGallery     = nullptr;
+		wxWidgetsPtr<wxButton>         _expandGallery   = nullptr;
+		wxWidgetsPtr<ImageGalleryView> _galleryView     = nullptr;
+		bool                           _galleryShown    = false;
+		bool                           _galleryExpanded = false;
 
-		bool _galleryShown    = false;
-		bool _galleryExpanded = false;
+		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
+		wxTimer                        _infoBarTimer;
 	};
 }

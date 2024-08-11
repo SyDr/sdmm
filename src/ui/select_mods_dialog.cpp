@@ -49,7 +49,13 @@ SelectModsDialog::SelectModsDialog(
 	bindEvents();
 
 	_listModel->setModList(_mods);
-	_listModel->setChecked({ _mods.active.cbegin(), _mods.active.cend() });
+
+	std::unordered_set<std::string> items;
+	for (const auto& item : _mods.data)
+		if (item.state == ModList::ModState::active)
+			items.emplace(item.id);
+
+	_listModel->setChecked(items);
 }
 
 std::unordered_set<std::string> const& SelectModsDialog::getSelected() const

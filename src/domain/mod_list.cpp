@@ -1,145 +1,199 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
 
 #include "mod_list.hpp"
+
 #include "utility/sdlexcept.h"
 
 using namespace mm;
 
-ModList::ModList(
-	std::set<std::string> available, std::vector<std::string> active, std::set<std::string> hidden)
-	: available(std::move(available))
-	, active(std::move(active))
-	, hidden(std::move(hidden))
-{}
-
-bool ModList::isActive(const std::string& item) const
+bool ModList::managed(const std::string& id) const
 {
-	return activePosition(item).has_value();
+	auto it = std::find_if(data.cbegin(), data.cend(), [&](const Mod& m) { return m.id == id; });
+
+	return it != data.cend();
 }
 
-bool ModList::isHidden(const std::string& item) const
+std::optional<size_t> ModList::position(const std::string& id) const
 {
-	return hidden.contains(item);
-}
+	auto it = std::find_if(data.cbegin(), data.cend(), [&](const Mod& m) { return m.id == id; });
 
-std::optional<size_t> ModList::activePosition(const std::string& item) const
-{
-	if (auto it = std::find(active.cbegin(), active.cend(), item); it != active.cend())
-		return std::distance(active.cbegin(), it);
+	if (it != data.cend())
+		return std::distance(data.cbegin(), it);
 
 	return {};
 }
 
-void ModList::activate(const std::string& item)
+std::optional<ModList::ModState> ModList::state(const std::string& id) const
 {
-	active.emplace(active.begin(), item);
+	if (auto pos = position(id))
+		return data[*pos].state;
+
+	return {};
 }
 
-void ModList::deactivate(const std::string& item)
+bool ModList::active(const std::string& id) const
 {
-	if (const auto position = activePosition(item); position.has_value())
-		active.erase(active.begin() + position.value());
+	const auto s = state(id);
+
+	return s && *s == ModState::active;
 }
 
-void ModList::switchState(const std::string& item)
+bool ModList::inactive(const std::string& id) const
 {
-	if (const auto position = activePosition(item); position.has_value())
-		active.erase(active.begin() + position.value());
+	const auto s = state(id);
+
+	return s && *s == ModState::inactive;
+}
+
+bool ModList::hidden(const std::string& id) const
+{
+	const auto s = state(id);
+
+	return s && *s == ModState::hidden;
+}
+
+void ModList::activate(const std::string& id)
+{
+	const auto pos = position(id);
+	if (!pos)
+	{
+		data.emplace(data.begin() + 0, Mod { id, ModState::active });
+		rest.erase(id);
+		return;
+	}
+
+	data[*pos].state = ModState::active;
+}
+
+void ModList::activate(const std::string& id, size_t at)
+{
+	const auto pos = position(id);
+	if (!pos)
+	{
+		data.emplace(data.begin() + at, Mod { id, ModState::active });
+		rest.erase(id);
+		return;
+	}
+
+	if (*pos != at)
+		move(*pos, at);
+
+	data[at].state = ModState::active;
+}
+
+void ModList::deactivate(const std::string& id)
+{
+	const auto pos = position(id);
+	if (pos)
+		data[*pos].state = ModState::inactive;
+}
+
+void ModList::switchState(const std::string& id)
+{
+	if (rest.contains(id))
+		activate(id);
 	else
-		active.emplace(active.begin(), item);
+		deactivate(id);
 }
 
-bool ModList::canMove(const std::string& from, const std::string& to) const
+bool ModList::canMove(const std::string&, const std::string&) const
 {
-	if (const auto position1 = activePosition(from); position1.has_value())
-		if (const auto position2 = activePosition(to); position2.has_value())
-			return true;
+	return true;
+}
 
-	return false;
+void ModList::move(size_t from, size_t to)
+{
+	auto item = data[from];
+
+	data.erase(data.begin() + from);
+	data.emplace(data.begin() + to, item);
 }
 
 void ModList::move(const std::string& from, const std::string& to)
 {
-	auto       posFrom = activePosition(from);
-	const auto posTo   = activePosition(to);
+	auto posFrom = position(from);
+	auto posTo   = position(to);
 
-	if (!posTo.has_value())
+	if (posFrom && !posTo)
 	{
-		if (posFrom.has_value())
-			deactivate(from);
-
+		reset(from);
 		return;
 	}
 
-	if (!posFrom.has_value())
+	if (!posFrom && posTo)
 	{
 		activate(from);
-		posFrom = activePosition(from);
+
+		posFrom = 0;
 	}
 
-	const auto step = posFrom.value() < posTo.value() ? 1 : -1;
-
-	for (auto index = posFrom.value(); index != posTo.value(); index += step)
-		std::swap(active[index], active[index + step]);
+	move(*posFrom, *posTo);
 }
 
-bool ModList::canMoveUp(const std::string& item) const
+bool ModList::canMoveUp(const std::string& id) const
 {
-	if (const auto position = activePosition(item); position.has_value() && position.value() != 0)
-		return true;
+	auto pos = position(id);
 
-	return false;
+	return pos && *pos > 0;
 }
 
-void ModList::moveUp(const std::string& item)
+void ModList::moveUp(const std::string& id)
 {
-	if (const auto position = activePosition(item); position.has_value() && position.value() != 0)
-		std::swap(active[position.value()], active[position.value() - 1]);
+	auto posFrom = position(id);
+	std::swap(data[*posFrom], data[*posFrom - 1]);
 }
 
-bool ModList::canMoveDown(const std::string& item) const
+bool ModList::canMoveDown(const std::string& id) const
 {
-	if (const auto position = activePosition(item))
-		return position.has_value() && position.value() != active.size() - 1;
+	auto pos = position(id);
 
-	return false;
+	return pos && (*pos + 1 < data.size());
 }
 
-void ModList::moveDown(const std::string& item)
+void ModList::moveDown(const std::string& id)
 {
-	if (const auto position = activePosition(item);
-		position.has_value() && position.value() != active.size() - 1)
-	{
-		std::swap(active[position.value()], active[position.value() + 1]);
-	}
+	auto posFrom = position(id);
+	std::swap(data[*posFrom], data[*posFrom + 1]);
 }
 
-void ModList::hide(const std::string& item)
+void ModList::hide(const std::string& id)
 {
-	hidden.emplace(item);
+	const auto pos = position(id);
+	if (pos)
+		data[*pos].state = ModState::hidden;
 }
 
-void ModList::show(const std::string& item)
+void ModList::show(const std::string& id)
 {
-	hidden.erase(item);
+	deactivate(id);
 }
 
-void ModList::switchVisibility(const std::string& item)
+void ModList::reset(const std::string& id)
 {
-	if (hidden.contains(item))
-		show(item);
+	const auto pos = position(id);
+	if (!pos)
+		return;
+
+	rest.emplace(data[*pos].id);
+	data.erase(data.begin() + *pos);
+}
+
+void ModList::switchVisibility(const std::string& id)
+{
+	if (hidden(id))
+		show(id);
 	else
-		hide(item);
+		hide(id);
 }
 
-void ModList::remove(const std::string& item)
+void ModList::remove(const std::string& id)
 {
-	show(item);
-	deactivate(item);
-	available.erase(item);
+	show(id);
+	deactivate(id);
+	data.erase(data.begin() + *position(id));
 }

@@ -1,11 +1,9 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
-
-#include <wx/string.h>
 
 #include <compare>
 #include <optional>
@@ -16,38 +14,75 @@ namespace mm
 {
 	struct ModList
 	{
-		std::set<std::string>    available;
-		std::set<std::string>    hidden;
-		std::vector<std::string> active;
+		enum class ModState
+		{
+			active,
+			inactive,
+			hidden,
+		};
+
+		struct Mod
+		{
+			std::string id;
+			ModState    state = ModState::active;
+
+			Mod() = default;
+
+			Mod(const std::string& id, ModState state)
+				: id(id)
+				, state(state) {};
+
+			std::weak_ordering operator<=>(const Mod& other) const = default;
+
+			std::string to_string() const
+			{
+				switch (state)
+				{
+				case ModState::inactive: return '*' + id;
+				case ModState::hidden: return '?' + id;
+				default: break;
+				}
+				return id;
+			}
+		};
+
+		std::vector<Mod> data;
+
+		std::set<std::string> rest;
 
 		std::vector<std::string> invalid;
 
 		ModList() = default;
-		ModList(
-			std::set<std::string> available, std::vector<std::string> active, std::set<std::string> hidden);
 
-		bool isActive(const std::string& item) const;
-		bool isHidden(const std::string& item) const;
+		bool managed(const std::string& id) const;
 
-		std::optional<size_t> activePosition(const std::string& item) const;
-		void                  activate(const std::string& item);
-		void                  deactivate(const std::string& item);
-		void                  switchState(const std::string& item);
+		std::optional<size_t> position(const std::string& id) const;
+
+		std::optional<ModState> state(const std::string& id) const;
+		bool                    active(const std::string& id) const;
+		bool                    inactive(const std::string& id) const;
+		bool                    hidden(const std::string& id) const;
+
+		void activate(const std::string& id);
+		void activate(const std::string& id, size_t at);
+		void deactivate(const std::string& id);
+		void hide(const std::string& id);
+		void show(const std::string& id);
+		void reset(const std::string& id);
+
+		void switchState(const std::string& id);
+		void switchVisibility(const std::string& id);
 
 		bool canMove(const std::string& from, const std::string& to) const;
+		bool canMoveUp(const std::string& id) const;
+		bool canMoveDown(const std::string& id) const;
+
 		void move(const std::string& from, const std::string& to);
+		void move(size_t from, size_t to);
+		void moveUp(const std::string& id);
+		void moveDown(const std::string& id);
 
-		bool canMoveUp(const std::string& item) const;
-		void moveUp(const std::string& item);
-
-		bool canMoveDown(const std::string& item) const;
-		void moveDown(const std::string& item);
-
-		void hide(const std::string& item);
-		void show(const std::string& item);
-		void switchVisibility(const std::string& item);
-
-		void remove(const std::string& item);
+		void remove(const std::string& id);
 
 		std::weak_ordering operator<=>(const ModList& other) const = default;
 	};

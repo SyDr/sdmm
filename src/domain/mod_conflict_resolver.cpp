@@ -13,8 +13,8 @@
 #include "interface/imod_data_provider.hpp"
 #include "mod_conflict_resolver.hpp"
 
-#include <set>
 #include <boost/range/algorithm_ext/erase.hpp>
+#include <set>
 
 using namespace mm;
 
@@ -31,8 +31,8 @@ namespace
 			expandRequirements(where, modDataProvider, id);
 	}
 
-	void reduceRequirements(std::set<std::string>&           where,
-		const std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
+	void reduceRequirements(std::set<std::string>& where, const std::vector<std::string>& active,
+		IModDataProvider& modDataProvider, const std::string& currentId)
 	{
 		if (where.contains(currentId))
 			return;
@@ -47,8 +47,8 @@ namespace
 		}
 	}
 
-	void reduceRequirementsTop(std::vector<std::string>& active,
-		IModDataProvider& modDataProvider, const std::string& currentId)
+	void reduceRequirementsTop(
+		std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
 	{
 		if (currentId.empty())
 			return;
@@ -57,8 +57,7 @@ namespace
 		reduceRequirements(reducedRequirements, active, modDataProvider, currentId);
 
 		boost::range::remove_erase_if(
-			active,
-			[&](const std::string& item) { return reducedRequirements.contains(item); });
+			active, [&](const std::string& item) { return reducedRequirements.contains(item); });
 	}
 }
 
@@ -67,8 +66,9 @@ ModList mm::resolve_mod_conflicts(
 {
 	// expand current mod list to contain all mods, required by active mods
 	std::vector<std::string> expandedRequirements;
-	for (const auto& id : mods.active)
-		expandRequirements(expandedRequirements, modDataProvider, id);
+	for (const auto& mod : mods.data)
+		if (mod.state == ModList::ModState::active)
+			expandRequirements(expandedRequirements, modDataProvider, mod.id);
 
 	// remove mods if user disables mod
 	// then remove mods, incompatible with top mods
@@ -117,9 +117,47 @@ ModList mm::resolve_mod_conflicts(
 		}
 	}
 
-	mods.active = sortedActive;
-	for (const auto& item : sortedActive)
-		mods.hidden.erase(item);
+	std::unordered_set<std::string> active { sortedActive.cbegin(), sortedActive.cend() };
+
+	size_t i = 0;
+
+	size_t skip = 0;
+
+	while (i < sortedActive.size())
+	{
+		const auto& id = sortedActive[i];
+
+		if (mods.data.size() <= i + skip)
+		{
+			mods.activate(id, i + skip);
+			++i;
+		}
+		else if (!active.count(mods.data[i + skip].id))
+		{
+			mods.deactivate(mods.data[i + skip].id);
+			++skip;
+		}
+		else if (id != mods.data[i + skip].id)
+		{
+			mods.activate(id, i + skip);
+			++i;
+		}
+		else if (mods.data[i + skip].state != ModList::ModState::active)
+		{
+			mods.activate(id, i + skip);
+			++i;
+		}
+		else
+		{
+			++i;
+		}
+	}
+
+	while (i + skip < mods.data.size())
+	{
+		mods.deactivate(mods.data[i + skip].id);
+		++skip;
+	}
 
 	return mods;
 }

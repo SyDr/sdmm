@@ -115,7 +115,9 @@
 	"Load order" : "Порядок загрузки",
 	"Status" : "Статус",
 	"Active" : "Активные",
-	"Active (%s)" : "Активные (%s)",
+	"Priority" : "Приоритет",
+	"Reset" : "Сбросить",
+	"Automatic mod conflict resolve mode selected" : "Включён режим автоматического разрешения конфликтов между модами",
 
 	"category" : {
 		"gameplay" : "Геймплей",

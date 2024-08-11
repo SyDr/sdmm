@@ -13,6 +13,7 @@
 
 #include "domain/mod_list.hpp"
 #include "utility/wx_widgets_ptr.hpp"
+#include "mod_list_model_mode.hpp"
 
 namespace mm
 {
@@ -24,9 +25,6 @@ namespace mm
 	class ModListModel : public wxDataViewModel
 	{
 	public:
-		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden,
-			bool groupShow = false);
-
 		enum class Column
 		{
 			status,
@@ -41,12 +39,16 @@ namespace mm
 			total,
 		};
 
+		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden,
+			ModListModelMode mode = ModListModelMode::flat);
+
 		bool IsListModel() const override;
 
 		unsigned int GetColumnCount() const override;
 		wxString     GetColumnType(unsigned int col) const override;
 
 		bool IsContainer(const wxDataViewItem& item) const override;
+		bool HasContainerColumns(const wxDataViewItem& item) const override;
 
 		wxDataViewItem GetParent(const wxDataViewItem& item) const override;
 		unsigned int   GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const override;
@@ -85,7 +87,7 @@ namespace mm
 		void reload();
 
 	private:
-		const bool _groupShow = false;
+		const ModListModelMode _mode = ModListModelMode::flat;
 
 		ModList       _list;
 		DisplayedData _displayed;

@@ -98,13 +98,19 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 	if (!data.is_object())
 		return result;
 
-	if (auto active = data.find("list"); active != data.end() && active->is_array())
-		for (const auto& item : *active)
-			result.mods.active.emplace_back(item.get<std::string>());
-
-	if (auto hidden = data.find("hidden"); hidden != data.end() && hidden->is_array())
-		for (const auto& item : *hidden)
-			result.mods.hidden.emplace(item.get<std::string>());
+	if (auto list = data.find("list"); list != data.end() && list->is_array())
+	{
+		for (const auto& item : *list)
+		{
+			const auto mod = item.get<std::string>();
+			if (mod.starts_with('*'))
+				result.mods.data.emplace_back(mod.substr(1), ModList::ModState::inactive);
+			else if (mod.starts_with('?'))
+				result.mods.data.emplace_back(mod.substr(1), ModList::ModState::hidden);
+			else
+				result.mods.data.emplace_back(mod, ModList::ModState::active);
+		}
+	}
 
 	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
 		result.executable = exe->get<std::string>();
@@ -118,21 +124,10 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 
 	data["mm_version"] = PROGRAM_VERSION;
 
-	if (!preset.mods.active.empty())
-	{
-		auto& ref = data["list"] = nlohmann::json::array();
-		for (const auto& item : preset.mods.active)
-			ref.emplace_back(item);
-	}
-	if (!preset.mods.hidden.empty())
-	{
-		auto& ref = data["hidden"] = nlohmann::json::array();
-		for (const auto& item : preset.mods.hidden)
-			ref.emplace_back(item);
-	}
+	auto& ref = data["list"] = nlohmann::json::array();
 
-	if (!preset.executable.empty())
-		data["exe"] = preset.executable;
+	for (const auto& item : preset.mods.data)
+		ref.emplace_back(item.to_string());
 
 	return data;
 }

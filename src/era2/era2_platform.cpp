@@ -31,14 +31,23 @@ using namespace mm;
 
 namespace
 {
-	bool validateModId(const fs::path& modsPath, std::string& id)
+	bool validateModId(const fs::path& modsPath, std::string& id, ModList::ModState& state)
 	{
 		boost::trim(id);
 		if (id.empty())
 			return false;
 
-		if (id == mm::SystemInfo::ManagedMod)
-			return false;
+		state = ModList::ModState::active;
+		if (id.starts_with('*'))
+		{
+			id    = id.substr(1);
+			state = ModList::ModState::inactive;
+		}
+		else if (id.starts_with('?'))
+		{
+			id    = id.substr(1);
+			state = ModList::ModState::hidden;
+		}
 
 		const auto path = modsPath / id;
 		if (!exists(path) || !is_directory(path))
@@ -47,9 +56,10 @@ namespace
 		return true;
 	}
 
-	ModList loadMods(const fs::path& activePath, const fs::path& hiddenPath, const fs::path& modsPath)
+	ModList loadMods(const fs::path& activePath, const fs::path&, const fs::path& modsPath)
 	{
-		ModList items;
+		ModList           items;
+		ModList::ModState state = ModList::ModState::active;
 
 		// active mods / ignore mm_managed_mod
 		std::vector<std::string> activeMods;
@@ -57,26 +67,16 @@ namespace
 
 		for (auto item : boost::adaptors::reverse(activeMods))
 		{
-			if (validateModId(modsPath, item))
+			if (validateModId(modsPath, item, state))
 			{
-				if (!items.available.contains(item))
-				{
-					items.active.emplace_back(item);
-					items.available.emplace(item);
-				}
+				if (!items.managed(item))
+					items.data.emplace_back(item, state);
 			}
-			else if (!item.empty() && item != SystemInfo::ManagedMod)
+			else if (!item.empty())
 			{
 				items.invalid.emplace_back(item);
 			}
 		}
-
-		// hidden mods in data dir
-		std::vector<std::string> hiddenMods;
-		boost::split(hiddenMods, readFile(hiddenPath), boost::is_any_of("\r\n"));
-		for (auto item : hiddenMods)
-			if (validateModId(modsPath, item))
-				items.hidden.emplace(item);
 
 		// remaining items from directory
 		if (exists(modsPath))
@@ -86,24 +86,32 @@ namespace
 			{
 				if (!it->is_directory())
 					continue;
-				items.available.emplace(it->path().filename().string());
+
+				const auto item = it->path().filename().string();
+				if (!items.managed(item))
+					items.rest.emplace(item);
 			}
 		}
-
-		items.available.erase(mm::SystemInfo::ManagedMod);
 
 		return items;
 	}
 
-	void saveMods(
-		const fs::path& activePath, const fs::path& hiddenPath, const ModList& mods)
+	void saveMods(const fs::path& activePath, const fs::path&, const ModList& mods)
 	{
-		auto                    reversedRange = mods.active | boost::adaptors::reversed;
-		std::deque<std::string> reversed(reversedRange.begin(), reversedRange.end());
-		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(reversed));
+		std::vector<std::string> toSave;
+		for (const auto& item : boost::adaptors::reverse(mods.data))
+		{
+			switch (item.state)
+			{
+			case ModList::ModState::active: toSave.emplace_back(item.id); break;
+			case ModList::ModState::inactive: toSave.emplace_back('*' + item.id); break;
+			case ModList::ModState::hidden: toSave.emplace_back('?' + item.id); break;
+			}
+		}
 
-		overwriteFileFromContainer(activePath, reversed);
-		overwriteFileFromContainer(hiddenPath, mods.hidden);
+		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(toSave));
+
+		overwriteFileFromContainer(activePath, toSave);
 	}
 }
 

@@ -37,42 +37,33 @@ void Era2ModManager::mods(ModList mods)
 	_list = std::move(mods);
 }
 
-std::optional<size_t> Era2ModManager::activePosition(const std::string& item) const
-{
-	return _list.activePosition(item);
-}
-
 void Era2ModManager::activate(const std::string& item)
 {
-	const auto size = _list.active.size();
-
 	_list.activate(item);
 
-	if (size != _list.active.size())
-		_listChanged();
+	_listChanged();
 }
 
 void Era2ModManager::deactivate(const std::string& item)
 {
-	const auto size = _list.active.size();
-
 	_list.deactivate(item);
 
-	if (size != _list.active.size())
-		_listChanged();
+	_listChanged();
 }
 
 void Era2ModManager::switchState(const std::string& item)
 {
-	if (!_list.isActive(item))
+	if (!_list.active(item))
 		activate(item);
 	else
 		deactivate(item);
 }
 
-bool Era2ModManager::canMove(const std::string& from, const std::string& to) const
+void Era2ModManager::reset(const std::string& item)
 {
-	return _list.canMove(from, to);
+	_list.reset(item);
+
+	_listChanged();
 }
 
 void Era2ModManager::move(const std::string& from, const std::string& to)
@@ -85,21 +76,11 @@ void Era2ModManager::move(const std::string& from, const std::string& to)
 	_listChanged();
 }
 
-bool Era2ModManager::canMoveUp(const std::string& item) const
-{
-	return _list.canMoveUp(item);
-}
-
 void Era2ModManager::moveUp(const std::string& item)
 {
 	_list.moveUp(item);
 
 	_listChanged();
-}
-
-bool Era2ModManager::canMoveDown(const std::string& item) const
-{
-	return _list.canMoveDown(item);
 }
 
 void Era2ModManager::moveDown(const std::string& item)
@@ -111,27 +92,21 @@ void Era2ModManager::moveDown(const std::string& item)
 
 void Era2ModManager::hide(const std::string& item)
 {
-	const auto size = _list.hidden.size();
-
 	_list.hide(item);
 
-	if (size != _list.hidden.size())
-		_listChanged();
+	_listChanged();
 }
 
 void Era2ModManager::show(const std::string& item)
 {
-	const auto size = _list.hidden.size();
-
 	_list.show(item);
 
-	if (size != _list.hidden.size())
-		_listChanged();
+	_listChanged();
 }
 
 void Era2ModManager::switchVisibility(const std::string& item)
 {
-	if (_list.isHidden(item))
+	if (_list.hidden(item))
 		show(item);
 	else
 		hide(item);

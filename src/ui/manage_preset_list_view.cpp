@@ -258,7 +258,14 @@ void ManagePresetListView::onLoadPresetRequested()
 	auto selected = getSelection();
 	auto preset   = _platform.getPresetManager()->loadPreset(selected);
 
-	preset.mods.available = _platform.modManager()->mods().available;
+	for (const auto& item : _platform.modManager()->mods().data)
+		if (!preset.mods.position(item.id))
+			preset.mods.rest.emplace(item.id);
+
+	for (const auto& item : _platform.modManager()->mods().rest)
+		if (!preset.mods.position(item))
+			preset.mods.rest.emplace(item);
+
 	preset.mods.invalid   = _platform.modManager()->mods().invalid;
 
 	_platform.apply(&preset.mods);
