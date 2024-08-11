@@ -21,6 +21,7 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 TODO
 ----
 - For portable build maybe allow to use just parent dir instead of 2 inderections (like <root>/MM instead of <root>/Tools/MM).
+- Improve screenshots display (use separate window?).
 - Use UPX or something else to reduce release binary size.
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).
 - Update icons.
