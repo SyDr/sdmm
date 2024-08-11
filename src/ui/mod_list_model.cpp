@@ -75,7 +75,8 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	case Column::author:
 	case Column::category:
 	case Column::load_order:
-	case Column::version: return wxDataViewTextRenderer::GetDefaultType();
+	case Column::version:
+	case Column::directory: return wxDataViewTextRenderer::GetDefaultType();
 	case Column::checkbox: return wxDataViewToggleRenderer::GetDefaultType();
 	case Column::status: return wxDataViewBitmapRenderer::GetDefaultType();
 	}
@@ -263,6 +264,11 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	case Column::version:
 	{
 		variant = wxVariant(wxString::FromUTF8(mod.version));
+		break;
+	}
+	case Column::directory:
+	{
+		variant = wxVariant(wxString::FromUTF8(mod.id));
 		break;
 	}
 	case Column::checkbox:

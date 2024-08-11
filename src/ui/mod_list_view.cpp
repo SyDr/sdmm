@@ -284,6 +284,7 @@ void ModListView::createListColumns()
 	auto r2 = new wxDataViewTextRenderer();
 	auto r3 = new wxDataViewTextRenderer();
 	auto r4 = new wxDataViewTextRenderer();
+	auto rDirectoryName = new wxDataViewTextRenderer();
 
 	rPriority->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
@@ -291,8 +292,9 @@ void ModListView::createListColumns()
 	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r3->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r4->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	rDirectoryName->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	r4->EnableEllipsize(wxELLIPSIZE_END);
+	rDirectoryName->EnableEllipsize(wxELLIPSIZE_END);
 
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
@@ -311,12 +313,16 @@ void ModListView::createListColumns()
 	auto column4 =
 		new wxDataViewColumn("Author"_lng, r4, static_cast<unsigned int>(ModListModel::Column::author),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+	auto columnDirectoryName = new wxDataViewColumn("Directory"_lng, rDirectoryName,
+		static_cast<unsigned int>(ModListModel::Column::directory),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 
 	_list->AppendColumn(columnPriority);
 	_list->AppendColumn(column1);
 	_list->AppendColumn(column2);
 	_list->AppendColumn(column3);
 	_list->AppendColumn(column4);
+	_list->AppendColumn(columnDirectoryName);
 
 	columnPriority->SetSortOrder(true);
 }

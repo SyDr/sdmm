@@ -29,7 +29,6 @@ TODO
 - Update icons.
 - Update show mod files functionality.
 - Update sort implementation (empty category to the end).
-- Show mod real dir somehow (column?).
 - Sort by version correctly or remove ability to sort by version.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).

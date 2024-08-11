@@ -35,6 +35,7 @@ namespace mm
 			version,
 			checkbox,
 			load_order,
+			directory,
 
 			total,
 		};
