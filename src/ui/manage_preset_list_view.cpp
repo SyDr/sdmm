@@ -10,18 +10,18 @@
 #include "application.h"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
+#include "export_preset_dialog.hpp"
+#include "import_preset_dialog.hpp"
 #include "interface/iicon_storage.hpp"
+#include "interface/ilaunch_helper.hpp"
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
-#include "interface/ilaunch_helper.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
-#include "export_preset_dialog.hpp"
-#include "import_preset_dialog.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -135,8 +135,8 @@ void ManagePresetListView::createListColumns()
 
 	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 = new wxDataViewColumn("Mod"_lng, r1,
-		static_cast<unsigned int>(ModListModel::Column::name), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_mods->AppendColumn(column0);
 	_mods->AppendColumn(column1);
@@ -220,6 +220,8 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 			return;
 	}
 
+	_platform.getPresetManager()->savePreset(
+		baseName, { _platform.modManager()->mods(), _platform.launchHelper()->getExecutable() });
 	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
@@ -266,7 +268,7 @@ void ManagePresetListView::onLoadPresetRequested()
 		if (!preset.mods.position(item))
 			preset.mods.rest.emplace(item);
 
-	preset.mods.invalid   = _platform.modManager()->mods().invalid;
+	preset.mods.invalid = _platform.modManager()->mods().invalid;
 
 	_platform.apply(&preset.mods);
 	_platform.localConfig()->setActivePreset(selected);
@@ -339,8 +341,9 @@ void ManagePresetListView::onDeletePreset()
 	EX_TRY;
 
 	auto      selected = getSelection();
-	const int answer   = wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), wxString::FromUTF8(selected)),
-		  wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+	const int answer =
+		wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), wxString::FromUTF8(selected)),
+			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 	if (answer == wxYES)
 		_platform.getPresetManager()->remove(selected);
