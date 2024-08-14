@@ -371,6 +371,16 @@ int ModListModel::Compare(
 		return 1;
 	}
 
+	if (static_cast<Column>(column) == Column::category)
+	{
+		const auto& cat1 = _modDataProvider.modData(_displayed.items[index1]).category;
+		const auto& cat2 = _modDataProvider.modData(_displayed.items[index2]).category;
+
+		if (cat1.empty() != cat2.empty())
+			return ascending ? static_cast<ssize_t>(cat1.empty()) - static_cast<ssize_t>(cat2.empty())
+							 : static_cast<ssize_t>(cat2.empty()) - static_cast<ssize_t>(cat1.empty());
+	}
+
 	if (auto res = wxDataViewModel::Compare(item1, item2, column, ascending); res != 0)
 		return res;
 

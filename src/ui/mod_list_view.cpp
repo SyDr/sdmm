@@ -288,26 +288,24 @@ void ModListView::createListColumns()
 
 	rDirectoryName->EnableEllipsize(wxELLIPSIZE_END);
 
-	constexpr auto columnFlags =
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
-
 	auto columnPriority = new wxDataViewColumn("Priority"_lng, rPriority,
 		static_cast<unsigned int>(ModListModel::Column::priority), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		columnFlags);
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
 	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
-		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
-	auto column2 =
-		new wxDataViewColumn("Category"_lng, r2, static_cast<unsigned int>(ModListModel::Column::category),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
-	auto column3 =
-		new wxDataViewColumn("Version"_lng, r3, static_cast<unsigned int>(ModListModel::Column::version),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
-	auto column4 =
-		new wxDataViewColumn("Author"_lng, r4, static_cast<unsigned int>(ModListModel::Column::author),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
+	auto column2 = new wxDataViewColumn("Category"_lng, r2,
+		static_cast<unsigned int>(ModListModel::Column::category), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
+	auto column3 = new wxDataViewColumn("Version"_lng, r3,
+		static_cast<unsigned int>(ModListModel::Column::version), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_REORDERABLE);
+	auto column4 = new wxDataViewColumn("Author"_lng, r4,
+		static_cast<unsigned int>(ModListModel::Column::author), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
 	auto columnDirectoryName = new wxDataViewColumn("Directory"_lng, rDirectoryName,
 		static_cast<unsigned int>(ModListModel::Column::directory), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		columnFlags);
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
 
 	_list->AppendColumn(columnPriority);
 	_list->AppendColumn(column1);

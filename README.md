@@ -26,7 +26,6 @@ TODO
 - Improve IconStorage to allow different icon size (currently only 16x16 is used).
 - Update icons.
 - Update show mod files functionality.
-- Update sort implementation (empty category to the end).
 - Sort by version correctly or remove ability to sort by version.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
