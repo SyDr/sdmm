@@ -80,35 +80,9 @@ MainFrame::MainFrame(Application& app)
 			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, *_iconStorage);
 			pages->AddPage(presetManagerView, "Profiles"_lng);
 		}
-
-		if (auto launchHelper = _currentPlatform->launchHelper())
-		{
-			_launchButton = new wxButton(panel, wxID_ANY,
-				wxString::Format(
-					wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())));
-			_launchButton->SetBitmap(_iconStorage->get(launchHelper->getLaunchString()));
-
-			wxSize goodSize = _launchButton->GetBestSize();
-			goodSize.SetWidth(goodSize.GetHeight());
-			_launchManageButton =
-				new wxButton(panel, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
-			_launchManageButton->SetBitmap(_iconStorage->get(embedded_icon::cog));
-			_launchManageButton->SetToolTip("Change executable for launch"_lng);
-		}
 	}
 
 	auto layout = new wxBoxSizer(wxVERTICAL);
-
-	if (_currentPlatform && _currentPlatform->launchHelper())
-	{
-		auto topLineSizer = new wxBoxSizer(wxHORIZONTAL);
-
-		topLineSizer->AddStretchSpacer(1);
-		topLineSizer->Add(_launchButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-		topLineSizer->Add(_launchManageButton, wxSizerFlags(0).CenterVertical().Border(wxALL, 4));
-
-		layout->Add(topLineSizer, wxSizerFlags(0).Expand());
-	}
 
 	layout->Add(pages, wxSizerFlags(1).Expand());
 	panel->SetSizer(layout);
@@ -128,8 +102,6 @@ MainFrame::MainFrame(Application& app)
 		if (auto launchHelper = _currentPlatform->launchHelper())
 		{
 			launchHelper->onDataChanged().connect([this] { updateExecutableRelatedData(); });
-			_launchButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onLaunchGameRequested(); });
-			_launchManageButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { selectExeToLaunch(); });
 		}
 	}
 }
@@ -401,10 +373,7 @@ void MainFrame::updateExecutableRelatedData()
 		auto text = wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption()));
 		auto icon = _iconStorage->get(helper->getLaunchString());
 
-		_launchButton->SetLabelText(text);
 		_launchMenuItem->SetItemLabel(text);
-
-		_launchButton->SetBitmap(icon);
 		_launchMenuItem->SetBitmap(icon);
 
 		Layout();
