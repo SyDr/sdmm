@@ -67,7 +67,7 @@ ModList mm::resolve_mod_conflicts(
 	// expand current mod list to contain all mods, required by active mods
 	std::vector<std::string> expandedRequirements;
 	for (const auto& mod : mods.data)
-		if (mod.state == ModList::ModState::active)
+		if (mod.state == ModList::ModState::enabled)
 			expandRequirements(expandedRequirements, modDataProvider, mod.id);
 
 	// remove mods if user disables mod
@@ -129,22 +129,22 @@ ModList mm::resolve_mod_conflicts(
 
 		if (mods.data.size() <= i + skip)
 		{
-			mods.activate(id, i + skip);
+			mods.enable(id, i + skip);
 			++i;
 		}
 		else if (!active.count(mods.data[i + skip].id))
 		{
-			mods.deactivate(mods.data[i + skip].id);
+			mods.disable(mods.data[i + skip].id);
 			++skip;
 		}
 		else if (id != mods.data[i + skip].id)
 		{
-			mods.activate(id, i + skip);
+			mods.enable(id, i + skip);
 			++i;
 		}
-		else if (mods.data[i + skip].state != ModList::ModState::active)
+		else if (mods.data[i + skip].state != ModList::ModState::enabled)
 		{
-			mods.activate(id, i + skip);
+			mods.enable(id, i + skip);
 			++i;
 		}
 		else
@@ -155,7 +155,7 @@ ModList mm::resolve_mod_conflicts(
 
 	while (i + skip < mods.data.size())
 	{
-		mods.deactivate(mods.data[i + skip].id);
+		mods.disable(mods.data[i + skip].id);
 		++skip;
 	}
 

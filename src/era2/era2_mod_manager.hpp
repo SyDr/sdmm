@@ -26,10 +26,10 @@ namespace mm
 
 		ModList const& mods() const override;
 
-		void activate(const std::string& item) override;
-		void deactivate(const std::string& item) override;
+		void enable(const std::string& item) override;
+		void disable(const std::string& item) override;
 		void switchState(const std::string& item) override;
-		void reset(const std::string& item) override;
+		void archive(const std::string& item) override;
 
 		void move(const std::string& from, const std::string& to) override;
 		void moveUp(const std::string& item) override;

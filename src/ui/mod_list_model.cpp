@@ -106,7 +106,7 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 		return wxDataViewItem();
 
 	const auto pos    = _list.position(_displayed.items[row]);
-	const auto active = _list.active(_displayed.items[row]);
+	const auto active = _list.enabled(_displayed.items[row]);
 
 	if (_mode == ModListModelMode::flat || (_mode == ModListModelMode::modern && pos))
 		return wxDataViewItem();
@@ -165,7 +165,7 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 			if constexpr (std::is_same_v<T, std::monostate>)
 			{
 				for (size_t i = 0; i < _displayed.items.size(); ++i)
-					if (_list.active(_displayed.items[i]))
+					if (_list.enabled(_displayed.items[i]))
 						children.push_back(toDataViewItem(i, ItemType::item));
 			}
 			else  // T == std::string
@@ -173,7 +173,7 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 				for (size_t i = 0; i < _displayed.items.size(); ++i)
 				{
 					const bool show = _mode == ModListModelMode::modern ? !_list.position(_displayed.items[i])
-																		: !_list.active(_displayed.items[i]);
+																		: !_list.enabled(_displayed.items[i]);
 
 					if (show && _modDataProvider.modData(_displayed.items[i]).category == arg)
 						children.push_back(toDataViewItem(i, ItemType::item));
@@ -230,8 +230,8 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 			const auto& icon_ = [&]() {
 				switch (*_list.state(id))
 				{
-				case ModList::ModState::active: return embedded_icon::tick_green;
-				case ModList::ModState::inactive: return embedded_icon::cross_gray;
+				case ModList::ModState::enabled: return embedded_icon::tick_green;
+				case ModList::ModState::disabled: return embedded_icon::cross_gray;
 				}
 
 				return embedded_icon::blank;
@@ -403,7 +403,7 @@ void ModListModel::reload()
 	{
 		if (_mode == ModListModelMode::classic)
 		{
-			if (!_list.active(id))
+			if (!_list.enabled(id))
 				++cats[_modDataProvider.modData(id).category];
 			else
 				++activeCount;
@@ -419,7 +419,7 @@ void ModListModel::reload()
 	if (activeCount)
 	{
 		_displayed.categories.emplace_back(
-			std::monostate(), wxString::Format(L"%s (%d)", "Active"_lng, activeCount));
+			std::monostate(), wxString::Format(L"%s (%d)", "Enabled"_lng, activeCount));
 	}
 
 	for (const auto& cat : cats)

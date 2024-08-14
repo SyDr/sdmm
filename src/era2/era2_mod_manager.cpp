@@ -37,31 +37,31 @@ void Era2ModManager::mods(ModList mods)
 	_list = std::move(mods);
 }
 
-void Era2ModManager::activate(const std::string& item)
+void Era2ModManager::enable(const std::string& item)
 {
-	_list.activate(item);
+	_list.enable(item);
 
 	_listChanged();
 }
 
-void Era2ModManager::deactivate(const std::string& item)
+void Era2ModManager::disable(const std::string& item)
 {
-	_list.deactivate(item);
+	_list.disable(item);
 
 	_listChanged();
 }
 
 void Era2ModManager::switchState(const std::string& item)
 {
-	if (!_list.active(item))
-		activate(item);
+	if (!_list.enabled(item))
+		enable(item);
 	else
-		deactivate(item);
+		disable(item);
 }
 
-void Era2ModManager::reset(const std::string& item)
+void Era2ModManager::archive(const std::string& item)
 {
-	_list.reset(item);
+	_list.archive(item);
 
 	_listChanged();
 }

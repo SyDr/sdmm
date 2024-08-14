@@ -20,10 +20,11 @@ namespace mm
 
 		[[nodiscard]] virtual ModList const& mods() const = 0;
 
-		virtual void activate(const std::string& item)    = 0;
-		virtual void deactivate(const std::string& item)  = 0;
+		virtual void enable(const std::string& item)  = 0;
+		virtual void disable(const std::string& item) = 0;
+		virtual void archive(const std::string& item) = 0;
+
 		virtual void switchState(const std::string& item) = 0;
-		virtual void reset(const std::string& item)       = 0;
 
 		virtual void move(const std::string& from, const std::string& to) = 0;
 		virtual void moveUp(const std::string& item)                      = 0;

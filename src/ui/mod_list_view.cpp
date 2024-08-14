@@ -228,7 +228,7 @@ void ModListView::createControls(const wxString& managedPath)
 	_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
 	_changeState->SetBitmap(_iconStorage.get(embedded_icon::plus));
 
-	_resetState = new wxButton(_group, wxID_ANY, "Reset"_lng);
+	_resetState = new wxButton(_group, wxID_ANY, "Archive"_lng);
 	_resetState->SetBitmap(_iconStorage.get(embedded_icon::reset_position));
 
 	_sort = new wxButton(_group, wxID_ANY, "Sort"_lng);
@@ -344,8 +344,8 @@ void ModListView::updateControlsState()
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(
-		_iconStorage.get(_modManager.mods().active(mod.id) ? embedded_icon::minus : embedded_icon::plus));
-	_changeState->SetLabelText(_modManager.mods().active(mod.id) ? "Disable"_lng : "Enable"_lng);
+		_iconStorage.get(_modManager.mods().enabled(mod.id) ? embedded_icon::minus : embedded_icon::plus));
+	_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
 
@@ -465,7 +465,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
 	{
-		onSortModsRequested(_modManager.mods().active(_selectedMod) ? std::string() : _selectedMod);
+		onSortModsRequested(_modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod);
 
 		static bool messageWasShown = false;
 		if (!messageWasShown)
@@ -486,11 +486,11 @@ void ModListView::onResetSelectedModStateRequested()
 	if (_selectedMod.empty())
 		return;
 
-	_modManager.reset(_selectedMod);
+	_modManager.archive(_selectedMod);
 
 	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
 	{
-		onSortModsRequested(_modManager.mods().active(_selectedMod) ? std::string() : _selectedMod);
+		onSortModsRequested(_modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod);
 
 		static bool messageWasShown = false;
 		if (!messageWasShown)

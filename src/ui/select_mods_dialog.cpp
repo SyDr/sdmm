@@ -52,7 +52,7 @@ SelectModsDialog::SelectModsDialog(
 
 	std::unordered_set<std::string> items;
 	for (const auto& item : _mods.data)
-		if (item.state == ModList::ModState::active)
+		if (item.state == ModList::ModState::enabled)
 			items.emplace(item.id);
 
 	_listModel->setChecked(items);

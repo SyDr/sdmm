@@ -37,11 +37,11 @@ namespace
 		if (id.empty())
 			return false;
 
-		state = ModList::ModState::active;
+		state = ModList::ModState::enabled;
 		if (id.starts_with('*'))
 		{
 			id    = id.substr(1);
-			state = ModList::ModState::inactive;
+			state = ModList::ModState::disabled;
 		}
 
 		const auto path = modsPath / id;
@@ -54,7 +54,7 @@ namespace
 	ModList loadMods(const fs::path& activePath, const fs::path&, const fs::path& modsPath)
 	{
 		ModList           items;
-		ModList::ModState state = ModList::ModState::active;
+		ModList::ModState state = ModList::ModState::enabled;
 
 		// active mods / ignore mm_managed_mod
 		std::vector<std::string> activeMods;
@@ -98,8 +98,8 @@ namespace
 		{
 			switch (item.state)
 			{
-			case ModList::ModState::active: toSave.emplace_back(item.id); break;
-			case ModList::ModState::inactive: toSave.emplace_back('*' + item.id); break;
+			case ModList::ModState::enabled: toSave.emplace_back(item.id); break;
+			case ModList::ModState::disabled: toSave.emplace_back('*' + item.id); break;
 			}
 		}
 

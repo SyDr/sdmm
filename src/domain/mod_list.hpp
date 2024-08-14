@@ -16,14 +16,14 @@ namespace mm
 	{
 		enum class ModState
 		{
-			active,
-			inactive,
+			enabled,
+			disabled,
 		};
 
 		struct Mod
 		{
 			std::string id;
-			ModState    state = ModState::active;
+			ModState    state = ModState::enabled;
 
 			Mod() = default;
 
@@ -37,17 +37,15 @@ namespace mm
 			{
 				switch (state)
 				{
-				case ModState::inactive: return '*' + id;
+				case ModState::disabled: return '*' + id;
 				default: break;
 				}
 				return id;
 			}
 		};
 
-		std::vector<Mod> data;
-
-		std::set<std::string> rest;
-
+		std::vector<Mod>         data;
+		std::set<std::string>    rest;
 		std::vector<std::string> invalid;
 
 		ModList() = default;
@@ -57,13 +55,13 @@ namespace mm
 		std::optional<size_t> position(const std::string& id) const;
 
 		std::optional<ModState> state(const std::string& id) const;
-		bool                    active(const std::string& id) const;
-		bool                    inactive(const std::string& id) const;
+		bool                    enabled(const std::string& id) const;
+		bool                    disabled(const std::string& id) const;
 
-		void activate(const std::string& id);
-		void activate(const std::string& id, size_t at);
-		void deactivate(const std::string& id);
-		void reset(const std::string& id);
+		void enable(const std::string& id);
+		void enable(const std::string& id, size_t at);
+		void disable(const std::string& id);
+		void archive(const std::string& id);
 
 		void switchState(const std::string& id);
 

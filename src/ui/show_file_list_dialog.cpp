@@ -46,7 +46,7 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 	ModList list;
 
 	for (const auto& item : _data.modList)
-		list.data.emplace_back(item, ModList::ModState::active);
+		list.data.emplace_back(item, ModList::ModState::enabled);
 
 	_listModel->setModList(list);
 }

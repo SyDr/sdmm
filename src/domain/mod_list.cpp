@@ -36,39 +36,39 @@ std::optional<ModList::ModState> ModList::state(const std::string& id) const
 	return {};
 }
 
-bool ModList::active(const std::string& id) const
+bool ModList::enabled(const std::string& id) const
 {
 	const auto s = state(id);
 
-	return s && *s == ModState::active;
+	return s && *s == ModState::enabled;
 }
 
-bool ModList::inactive(const std::string& id) const
+bool ModList::disabled(const std::string& id) const
 {
 	const auto s = state(id);
 
-	return s && *s == ModState::inactive;
+	return s && *s == ModState::disabled;
 }
 
-void ModList::activate(const std::string& id)
+void ModList::enable(const std::string& id)
 {
 	const auto pos = position(id);
 	if (!pos)
 	{
-		data.emplace(data.begin() + 0, Mod { id, ModState::active });
+		data.emplace(data.begin() + 0, Mod { id, ModState::enabled });
 		rest.erase(id);
 		return;
 	}
 
-	data[*pos].state = ModState::active;
+	data[*pos].state = ModState::enabled;
 }
 
-void ModList::activate(const std::string& id, size_t at)
+void ModList::enable(const std::string& id, size_t at)
 {
 	const auto pos = position(id);
 	if (!pos)
 	{
-		data.emplace(data.begin() + at, Mod { id, ModState::active });
+		data.emplace(data.begin() + at, Mod { id, ModState::enabled });
 		rest.erase(id);
 		return;
 	}
@@ -76,22 +76,22 @@ void ModList::activate(const std::string& id, size_t at)
 	if (*pos != at)
 		move(*pos, at);
 
-	data[at].state = ModState::active;
+	data[at].state = ModState::enabled;
 }
 
-void ModList::deactivate(const std::string& id)
+void ModList::disable(const std::string& id)
 {
 	const auto pos = position(id);
 	if (pos)
-		data[*pos].state = ModState::inactive;
+		data[*pos].state = ModState::disabled;
 }
 
 void ModList::switchState(const std::string& id)
 {
 	if (rest.contains(id))
-		activate(id);
+		enable(id);
 	else
-		deactivate(id);
+		disable(id);
 }
 
 bool ModList::canMove(const std::string&, const std::string&) const
@@ -114,13 +114,13 @@ void ModList::move(const std::string& from, const std::string& to)
 
 	if (posFrom && !posTo)
 	{
-		reset(from);
+		archive(from);
 		return;
 	}
 
 	if (!posFrom && posTo)
 	{
-		activate(from);
+		enable(from);
 
 		posFrom = 0;
 	}
@@ -154,7 +154,7 @@ void ModList::moveDown(const std::string& id)
 	std::swap(data[*posFrom], data[*posFrom + 1]);
 }
 
-void ModList::reset(const std::string& id)
+void ModList::archive(const std::string& id)
 {
 	const auto pos = position(id);
 	if (!pos)
@@ -166,6 +166,6 @@ void ModList::reset(const std::string& id)
 
 void ModList::remove(const std::string& id)
 {
-	deactivate(id);
+	disable(id);
 	data.erase(data.begin() + *position(id));
 }
