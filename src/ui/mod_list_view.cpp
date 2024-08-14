@@ -108,14 +108,14 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
-		if (auto item = _listModel->categoryByItem(event.GetItem()); item.has_value())
+		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 			_hiddenCategories.emplace(*item);
 		else
 			event.Veto();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
-		if (auto item = _listModel->categoryByItem(event.GetItem()); item.has_value())
+		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 			_hiddenCategories.erase(*item);
 	});
 
@@ -406,7 +406,7 @@ void ModListView::expandChildren()
 
 	for (const auto& item : children)
 	{
-		auto cat = _listModel->categoryByItem(item);
+		auto cat = _listModel->itemGroupByItem(item);
 
 		if (!cat.has_value() || !_hiddenCategories.contains(*cat))
 			_list->ExpandChildren(item);

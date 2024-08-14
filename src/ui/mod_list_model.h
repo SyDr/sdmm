@@ -12,7 +12,7 @@
 #include <wx/dataview.h>
 
 #include "domain/mod_list.hpp"
-#include "mod_list_model_mode.hpp"
+#include "mod_list_model_structs.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
 namespace mm
@@ -64,27 +64,10 @@ namespace mm
 		void                                   setChecked(std::unordered_set<std::string> items);
 		std::unordered_set<std::string> const& getChecked() const;
 
-		const ModData*             findMod(const wxDataViewItem& item) const;
-		wxDataViewItem             findItemById(const std::string& id) const;
-		std::string                findIdByItem(const wxDataViewItem& item) const;
-		std::optional<std::string> categoryByItem(const wxDataViewItem& item) const;
-
-		struct DisplayedData
-		{
-			std::vector<std::string> items;
-
-			struct ActiveGroupTag
-			{};
-
-			struct TurnedOffGroupTag
-			{};
-			// std::string -> category as in info file or empty string
-			// std::monostate -> Active group
-			using category_type    = std::variant<std::string, std::monostate>;
-			using cat_plus_display = std::pair<category_type, wxString>;
-
-			std::vector<cat_plus_display> categories;
-		};
+		const ModData*                                   findMod(const wxDataViewItem& item) const;
+		wxDataViewItem                                   findItemById(const std::string& id) const;
+		std::string                                      findIdByItem(const wxDataViewItem& item) const;
+		std::optional<ModListDsplayedData::GroupItemsBy> itemGroupByItem(const wxDataViewItem& item) const;
 
 	private:
 		void reload();
@@ -92,8 +75,8 @@ namespace mm
 	private:
 		const ModListModelMode _mode = ModListModelMode::flat;
 
-		ModList       _list;
-		DisplayedData _displayed;
+		ModList             _list;
+		ModListDsplayedData _displayed;
 
 		std::unordered_set<std::string> _checked;
 

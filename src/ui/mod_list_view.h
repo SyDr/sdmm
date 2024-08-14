@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -8,11 +8,12 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 
 #include <wx/dataview.h>
 #include <wx/menu.h>
 
-#include "mod_list_model_mode.hpp"
+#include "mod_list_model_structs.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
 class wxCheckBox;
@@ -70,11 +71,11 @@ namespace mm
 		std::string _selectedMod;
 
 	private:
-		wxObjectDataPtr<ModListModel>   _listModel;
-		std::unordered_set<std::string> _hiddenCategories;
+		wxObjectDataPtr<ModListModel>               _listModel;
+		std::set<ModListDsplayedData::GroupItemsBy> _hiddenCategories;
 
-		wxWidgetsPtr<wxStaticBox>    _group              = nullptr;
-		wxWidgetsPtr<wxDataViewCtrl> _list               = nullptr;
+		wxWidgetsPtr<wxStaticBox>    _group = nullptr;
+		wxWidgetsPtr<wxDataViewCtrl> _list  = nullptr;
 
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;

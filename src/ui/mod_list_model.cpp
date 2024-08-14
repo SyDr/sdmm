@@ -105,8 +105,8 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 	if (type == ItemType::container)
 		return wxDataViewItem();
 
-	const auto pos    = _list.position(_displayed.items[row]);
-	const auto active = _list.enabled(_displayed.items[row]);
+	const auto pos     = _list.position(_displayed.items[row]);
+	const auto enabled = _list.enabled(_displayed.items[row]);
 
 	if (_mode == ModListModelMode::flat || (_mode == ModListModelMode::modern && pos))
 		return wxDataViewItem();
@@ -116,8 +116,10 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 		if (std::visit(
 				[&](auto&& arg) {
 					using T = std::decay_t<decltype(arg)>;
-					if constexpr (std::is_same_v<T, std::monostate>)
-						return active;
+					if constexpr (std::is_same_v<T, ModListDsplayedData::EnabledGroupTag>)
+						return enabled;
+					else if constexpr (std::is_same_v<T, ModListDsplayedData::ArchivedGroupTag>)
+						return !pos;
 					else  // T == std::string
 						return _modDataProvider.modData(_displayed.items[row]).category == arg;
 				},
@@ -162,10 +164,16 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 	std::visit(
 		[&](auto&& arg) {
 			using T = std::decay_t<decltype(arg)>;
-			if constexpr (std::is_same_v<T, std::monostate>)
+			if constexpr (std::is_same_v<T, ModListDsplayedData::EnabledGroupTag>)
 			{
 				for (size_t i = 0; i < _displayed.items.size(); ++i)
 					if (_list.enabled(_displayed.items[i]))
+						children.push_back(toDataViewItem(i, ItemType::item));
+			}
+			else if constexpr (std::is_same_v<T, ModListDsplayedData::ArchivedGroupTag>)
+			{
+				for (size_t i = 0; i < _displayed.items.size(); ++i)
+					if (_list.rest.contains(_displayed.items[i]))
 						children.push_back(toDataViewItem(i, ItemType::item));
 			}
 			else  // T == std::string
@@ -397,8 +405,10 @@ void ModListModel::reload()
 	for (const auto& mod : _list.rest)
 		_displayed.items.emplace_back(mod);
 
-	size_t                                  activeCount = 0;
+	size_t                                  enabledCount = 0;
 	std::unordered_map<std::string, size_t> cats;
+	size_t                                  archivedCount = 0;
+
 	for (const auto& id : _displayed.items)
 	{
 		if (_mode == ModListModelMode::classic)
@@ -406,20 +416,20 @@ void ModListModel::reload()
 			if (!_list.enabled(id))
 				++cats[_modDataProvider.modData(id).category];
 			else
-				++activeCount;
+				++enabledCount;
 		}
 		else if (_mode == ModListModelMode::modern)
 		{
 			auto pos = _list.position(id);
 			if (!pos)
-				++cats[_modDataProvider.modData(id).category];
+				++archivedCount;
 		}
 	}
 
-	if (activeCount)
+	if (enabledCount)
 	{
-		_displayed.categories.emplace_back(
-			std::monostate(), wxString::Format(L"%s (%d)", "Enabled"_lng, activeCount));
+		_displayed.categories.emplace_back(ModListDsplayedData::EnabledGroupTag(),
+			wxString::Format(L"%s (%d)", "Enabled"_lng, enabledCount));
 	}
 
 	for (const auto& cat : cats)
@@ -429,19 +439,29 @@ void ModListModel::reload()
 								  : wxString::FromUTF8(wxGetApp().categoryTranslationString(cat.first)),
 				cat.second));
 
+	if (archivedCount)
+	{
+		_displayed.categories.emplace_back(ModListDsplayedData::ArchivedGroupTag(),
+			wxString::Format(L"%s (%d)", "Archived"_lng, archivedCount));
+	}
+
 	std::sort(_displayed.categories.begin(), _displayed.categories.end(),
-		[](const DisplayedData::cat_plus_display& left, const DisplayedData::cat_plus_display& right) {
-			if (std::holds_alternative<std::monostate>(left.first))
-				return true;
+		[](const ModListDsplayedData::CategoryAndCaption&  left,
+			const ModListDsplayedData::CategoryAndCaption& right) {
+			if (left.first.index() != right.first.index())
+				return left.first.index() < right.first.index();
 
-			if (std::holds_alternative<std::monostate>(right.first))
-				return false;
+			auto lstr = std::get_if<std::string>(&left.first);
+			auto rstr = std::get_if<std::string>(&right.first);
 
-			if (std::get<std::string>(left.first).empty())
-				return false;
+			if (lstr && rstr)
+			{
+				if (lstr->empty())
+					return false;
 
-			if (std::get<std::string>(right.first).empty())
-				return true;
+				if (rstr->empty())
+					return true;
+			}
 
 			return left.second < right.second;
 		});
@@ -482,7 +502,8 @@ std::string ModListModel::findIdByItem(const wxDataViewItem& item) const
 	return _displayed.items[index];
 }
 
-std::optional<std::string> ModListModel::categoryByItem(const wxDataViewItem& item) const
+std::optional<ModListDsplayedData::GroupItemsBy> ModListModel::itemGroupByItem(
+	const wxDataViewItem& item) const
 {
 	if (!item.IsOk())
 		return {};
@@ -491,8 +512,5 @@ std::optional<std::string> ModListModel::categoryByItem(const wxDataViewItem& it
 	if (type != ItemType::container)
 		return {};
 
-	if (auto s = std::get_if<std::string>(&_displayed.categories[index].first))
-		return *s;
-
-	return {};
+	return _displayed.categories[index].first;
 }
