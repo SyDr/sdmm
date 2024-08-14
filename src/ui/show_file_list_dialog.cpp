@@ -36,7 +36,7 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 	: wxDialog(parent, wxID_ANY, "Mod file list"_lng, wxDefaultPosition, wxSize(800, 444),
 			   wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _data(std::move(data))
-	, _listModel(new ModListModel(dataProvider, iconStorage, true))
+	, _listModel(new ModListModel(dataProvider, iconStorage))
 {
 	createControls();
 	buildLayout();

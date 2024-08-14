@@ -47,10 +47,9 @@ namespace
 }
 
 ModListModel::ModListModel(
-	IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden, ModListModelMode mode)
+	IModDataProvider& modDataProvider, IIconStorage& iconStorage, ModListModelMode mode)
 	: _modDataProvider(modDataProvider)
 	, _iconStorage(iconStorage)
-	, _showHidden(showHidden)
 	, _mode(mode)
 {
 	reload();
@@ -232,8 +231,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 				switch (*_list.state(id))
 				{
 				case ModList::ModState::active: return embedded_icon::tick_green;
-				case ModList::ModState::inactive: [[fallthrough]];
-				case ModList::ModState::hidden: return embedded_icon::cross_gray;
+				case ModList::ModState::inactive: return embedded_icon::cross_gray;
 				}
 
 				return embedded_icon::blank;
@@ -325,16 +323,8 @@ bool ModListModel::GetAttr(const wxDataViewItem& item, unsigned int, wxDataViewI
 
 	const auto& mod = _displayed.items[index];
 
-	if (_list.hidden(mod))
-	{
-		attr.SetBackgroundColour(*wxLIGHT_GREY);
-		return true;
-	}
-
 	if (_modDataProvider.modData(mod).virtual_mod)
-	{
 		attr.SetBackgroundColour(wxColour(255, 127, 127));
-	}
 
 	return false;
 }
@@ -402,10 +392,7 @@ void ModListModel::reload()
 	_displayed.items.clear();
 
 	for (const auto& mod : _list.data)
-	{
-		if (_showHidden || mod.state != ModList::ModState::hidden)
-			_displayed.items.emplace_back(mod.id);
-	}
+		_displayed.items.emplace_back(mod.id);
 
 	for (const auto& mod : _list.rest)
 		_displayed.items.emplace_back(mod);
@@ -508,16 +495,4 @@ std::optional<std::string> ModListModel::categoryByItem(const wxDataViewItem& it
 		return *s;
 
 	return {};
-}
-
-void ModListModel::showHidden(bool show)
-{
-	_showHidden = show;
-	reload();
-}
-
-void ModListModel::showInactive(bool show)
-{
-	_showInactive = show;
-	reload();
 }

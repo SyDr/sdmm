@@ -60,7 +60,7 @@ ManagePresetListView::ManagePresetListView(
 	: wxPanel(parent, wxID_ANY)
 	, _platform(platform)
 	, _selected(platform.localConfig()->getAcitvePreset())
-	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage, true))
+	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::unexpected_error);

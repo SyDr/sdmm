@@ -64,14 +64,16 @@ MainFrame::MainFrame(Application& app)
 
 	if (_currentPlatform)
 	{
+		auto modListViewModern =
+			new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::modern);
+		pages->AddPage(modListViewModern, "Mods"_lng + L" (new)");
+
 		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
 		pages->AddPage(modListView, "Mods"_lng + L" (flat)");
 
-		auto modListViewClassic = new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::classic);
+		auto modListViewClassic =
+			new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::classic);
 		pages->AddPage(modListViewClassic, "Mods"_lng + L" (classic)");
-
-		auto modListViewModern = new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::modern);
-		pages->AddPage(modListViewModern, "Mods"_lng + L" (new)");
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{
@@ -158,7 +160,6 @@ void MainFrame::OnAbout()
 void MainFrame::createMenuBar()
 {
 	wxMenu* gameMenu = nullptr;
-
 
 	if (auto launchHelper = _currentPlatform ? _currentPlatform->launchHelper() : nullptr)
 	{

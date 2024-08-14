@@ -90,28 +90,6 @@ void Era2ModManager::moveDown(const std::string& item)
 	_listChanged();
 }
 
-void Era2ModManager::hide(const std::string& item)
-{
-	_list.hide(item);
-
-	_listChanged();
-}
-
-void Era2ModManager::show(const std::string& item)
-{
-	_list.show(item);
-
-	_listChanged();
-}
-
-void Era2ModManager::switchVisibility(const std::string& item)
-{
-	if (_list.hidden(item))
-		show(item);
-	else
-		hide(item);
-}
-
 void Era2ModManager::remove(const std::string& item)
 {
 	_list.remove(item);

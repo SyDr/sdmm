@@ -27,7 +27,6 @@ namespace
 {
 	constexpr const auto st_active_preset         = "active_preset";
 	constexpr const auto st_executable            = "executable";
-	constexpr const auto st_show_hidden           = "show_hidden";
 	constexpr const auto st_conflict_resolve_mode = "conflict_resolve_mode";
 }
 
@@ -104,17 +103,6 @@ void Era2Config::setActivePreset(const std::string& preset)
 	save();
 }
 
-bool Era2Config::showHiddenMods() const
-{
-	return _data[st_show_hidden].get<bool>();
-}
-
-void Era2Config::showHiddenMods(bool value)
-{
-	_data[st_show_hidden] = value;
-	save();
-}
-
 ConflictResolveMode Era2Config::conflictResolveMode() const
 {
 	switch (auto mode = static_cast<ConflictResolveMode>(_data[st_conflict_resolve_mode].get<int>()))
@@ -139,9 +127,6 @@ void Era2Config::validate()
 
 	if (!_data.count(st_executable) || !_data[st_executable].is_string())
 		_data[st_executable] = std::string();
-
-	if (!_data.count(st_show_hidden) || !_data[st_show_hidden].is_boolean())
-		_data[st_show_hidden] = false;
 
 	if (!_data.count(st_conflict_resolve_mode) || !_data[st_conflict_resolve_mode].is_number_integer())
 		_data[st_conflict_resolve_mode] = ConflictResolveMode::automatic;

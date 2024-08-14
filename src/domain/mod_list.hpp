@@ -18,7 +18,6 @@ namespace mm
 		{
 			active,
 			inactive,
-			hidden,
 		};
 
 		struct Mod
@@ -39,7 +38,6 @@ namespace mm
 				switch (state)
 				{
 				case ModState::inactive: return '*' + id;
-				case ModState::hidden: return '?' + id;
 				default: break;
 				}
 				return id;
@@ -61,17 +59,13 @@ namespace mm
 		std::optional<ModState> state(const std::string& id) const;
 		bool                    active(const std::string& id) const;
 		bool                    inactive(const std::string& id) const;
-		bool                    hidden(const std::string& id) const;
 
 		void activate(const std::string& id);
 		void activate(const std::string& id, size_t at);
 		void deactivate(const std::string& id);
-		void hide(const std::string& id);
-		void show(const std::string& id);
 		void reset(const std::string& id);
 
 		void switchState(const std::string& id);
-		void switchVisibility(const std::string& id);
 
 		bool canMove(const std::string& from, const std::string& to) const;
 		bool canMoveUp(const std::string& id) const;

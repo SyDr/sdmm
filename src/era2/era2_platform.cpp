@@ -43,11 +43,6 @@ namespace
 			id    = id.substr(1);
 			state = ModList::ModState::inactive;
 		}
-		else if (id.starts_with('?'))
-		{
-			id    = id.substr(1);
-			state = ModList::ModState::hidden;
-		}
 
 		const auto path = modsPath / id;
 		if (!exists(path) || !is_directory(path))
@@ -105,7 +100,6 @@ namespace
 			{
 			case ModList::ModState::active: toSave.emplace_back(item.id); break;
 			case ModList::ModState::inactive: toSave.emplace_back('*' + item.id); break;
-			case ModList::ModState::hidden: toSave.emplace_back('?' + item.id); break;
 			}
 		}
 

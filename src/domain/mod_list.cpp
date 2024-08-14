@@ -50,13 +50,6 @@ bool ModList::inactive(const std::string& id) const
 	return s && *s == ModState::inactive;
 }
 
-bool ModList::hidden(const std::string& id) const
-{
-	const auto s = state(id);
-
-	return s && *s == ModState::hidden;
-}
-
 void ModList::activate(const std::string& id)
 {
 	const auto pos = position(id);
@@ -161,18 +154,6 @@ void ModList::moveDown(const std::string& id)
 	std::swap(data[*posFrom], data[*posFrom + 1]);
 }
 
-void ModList::hide(const std::string& id)
-{
-	const auto pos = position(id);
-	if (pos)
-		data[*pos].state = ModState::hidden;
-}
-
-void ModList::show(const std::string& id)
-{
-	deactivate(id);
-}
-
 void ModList::reset(const std::string& id)
 {
 	const auto pos = position(id);
@@ -183,17 +164,8 @@ void ModList::reset(const std::string& id)
 	data.erase(data.begin() + *pos);
 }
 
-void ModList::switchVisibility(const std::string& id)
-{
-	if (hidden(id))
-		show(id);
-	else
-		hide(id);
-}
-
 void ModList::remove(const std::string& id)
 {
-	show(id);
 	deactivate(id);
 	data.erase(data.begin() + *position(id));
 }

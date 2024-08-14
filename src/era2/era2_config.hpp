@@ -33,9 +33,6 @@ namespace mm
 		std::string getAcitvePreset() const override;
 		void        setActivePreset(const std::string& preset) override;
 
-		bool showHiddenMods() const override;
-		void showHiddenMods(bool value) override;
-
 		ConflictResolveMode conflictResolveMode() const override;
 		void                conflictResolveMode(ConflictResolveMode value) override;
 

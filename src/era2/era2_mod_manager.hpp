@@ -35,10 +35,6 @@ namespace mm
 		void moveUp(const std::string& item) override;
 		void moveDown(const std::string& item) override;
 
-		void hide(const std::string& item) override;
-		void show(const std::string& item) override;
-		void switchVisibility(const std::string& item) override;
-
 		void remove(const std::string& item) override;
 
 		sigslot::signal<>& onListChanged() override;

@@ -105,8 +105,6 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 			const auto mod = item.get<std::string>();
 			if (mod.starts_with('*'))
 				result.mods.data.emplace_back(mod.substr(1), ModList::ModState::inactive);
-			else if (mod.starts_with('?'))
-				result.mods.data.emplace_back(mod.substr(1), ModList::ModState::hidden);
 			else
 				result.mods.data.emplace_back(mod, ModList::ModState::active);
 		}

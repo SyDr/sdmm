@@ -33,13 +33,13 @@
 #include <wx/checkbox.h>
 #include <wx/collpane.h>
 #include <wx/dataview.h>
+#include <wx/infobar.h>
 #include <wx/msgdlg.h>
 #include <wx/notifmsg.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
-#include <wx/infobar.h>
 
 #include <algorithm>
 
@@ -49,8 +49,7 @@ ModListView::ModListView(
 	wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, ModListModelMode listMode)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
-	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
-		  managedPlatform.localConfig()->showHiddenMods(), listMode))
+	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage, listMode))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
@@ -68,7 +67,6 @@ void ModListView::buildLayout()
 {
 	auto listGroupSizer = new wxBoxSizer(wxVERTICAL);
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	listGroupSizer->Add(_checkboxShowHidden, wxSizerFlags(0).Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
 	buttonSizer->Add(_moveUp, wxSizerFlags(0).Expand().Border(wxALL, 4));
@@ -107,8 +105,6 @@ void ModListView::buildLayout()
 
 void ModListView::bindEvents()
 {
-	_checkboxShowHidden->Bind(wxEVT_CHECKBOX, &ModListView::OnEventCheckboxShowHidden, this);
-
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
@@ -213,9 +209,6 @@ void ModListView::createControls(const wxString& managedPath)
 
 	createListControl();
 
-	_checkboxShowHidden = new wxCheckBox(_group, wxID_ANY, "Show hidden"_lng);
-	_checkboxShowHidden->SetValue(_managedPlatform.localConfig()->showHiddenMods());
-
 	_modDescription = wxWebView::New();
 	_modDescription->Create(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize);
 	_modDescription->EnableContextMenu(false);
@@ -241,7 +234,6 @@ void ModListView::createControls(const wxString& managedPath)
 	_sort = new wxButton(_group, wxID_ANY, "Sort"_lng);
 	_sort->SetBitmap(_iconStorage.get(embedded_icon::sort));
 
-	_menu.showOrHide     = _menu.menu.Append(wxID_ANY, L"placeholder");
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
@@ -280,10 +272,10 @@ void ModListView::createListColumns()
 {
 	auto rPriority = new mmPriorityDataRenderer();
 
-	auto r1 = new wxDataViewIconTextRenderer();
-	auto r2 = new wxDataViewTextRenderer();
-	auto r3 = new wxDataViewTextRenderer();
-	auto r4 = new wxDataViewTextRenderer();
+	auto r1             = new wxDataViewIconTextRenderer();
+	auto r2             = new wxDataViewTextRenderer();
+	auto r3             = new wxDataViewTextRenderer();
+	auto r4             = new wxDataViewTextRenderer();
 	auto rDirectoryName = new wxDataViewTextRenderer();
 
 	rPriority->SetAlignment(wxALIGN_CENTER_VERTICAL);
@@ -299,9 +291,9 @@ void ModListView::createListColumns()
 	constexpr auto columnFlags =
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
 
-	auto columnPriority =
-		new wxDataViewColumn("Priority"_lng, rPriority, static_cast<unsigned int>(ModListModel::Column::priority),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+	auto columnPriority = new wxDataViewColumn("Priority"_lng, rPriority,
+		static_cast<unsigned int>(ModListModel::Column::priority), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		columnFlags);
 	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
 	auto column2 =
@@ -314,8 +306,8 @@ void ModListView::createListColumns()
 		new wxDataViewColumn("Author"_lng, r4, static_cast<unsigned int>(ModListModel::Column::author),
 			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
 	auto columnDirectoryName = new wxDataViewColumn("Directory"_lng, rDirectoryName,
-		static_cast<unsigned int>(ModListModel::Column::directory),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+		static_cast<unsigned int>(ModListModel::Column::directory), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+		columnFlags);
 
 	_list->AppendColumn(columnPriority);
 	_list->AppendColumn(column1);
@@ -351,8 +343,8 @@ void ModListView::updateControlsState()
 
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
-	_changeState->SetBitmap(_iconStorage.get(
-		_modManager.mods().active(mod.id) ? embedded_icon::minus : embedded_icon::plus));
+	_changeState->SetBitmap(
+		_iconStorage.get(_modManager.mods().active(mod.id) ? embedded_icon::minus : embedded_icon::plus));
 	_changeState->SetLabelText(_modManager.mods().active(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
@@ -361,7 +353,7 @@ void ModListView::updateControlsState()
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
 
 	bool useRichDescription = false;
-	auto description = "No description available"_lng;
+	auto description        = "No description available"_lng;
 
 	if (mod.virtual_mod)
 	{
@@ -374,7 +366,7 @@ void ModListView::updateControlsState()
 			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
 				cmark_markdown_to_html(desc.c_str(), desc.size(), 0), &std::free);
 
-			desc = cnvt.get();
+			desc               = cnvt.get();
 			useRichDescription = true;
 		}
 
@@ -441,7 +433,6 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 {
 	if (const auto mod = _listModel->findMod(item))
 	{
-		_menu.showOrHide->SetItemLabel(_modManager.mods().hidden(mod->id) ? "Show"_lng : "Hide"_lng);
 		_menu.openHomepage->Enable(!mod->homepage.empty());
 		_menu.openDir->Enable(!mod->virtual_mod);
 		_menu.deleteOrRemove->SetItemLabel(mod->virtual_mod ? "Remove from list"_lng : "Delete"_lng);
@@ -455,9 +446,7 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 
 	const auto mod = _listModel->findMod(_list->GetSelection());
 
-	if (itemId == _menu.showOrHide->GetId())
-		_modManager.switchVisibility(_selectedMod);
-	else if (itemId == _menu.openHomepage->GetId())
+	if (itemId == _menu.openHomepage->GetId())
 		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage));
 	else if (itemId == _menu.openDir->GetId())
 		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
@@ -481,8 +470,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 		static bool messageWasShown = false;
 		if (!messageWasShown)
 		{
-			_infoBar->ShowMessage(
-				wxString::Format("Automatic mod conflict resolve mode selected"_lng));
+			_infoBar->ShowMessage(wxString::Format("Automatic mod conflict resolve mode selected"_lng));
 			_infoBarTimer.StartOnce(5000);
 			messageWasShown = true;
 		}
@@ -507,26 +495,11 @@ void ModListView::onResetSelectedModStateRequested()
 		static bool messageWasShown = false;
 		if (!messageWasShown)
 		{
-			_infoBar->ShowMessage(
-				wxString::Format("Automatic mod conflict resolve mode selected"_lng));
+			_infoBar->ShowMessage(wxString::Format("Automatic mod conflict resolve mode selected"_lng));
 			_infoBarTimer.StartOnce(5000);
 			messageWasShown = true;
 		}
 	}
-
-	EX_UNEXPECTED;
-}
-
-void ModListView::OnEventCheckboxShowHidden(const wxCommandEvent&)
-{
-	EX_TRY;
-
-	_listModel->showHidden(_checkboxShowHidden->IsChecked());
-	_managedPlatform.localConfig()->showHiddenMods(_checkboxShowHidden->IsChecked());
-
-	expandChildren();
-	followSelection();
-	updateControlsState();
 
 	EX_UNEXPECTED;
 }

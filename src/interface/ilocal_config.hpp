@@ -19,9 +19,6 @@ namespace mm
 		[[nodiscard]] virtual fs::path getDataPath() const = 0;
 		[[nodiscard]] virtual fs::path getTempPath() const = 0;
 
-		[[nodiscard]] virtual bool showHiddenMods() const     = 0;
-		virtual void               showHiddenMods(bool value) = 0;
-
 		[[nodiscard]] virtual ConflictResolveMode conflictResolveMode() const                    = 0;
 		virtual void                              conflictResolveMode(ConflictResolveMode value) = 0;
 

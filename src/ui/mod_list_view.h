@@ -49,7 +49,6 @@ namespace mm
 
 		void OnListItemContextMenu(const wxDataViewItem& item);
 		void OnMenuItemSelected(const wxCommandEvent& event);
-		void OnEventCheckboxShowHidden(const wxCommandEvent& event);
 
 		void onSwitchSelectedModStateRequested();
 		void onResetSelectedModStateRequested();
@@ -76,7 +75,6 @@ namespace mm
 
 		wxWidgetsPtr<wxStaticBox>    _group              = nullptr;
 		wxWidgetsPtr<wxDataViewCtrl> _list               = nullptr;
-		wxWidgetsPtr<wxCheckBox>     _checkboxShowHidden = nullptr;
 
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;
@@ -91,7 +89,6 @@ namespace mm
 		struct  // Menu
 		{
 			wxMenu                   menu;
-			wxWidgetsPtr<wxMenuItem> showOrHide     = nullptr;
 			wxWidgetsPtr<wxMenuItem> openHomepage   = nullptr;
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;

@@ -41,7 +41,7 @@ SelectModsDialog::SelectModsDialog(
 	: wxDialog(&parent, wxID_ANY, "Select mods"_lng, wxDefaultPosition, wxSize(800, 444),
 		  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(iconStorage)
-	, _listModel(new ModListModel(dataProvider, iconStorage, true))
+	, _listModel(new ModListModel(dataProvider, iconStorage))
 	, _mods(std::move(list))
 {
 	createControls();

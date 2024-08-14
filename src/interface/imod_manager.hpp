@@ -29,10 +29,6 @@ namespace mm
 		virtual void moveUp(const std::string& item)                      = 0;
 		virtual void moveDown(const std::string& item)                    = 0;
 
-		virtual void hide(const std::string& item)             = 0;
-		virtual void show(const std::string& item)             = 0;
-		virtual void switchVisibility(const std::string& item) = 0;
-
 		virtual void remove(const std::string& item) = 0;
 
 		[[nodiscard]] virtual sigslot::signal<>& onListChanged() = 0;

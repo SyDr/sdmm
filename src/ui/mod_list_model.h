@@ -12,8 +12,8 @@
 #include <wx/dataview.h>
 
 #include "domain/mod_list.hpp"
-#include "utility/wx_widgets_ptr.hpp"
 #include "mod_list_model_mode.hpp"
+#include "utility/wx_widgets_ptr.hpp"
 
 namespace mm
 {
@@ -40,7 +40,7 @@ namespace mm
 			total,
 		};
 
-		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage, bool showHidden,
+		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
 			ModListModelMode mode = ModListModelMode::flat);
 
 		bool IsListModel() const override;
@@ -64,9 +64,6 @@ namespace mm
 		void                                   setChecked(std::unordered_set<std::string> items);
 		std::unordered_set<std::string> const& getChecked() const;
 
-		void showHidden(bool show);
-		void showInactive(bool show);
-
 		const ModData*             findMod(const wxDataViewItem& item) const;
 		wxDataViewItem             findItemById(const std::string& id) const;
 		std::string                findIdByItem(const wxDataViewItem& item) const;
@@ -76,6 +73,11 @@ namespace mm
 		{
 			std::vector<std::string> items;
 
+			struct ActiveGroupTag
+			{};
+
+			struct TurnedOffGroupTag
+			{};
 			// std::string -> category as in info file or empty string
 			// std::monostate -> Active group
 			using category_type    = std::variant<std::string, std::monostate>;
@@ -97,8 +99,5 @@ namespace mm
 
 		IModDataProvider& _modDataProvider;
 		IIconStorage&     _iconStorage;
-
-		bool _showHidden   = false;
-		bool _showInactive = true;
 	};
 }
