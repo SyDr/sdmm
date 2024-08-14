@@ -16,6 +16,7 @@
 
 #include "system_info.hpp"
 #include "type/main_window_properties.h"
+#include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 
@@ -27,10 +28,11 @@ namespace
 	{
 		fs::path myDir(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
 
-		if (exists(myDir / SystemInfo::SettingsFile) && is_regular_file(myDir / SystemInfo::SettingsFile))
+		if (exists(myDir / SystemInfo::BaseDirFile) && is_regular_file(myDir / SystemInfo::BaseDirFile))
 		{
 			return PortableMode(
-				(myDir.parent_path().parent_path() / SystemInfo::AppDataDirectory).make_preferred(),
+				(myDir / readFile(myDir / SystemInfo::BaseDirFile) / SystemInfo::AppDataDirectory)
+					.make_preferred(),
 				myDir / SystemInfo::SettingsFile);
 		}
 

@@ -20,8 +20,6 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
 TODO
 ----
-- For portable build detect portable mode not by settings.json, but by other file (like portable with content ../../).
-- For portable build maybe allow to use just parent dir instead of 2 inderections (like <root>/MM instead of <root>/Tools/MM).
 - Write memory dump on crash (and inclue debug symbols?).
 - Improve screenshots display (use separate window?).
 - Use UPX or something else to reduce release binary size.

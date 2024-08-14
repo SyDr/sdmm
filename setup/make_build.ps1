@@ -13,7 +13,7 @@ Remove-Item -Path "$StaticDirBuild" -Recurse -ErrorAction Ignore
 Remove-Item -Path "Output\sdmm_v_$MMVersion.zip" -ErrorAction Ignore
 
 New-Item -ItemType Directory -Path "$StaticDirBuild" | Out-Null
-New-Item -ItemType File -Path "$StaticDirBuild\settings.json" | Out-Null
+New-Item -ItemType File -Path "$StaticDirBuild\base_dir.txt" -Value "../../" | Out-Null
 Copy-Item -Path "..\release-static\main.exe" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\LICENSE" -Destination "$StaticDirBuild\" -Recurse -Container

@@ -10,6 +10,7 @@
 namespace mm::SystemInfo
 {
 	constexpr const auto AppDataDirectory = "_MM_Data";
+	constexpr const auto BaseDirFile      = "base_dir.txt";
 	constexpr const auto SettingsFile     = "settings.json";
 
 	constexpr const auto DataDir         = "data";
