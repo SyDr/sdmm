@@ -69,16 +69,16 @@ void ModListView::buildLayout()
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
-	buttonSizer->Add(_moveUp, wxSizerFlags(0).Expand().Border(wxALL, 4));
-	buttonSizer->Add(_moveDown, wxSizerFlags(0).Expand().Border(wxALL, 4));
-	buttonSizer->Add(_changeState, wxSizerFlags(0).Expand().Border(wxALL, 4));
-	buttonSizer->Add(_resetState, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4));
+	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4));
+	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4));
+	buttonSizer->Add(_resetState, wxSizerFlags(0).Border(wxALL, 4));
 	buttonSizer->AddStretchSpacer(1);
-	buttonSizer->Add(_sort, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4));
 
 	auto leftGroupSizer = new wxStaticBoxSizer(_group, wxHORIZONTAL);
-	leftGroupSizer->Add(listGroupSizer, wxSizerFlags(1).Expand());
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
+	leftGroupSizer->Add(listGroupSizer, wxSizerFlags(1).Expand());
 
 	auto rightBottomSizer = new wxBoxSizer(wxHORIZONTAL);
 	rightBottomSizer->AddStretchSpacer();
@@ -219,20 +219,27 @@ void ModListView::createControls(const wxString& managedPath)
 	_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP);
 
-	_moveUp = new wxButton(_group, wxID_ANY, "Move Up"_lng);
-	_moveUp->SetBitmap(_iconStorage.get(embedded_icon::up));
+	_moveUp = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::up), wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_moveUp->SetToolTip("Move Up"_lng);
 
-	_moveDown = new wxButton(_group, wxID_ANY, "Move Down"_lng);
-	_moveDown->SetBitmap(_iconStorage.get(embedded_icon::down));
+	_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::down), wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_moveDown->SetToolTip("Move Down"_lng);
 
-	_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
-	_changeState->SetBitmap(_iconStorage.get(embedded_icon::plus));
+	_changeState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::plus),
+		wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_changeState->SetToolTip("Enable"_lng);
 
-	_resetState = new wxButton(_group, wxID_ANY, "Archive"_lng);
-	_resetState->SetBitmap(_iconStorage.get(embedded_icon::reset_position));
+	_resetState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::reset_position),
+		wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_resetState->SetToolTip("Archive"_lng);
 
-	_sort = new wxButton(_group, wxID_ANY, "Sort"_lng);
-	_sort->SetBitmap(_iconStorage.get(embedded_icon::sort));
+	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::sort), wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_sort->SetToolTip("Sort"_lng);
 
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
@@ -297,12 +304,12 @@ void ModListView::createListColumns()
 	auto column2 = new wxDataViewColumn("Category"_lng, r2,
 		static_cast<unsigned int>(ModListModel::Column::category), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column3 = new wxDataViewColumn("Version"_lng, r3,
-		static_cast<unsigned int>(ModListModel::Column::version), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column4 = new wxDataViewColumn("Author"_lng, r4,
-		static_cast<unsigned int>(ModListModel::Column::author), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
+	auto column3 =
+		new wxDataViewColumn("Version"_lng, r3, static_cast<unsigned int>(ModListModel::Column::version),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_REORDERABLE);
+	auto column4             = new wxDataViewColumn("Author"_lng, r4,
+					static_cast<unsigned int>(ModListModel::Column::author), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
+					wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
 	auto columnDirectoryName = new wxDataViewColumn("Directory"_lng, rDirectoryName,
 		static_cast<unsigned int>(ModListModel::Column::directory), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
 		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
@@ -343,7 +350,7 @@ void ModListView::updateControlsState()
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(
 		_iconStorage.get(_modManager.mods().enabled(mod.id) ? embedded_icon::minus : embedded_icon::plus));
-	_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
+	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
 
