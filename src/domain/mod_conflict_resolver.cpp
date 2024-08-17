@@ -34,7 +34,7 @@ namespace
 	void reduceRequirements(std::set<std::string>& where, const std::vector<std::string>& active,
 		IModDataProvider& modDataProvider, const std::string& currentId)
 	{
-		if (where.contains(currentId))
+		if (where.contains(currentId))  // requirements chain already added
 			return;
 
 		where.emplace(currentId);
@@ -59,10 +59,23 @@ namespace
 		boost::range::remove_erase_if(
 			active, [&](const std::string& item) { return reducedRequirements.contains(item); });
 	}
+
+	void reduceIncompatibleChain(
+		std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
+	{
+		if (currentId.empty())
+			return;
+
+		for (const auto& id : modDataProvider.modData(currentId).incompatible)
+			reduceRequirementsTop(active, modDataProvider, id);
+
+		for (const auto& id : modDataProvider.modData(currentId).requires_)
+			reduceIncompatibleChain(active, modDataProvider, id);
+	}
 }
 
-ModList mm::resolve_mod_conflicts(
-	ModList mods, IModDataProvider& modDataProvider, const std::string& disablingMod)
+ModList mm::ResolveModConflicts(ModList mods, IModDataProvider& modDataProvider,
+	const std::string& enablingMod, const std::string& disablingMod)
 {
 	// expand current mod list to contain all mods, required by active mods
 	std::vector<std::string> expandedRequirements;
@@ -71,12 +84,16 @@ ModList mm::resolve_mod_conflicts(
 			expandRequirements(expandedRequirements, modDataProvider, mod.id);
 
 	// remove mods if user disables mod
+	// then remove mods, incompatible with mod, which user enables
 	// then remove mods, incompatible with top mods
 	reduceRequirementsTop(expandedRequirements, modDataProvider, disablingMod);
+	reduceIncompatibleChain(expandedRequirements, modDataProvider, enablingMod);
 
 	for (size_t i = 0; i < expandedRequirements.size(); ++i)
-		for (const auto& id : modDataProvider.modData(expandedRequirements[i]).incompatible)
-			reduceRequirementsTop(expandedRequirements, modDataProvider, id);
+	{
+		const auto copy = expandedRequirements[i];
+		reduceIncompatibleChain(expandedRequirements, modDataProvider, copy);
+	}
 
 	std::vector<std::string> sortedActive;
 

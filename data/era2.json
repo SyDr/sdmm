@@ -69,6 +69,36 @@
 			"WoG Scripts"
 		]
 	},
+	"_MM_TestR1": {
+		"requires": [
+			"_MM_TestR2"
+		]
+	},
+	"_MM_TestR2": {
+		"requires": [
+			"_MM_TestR3"
+		]
+	},
+	"_MM_TestR3": {
+		"requires": [
+			"_MM_TestR4"
+		]
+	},
+	"_MM_TestI1": {
+		"requires": [
+			"_MM_TestI2"
+		]
+	},
+	"_MM_TestI2": {
+		"incompatible": [
+			"_MM_TestR2"
+		]
+	},
+	"_MM_TestI3": {
+		"incompatible": [
+			"_MM_TestR4"
+		]
+	},
 	"@to_sort_data": {
 		"random": [
 			"TrainerX and WoG graphicsX both replace zobj049.def",

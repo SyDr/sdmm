@@ -57,7 +57,7 @@ namespace mm
 		void expandChildren();
 		void followSelection();
 		void updateControlsState();
-		void onSortModsRequested(const std::string& disablingMod);
+		void onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod);
 		void onRemoveModRequested();
 		void openGalleryRequested();
 

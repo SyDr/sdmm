@@ -191,7 +191,7 @@ void ModListView::bindEvents()
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
 	_resetState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onResetSelectedModStateRequested(); });
-	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}); });
+	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
@@ -228,13 +228,11 @@ void ModListView::createControls(const wxString& managedPath)
 	_moveDown->SetToolTip("Move Down"_lng);
 
 	_changeState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::plus),
-		wxDefaultPosition,
-		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
 
 	_resetState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::reset_position),
-		wxDefaultPosition,
-		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_resetState->SetToolTip("Archive"_lng);
 
 	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::sort), wxDefaultPosition,
@@ -470,7 +468,10 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
 	{
-		onSortModsRequested(_modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod);
+		const auto& enabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
+		const auto& disabling = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
+
+		onSortModsRequested(enabling, disabling);
 
 		static bool messageWasShown = false;
 		if (!messageWasShown)
@@ -496,13 +497,14 @@ void ModListView::onResetSelectedModStateRequested()
 	EX_UNEXPECTED;
 }
 
-void ModListView::onSortModsRequested(const std::string& disablingMod)
+void ModListView::onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod)
 {
 	wxBusyCursor bc;
 
 	EX_TRY;
 
-	auto mods = resolve_mod_conflicts(_modManager.mods(), *_managedPlatform.modDataProvider(), disablingMod);
+	auto mods = ResolveModConflicts(
+		_modManager.mods(), *_managedPlatform.modDataProvider(), enablingMod, disablingMod);
 	if (mods != _modManager.mods())
 		_managedPlatform.apply(&mods);
 
