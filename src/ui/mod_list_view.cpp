@@ -493,19 +493,6 @@ void ModListView::onResetSelectedModStateRequested()
 
 	_modManager.archive(_selectedMod);
 
-	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
-	{
-		onSortModsRequested(_modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod);
-
-		static bool messageWasShown = false;
-		if (!messageWasShown)
-		{
-			_infoBar->ShowMessage(wxString::Format("Automatic mod conflict resolve mode selected"_lng));
-			_infoBarTimer.StartOnce(5000);
-			messageWasShown = true;
-		}
-	}
-
 	EX_UNEXPECTED;
 }
 
