@@ -227,7 +227,7 @@ void ModListView::createControls(const wxString& managedPath)
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveDown->SetToolTip("Move Down"_lng);
 
-	_changeState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::plus),
+	_changeState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::tick_green),
 		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
 
@@ -347,7 +347,7 @@ void ModListView::updateControlsState()
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(
-		_iconStorage.get(_modManager.mods().enabled(mod.id) ? embedded_icon::minus : embedded_icon::plus));
+		_iconStorage.get(_modManager.mods().enabled(mod.id) ? embedded_icon::cross_gray : embedded_icon::tick_green));
 	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
