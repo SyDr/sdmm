@@ -346,8 +346,8 @@ void ModListView::updateControlsState()
 
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
-	_changeState->SetBitmap(
-		_iconStorage.get(_modManager.mods().enabled(mod.id) ? embedded_icon::cross_gray : embedded_icon::tick_green));
+	_changeState->SetBitmap(_iconStorage.get(
+		_modManager.mods().enabled(mod.id) ? embedded_icon::cross_gray : embedded_icon::tick_green));
 	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
@@ -468,7 +468,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
 	{
-		const auto& enabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
+		const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
 		const auto& disabling = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
 
 		onSortModsRequested(enabling, disabling);
