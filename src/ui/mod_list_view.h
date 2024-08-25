@@ -13,7 +13,7 @@
 #include <wx/dataview.h>
 #include <wx/menu.h>
 
-#include "mod_list_model_structs.hpp"
+#include "type/mod_list_model_structs.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
 class wxCheckBox;

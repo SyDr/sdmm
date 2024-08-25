@@ -105,7 +105,7 @@
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
     <ClInclude Include="ui\mod_list_model.h" />
     <ClInclude Include="ui\export_preset_dialog.hpp" />
-    <ClInclude Include="ui\mod_list_model_structs.hpp" />
+    <ClInclude Include="type\mod_list_model_structs.hpp" />
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\select_mods_dialog.hpp" />

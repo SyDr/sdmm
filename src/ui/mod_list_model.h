@@ -12,7 +12,7 @@
 #include <wx/dataview.h>
 
 #include "domain/mod_list.hpp"
-#include "mod_list_model_structs.hpp"
+#include "type/mod_list_model_structs.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
 namespace mm
