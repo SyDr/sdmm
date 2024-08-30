@@ -7,7 +7,6 @@ TODO: write here more information.
 Installing
 ----------
 Download and install from [releases](./releases) page.
-- TODO: get WebView2Loader.dll from VCPKG location (and check, why it's not copied automatically).
 
 Development
 -----------
@@ -18,8 +17,10 @@ Instal Visual Studio (2022) with C++ support.
 
 Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
-TODO
-----
+TODO (In no particular order)
+-----------------------------
+- Save and load expanded/collapsed categories.
+- Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and inclue debug symbols?).
 - Improve screenshots display (use separate window?).
 - Use UPX or something else to reduce release binary size.
