@@ -28,6 +28,19 @@ std::optional<size_t> ModList::position(const std::string& id) const
 	return {};
 }
 
+std::string ModList::next(const std::string& id) const
+{
+	const auto position = [&] {
+		const auto pos = this->position(id);
+		if (!pos)
+			return 0u;
+
+		return pos == data.size() - 1 ? *pos - 1 : *pos + 1;
+	}();
+
+	return position >= data.size() ? "" : data[position].id;
+}
+
 std::optional<ModList::ModState> ModList::state(const std::string& id) const
 {
 	if (auto pos = position(id))

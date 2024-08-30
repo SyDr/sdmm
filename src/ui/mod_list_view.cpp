@@ -492,7 +492,11 @@ void ModListView::onResetSelectedModStateRequested()
 	if (_selectedMod.empty())
 		return;
 
-	_modManager.archive(_selectedMod);
+	auto next = _modManager.mods().next(_selectedMod);
+
+	std::swap(next, _selectedMod);
+
+	_modManager.archive(next);
 
 	EX_UNEXPECTED;
 }

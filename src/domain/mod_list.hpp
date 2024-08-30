@@ -53,6 +53,7 @@ namespace mm
 		bool managed(const std::string& id) const;
 
 		std::optional<size_t> position(const std::string& id) const;
+		std::string           next(const std::string& id) const;
 
 		std::optional<ModState> state(const std::string& id) const;
 		bool                    enabled(const std::string& id) const;
