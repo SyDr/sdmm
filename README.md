@@ -19,6 +19,7 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
 TODO (In no particular order)
 -----------------------------
+- Use wxWidgets from trunk to test dark theme support.
 - Save and load expanded/collapsed categories.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and inclue debug symbols?).
