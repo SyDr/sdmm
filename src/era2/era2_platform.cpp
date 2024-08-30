@@ -31,7 +31,7 @@ using namespace mm;
 
 namespace
 {
-	bool validateModId(const fs::path& modsPath, std::string& id, ModList::ModState& state)
+	bool validateModId(std::string& id, ModList::ModState& state)
 	{
 		boost::trim(id);
 		if (id.empty())
@@ -43,10 +43,6 @@ namespace
 			id    = id.substr(1);
 			state = ModList::ModState::disabled;
 		}
-
-		const auto path = modsPath / id;
-		if (!exists(path) || !is_directory(path))
-			return false;
 
 		return true;
 	}
@@ -60,17 +56,10 @@ namespace
 		std::vector<std::string> activeMods;
 		boost::split(activeMods, readFile(activePath), boost::is_any_of("\r\n"));
 
-		for (auto item : boost::adaptors::reverse(activeMods))
+		for (auto& item : boost::adaptors::reverse(activeMods))
 		{
-			if (validateModId(modsPath, item, state))
-			{
-				if (!items.managed(item))
-					items.data.emplace_back(item, state);
-			}
-			else if (!item.empty())
-			{
-				items.invalid.emplace_back(item);
-			}
+			if (validateModId(item, state) && !items.managed(item))
+				items.data.emplace_back(item, state);
 		}
 
 		// remaining items from directory
@@ -102,8 +91,6 @@ namespace
 			case ModList::ModState::disabled: toSave.emplace_back('*' + item.id); break;
 			}
 		}
-
-		std::copy(mods.invalid.begin(), mods.invalid.end(), std::back_inserter(toSave));
 
 		overwriteFileFromContainer(activePath, toSave);
 	}

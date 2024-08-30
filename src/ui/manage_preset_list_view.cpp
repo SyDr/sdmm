@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -267,8 +267,6 @@ void ManagePresetListView::onLoadPresetRequested()
 	for (const auto& item : _platform.modManager()->mods().rest)
 		if (!preset.mods.position(item))
 			preset.mods.rest.emplace(item);
-
-	preset.mods.invalid = _platform.modManager()->mods().invalid;
 
 	_platform.apply(&preset.mods);
 	_platform.localConfig()->setActivePreset(selected);

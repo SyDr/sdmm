@@ -46,7 +46,6 @@ namespace mm
 
 		std::vector<Mod>         data;
 		std::set<std::string>    rest;
-		std::vector<std::string> invalid;
 
 		ModList() = default;
 
