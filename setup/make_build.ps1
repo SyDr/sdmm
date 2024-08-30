@@ -18,7 +18,6 @@ Copy-Item -Path "..\release-static\main.exe" -Destination "$StaticDirBuild" -Rec
 Copy-Item -Path "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\LICENSE" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\lng\" -Destination "$StaticDirBuild\" -Recurse -Container
-Copy-Item -Path "..\icons\" -Filter "*.png" -Destination "$StaticDirBuild\" -Recurse -Container
-Copy-Item -Path "..\icons\" -Filter "*.svg" -Destination "$StaticDirBuild\" -Recurse -Container
+Copy-Item -Path "..\icons\" -Filter "*.png,*.svg" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\data\" -Destination "$StaticDirBuild\" -Recurse -Container
 Compress-Archive -Path $StaticDirBuild -DestinationPath "Output\sdmm_v_$MMVersion.zip"
