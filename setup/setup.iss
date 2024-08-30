@@ -48,6 +48,7 @@ Source: "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll";
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\lng\*.json"; DestDir: "{app}\lng"
 Source: "..\icons\*.png"; DestDir: "{app}\icons"
+Source: "..\icons\*.svg"; DestDir: "{app}\icons"
 Source: "..\data\*.*"; DestDir: "{app}\data"
 
 [Icons]

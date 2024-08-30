@@ -14,5 +14,5 @@ wxIcon mm::loadModIcon(IIconStorage& storage, const fs::path& parent, const std:
 	if (!filename.empty())
 		return storage.get((parent / filename).lexically_normal().string());
 
-	return storage.get(embedded_icon::circle);
+	return storage.get(IconPredefined::circle);
 }

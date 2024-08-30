@@ -19,5 +19,6 @@ Copy-Item -Path "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Load
 Copy-Item -Path "..\LICENSE" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\lng\" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\icons\" -Filter "*.png" -Destination "$StaticDirBuild\" -Recurse -Container
+Copy-Item -Path "..\icons\" -Filter "*.svg" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\data\" -Destination "$StaticDirBuild\" -Recurse -Container
 Compress-Archive -Path $StaticDirBuild -DestinationPath "Output\sdmm_v_$MMVersion.zip"
