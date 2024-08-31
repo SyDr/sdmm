@@ -64,12 +64,16 @@ namespace mm
 		void                                   setChecked(std::unordered_set<std::string> items);
 		std::unordered_set<std::string> const& getChecked() const;
 
+		void applyFilter(const std::string& value);
+
 		const ModData*                                   findMod(const wxDataViewItem& item) const;
 		wxDataViewItem                                   findItemById(const std::string& id) const;
 		std::string                                      findIdByItem(const wxDataViewItem& item) const;
 		std::optional<ModListDsplayedData::GroupItemsBy> itemGroupByItem(const wxDataViewItem& item) const;
 
 	private:
+		bool passFilter(const std::string& id) const;
+
 		void reload();
 
 	private:
@@ -77,6 +81,8 @@ namespace mm
 
 		ModList             _list;
 		ModListDsplayedData _displayed;
+
+		std::string _filter;
 
 		std::unordered_set<std::string> _checked;
 

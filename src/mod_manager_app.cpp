@@ -15,13 +15,14 @@
 #include "ui/main_frame.h"
 #include "utility/sdlexcept.h"
 
+#include <boost/locale.hpp>
+#include <boost/nowide/filesystem.hpp>
 #include <wx/app.h>
 #include <wx/aui/framemanager.h>
 #include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/snglinst.h>
 #include <wx/stdpaths.h>
-#include <boost/nowide/filesystem.hpp>
 
 using namespace mm;
 
@@ -38,6 +39,8 @@ bool ModManagerApp::OnInit()
 		return false;
 
 	boost::nowide::nowide_filesystem();
+	boost::locale::generator lg;
+	std::locale::global(lg(""));
 
 	wxInitAllImageHandlers();
 	initServices();

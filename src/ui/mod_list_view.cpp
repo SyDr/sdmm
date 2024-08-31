@@ -37,6 +37,7 @@
 #include <wx/msgdlg.h>
 #include <wx/notifmsg.h>
 #include <wx/sizer.h>
+#include <wx/srchctrl.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
@@ -66,6 +67,7 @@ ModListView::ModListView(
 void ModListView::buildLayout()
 {
 	auto listGroupSizer = new wxBoxSizer(wxVERTICAL);
+	listGroupSizer->Add(_filter, wxSizerFlags(0).Expand().Border(wxALL, 4));
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
@@ -105,6 +107,16 @@ void ModListView::buildLayout()
 
 void ModListView::bindEvents()
 {
+	_filter->Bind(wxEVT_TEXT, [=](wxCommandEvent& event) {
+		const auto str = event.GetString();
+		_listModel->applyFilter(str.ToStdString(wxConvUTF8));
+		expandChildren();
+
+		_filter->ShowCancelButton(!str.IsEmpty());
+
+		event.Skip();
+	});
+
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
@@ -207,10 +219,13 @@ void ModListView::createControls(const wxString& managedPath)
 {
 	_group = new wxStaticBox(this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, managedPath));
 
+	_filter = new wxSearchCtrl(this, wxID_ANY);
+	_filter->SetDescriptiveText("Filter"_lng);
+
 	createListControl();
 
 	_modDescription = wxWebView::New();
-	_modDescription->Create(this, wxID_ANY, wxString(), wxDefaultPosition, wxDefaultSize);
+	_modDescription->Create(this, wxID_ANY);
 	_modDescription->EnableContextMenu(false);
 	_modDescription->EnableHistory(false);
 	_modDescription->SetPage(L"", L"");

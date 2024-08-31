@@ -6,9 +6,9 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
-#include <set>
 
 #include <wx/dataview.h>
 #include <wx/menu.h>
@@ -23,6 +23,7 @@ class wxInfoBarGeneric;
 class wxStaticBox;
 class wxStaticText;
 class wxWebView;
+class wxSearchCtrl;
 
 namespace mm
 {
@@ -74,8 +75,9 @@ namespace mm
 		wxObjectDataPtr<ModListModel>               _listModel;
 		std::set<ModListDsplayedData::GroupItemsBy> _hiddenCategories;
 
-		wxWidgetsPtr<wxStaticBox>    _group = nullptr;
-		wxWidgetsPtr<wxDataViewCtrl> _list  = nullptr;
+		wxWidgetsPtr<wxStaticBox>    _group  = nullptr;
+		wxWidgetsPtr<wxSearchCtrl>   _filter = nullptr;
+		wxWidgetsPtr<wxDataViewCtrl> _list   = nullptr;
 
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;

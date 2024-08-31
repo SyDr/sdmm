@@ -18,6 +18,7 @@
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 
+#include <boost/locale.hpp>
 #include <wx/app.h>
 #include <wx/msgdlg.h>
 
@@ -387,7 +388,7 @@ int ModListModel::Compare(
 	return compareRest(Column::name);
 }
 
-void ModListModel::setModList(const ModList & mods)
+void ModListModel::setModList(const ModList& mods)
 {
 	_list = mods;
 	reload();
@@ -404,16 +405,40 @@ const std::unordered_set<std::string>& ModListModel::getChecked() const
 	return _checked;
 }
 
+void ModListModel::applyFilter(const std::string& value)
+{
+	_filter = boost::locale::fold_case(value);
+	reload();
+}
+
+bool ModListModel::passFilter(const std::string& id) const
+{
+	// TODO: move into mod itself?
+
+	if (_filter.empty())
+		return true;
+
+	const auto& mod = _modDataProvider.modData(id);
+
+	return std::ranges::any_of(
+		std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version },
+		[&](const std::string& from) {
+			return boost::contains(boost::locale::fold_case(from), _filter);
+		});
+}
+
 void ModListModel::reload()
 {
 	_displayed.categories.clear();
 	_displayed.items.clear();
 
 	for (const auto& mod : _list.data)
-		_displayed.items.emplace_back(mod.id);
+		if (passFilter(mod.id))
+			_displayed.items.emplace_back(mod.id);
 
 	for (const auto& mod : _list.rest)
-		_displayed.items.emplace_back(mod);
+		if (passFilter(mod))
+			_displayed.items.emplace_back(mod);
 
 	size_t                                  enabledCount = 0;
 	std::unordered_map<std::string, size_t> cats;
