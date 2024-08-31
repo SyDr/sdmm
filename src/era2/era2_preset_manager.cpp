@@ -99,16 +99,8 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 		return result;
 
 	if (auto list = data.find("list"); list != data.end() && list->is_array())
-	{
 		for (const auto& item : *list)
-		{
-			const auto mod = item.get<std::string>();
-			if (mod.starts_with('*'))
-				result.mods.data.emplace_back(mod.substr(1), ModList::ModState::disabled);
-			else
-				result.mods.data.emplace_back(mod, ModList::ModState::enabled);
-		}
-	}
+			result.mods.emplace_back(item.get<std::string>());
 
 	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
 		result.executable = exe->get<std::string>();
@@ -124,8 +116,8 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 
 	auto& ref = data["list"] = nlohmann::json::array();
 
-	for (const auto& item : preset.mods.data)
-		ref.emplace_back(item.to_string());
+	for (const auto& item : preset.mods)
+		ref.emplace_back(item);
 
 	return data;
 }

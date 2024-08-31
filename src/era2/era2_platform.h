@@ -28,9 +28,9 @@ namespace mm
 		explicit Era2Platform(Application const& app);
 
 		fs::path managedPath() const override;
-		void     reload(bool force) override;
 
-		void apply(ModList* mods) override;
+		void reload(bool force) override;
+		void apply(const std::vector<std::string>& active) override;
 
 		IPresetManager*   getPresetManager() const override;
 		ILocalConfig*     localConfig() const override;

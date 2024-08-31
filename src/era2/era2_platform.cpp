@@ -130,16 +130,14 @@ void Era2Platform::reload(bool force)
 	_modManager->onListChanged()();
 }
 
-void Era2Platform::apply(ModList* mods)
+void Era2Platform::apply(const std::vector<std::string>& active)
 {
 	auto block1 = _modListChanged.blocker();
 
-	if (mods)
-	{
-		_modManager->mods(*mods);
-		_modManager->onListChanged()();
-		save();
-	}
+	_modManager->apply(active);
+	_modManager->onListChanged()();
+
+	save();
 }
 
 fs::path Era2Platform::getModsDirPath() const

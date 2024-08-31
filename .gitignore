@@ -18,3 +18,4 @@
 /release-static/
 /setup/log*.txt
 /setup/Portable/
+/enc_temp_folder/

@@ -136,7 +136,7 @@ void ExportPresetDialog::updatePreview()
 	}
 	else
 	{
-		preset.mods       = _platform.modManager()->mods();
+		preset.mods       = _platform.modManager()->mods().enabled();
 		preset.executable = _platform.launchHelper()->getExecutable();
 	}
 

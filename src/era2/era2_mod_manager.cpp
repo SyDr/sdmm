@@ -59,6 +59,13 @@ void Era2ModManager::switchState(const std::string& item)
 		disable(item);
 }
 
+void Era2ModManager::apply(const std::vector<std::string>& items)
+{
+	_list.apply(items);
+
+	_listChanged();
+}
+
 void Era2ModManager::archive(const std::string& item)
 {
 	_list.archive(item);

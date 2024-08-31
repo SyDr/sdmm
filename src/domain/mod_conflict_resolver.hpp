@@ -11,6 +11,6 @@ namespace mm
 {
 	struct IModDataProvider;
 
-	ModList ResolveModConflicts(ModList mods, mm::IModDataProvider& modDataProvider,
+	std::vector<std::string> ResolveModConflicts(const ModList& mods, mm::IModDataProvider& modDataProvider,
 		const std::string& enablingMod, const std::string& disablingMod);
 }

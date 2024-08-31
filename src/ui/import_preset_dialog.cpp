@@ -179,7 +179,7 @@ void ImportPresetDialog::doImportAndClose()
 	auto presetData = _platform.getPresetManager()->loadPreset(parsed);
 
 	if (_loadNow->IsChecked())
-		_platform.apply(&presetData.mods);
+		_platform.modManager()->apply(presetData.mods);
 
 	if (!_importName->IsEmpty())
 	{

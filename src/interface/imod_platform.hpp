@@ -21,10 +21,10 @@ namespace mm
 	{
 		virtual ~IModPlatform() = default;
 
-		[[nodiscard]] virtual fs::path managedPath() const        = 0;
-		virtual void                   reload(bool force = false) = 0;
+		virtual void reload(bool force = false)                    = 0;
+		virtual void apply(const std::vector<std::string>& active) = 0;
 
-		virtual void apply(ModList* mods) = 0;
+		[[nodiscard]] virtual fs::path managedPath() const = 0;
 
 		[[nodiscard]] virtual ILaunchHelper*    launchHelper() const     = 0;
 		[[nodiscard]] virtual ILocalConfig*     localConfig() const      = 0;

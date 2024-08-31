@@ -13,15 +13,14 @@ namespace mm
 {
 	struct PresetData
 	{
-		ModList     mods;
-
-		std::string executable;
+		std::vector<std::string> mods;
+		std::string              executable;
 
 		std::weak_ordering operator<=>(const PresetData& other) const = default;
 
-		PresetData(const ModList& mods, const std::string& executable)
-			: mods(mods)
-			, executable(executable)
+		PresetData(std::vector<std::string> mods, std::string executable)
+			: mods(std::move(mods))
+			, executable(std::move(executable))
 		{}
 
 		PresetData() = default;

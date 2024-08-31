@@ -19,6 +19,7 @@ Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
 TODO (In no particular order)
 -----------------------------
+- Allow sent disabled mods into archive on loading preset.
 - Implement mod filtering on the view.
 - Use wxWidgets from trunk to test dark theme support.
 - Save and load expanded/collapsed categories.

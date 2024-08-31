@@ -44,24 +44,28 @@ namespace mm
 			}
 		};
 
-		std::vector<Mod>         data;
-		std::set<std::string>    rest;
+		std::vector<Mod>      data;
+		std::set<std::string> rest;
 
 		ModList() = default;
+		explicit ModList(const std::vector<std::string>& active);
 
 		bool managed(const std::string& id) const;
 
 		std::optional<size_t> position(const std::string& id) const;
 		std::string           next(const std::string& id) const;
 
-		std::optional<ModState> state(const std::string& id) const;
-		bool                    enabled(const std::string& id) const;
-		bool                    disabled(const std::string& id) const;
+		std::optional<ModState>  state(const std::string& id) const;
+		bool                     enabled(const std::string& id) const;
+		bool                     disabled(const std::string& id) const;
+		std::vector<std::string> enabled() const;
 
 		void enable(const std::string& id);
 		void enable(const std::string& id, size_t at);
 		void disable(const std::string& id);
 		void archive(const std::string& id);
+
+		void apply(const std::vector<std::string>& ids);
 
 		void switchState(const std::string& id);
 

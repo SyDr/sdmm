@@ -74,7 +74,7 @@ namespace
 	}
 }
 
-ModList mm::ResolveModConflicts(ModList mods, IModDataProvider& modDataProvider,
+std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataProvider& modDataProvider,
 	const std::string& enablingMod, const std::string& disablingMod)
 {
 	// expand current mod list to contain all mods, required by active mods
@@ -134,47 +134,5 @@ ModList mm::ResolveModConflicts(ModList mods, IModDataProvider& modDataProvider,
 		}
 	}
 
-	std::unordered_set<std::string> active { sortedActive.cbegin(), sortedActive.cend() };
-
-	size_t i = 0;
-
-	size_t skip = 0;
-
-	while (i < sortedActive.size())
-	{
-		const auto& id = sortedActive[i];
-
-		if (mods.data.size() <= i + skip)
-		{
-			mods.enable(id, i + skip);
-			++i;
-		}
-		else if (!active.count(mods.data[i + skip].id))
-		{
-			mods.disable(mods.data[i + skip].id);
-			++skip;
-		}
-		else if (id != mods.data[i + skip].id)
-		{
-			mods.enable(id, i + skip);
-			++i;
-		}
-		else if (mods.data[i + skip].state != ModList::ModState::enabled)
-		{
-			mods.enable(id, i + skip);
-			++i;
-		}
-		else
-		{
-			++i;
-		}
-	}
-
-	while (i + skip < mods.data.size())
-	{
-		mods.disable(mods.data[i + skip].id);
-		++skip;
-	}
-
-	return mods;
+	return sortedActive;
 }

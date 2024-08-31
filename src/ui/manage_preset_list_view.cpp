@@ -221,7 +221,7 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 	}
 
 	_platform.getPresetManager()->savePreset(
-		baseName, { _platform.modManager()->mods(), _platform.launchHelper()->getExecutable() });
+		baseName, { _platform.modManager()->mods().enabled(), _platform.launchHelper()->getExecutable() });
 	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
@@ -260,16 +260,9 @@ void ManagePresetListView::onLoadPresetRequested()
 	auto selected = getSelection();
 	auto preset   = _platform.getPresetManager()->loadPreset(selected);
 
-	for (const auto& item : _platform.modManager()->mods().data)
-		if (!preset.mods.position(item.id))
-			preset.mods.rest.emplace(item.id);
-
-	for (const auto& item : _platform.modManager()->mods().rest)
-		if (!preset.mods.position(item))
-			preset.mods.rest.emplace(item);
-
-	_platform.apply(&preset.mods);
+	_platform.modManager()->apply(preset.mods);
 	_platform.localConfig()->setActivePreset(selected);
+
 	_selected = selected;
 
 	refreshListContent();
@@ -373,7 +366,7 @@ void ManagePresetListView::updatePreview()
 		// mods.available = _platform.modManager()->mods().available;
 	}
 
-	_listModel->setModList(preset.mods);
+	_listModel->setModList(ModList(preset.mods));
 
 	EX_UNEXPECTED;
 }

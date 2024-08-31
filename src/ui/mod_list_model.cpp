@@ -387,7 +387,7 @@ int ModListModel::Compare(
 	return compareRest(Column::name);
 }
 
-void ModListModel::setModList(ModList const& mods)
+void ModListModel::setModList(const ModList & mods)
 {
 	_list = mods;
 	reload();
@@ -399,7 +399,7 @@ void ModListModel::setChecked(std::unordered_set<std::string> items)
 	Cleared();
 }
 
-std::unordered_set<std::string> const& ModListModel::getChecked() const
+const std::unordered_set<std::string>& ModListModel::getChecked() const
 {
 	return _checked;
 }

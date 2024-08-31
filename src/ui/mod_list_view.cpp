@@ -507,10 +507,11 @@ void ModListView::onSortModsRequested(const std::string& enablingMod, const std:
 
 	EX_TRY;
 
-	auto mods = ResolveModConflicts(
+	auto enabled = ResolveModConflicts(
 		_modManager.mods(), *_managedPlatform.modDataProvider(), enablingMod, disablingMod);
-	if (mods != _modManager.mods())
-		_managedPlatform.apply(&mods);
+
+	if (enabled != _modManager.mods().enabled())
+		_managedPlatform.apply(enabled);
 
 	EX_UNEXPECTED;
 }
