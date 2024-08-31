@@ -119,6 +119,7 @@
 	"Reset" : "Сбросить",
 	"Directory" : "Каталог",
 	"Automatic mod conflict resolve mode selected" : "Включён режим автоматического разрешения конфликтов между модами",
+	"Filter" : "Фильтр",
 
 	"category" : {
 		"gameplay" : "Геймплей",
