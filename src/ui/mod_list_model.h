@@ -41,7 +41,8 @@ namespace mm
 		};
 
 		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
-			ModListModelMode mode = ModListModelMode::flat);
+			ModListModelManagedMode  managedMode  = ModListModelManagedMode::as_flat_list,
+			ModListModelArchivedMode archivedMode = ModListModelArchivedMode::as_single_group);
 
 		bool IsListModel() const override;
 
@@ -77,7 +78,8 @@ namespace mm
 		void reload();
 
 	private:
-		const ModListModelMode _mode = ModListModelMode::flat;
+		const ModListModelManagedMode  _managedMode  = ModListModelManagedMode::as_flat_list;
+		const ModListModelArchivedMode _archivedMode = ModListModelArchivedMode::as_single_group;
 
 		ModList             _list;
 		ModListDsplayedData _displayed;

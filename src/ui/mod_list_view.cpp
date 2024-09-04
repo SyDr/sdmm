@@ -46,11 +46,12 @@
 
 using namespace mm;
 
-ModListView::ModListView(
-	wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, ModListModelMode listMode)
+ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
+	ModListModelManagedMode  managedMode,
+	ModListModelArchivedMode archivedMode)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
-	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage, listMode))
+	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage, managedMode, archivedMode))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);

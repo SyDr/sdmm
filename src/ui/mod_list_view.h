@@ -38,7 +38,8 @@ namespace mm
 	{
 	public:
 		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-			ModListModelMode listMode = ModListModelMode::flat);
+			ModListModelManagedMode  managedMode  = ModListModelManagedMode::as_flat_list,
+			ModListModelArchivedMode archivedMode = ModListModelArchivedMode::as_single_group);
 
 	private:
 		void createControls(const wxString& managedPath);

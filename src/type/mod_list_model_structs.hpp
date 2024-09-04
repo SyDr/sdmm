@@ -14,18 +14,24 @@ class wxString;
 
 namespace mm
 {
-	enum class ModListModelMode
+	enum class ModListModelManagedMode
 	{
-		flat,
-		classic,
-		modern,
+		as_flat_list,
+		as_group,
+	};
+
+	enum class ModListModelArchivedMode
+	{
+		as_flat_list,
+		as_single_group,
+		as_individual_groups
 	};
 
 	struct ModListDsplayedData
 	{
-		struct EnabledGroupTag
+		struct ManagedGroupTag
 		{
-			std::weak_ordering operator<=>(const EnabledGroupTag& other) const = default;
+			std::weak_ordering operator<=>(const ManagedGroupTag& other) const = default;
 		};
 
 		struct ArchivedGroupTag
@@ -33,7 +39,7 @@ namespace mm
 			std::weak_ordering operator<=>(const ArchivedGroupTag& other) const = default;
 		};
 
-		using GroupItemsBy       = std::variant<EnabledGroupTag, std::string, ArchivedGroupTag>;
+		using GroupItemsBy       = std::variant<ManagedGroupTag, std::string, ArchivedGroupTag>;
 		using CategoryAndCaption = std::pair<GroupItemsBy, wxString>;
 
 		std::vector<std::string>        items;

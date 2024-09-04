@@ -58,6 +58,7 @@ namespace mm
 		std::optional<ModState>  state(const std::string& id) const;
 		bool                     enabled(const std::string& id) const;
 		bool                     disabled(const std::string& id) const;
+
 		std::vector<std::string> enabled() const;
 
 		void enable(const std::string& id);

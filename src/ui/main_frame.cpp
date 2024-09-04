@@ -64,16 +64,25 @@ MainFrame::MainFrame(Application& app)
 
 	if (_currentPlatform)
 	{
-		auto modListViewModern =
-			new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::modern);
-		pages->AddPage(modListViewModern, "Mods"_lng + L" (new)");
+		auto modListView1 = new ModListView(pages, *_currentPlatform, *_iconStorage,
+			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_flat_list);
+		pages->AddPage(modListView1, "Mods"_lng + L" (flat, flat)");
 
-		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
-		pages->AddPage(modListView, "Mods"_lng + L" (flat)");
+		auto modListView2 = new ModListView(pages, *_currentPlatform, *_iconStorage,
+			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_single_group);
+		pages->AddPage(modListView2, "Mods"_lng + L" (flat, single)");
 
-		auto modListViewClassic =
-			new ModListView(pages, *_currentPlatform, *_iconStorage, ModListModelMode::classic);
-		pages->AddPage(modListViewClassic, "Mods"_lng + L" (classic)");
+		auto modListView3 = new ModListView(pages, *_currentPlatform, *_iconStorage,
+			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_individual_groups);
+		pages->AddPage(modListView3, "Mods"_lng + L" (flat, individual)");
+
+		auto modListView5 = new ModListView(pages, *_currentPlatform, *_iconStorage,
+			ModListModelManagedMode::as_group, ModListModelArchivedMode::as_single_group);
+		pages->AddPage(modListView5, "Mods"_lng + L" (group, single)");
+
+		auto modListView6 = new ModListView(pages, *_currentPlatform, *_iconStorage,
+			ModListModelManagedMode::as_group, ModListModelArchivedMode::as_individual_groups);
+		pages->AddPage(modListView6, "Mods"_lng + L" (group, individual)");
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{
