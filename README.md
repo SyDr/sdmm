@@ -39,7 +39,6 @@ TODO (In no particular order)
 - WebPreview check width.
 - Click outside of list selects item? Research.
 - Drag'n'drop icons. Remove copy mark.
-- Fix drag'n'drop disabled into disabled.
 - Select all freezes all selected (wx bug?).
 - Implement link following.
 - Disable image loading logs for exe preview dialog.

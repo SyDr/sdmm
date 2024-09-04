@@ -126,9 +126,12 @@ void ModList::switchState(const std::string& id)
 		disable(id);
 }
 
-bool ModList::canMove(const std::string&, const std::string&) const
+bool ModList::canMove(const std::string& from, const std::string& to) const
 {
-	return true;
+	auto posFrom = position(from);
+	auto posTo   = position(to);
+
+	return posFrom.has_value() || posTo.has_value();
 }
 
 void ModList::move(size_t from, size_t to)
@@ -156,6 +159,9 @@ void ModList::move(const std::string& from, const std::string& to)
 
 		posFrom = 0;
 	}
+
+	if (!posFrom && !posTo)
+		return;
 
 	move(*posFrom, *posTo);
 }
