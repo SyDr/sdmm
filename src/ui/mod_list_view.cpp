@@ -205,6 +205,17 @@ void ModListView::bindEvents()
 	_resetState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onResetSelectedModStateRequested(); });
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
+	_modDescriptionPlain->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
+		if (!event.GetMouseEvent().ButtonDClick(wxMOUSE_BTN_LEFT))
+		{
+			event.Skip();
+			return;
+		}
+
+		const auto url = _modDescriptionPlain->GetRange(event.GetURLStart(), event.GetURLEnd());
+		wxLaunchDefaultBrowser(url);
+	});
+
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
 	_showGallery->Bind(

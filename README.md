@@ -23,7 +23,7 @@ TODO (In no particular order)
 - Use wxWidgets from trunk to test dark theme support.
 - Save and load expanded/collapsed categories.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
-- Write memory dump on crash (and inclue debug symbols?).
+- Write memory dump on crash (and include debug symbols?).
 - Improve screenshots display (use separate window?).
 - Use UPX or something else to reduce release binary size.
 - Update icons.
@@ -38,7 +38,6 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Click outside of list selects item? Research.
-- Implement link following.
 - Disable image loading logs for exe preview dialog.
 - Navigate in mod list via keys?
 - Setup column list.
