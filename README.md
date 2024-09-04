@@ -38,7 +38,6 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Click outside of list selects item? Research.
-- Drag'n'drop icons. Remove copy mark.
 - Implement link following.
 - Disable image loading logs for exe preview dialog.
 - Navigate in mod list via keys?
