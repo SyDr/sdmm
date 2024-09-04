@@ -43,6 +43,5 @@ TODO (In no particular order)
 - Select all freezes all selected (wx bug?).
 - Implement link following.
 - Disable image loading logs for exe preview dialog.
-- Get these "things" into launch string.
 - Navigate in mod list via keys?
 - Setup column list.
