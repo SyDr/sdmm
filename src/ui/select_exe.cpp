@@ -86,6 +86,8 @@ void SelectExe::refreshListContent()
 	_list->DeleteAllItems();
 	_imageList->RemoveAll();
 
+	wxLogNull noLogging;  // suppress wxWidgets messages about inability to load icon
+
 	using di = fs::directory_iterator;
 	for (auto it = di(_basePath), end = di(); it != end; ++it)
 	{
