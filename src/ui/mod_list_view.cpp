@@ -111,6 +111,8 @@ void ModListView::bindEvents()
 		const auto str = event.GetString();
 		_listModel->applyFilter(str.ToStdString(wxConvUTF8));
 		expandChildren();
+		followSelection();
+		updateControlsState();
 
 		_filter->ShowCancelButton(!str.IsEmpty());
 
