@@ -36,3 +36,13 @@ TODO (In no particular order)
 - Implement update checking.
 - Implement auto update.
 - Implement mod editor (or not?).
+- WebPreview check width.
+- Click outside of list selects item? Research.
+- Drag'n'drop icons. Remove copy mark.
+- Fix drag'n'drop disabled into disabled.
+- Select all freezes all selected (wx bug?).
+- Implement link following.
+- Disable image loading logs for exe preview dialog.
+- Get these "things" into launch string.
+- Navigate in mod list via keys?
+- Setup column list.
