@@ -37,9 +37,7 @@ namespace mm
 	class ModListView : public wxPanel
 	{
 	public:
-		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-			ModListModelManagedMode  managedMode  = ModListModelManagedMode::as_flat_list,
-			ModListModelArchivedMode archivedMode = ModListModelArchivedMode::as_single_group);
+		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage);
 
 	private:
 		void createControls(const wxString& managedPath);
@@ -80,10 +78,11 @@ namespace mm
 		wxWidgetsPtr<wxSearchCtrl>   _filter = nullptr;
 		wxWidgetsPtr<wxDataViewCtrl> _list   = nullptr;
 
+		wxWidgetsPtr<wxButton> _configure = nullptr;
+
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;
 		wxWidgetsPtr<wxButton> _changeState = nullptr;
-		wxWidgetsPtr<wxButton> _resetState  = nullptr;
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
@@ -95,6 +94,7 @@ namespace mm
 			wxMenu                   menu;
 			wxWidgetsPtr<wxMenuItem> openHomepage   = nullptr;
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
+			wxWidgetsPtr<wxMenuItem> archive        = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 

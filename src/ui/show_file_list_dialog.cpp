@@ -48,7 +48,7 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 	for (const auto& item : _data.modList)
 		list.data.emplace_back(item, ModList::ModState::enabled);
 
-	_listModel->setModList(list);
+	_listModel->modList(list);
 }
 
 void ShowFileListDialog::createControls()
@@ -81,10 +81,10 @@ void ShowFileListDialog::createListColumns()
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
 	auto column0 =
-		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+		new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModelColumn::priority),
 							 wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1= new wxDataViewColumn("Mod"_lng, r1,
-										static_cast<unsigned int>(ModListModel::Column::name),
+										static_cast<unsigned int>(ModListModelColumn::name),
 										wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);

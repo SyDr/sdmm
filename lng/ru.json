@@ -121,6 +121,14 @@
 	"Automatic mod conflict resolve mode selected" : "Включён режим автоматического разрешения конфликтов между модами",
 	"Filter" : "Фильтр",
 	"Managed" : "Управляемые",
+	"Column" : "Столбец",
+	"Configure view" : "Настроить отображение",
+	"Show managed mods" : "Показать управляемые моды",
+	"as a flat list" : "плоским списком",
+	"as a group" : "группой",
+	"Show archived mods" : "Показать архивные моды",
+	"as a single group" : "одной группой",
+	"grouped by category" : "сгруппированными по категориям",
 
 	"category" : {
 		"gameplay" : "Геймплей",

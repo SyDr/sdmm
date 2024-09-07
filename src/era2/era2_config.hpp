@@ -36,6 +36,15 @@ namespace mm
 		ConflictResolveMode conflictResolveMode() const override;
 		void                conflictResolveMode(ConflictResolveMode value) override;
 
+		std::vector<int> listColumns() const override;
+		void             listColumns(const std::vector<int>& value) override;
+
+		ModListModelManagedMode managedModsDisplay() const override;
+		void                    managedModsDisplay(ModListModelManagedMode value) override;
+
+		ModListModelArchivedMode archivedModsDisplay() const override;
+		void                     archivedModsDisplay(ModListModelArchivedMode value) override;
+
 	private:
 		fs::path getConfigFilePath() const;
 		void     createDirectories() const;

@@ -59,30 +59,12 @@ MainFrame::MainFrame(Application& app)
 	CreateStatusBar();
 
 	auto panel = new wxPanel(this);
-	auto pages = new wxAuiNotebook(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-		wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS);
+	auto pages = new wxNotebook(panel, wxID_ANY);
 
 	if (_currentPlatform)
 	{
-		auto modListView1 = new ModListView(pages, *_currentPlatform, *_iconStorage,
-			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_flat_list);
-		pages->AddPage(modListView1, "Mods"_lng + L" (flat, flat)");
-
-		auto modListView2 = new ModListView(pages, *_currentPlatform, *_iconStorage,
-			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_single_group);
-		pages->AddPage(modListView2, "Mods"_lng + L" (flat, single)");
-
-		auto modListView3 = new ModListView(pages, *_currentPlatform, *_iconStorage,
-			ModListModelManagedMode::as_flat_list, ModListModelArchivedMode::as_individual_groups);
-		pages->AddPage(modListView3, "Mods"_lng + L" (flat, individual)");
-
-		auto modListView5 = new ModListView(pages, *_currentPlatform, *_iconStorage,
-			ModListModelManagedMode::as_group, ModListModelArchivedMode::as_single_group);
-		pages->AddPage(modListView5, "Mods"_lng + L" (group, single)");
-
-		auto modListView6 = new ModListView(pages, *_currentPlatform, *_iconStorage,
-			ModListModelManagedMode::as_group, ModListModelArchivedMode::as_individual_groups);
-		pages->AddPage(modListView6, "Mods"_lng + L" (group, individual)");
+		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
+		pages->AddPage(modListView, "Mods"_lng);
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{

@@ -38,6 +38,7 @@
     <ClCompile Include="ui\icon_helper.cpp" />
     <ClCompile Include="ui\export_preset_dialog.cpp" />
     <ClCompile Include="ui\import_preset_dialog.cpp" />
+    <ClCompile Include="ui\configure_main_list_view.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -102,7 +103,8 @@
     <ClInclude Include="domain\preset_data.hpp" />
     <ClInclude Include="ui\import_preset_dialog.hpp" />
     <ClInclude Include="version.hpp" />
-    <ClInclude Include="ui\mod_list_model_structs.hpp" />
+    <ClInclude Include="type\mod_list_model_structs.hpp" />
+    <ClInclude Include="ui\configure_main_list_view.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

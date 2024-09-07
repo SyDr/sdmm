@@ -133,9 +133,9 @@ void ManagePresetListView::createListColumns()
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::priority),
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModelColumn::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
+	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModelColumn::name),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_mods->AppendColumn(column0);
@@ -366,7 +366,7 @@ void ManagePresetListView::updatePreview()
 		// mods.available = _platform.modManager()->mods().available;
 	}
 
-	_listModel->setModList(ModList(preset.mods));
+	_listModel->modList(ModList(preset.mods));
 
 	EX_UNEXPECTED;
 }

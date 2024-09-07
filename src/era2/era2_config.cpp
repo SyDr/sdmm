@@ -8,6 +8,7 @@
 #include "era2_config.hpp"
 
 #include <fstream>
+#include <ranges>
 #include <sstream>
 #include <unordered_set>
 
@@ -16,10 +17,11 @@
 #include <wx/log.h>
 #include <wx/stdpaths.h>
 
-#include "utility/fs_util.h"
-#include "utility/sdlexcept.h"
-#include "utility/json_util.h"
 #include "system_info.hpp"
+#include "type/mod_list_model_structs.hpp"
+#include "utility/fs_util.h"
+#include "utility/json_util.h"
+#include "utility/sdlexcept.h"
 
 using namespace mm;
 
@@ -28,6 +30,9 @@ namespace
 	constexpr const auto st_active_preset         = "active_preset";
 	constexpr const auto st_executable            = "executable";
 	constexpr const auto st_conflict_resolve_mode = "conflict_resolve_mode";
+	constexpr const auto st_list_columns          = "list_columns";
+	constexpr const auto st_managed_mods_display  = "managed_mods_display";
+	constexpr const auto st_archived_mods_display = "archived_mods_display";
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -120,6 +125,55 @@ void Era2Config::conflictResolveMode(ConflictResolveMode value)
 	save();
 }
 
+std::vector<int> Era2Config::listColumns() const
+{
+	auto result = _data[st_list_columns].get<std::vector<int>>();
+
+	for (size_t i = 0; i < result.size(); ++i)
+	{
+		const auto v = static_cast<ModListModelColumn>(std::abs(result[i]));
+
+		if (std::ranges::find(MainListColumns, v) == MainListColumns.end())
+			result.erase(result.begin() + i);
+		else
+			++i;
+	}
+
+	for (const auto& i : MainListColumns)
+		if (!std::ranges::any_of(result, [&](const int v) { return std::abs(v) == static_cast<int>(i); }))
+			result.emplace_back(static_cast<int>(i));
+
+	return result;
+}
+
+void Era2Config::listColumns(const std::vector<int>& value)
+{
+	_data[st_list_columns] = value;
+	save();
+}
+
+ModListModelManagedMode Era2Config::managedModsDisplay() const
+{
+	return static_cast<ModListModelManagedMode>(_data[st_managed_mods_display]);
+}
+
+void Era2Config::managedModsDisplay(ModListModelManagedMode value)
+{
+	_data[st_managed_mods_display] = static_cast<unsigned>(value);
+	save();
+}
+
+ModListModelArchivedMode Era2Config::archivedModsDisplay() const
+{
+	return static_cast<ModListModelArchivedMode>(_data[st_archived_mods_display]);
+}
+
+void Era2Config::archivedModsDisplay(ModListModelArchivedMode value)
+{
+	_data[st_archived_mods_display] = static_cast<unsigned>(value);
+	save();
+}
+
 void Era2Config::validate()
 {
 	if (!_data.count(st_active_preset) || !_data[st_active_preset].is_string())
@@ -128,6 +182,30 @@ void Era2Config::validate()
 	if (!_data.count(st_executable) || !_data[st_executable].is_string())
 		_data[st_executable] = std::string();
 
-	if (!_data.count(st_conflict_resolve_mode) || !_data[st_conflict_resolve_mode].is_number_integer())
+	if (!_data.count(st_conflict_resolve_mode) || !_data[st_conflict_resolve_mode].is_number_unsigned() ||
+		_data[st_conflict_resolve_mode] > static_cast<unsigned>(ConflictResolveMode::automatic))
 		_data[st_conflict_resolve_mode] = ConflictResolveMode::automatic;
+
+	if (!_data.count(st_list_columns) || !_data[st_list_columns].is_array())
+		_data[st_list_columns] = nlohmann::json::array();
+
+	auto& lc = _data[st_list_columns];
+
+	size_t i = 0;
+	while (i < lc.size())
+	{
+		if (!lc[i].is_number_integer())
+			lc.erase(i);
+		else
+			++i;
+	}
+
+	if (!_data.count(st_managed_mods_display) || !_data[st_managed_mods_display].is_number_unsigned() ||
+		_data[st_managed_mods_display] > static_cast<unsigned>(ModListModelManagedMode::as_group))
+		_data[st_managed_mods_display] = 0;
+
+	if (!_data.count(st_archived_mods_display) || !_data[st_archived_mods_display].is_number_unsigned() ||
+		_data[st_archived_mods_display] >
+			static_cast<unsigned>(ModListModelArchivedMode::as_individual_groups))
+		_data[st_archived_mods_display] = 1;
 }

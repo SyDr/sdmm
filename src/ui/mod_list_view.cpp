@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,6 +8,7 @@
 #include "mod_list_view.h"
 
 #include "application.h"
+#include "configure_main_list_view.h"
 #include "domain/mod_conflict_resolver.hpp"
 #include "domain/mod_data.hpp"
 #include "image_gallery_view.hpp"
@@ -20,6 +21,7 @@
 #include "interface/ipreset_manager.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
+#include "mod_manager_app.h"
 #include "select_exe.h"
 #include "type/embedded_icon.h"
 #include "utility/fs_util.h"
@@ -46,19 +48,19 @@
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
-	ModListModelManagedMode  managedMode,
-	ModListModelArchivedMode archivedMode)
+ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
-	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage, managedMode, archivedMode))
+	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
+		  managedPlatform.localConfig()->managedModsDisplay(),
+		  managedPlatform.localConfig()->archivedModsDisplay()))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
 	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
-	_listModel->setModList(_modManager.mods());
+	_listModel->modList(_modManager.mods());
 	expandChildren();
 	buildLayout();
 	bindEvents();
@@ -72,10 +74,10 @@ void ModListView::buildLayout()
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
+	buttonSizer->Add(_configure, wxSizerFlags(0).Border(wxALL, 4));
 	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4));
 	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4));
 	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4));
-	buttonSizer->Add(_resetState, wxSizerFlags(0).Border(wxALL, 4));
 	buttonSizer->AddStretchSpacer(1);
 	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4));
 
@@ -195,17 +197,51 @@ void ModListView::bindEvents()
 	Bind(wxEVT_MENU, &ModListView::OnMenuItemSelected, this);
 
 	_modManager.onListChanged().connect([this] {
-		_listModel->setModList(_modManager.mods());
+		_listModel->modList(_modManager.mods());
 
 		expandChildren();
 		followSelection();
 		updateControlsState();
 	});
 
+	_configure->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+		const auto columns  = _managedPlatform.localConfig()->listColumns();
+		const auto managed  = _managedPlatform.localConfig()->managedModsDisplay();
+		const auto archived = _managedPlatform.localConfig()->archivedModsDisplay();
+
+		ConfigureMainListView dialog(this, _iconStorage, columns, managed, archived);
+
+		if (dialog.ShowModal() != wxID_OK)
+			return;
+
+		const auto newColumns = dialog.getColumns();
+		const auto newManaged = dialog.getManagedMode();
+		const auto newArchived = dialog.getArchivedMode();
+
+		if (columns != newColumns)
+		{
+			_managedPlatform.localConfig()->listColumns(newColumns);
+			createListColumns();
+		}
+
+		if (newManaged != managed || newArchived != archived)
+		{
+			_managedPlatform.localConfig()->managedModsDisplay(newManaged);
+			_managedPlatform.localConfig()->archivedModsDisplay(newArchived);
+
+			_listModel->setManagedModsDisplay(newManaged);
+			_listModel->setArchivedModsDisplay(newArchived);
+
+			expandChildren();
+			followSelection();
+			updateControlsState();
+		}
+	});
+
 	_moveUp->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
 	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
 	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
-	_resetState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onResetSelectedModStateRequested(); });
+
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
 	_modDescriptionPlain->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
@@ -248,6 +284,10 @@ void ModListView::createControls(const wxString& managedPath)
 	_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP | wxTE_NOHIDESEL);
 
+	_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::cog), wxDefaultPosition,
+		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_configure->SetToolTip("Configure view"_lng);
+
 	_moveUp = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::up), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveUp->SetToolTip("Move Up"_lng);
@@ -260,16 +300,13 @@ void ModListView::createControls(const wxString& managedPath)
 		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
 
-	_resetState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::reset_position),
-		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
-	_resetState->SetToolTip("Archive"_lng);
-
 	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::sort), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_sort->SetToolTip("Sort"_lng);
 
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
+	_menu.archive        = _menu.menu.Append(wxID_ANY, "Archive"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_showGallery = new wxButton(this, wxID_ANY, "Screenshots"_lng);
@@ -304,51 +341,43 @@ void ModListView::createListControl()
 
 void ModListView::createListColumns()
 {
-	auto rPriority = new mmPriorityDataRenderer();
+	_list->ClearColumns();
 
-	auto r1             = new wxDataViewIconTextRenderer();
-	auto r2             = new wxDataViewTextRenderer();
-	auto r3             = new wxDataViewTextRenderer();
-	auto r4             = new wxDataViewTextRenderer();
-	auto rDirectoryName = new wxDataViewTextRenderer();
+	auto columns = _managedPlatform.localConfig()->listColumns();
+	std::erase_if(columns, [](const int v) { return v < 0; });
 
-	rPriority->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	for (size_t i = 0; i < columns.size(); ++i)
+	{
+		const auto column = columns[i];
+		const auto typed  = static_cast<ModListModelColumn>(column);
 
-	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
-	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
-	r3->SetAlignment(wxALIGN_CENTER_VERTICAL);
-	r4->SetAlignment(wxALIGN_CENTER_VERTICAL);
-	rDirectoryName->SetAlignment(wxALIGN_CENTER_VERTICAL);
+		wxWidgetsPtr<wxDataViewRenderer> r = nullptr;
+		switch (typed)
+		{
+			using enum ModListModelColumn;
+		case ModListModelColumn::name: r = new wxDataViewIconTextRenderer(); break;
+		case ModListModelColumn::priority: r = new mmPriorityDataRenderer(); break;
+		default: r = new wxDataViewTextRenderer(); break;
+		}
 
-	rDirectoryName->EnableEllipsize(wxELLIPSIZE_END);
+		r->SetAlignment(wxALIGN_CENTER_VERTICAL);
+		if (i == columns.size() - 1)
+			r->EnableEllipsize(wxELLIPSIZE_END);
 
-	auto columnPriority = new wxDataViewColumn("Priority"_lng, rPriority,
-		static_cast<unsigned int>(ModListModel::Column::priority), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModel::Column::name),
-		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column2 = new wxDataViewColumn("Category"_lng, r2,
-		static_cast<unsigned int>(ModListModel::Column::category), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column3 =
-		new wxDataViewColumn("Version"_lng, r3, static_cast<unsigned int>(ModListModel::Column::version),
-			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto column4             = new wxDataViewColumn("Author"_lng, r4,
-					static_cast<unsigned int>(ModListModel::Column::author), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-					wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
-	auto columnDirectoryName = new wxDataViewColumn("Directory"_lng, rDirectoryName,
-		static_cast<unsigned int>(ModListModel::Column::directory), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER,
-		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE);
+		int flags = wxDATAVIEW_COL_RESIZABLE;  // | wxDATAVIEW_COL_REORDERABLE; // TODO: give it back and
+											   // allow sorting on main window instead
 
-	_list->AppendColumn(columnPriority);
-	_list->AppendColumn(column1);
-	_list->AppendColumn(column2);
-	_list->AppendColumn(column3);
-	_list->AppendColumn(column4);
-	_list->AppendColumn(columnDirectoryName);
+		if (typed != ModListModelColumn::version)
+			flags |= wxDATAVIEW_COL_SORTABLE;
 
-	columnPriority->SetSortOrder(true);
+		auto c = new wxDataViewColumn(wxString::FromUTF8(wxGetApp().translationString(to_string(typed))), r,
+			column, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, flags);
+
+		_list->AppendColumn(c);
+
+		if (typed == ModListModelColumn::priority)
+			c->SetSortOrder(true);
+	}
 }
 
 void ModListView::updateControlsState()
@@ -362,7 +391,6 @@ void ModListView::updateControlsState()
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		_resetState->Disable();
 		_modDescription->SetPage(L"", L"");
 		_modDescriptionPlain->SetValue(L"");
 		_openGallery->Disable();
@@ -378,8 +406,6 @@ void ModListView::updateControlsState()
 	_changeState->SetBitmap(_iconStorage.get(
 		_modManager.mods().enabled(mod.id) ? embedded_icon::cross_gray : embedded_icon::tick_green));
 	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
-
-	_resetState->Enable(_modManager.mods().position(mod.id).has_value());
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
@@ -482,6 +508,8 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage));
 	else if (itemId == _menu.openDir->GetId())
 		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
+	else if (itemId == _menu.archive->GetId())
+		onResetSelectedModStateRequested();
 	else if (itemId == _menu.deleteOrRemove->GetId())
 		onRemoveModRequested();
 }

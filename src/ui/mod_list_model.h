@@ -25,21 +25,6 @@ namespace mm
 	class ModListModel : public wxDataViewModel
 	{
 	public:
-		enum class Column
-		{
-			status,
-			priority,
-			name,
-			author,
-			category,
-			version,
-			checkbox,
-			load_order,
-			directory,
-
-			total,
-		};
-
 		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
 			ModListModelManagedMode  managedMode  = ModListModelManagedMode::as_flat_list,
 			ModListModelArchivedMode archivedMode = ModListModelArchivedMode::as_single_group);
@@ -61,9 +46,10 @@ namespace mm
 		int Compare(const wxDataViewItem& item1, const wxDataViewItem& item2, unsigned int column,
 			bool ascending) const override;
 
-		void                                   setModList(ModList const& mods);
+		void modList(const ModList& mods);
+
 		void                                   setChecked(std::unordered_set<std::string> items);
-		std::unordered_set<std::string> const& getChecked() const;
+		const std::unordered_set<std::string>& getChecked() const;
 
 		void applyFilter(const std::string& value);
 
@@ -72,14 +58,17 @@ namespace mm
 		std::string                                      findIdByItem(const wxDataViewItem& item) const;
 		std::optional<ModListDsplayedData::GroupItemsBy> itemGroupByItem(const wxDataViewItem& item) const;
 
+		void setManagedModsDisplay(ModListModelManagedMode value);
+		void setArchivedModsDisplay(ModListModelArchivedMode value);
+
 	private:
 		bool passFilter(const std::string& id) const;
 
 		void reload();
 
 	private:
-		const ModListModelManagedMode  _managedMode  = ModListModelManagedMode::as_flat_list;
-		const ModListModelArchivedMode _archivedMode = ModListModelArchivedMode::as_single_group;
+		ModListModelManagedMode  _managedMode  = ModListModelManagedMode::as_flat_list;
+		ModListModelArchivedMode _archivedMode = ModListModelArchivedMode::as_single_group;
 
 		ModList             _list;
 		ModListDsplayedData _displayed;

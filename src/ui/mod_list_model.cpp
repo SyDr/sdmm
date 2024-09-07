@@ -65,22 +65,22 @@ bool ModListModel::IsListModel() const
 
 unsigned int ModListModel::GetColumnCount() const
 {
-	return static_cast<unsigned int>(Column::total);
+	return static_cast<unsigned int>(ModListModelColumn::total);
 }
 
 wxString ModListModel::GetColumnType(unsigned int col) const
 {
-	switch (static_cast<Column>(col))
+	switch (static_cast<ModListModelColumn>(col))
 	{
-	case Column::priority:
-	case Column::name: return wxDataViewIconTextRenderer::GetDefaultType();
-	case Column::author:
-	case Column::category:
-	case Column::load_order:
-	case Column::version:
-	case Column::directory: return wxDataViewTextRenderer::GetDefaultType();
-	case Column::checkbox: return wxDataViewToggleRenderer::GetDefaultType();
-	case Column::status: return wxDataViewBitmapRenderer::GetDefaultType();
+	case ModListModelColumn::priority:
+	case ModListModelColumn::name: return wxDataViewIconTextRenderer::GetDefaultType();
+	case ModListModelColumn::author:
+	case ModListModelColumn::category:
+	case ModListModelColumn::load_order:
+	case ModListModelColumn::version:
+	case ModListModelColumn::directory: return wxDataViewTextRenderer::GetDefaultType();
+	case ModListModelColumn::checkbox: return wxDataViewToggleRenderer::GetDefaultType();
+	case ModListModelColumn::status: return wxDataViewBitmapRenderer::GetDefaultType();
 	}
 
 	return wxEmptyString;
@@ -145,6 +145,10 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 {
 	if (!item.IsOk())
 	{
+
+		for (size_t i = 0; i < _displayed.categories.size(); ++i)
+			children.push_back(toDataViewItem(i, ItemType::container));
+
 		for (size_t i = 0; i < _displayed.items.size(); ++i)
 		{
 			if (_list.position(_displayed.items[i]))
@@ -158,9 +162,6 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 					children.push_back(toDataViewItem(i, ItemType::item));
 			}
 		}
-
-		for (size_t i = 0; i < _displayed.categories.size(); ++i)
-			children.push_back(toDataViewItem(i, ItemType::container));
 
 		return children.size();
 	}
@@ -207,14 +208,14 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 
 	if (type == ItemType::container)
 	{
-		switch (static_cast<Column>(col))
+		switch (static_cast<ModListModelColumn>(col))
 		{
-		case Column::priority:
+		case ModListModelColumn::priority:
 		{
 			variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(embedded_icon::blank)));
 			break;
 		}
-		case Column::name:
+		case ModListModelColumn::name:
 		{
 			variant = wxVariant(wxDataViewIconText(_displayed.categories[index].second, wxIcon()));
 			break;
@@ -227,9 +228,9 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	const auto& mod      = _modDataProvider.modData(id);
 	const auto  position = _list.position(id);
 
-	switch (static_cast<Column>(col))
+	switch (static_cast<ModListModelColumn>(col))
 	{
-	case Column::priority:
+	case ModListModelColumn::priority:
 	{
 		wxIcon   icon;
 		wxString text;
@@ -254,44 +255,44 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 		variant = wxVariant(wxDataViewIconText(text, icon));
 		break;
 	}
-	case Column::name:
+	case ModListModelColumn::name:
 	{
 		variant = wxVariant(wxDataViewIconText(
 			wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon)));
 		break;
 	}
-	case Column::author:
+	case ModListModelColumn::author:
 	{
 		variant = wxVariant(wxString::FromUTF8(mod.author));
 		break;
 	}
-	case Column::category:
+	case ModListModelColumn::category:
 	{
 		variant = wxVariant(wxString::FromUTF8(wxGetApp().categoryTranslationString(mod.category)));
 		break;
 	}
-	case Column::version:
+	case ModListModelColumn::version:
 	{
 		variant = wxVariant(wxString::FromUTF8(mod.version));
 		break;
 	}
-	case Column::directory:
+	case ModListModelColumn::directory:
 	{
 		variant = wxVariant(wxString::FromUTF8(mod.id));
 		break;
 	}
-	case Column::checkbox:
+	case ModListModelColumn::checkbox:
 	{
 		variant = wxVariant(_checked.contains(id));
 		break;
 	}
-	case Column::status:
+	case ModListModelColumn::status:
 	{
 		variant = wxVariant(wxDataViewIconText(
 			L"", _iconStorage.get(position ? embedded_icon::tick_green : embedded_icon::cross_gray)));
 		break;
 	}
-	case Column::load_order:
+	case ModListModelColumn::load_order:
 	{
 		wxString value;
 		if (position)
@@ -310,9 +311,9 @@ bool ModListModel::SetValue(const wxVariant&, const wxDataViewItem& item, unsign
 	if (type == ItemType::container)
 		return false;
 
-	switch (static_cast<Column>(col))
+	switch (static_cast<ModListModelColumn>(col))
 	{
-	case Column::checkbox:
+	case ModListModelColumn::checkbox:
 		const auto& myItem = _displayed.items[index];
 
 		if (auto it = _checked.find(myItem); it != _checked.cend())
@@ -346,23 +347,28 @@ int ModListModel::Compare(
 	const auto [type1, index1] = fromDataViewItem(item1);
 	const auto [type2, index2] = fromDataViewItem(item2);
 
-	auto compareRest = [&](Column col) {
+	auto compareRest = [&](ModListModelColumn col) {
 		return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(col), ascending);
 	};
 
 	if (type1 != type2)
-		return type1 < type2;
+	{
+		if (_managedMode == ModListModelManagedMode::as_flat_list)
+			return type1 < type2 ? 1 : -1;
+
+		return type1 < type2 ? -1 : 1;
+	}
 
 	if (type1 == ItemType::container)
 		return static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2);
 
-	if (static_cast<Column>(column) == Column::priority)
+	if (static_cast<ModListModelColumn>(column) == ModListModelColumn::priority)
 	{
 		const auto pos1 = _list.position(_displayed.items[index1]);
 		const auto pos2 = _list.position(_displayed.items[index2]);
 
 		if (!pos1 && !pos2)
-			return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(Column::name), true);
+			return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(ModListModelColumn::name), true);
 
 		if (pos1 && pos2)
 			return ascending ? static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2)
@@ -374,7 +380,7 @@ int ModListModel::Compare(
 		return 1;
 	}
 
-	if (static_cast<Column>(column) == Column::category)
+	if (static_cast<ModListModelColumn>(column) == ModListModelColumn::category)
 	{
 		const auto& cat1 = _modDataProvider.modData(_displayed.items[index1]).category;
 		const auto& cat2 = _modDataProvider.modData(_displayed.items[index2]).category;
@@ -387,10 +393,10 @@ int ModListModel::Compare(
 	if (auto res = wxDataViewModel::Compare(item1, item2, column, ascending); res != 0)
 		return res;
 
-	return compareRest(Column::name);
+	return compareRest(ModListModelColumn::name);
 }
 
-void ModListModel::setModList(const ModList& mods)
+void ModListModel::modList(const ModList& mods)
 {
 	_list = mods;
 	reload();
@@ -549,4 +555,16 @@ std::optional<ModListDsplayedData::GroupItemsBy> ModListModel::itemGroupByItem(
 		return {};
 
 	return _displayed.categories[index].first;
+}
+
+void ModListModel::setManagedModsDisplay(ModListModelManagedMode value)
+{
+	_managedMode = value;
+	reload();
+}
+
+void ModListModel::setArchivedModsDisplay(ModListModelArchivedMode value)
+{
+	_archivedMode = value;
+	reload();
 }

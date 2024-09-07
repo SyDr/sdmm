@@ -48,7 +48,7 @@ SelectModsDialog::SelectModsDialog(
 	buildLayout();
 	bindEvents();
 
-	_listModel->setModList(_mods);
+	_listModel->modList(_mods);
 
 	std::unordered_set<std::string> items;
 	for (const auto& item : _mods.data)
@@ -90,12 +90,12 @@ void SelectModsDialog::createListColumns()
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
 	r2->SetAlignment(wxALIGN_CENTER_VERTICAL);
 
-	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModel::Column::checkbox),
+	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModelColumn::checkbox),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 = new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModel::Column::priority),
+	auto column1 = new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModelColumn::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column2 = new wxDataViewColumn("Mod"_lng, r2,
-		static_cast<unsigned int>(ModListModel::Column::name), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
+		static_cast<unsigned int>(ModListModelColumn::name), wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);
 	_list->AppendColumn(column1);
