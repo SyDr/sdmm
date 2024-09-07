@@ -32,12 +32,12 @@ namespace
 		{
 			return PortableMode(
 				(myDir / readFile(myDir / SystemInfo::BaseDirFile) / SystemInfo::AppDataDirectory)
-					.make_preferred(),
+					.lexically_normal(),
 				myDir / SystemInfo::SettingsFile);
 		}
 
 		myDir = wxStandardPaths::Get().GetUserDataDir().ToStdString(wxConvUTF8);
-		return MainMode(myDir.make_preferred());
+		return MainMode(myDir.lexically_normal());
 	}
 
 	struct IsPortable
@@ -168,7 +168,7 @@ std::string AppConfig::selectedPlatform() const
 fs::path AppConfig::getDataPath() const
 {
 	if (!portableMode())
-		return _data[sd_game][selectedPlatform()][SD_SELECTED].get<std::string>();
+		return fs::path(_data[sd_game][selectedPlatform()][SD_SELECTED].get<std::string>()).lexically_normal();
 
 	return dataPath().parent_path();
 }
