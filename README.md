@@ -39,4 +39,3 @@ TODO (In no particular order)
 - WebPreview check width.
 - Click outside of list selects item? Research.
 - Navigate in mod list via keys?
-- Setup column list.
