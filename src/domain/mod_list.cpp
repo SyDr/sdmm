@@ -248,6 +248,6 @@ void ModList::apply(const std::vector<std::string>& ids)
 
 void ModList::remove(const std::string& id)
 {
-	disable(id);
-	data.erase(data.begin() + *position(id));
+	archive(id);
+	rest.erase(id);
 }
