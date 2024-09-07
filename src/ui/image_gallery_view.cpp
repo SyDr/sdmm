@@ -28,9 +28,10 @@ namespace
 ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs::path& directory,
 	const wxPoint& pos, const wxSize& size,
 	const wxString& name)
-	: wxScrolledCanvas(parent, winid, pos, size, wxSTATIC_BORDER | wxALWAYS_SHOW_SB, name)
+	: wxScrolledCanvas(
+		  parent, winid, pos, size, wxALWAYS_SHOW_SB | wxNO_BORDER | wxHSCROLL, name)
 {
-	SetScrollRate(180, -1);
+	SetScrollRate(180, 0);
 	Bind(wxEVT_PAINT, &ImageGalleryView::OnPaint, this);
 	Bind(wxEVT_SHOW, [=](const wxShowEvent& event) {
 		if (!event.IsShown())
