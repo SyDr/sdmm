@@ -48,7 +48,7 @@ void Era2Config::createDirectories() const
 {
 	create_directories(getProgramDataPath());
 	create_directories(getPresetsPath());
-	create_directories(getTempPath());
+	//create_directories(getTempPath());
 }
 
 void Era2Config::save()
