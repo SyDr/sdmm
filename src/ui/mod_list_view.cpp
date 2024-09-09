@@ -159,41 +159,21 @@ void ModListView::bindEvents()
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
-		if (!event.GetItem().IsOk() && event.GetProposedDropIndex() == -1)
+		if (!event.GetItem().IsOk())
 		{
 			event.Veto();
 			return;
 		}
 
-		event.SetDropEffect(wxDragResult::wxDragMove);
-
-		std::string moveTo;
-		if (event.GetProposedDropIndex() == -1)
+		auto moveTo = _listModel->findIdByItem(event.GetItem());
+		if (moveTo.empty())
 		{
-			moveTo = _listModel->findIdByItem(event.GetItem());
-		}
-		else
-		{
-			//_list->GetChildren();
+			event.Veto();
+			return;
 		}
 
-
-		if (event.GetProposedDropIndex() == -1)
-		{
-			moveTo = _listModel->findIdByItem(event.GetItem());
-			if (moveTo.empty())
-			{
-				event.Veto();
-				return;
-			}
-
-			if (!_modManager.mods().canMove(_selectedMod, moveTo))
-			{
-				event.Veto();
-				return;
-			}
-		}
-
+		if (!_modManager.mods().canMove(_selectedMod, moveTo))
+			event.Veto();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
