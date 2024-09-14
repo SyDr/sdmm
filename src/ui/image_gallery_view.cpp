@@ -36,7 +36,7 @@ ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs:
 	SetSizer(_gallerySizer);
 
 	Bind(wxEVT_SHOW, [=](const wxShowEvent&) {
-		SetMinSize({240, 200});
+		SetMinSize({ 240, 200 });
 		Reload();
 	});
 
@@ -88,10 +88,34 @@ void ImageGalleryView::createImageControls()
 
 		_galleryImages.clear();
 
+		auto cursor = wxCursor(wxStockCursor::wxCURSOR_HAND);
 		for (const auto& item : _images)
 		{
-			_galleryImages.emplace_back(new wxGenericStaticBitmap(this, wxID_ANY, item.second));
-			_gallerySizer->Add(_galleryImages.back(), wxSizerFlags(0).Expand().Border(wxALL, 4));
+			auto control = new wxGenericStaticBitmap(this, wxID_ANY, item.second);
+
+			_galleryImages.emplace_back(control);
+			_gallerySizer->Add(control, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
+			control->SetCursor(cursor);
+			control->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) {
+				auto frame = new wxDialog(this, wxID_ANY, "Screenshot"_lng);
+
+				wxImage image;
+				image.LoadFile(wxString::FromUTF8(item.first.string()));
+
+				auto gsb = new wxGenericStaticBitmap(frame, wxID_ANY, wxBitmap(image));
+				gsb->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) { frame->Close(); });
+				gsb->Bind(wxEVT_RIGHT_UP, [&](wxMouseEvent&) { frame->Close(); });
+
+				auto sizer = new wxBoxSizer(wxVERTICAL);
+				sizer->Add(gsb);
+
+				frame->SetSizer(sizer);
+				frame->Fit();
+				frame->CenterOnParent();
+
+				frame->Show();
+			});
 		}
 	}
 
@@ -140,7 +164,7 @@ void ImageGalleryView::Reset()
 	_images.clear();
 
 	if (_gallerySizer)
-	_gallerySizer->Clear();
+		_gallerySizer->Clear();
 	for (auto& item : _galleryImages)
 		assert(item->Destroy());
 

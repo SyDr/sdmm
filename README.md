@@ -24,7 +24,6 @@ TODO (In no particular order)
 - Save and load expanded/collapsed categories.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and include debug symbols?).
-- Improve screenshots display (use separate window?).
 - Use UPX or something else to reduce release binary size.
 - Update icons.
 - Update show mod files functionality.
