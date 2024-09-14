@@ -89,7 +89,6 @@ void ModListView::buildLayout()
 	rightBottomSizer->AddStretchSpacer();
 	rightBottomSizer->Add(_showGallery, wxSizerFlags(0).Border(wxALL, 4));
 	rightBottomSizer->Add(_openGallery, wxSizerFlags(0).Border(wxALL, 4));
-	rightBottomSizer->Add(_expandGallery, wxSizerFlags(0).Border(wxALL, 4));
 
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
 	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
@@ -214,8 +213,8 @@ void ModListView::bindEvents()
 		if (dialog.ShowModal() != wxID_OK)
 			return;
 
-		const auto newColumns = dialog.getColumns();
-		const auto newManaged = dialog.getManagedMode();
+		const auto newColumns  = dialog.getColumns();
+		const auto newManaged  = dialog.getManagedMode();
 		const auto newArchived = dialog.getArchivedMode();
 
 		if (columns != newColumns)
@@ -257,10 +256,7 @@ void ModListView::bindEvents()
 
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
-	_showGallery->Bind(
-		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown, _galleryExpanded); });
-	_expandGallery->Bind(
-		wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(_galleryShown, !_galleryExpanded); });
+	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown); });
 
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
 }
@@ -317,9 +313,6 @@ void ModListView::createControls(const wxString& managedPath)
 
 	_openGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
 	_openGallery->SetBitmap(_iconStorage.get(embedded_icon::folder));
-
-	_expandGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
-	_expandGallery->SetBitmap(_iconStorage.get(embedded_icon::maximize));
 
 	_galleryView = new ImageGalleryView(this, wxID_ANY);
 	_galleryView->Show(_galleryShown);
@@ -610,26 +603,14 @@ void ModListView::openGalleryRequested()
 	EX_UNEXPECTED;
 }
 
-void ModListView::updateGalleryState(bool show, bool expand)
+void ModListView::updateGalleryState(bool show)
 {
 	EX_TRY;
 
-	if (!show && _galleryExpanded)
-		expand = false;
+	_galleryShown = show;
 
-	if (expand && !_galleryShown)
-		show = true;
-
-	_galleryShown    = show;
-	_galleryExpanded = expand;
-
-	_showGallery->SetBitmap(
-		_iconStorage.get(show || expand ? embedded_icon::double_down : embedded_icon::double_up));
-	_galleryView->Show(show || expand);
-	_galleryView->Expand(expand);
-
-	if (auto topWindow = dynamic_cast<wxTopLevelWindow*>(wxTheApp->GetTopWindow()))
-		topWindow->ShowFullScreen(expand, wxFULLSCREEN_ALL);
+	_showGallery->SetBitmap(_iconStorage.get(show ? embedded_icon::double_down : embedded_icon::double_up));
+	_galleryView->Show(show);
 
 	Layout();
 

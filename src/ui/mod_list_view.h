@@ -61,7 +61,7 @@ namespace mm
 		void onRemoveModRequested();
 		void openGalleryRequested();
 
-		void updateGalleryState(bool show, bool expand);
+		void updateGalleryState(bool show);
 
 	private:
 		IModPlatform& _managedPlatform;
@@ -100,10 +100,8 @@ namespace mm
 
 		wxWidgetsPtr<wxButton>         _showGallery     = nullptr;
 		wxWidgetsPtr<wxButton>         _openGallery     = nullptr;
-		wxWidgetsPtr<wxButton>         _expandGallery   = nullptr;
 		wxWidgetsPtr<ImageGalleryView> _galleryView     = nullptr;
 		bool                           _galleryShown    = false;
-		bool                           _galleryExpanded = false;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;

@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2023-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -9,13 +9,15 @@
 
 #include "application.h"
 
-
-#include <wx/dcbuffer.h>
+#include <wx/generic/statbmpg.h>
+#include <wx/wrapsizer.h>
 
 using namespace mm;
 
 namespace
 {
+	const size_t defaultScreenHeight = 180;
+
 	wxSize getBestSize(const wxSize initSize, const wxCoord maxHeight)
 	{
 		if (initSize.GetHeight() <= maxHeight)
@@ -26,17 +28,18 @@ namespace
 }
 
 ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs::path& directory,
-	const wxPoint& pos, const wxSize& size,
-	const wxString& name)
-	: wxScrolledCanvas(
-		  parent, winid, pos, size, wxALWAYS_SHOW_SB | wxNO_BORDER | wxHSCROLL, name)
+	const wxPoint& pos, const wxSize& size, const wxString& name)
+	: wxScrolled<wxPanel>(parent, winid, pos, size, wxVSCROLL, name)
 {
-	SetScrollRate(180, 0);
-	Bind(wxEVT_PAINT, &ImageGalleryView::OnPaint, this);
-	Bind(wxEVT_SHOW, [=](const wxShowEvent& event) {
-		if (!event.IsShown())
-			_bestHeight = 0;
+	SetScrollRate(0, 40);
+	_gallerySizer = new wxWrapSizer();
+	SetSizer(_gallerySizer);
+
+	Bind(wxEVT_SHOW, [=](const wxShowEvent&) {
+		SetMinSize({240, 200});
+		Reload();
 	});
+
 	SetPath(directory);
 }
 
@@ -51,65 +54,13 @@ void ImageGalleryView::SetPath(const fs::path& directory)
 	Reload();
 }
 
-void ImageGalleryView::Expand(bool value)
-{
-	if (_expanded != value)
-	{
-		_expanded = value;
-		CacheBestSize(DoGetBestSize());
-		Refresh();
-	}
-}
-
-wxSize ImageGalleryView::DoGetBestSize() const
-{
-	return { _expanded ? 80000 : 240, _expanded ? 60000 : 180 };
-}
-
-void ImageGalleryView::OnPaint(wxPaintEvent&)
-{
-	wxPaintDC dc(this);
-	DoPrepareDC(dc);
-	dc.Clear();
-
-	const wxSize  dcSize   = dc.GetSize();
-	const wxPoint dcOrigin = dc.GetDeviceOrigin();
-
-	const size_t bestHeight = dcSize.GetHeight() - 4;
-
-	if (_bestHeight != bestHeight)
-	{
-		_bestHeight = bestHeight;
-		Reload();
-	}
-
-	wxCoord curX = 2;
-
-	std::lock_guard<std::mutex> lock(_dataAccess);
-
-	for (size_t i = 0; i < _images.size(); ++i)
-	{
-		const wxBitmap& image = _images[i].second;
-
-		if (!image.IsOk())
-			continue;
-
-		if (curX + dcOrigin.x <= dcSize.GetWidth() && curX + dcOrigin.x + image.GetWidth() >= 0)
-			dc.DrawBitmap(image, curX, (dcSize.GetHeight() - image.GetHeight()) / 2, false);
-
-		curX += image.GetWidth() + 2;
-	}
-
-	SetVirtualSize(curX, dcSize.GetHeight());
-}
-
 void ImageGalleryView::Reload()
 {
 	Reset();
 
-	if (!fs::exists(_path) || !_bestHeight)
+	if (!fs::exists(_path) || !IsShown())
 	{
-		CallAfter([=] { Refresh(false); });
+		CallAfter([=] { createImageControls(); });
 		return;
 	}
 
@@ -126,6 +77,28 @@ void ImageGalleryView::start()
 	_future = std::async(std::launch::async, [=] { loadInBackground(); });
 }
 
+void ImageGalleryView::createImageControls()
+{
+	{
+		std::lock_guard lg(_dataAccess);
+
+		_gallerySizer->Clear();
+		for (auto& item : _galleryImages)
+			assert(item->Destroy());
+
+		_galleryImages.clear();
+
+		for (const auto& item : _images)
+		{
+			_galleryImages.emplace_back(new wxGenericStaticBitmap(this, wxID_ANY, item.second));
+			_gallerySizer->Add(_galleryImages.back(), wxSizerFlags(0).Expand().Border(wxALL, 4));
+		}
+	}
+
+	Layout();
+	FitInside();
+}
+
 void ImageGalleryView::stopWork()
 {
 	_canceled = true;
@@ -137,7 +110,7 @@ void ImageGalleryView::loadInBackground()
 {
 	_canceled = false;
 
-	if (!_bestHeight)
+	if (!IsShown())
 		return;
 
 	for (size_t i = 0; !_canceled && i < _images.size(); ++i)
@@ -150,21 +123,27 @@ void ImageGalleryView::loadInBackground()
 		if (!item.IsOk())
 			continue;
 
-		const wxSize bestSize(getBestSize(item.GetSize(), _bestHeight));
+		const wxSize bestSize(getBestSize(item.GetSize(), defaultScreenHeight));
 		item.Rescale(bestSize.GetWidth(), bestSize.GetHeight(), wxIMAGE_QUALITY_NORMAL);
 
 		_images[i].second = wxBitmap(item);
-
-		CallAfter([=] { Refresh(false); });
 	}
 
-	CallAfter([=] { Refresh(false); });
+	CallAfter([=] { createImageControls(); });
 }
 
 void ImageGalleryView::Reset()
 {
 	stopWork();
+
+	std::lock_guard<std::mutex> lock(_dataAccess);
 	_images.clear();
 
-	SetVirtualSize(0, 0);
+	if (_gallerySizer)
+	_gallerySizer->Clear();
+	for (auto& item : _galleryImages)
+		assert(item->Destroy());
+
+	_galleryImages.clear();
+	Layout();
 }
