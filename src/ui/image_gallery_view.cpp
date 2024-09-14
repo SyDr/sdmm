@@ -84,7 +84,7 @@ void ImageGalleryView::createImageControls()
 
 		_gallerySizer->Clear();
 		for (auto& item : _galleryImages)
-			assert(item->Destroy());
+			item->Destroy();
 
 		_galleryImages.clear();
 
@@ -166,7 +166,7 @@ void ImageGalleryView::Reset()
 	if (_gallerySizer)
 		_gallerySizer->Clear();
 	for (auto& item : _galleryImages)
-		assert(item->Destroy());
+		item->Destroy();
 
 	_galleryImages.clear();
 	Layout();
