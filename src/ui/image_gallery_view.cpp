@@ -104,8 +104,8 @@ void ImageGalleryView::createImageControls()
 				image.LoadFile(wxString::FromUTF8(item.first.string()));
 
 				auto gsb = new wxGenericStaticBitmap(frame, wxID_ANY, wxBitmap(image));
-				gsb->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) { frame->Close(); });
-				gsb->Bind(wxEVT_RIGHT_UP, [&](wxMouseEvent&) { frame->Close(); });
+				gsb->Bind(wxEVT_LEFT_UP, [=](wxMouseEvent&) { frame->Destroy(); });
+				gsb->Bind(wxEVT_RIGHT_UP, [=](wxMouseEvent&) { frame->Destroy(); });
 
 				auto sizer = new wxBoxSizer(wxVERTICAL);
 				sizer->Add(gsb);
