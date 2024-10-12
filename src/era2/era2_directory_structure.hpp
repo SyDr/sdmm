@@ -11,31 +11,18 @@
 #include <string>
 #include <vector>
 
-#include <wx/string.h>
-
 namespace mm
 {
-	struct Era2DirectoryEntry
+	struct Era2FileEntry
 	{
-		bool raw = false;
-		bool lod = false;
-
-		Era2DirectoryEntry() = default;
-		Era2DirectoryEntry(bool raw, bool lod)
-			: raw(raw)
-			, lod(lod) {};
-
-		bool any() const
-		{
-			return raw || lod;
-		}
+		fs::path                 filePath;  // virtual file path
+		std::string              gamePath;  // path to file in game, if available
+		std::vector<std::string> modPaths;
 	};
 
 	struct Era2DirectoryStructure
 	{
-		std::vector<fs::path>    fileList;
-		std::vector<std::string> modList;
-
-		std::vector<std::vector<Era2DirectoryEntry>> entries;  // [path index][mod index] = entry
+		std::vector<std::string>   mods;
+		std::vector<Era2FileEntry> entries;
 	};
 }

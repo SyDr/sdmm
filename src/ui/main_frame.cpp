@@ -25,7 +25,6 @@
 #include "select_exe.h"
 #include "service/icon_storage.hpp"
 #include "show_file_list_dialog.hpp"
-#include "show_file_list_helper.hpp"
 #include "system_info.hpp"
 #include "type/embedded_icon.h"
 #include "type/main_window_properties.h"
@@ -230,8 +229,9 @@ void MainFrame::OnMenuToolsListModFiles()
 {
 	EX_TRY;
 
-	showModFileList(
-		*this, *_iconStorage, *_currentPlatform->modDataProvider(), _currentPlatform->modManager()->mods());
+	ShowFileListDialog sfld(this, *_iconStorage, *_currentPlatform->modDataProvider(),
+		_currentPlatform->modManager()->mods(), _currentPlatform->managedPath());
+	sfld.ShowModal();
 
 	EX_UNEXPECTED;
 }
