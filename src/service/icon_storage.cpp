@@ -25,7 +25,7 @@ std::size_t hash_value(const wxSize& v)
 	return r;
 }
 
-wxIcon IconStorage::get(const std::string& name, const wxSize& targetSize)
+wxBitmap IconStorage::get(const std::string& name, const wxSize& targetSize)
 {
 	if (name.empty())
 		return get("icons/blank.svg", targetSize);
@@ -65,7 +65,7 @@ wxIcon IconStorage::get(const std::string& name, const wxSize& targetSize)
 	return _iconCache[{ name, targetSize }] = icon;
 }
 
-wxIcon IconStorage::get(IconPredefined icon, IconPredefinedSize targetSize)
+wxBitmap IconStorage::get(IconPredefined icon, IconPredefinedSize targetSize)
 {
 	std::string name = "icons/";
 	wxSize      size = { 16, 16 };
@@ -89,7 +89,7 @@ wxIcon IconStorage::get(IconPredefined icon, IconPredefinedSize targetSize)
 	return get(name, size);
 }
 
-wxIcon IconStorage::get(const std::string& name)
+wxBitmap IconStorage::get(const std::string& name)
 {
 	return get(name, { 16, 16 });
 }

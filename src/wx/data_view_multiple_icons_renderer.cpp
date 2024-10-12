@@ -21,12 +21,12 @@ bool mmDataViewMultipleIconsRenderer::Render(wxRect cell, wxDC* dc, int)
 
 	for (size_t i = 0; i < _data.GetCount(); ++i)
 	{
-		wxIcon icon;
+		wxBitmap icon;
 		icon << _data[i];
 
 		if (icon.IsOk())
 		{
-			dc->DrawIcon(icon, cell.x + xOffset, cell.y + (cell.height - icon.GetHeight()) / 2);
+			dc->DrawBitmap(icon, cell.x + xOffset, cell.y + (cell.height - icon.GetHeight()) / 2, true);
 			xOffset += icon.GetWidth() + 4;
 		}
 	}
@@ -40,7 +40,7 @@ wxSize mmDataViewMultipleIconsRenderer::GetSize() const
 
 	for (size_t i = 0; i < _data.GetCount(); ++i)
 	{
-		wxIcon icon;
+		wxBitmap icon;
 		icon << _data[i];
 
 		if (icon.IsOk())

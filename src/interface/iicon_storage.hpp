@@ -9,7 +9,7 @@
 
 #include <string>
 
-class wxIcon;
+class wxBitmap;
 class wxSize;
 
 namespace mm
@@ -18,8 +18,8 @@ namespace mm
 	{
 		virtual ~IIconStorage() = default;
 
-		[[nodiscard]] virtual wxIcon get(
+		[[nodiscard]] virtual wxBitmap get(
 			IconPredefined icon, IconPredefinedSize targetSize = IconPredefinedSize::x16) = 0;
-		[[nodiscard]] virtual wxIcon get(const std::string& name)                         = 0;
+		[[nodiscard]] virtual wxBitmap get(const std::string& name)                       = 0;
 	};
 }

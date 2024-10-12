@@ -7,11 +7,11 @@
 
 #include "type/filesystem.hpp"
 
-class wxIcon;
+class wxBitmap;
 
 namespace mm
 {
 	struct IIconStorage;
 
-	wxIcon loadModIcon(IIconStorage& storage, const fs::path& parent, const std::string& filename);
+	wxBitmap loadModIcon(IIconStorage& storage, const fs::path& parent, const std::string& filename);
 }

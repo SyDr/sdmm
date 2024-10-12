@@ -141,7 +141,7 @@ void SelectDirectoryDialog::fillData()
 
 	for (const auto& value : _appConfig.getKnownDataPathList())
 	{
-		wxIcon icon = _iconStorage.get(
+		auto icon = _iconStorage.get(
 			_appConfig.dataPathHasStar(value) ? embedded_icon::bookmark : embedded_icon::blank);
 
 		wxVector<wxVariant> data;

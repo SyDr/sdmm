@@ -9,7 +9,7 @@
 #include "interface/iicon_storage.hpp"
 #include "type/embedded_icon.h"
 
-wxIcon mm::loadModIcon(IIconStorage& storage, const fs::path& parent, const std::string& filename)
+wxBitmap mm::loadModIcon(IIconStorage& storage, const fs::path& parent, const std::string& filename)
 {
 	if (!filename.empty())
 		return storage.get((parent / filename).lexically_normal().string());

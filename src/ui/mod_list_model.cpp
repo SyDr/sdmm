@@ -232,7 +232,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	{
 	case ModListModelColumn::priority:
 	{
-		wxIcon   icon;
+		wxBitmap icon;
 		wxString text;
 
 		if (position)

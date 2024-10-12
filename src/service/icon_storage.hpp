@@ -18,13 +18,13 @@ namespace mm
 {
 	struct IconStorage : public IIconStorage
 	{
-		wxIcon get(IconPredefined icon, IconPredefinedSize targetSize) override;
-		wxIcon get(const std::string& name) override;
+		wxBitmap get(IconPredefined icon, IconPredefinedSize targetSize) override;
+		wxBitmap get(const std::string& name) override;
 
-		wxIcon get(const std::string& name, const wxSize& targetSize);
+		wxBitmap get(const std::string& name, const wxSize& targetSize);
 
 	private:
 		using IconCacheKey = std::pair<std::string, wxSize>;
-		std::unordered_map<IconCacheKey, wxIcon, boost::hash<IconCacheKey>> _iconCache;
+		std::unordered_map<IconCacheKey, wxBitmap, boost::hash<IconCacheKey>> _iconCache;
 	};
 }
