@@ -26,7 +26,6 @@ TODO (In no particular order)
 - Write memory dump on crash (and include debug symbols?).
 - Use UPX or something else to reduce release binary size.
 - Update icons.
-- Update show mod files functionality.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
 - Use IE7 mode for preview, if Edge is not available (or ignore?).
@@ -36,5 +35,4 @@ TODO (In no particular order)
 - Implement auto update.
 - Implement mod editor (or not?).
 - WebPreview check width.
-- Click outside of list selects item? Research.
 - Navigate in mod list via keys?
