@@ -22,8 +22,10 @@ namespace mm
 	{
 		Era2ModDataProvider(fs::path basePath, std::string preferredLng, const II18nService& i18Service);
 
-		const ModData& modData(const std::string& id) override;
-		void           clear();
+		const ModData&     modData(const std::string& id) override;
+		const std::string& description(const std::string& id) override;
+
+		void clear();
 
 	private:
 		void loadDefaults();
@@ -33,7 +35,8 @@ namespace mm
 		const std::string   _preferredLng;
 		const II18nService& _i18Service;
 
-		std::map<std::string, ModData> _data;
+		std::map<std::string, ModData>     _data;
+		std::map<std::string, std::string> _description;
 
 		std::map<std::string, std::set<std::string>> _defaultIncompatible;
 		std::map<std::string, std::set<std::string>> _defaultRequires;

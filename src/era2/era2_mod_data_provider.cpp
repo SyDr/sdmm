@@ -10,6 +10,7 @@
 
 #include "era2_mod_data_loader.hpp"
 #include "system_info.hpp"
+#include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 
 using namespace mm;
@@ -29,10 +30,24 @@ const ModData& Era2ModDataProvider::modData(const std::string& id)
 
 	if (it == _data.cend())
 	{
-		auto modData = mm::Era2ModDataLoader::load(_basePath / id, _preferredLng,
-			_defaultIncompatible[id], _defaultRequires[id], _defaultLoadAfter[id], _i18Service);
+		auto modData = mm::Era2ModDataLoader::load(_basePath / id, _preferredLng, _defaultIncompatible[id],
+			_defaultRequires[id], _defaultLoadAfter[id], _i18Service);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
+	}
+
+	return it->second;
+}
+
+const std::string& mm::Era2ModDataProvider::description(const std::string& id)
+{
+	auto it = _description.find(id);
+
+	if (it == _description.cend())
+	{
+		const auto& mod = modData(id);
+
+		std::tie(it, std::ignore) = _description.emplace(id, readFile(mod.data_path / mod.description));
 	}
 
 	return it->second;

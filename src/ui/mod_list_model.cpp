@@ -145,7 +145,6 @@ unsigned int ModListModel::GetChildren(const wxDataViewItem& item, wxDataViewIte
 {
 	if (!item.IsOk())
 	{
-
 		for (size_t i = 0; i < _displayed.categories.size(); ++i)
 			children.push_back(toDataViewItem(i, ItemType::container));
 
@@ -368,7 +367,8 @@ int ModListModel::Compare(
 		const auto pos2 = _list.position(_displayed.items[index2]);
 
 		if (!pos1 && !pos2)
-			return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(ModListModelColumn::name), true);
+			return wxDataViewModel::Compare(
+				item1, item2, static_cast<unsigned int>(ModListModelColumn::name), true);
 
 		if (pos1 && pos2)
 			return ascending ? static_cast<ssize_t>(index1) - static_cast<ssize_t>(index2)
@@ -426,10 +426,11 @@ bool ModListModel::passFilter(const std::string& id) const
 	if (_filter.empty())
 		return true;
 
-	const auto& mod = _modDataProvider.modData(id);
+	const auto& mod  = _modDataProvider.modData(id);
+	const auto& desc = _modDataProvider.description(mod.id);
 
 	return std::ranges::any_of(
-		std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version },
+		std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version, desc },
 		[&](const std::string& from) { return boost::contains(boost::locale::fold_case(from), _filter); });
 }
 

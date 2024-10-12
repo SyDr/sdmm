@@ -40,10 +40,12 @@ namespace mm
 		void bindEvents();
 		void buildLayout();
 
-		const ModData& modData(const std::string& id) override;
+		const ModData&     modData(const std::string& id) override;
+		const std::string& description(const std::string& id) override;
 
 	private:
 		std::map<std::string, ModData> _data;
+		std::string                    _workaround;
 
 		const ModListModelManagedMode  _initialManagedMode;
 		const ModListModelArchivedMode _initialArchivedMode;

@@ -223,3 +223,8 @@ const ModData& ConfigureMainListView::modData(const std::string& id)
 
 	return it->second;
 }
+
+const std::string& mm::ConfigureMainListView::description(const std::string&)
+{
+	return _workaround;  // FIXME: refactor this piece of
+}

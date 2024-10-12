@@ -410,7 +410,7 @@ void ModListView::updateControlsState()
 	{
 		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 	}
-	else if (auto desc = readFile(mod.data_path / mod.description); !desc.empty())
+	else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
 	{
 		if (mod.description.extension() == ".md")
 		{
