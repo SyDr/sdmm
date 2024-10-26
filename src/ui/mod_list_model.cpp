@@ -419,19 +419,37 @@ void ModListModel::applyFilter(const std::string& value)
 	reload();
 }
 
+void ModListModel::applyCategoryFilter(const std::optional<std::string>& value)
+{
+	_categoryFilter = value;
+	reload();
+}
+
 bool ModListModel::passFilter(const std::string& id) const
 {
 	// TODO: move into mod itself?
 
-	if (_filter.empty())
+	if (_filter.empty() && !_categoryFilter.has_value())
 		return true;
 
 	const auto& mod  = _modDataProvider.modData(id);
 	const auto& desc = _modDataProvider.description(mod.id);
 
-	return std::ranges::any_of(
-		std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version, desc },
-		[&](const std::string& from) { return boost::contains(boost::locale::fold_case(from), _filter); });
+	if (_categoryFilter.has_value() && mod.category != _categoryFilter)
+	{
+		return false;
+	}
+
+	if (!_filter.empty())
+	{
+		return std::ranges::any_of(
+			std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version, desc },
+			[&](const std::string& from) {
+				return boost::contains(boost::locale::fold_case(from), _filter);
+			});
+	}
+
+	return true;
 }
 
 void ModListModel::reload()

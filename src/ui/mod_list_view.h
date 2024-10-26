@@ -57,6 +57,7 @@ namespace mm
 		void expandChildren();
 		void followSelection();
 		void updateControlsState();
+		void updateCategoryFilterContent();
 		void onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod);
 		void onRemoveModRequested();
 		void openGalleryRequested();
@@ -74,9 +75,11 @@ namespace mm
 		wxObjectDataPtr<ModListModel>               _listModel;
 		std::set<ModListDsplayedData::GroupItemsBy> _hiddenCategories;
 
-		wxWidgetsPtr<wxStaticBox>    _group  = nullptr;
-		wxWidgetsPtr<wxSearchCtrl>   _filter = nullptr;
-		wxWidgetsPtr<wxDataViewCtrl> _list   = nullptr;
+		wxWidgetsPtr<wxStaticBox>    _group          = nullptr;
+		wxWidgetsPtr<wxSearchCtrl>   _filterText     = nullptr;
+		wxWidgetsPtr<wxChoice>       _filterCategory = nullptr;
+		std::vector<std::string>     _categories;
+		wxWidgetsPtr<wxDataViewCtrl> _list           = nullptr;
 
 		wxWidgetsPtr<wxButton> _configure = nullptr;
 
@@ -98,10 +101,10 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 
-		wxWidgetsPtr<wxButton>         _showGallery     = nullptr;
-		wxWidgetsPtr<wxButton>         _openGallery     = nullptr;
-		wxWidgetsPtr<ImageGalleryView> _galleryView     = nullptr;
-		bool                           _galleryShown    = false;
+		wxWidgetsPtr<wxButton>         _showGallery  = nullptr;
+		wxWidgetsPtr<wxButton>         _openGallery  = nullptr;
+		wxWidgetsPtr<ImageGalleryView> _galleryView  = nullptr;
+		bool                           _galleryShown = false;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;

@@ -65,12 +65,17 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 	buildLayout();
 	bindEvents();
 	updateControlsState();
+	updateCategoryFilterContent();
 }
 
 void ModListView::buildLayout()
 {
+	auto filterSizer = new wxBoxSizer(wxHORIZONTAL);
+	filterSizer->Add(_filterText, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	filterSizer->Add(_filterCategory, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
 	auto listGroupSizer = new wxBoxSizer(wxVERTICAL);
-	listGroupSizer->Add(_filter, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	listGroupSizer->Add(filterSizer, wxSizerFlags(0).Expand());
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
@@ -109,16 +114,31 @@ void ModListView::buildLayout()
 
 void ModListView::bindEvents()
 {
-	_filter->Bind(wxEVT_TEXT, [=](wxCommandEvent& event) {
+	_filterText->Bind(wxEVT_TEXT, [=](wxCommandEvent& event) {
 		const auto str = event.GetString();
 		_listModel->applyFilter(str.ToStdString(wxConvUTF8));
 		expandChildren();
 		followSelection();
 		updateControlsState();
 
-		_filter->ShowCancelButton(!str.IsEmpty());
+		_filterText->ShowCancelButton(!str.IsEmpty());
 
 		event.Skip();
+	});
+
+	_filterCategory->Bind(wxEVT_CHOICE, [=](wxCommandEvent& event) {
+		const auto sel = event.GetSelection();
+		if (sel == wxNOT_FOUND || sel > std::ssize(_categories)) // there is also item All in the combo
+			return;
+
+		if (sel == 0)
+			_listModel->applyCategoryFilter({});
+		else
+			_listModel->applyCategoryFilter(_categories[sel - 1]);
+
+		expandChildren();
+		followSelection();
+		updateControlsState();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
@@ -201,6 +221,7 @@ void ModListView::bindEvents()
 		expandChildren();
 		followSelection();
 		updateControlsState();
+		updateCategoryFilterContent();
 	});
 
 	_configure->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
@@ -265,8 +286,13 @@ void ModListView::createControls(const wxString& managedPath)
 {
 	_group = new wxStaticBox(this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, managedPath));
 
-	_filter = new wxSearchCtrl(this, wxID_ANY);
-	_filter->SetDescriptiveText("Filter"_lng);
+	_filterText = new wxSearchCtrl(this, wxID_ANY);
+	_filterText->SetDescriptiveText("Filter"_lng);
+
+	wxArrayString items;
+	items.Add("All"_lng);
+	_filterCategory = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+	_filterCategory->SetSelection(0);
 
 	createListControl();
 
@@ -448,6 +474,65 @@ void ModListView::updateControlsState()
 	Layout();
 
 	EX_UNEXPECTED;
+}
+
+void ModListView::updateCategoryFilterContent()
+{
+	std::optional<std::string> selected;
+	if (_filterCategory->GetSelection() > 0)
+		selected = _categories[_filterCategory->GetSelection() - 1];
+
+	std::set<std::string> cats;
+	for (const auto& item : _modManager.mods().data)
+		cats.emplace(_managedPlatform.modDataProvider()->modData(item.id).category);
+
+	for (const auto& item : _modManager.mods().rest)
+		cats.emplace(_managedPlatform.modDataProvider()->modData(item).category);
+
+	std::vector<std::pair<std::string, wxString>> items;
+
+	for (const auto& item : cats)
+	{
+		if (!item.empty())
+			items.emplace_back(item, wxString::FromUTF8(wxGetApp().categoryTranslationString(item)));
+		else
+			items.emplace_back(item, "Without category"_lng);
+	}
+
+	std::sort(items.begin(), items.end(), [](const auto& l, const auto& r) { return l.second < r.second; });
+
+	_categories.clear();
+	std::vector<wxString> displayedItems;
+	displayedItems.emplace_back("All"_lng);
+
+	for (const auto& item : items)
+	{
+		_categories.emplace_back(item.first);
+		displayedItems.emplace_back(item.second);
+	}
+
+	_filterCategory->Set(displayedItems);
+	if (!selected.has_value())
+	{
+		_filterCategory->Select(0);
+	}
+	else
+	{
+		auto it = std::find(_categories.cbegin(), _categories.cend(), selected);
+		if (it != _categories.cend())
+		{
+			_filterCategory->Select(std::distance(_categories.cbegin(), it) + 1);
+		}
+		else
+		{
+			_filterCategory->Select(0);
+			_listModel->applyCategoryFilter({});
+
+			expandChildren();
+			followSelection();
+			updateControlsState();
+		}
+	}
 }
 
 void ModListView::expandChildren()
