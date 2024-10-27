@@ -44,8 +44,9 @@ namespace
 		L".pac",
 	};
 
-	Era2DirectoryStructure listModFiles(
-		const std::vector<std::string>& mods, mm::IModDataProvider& dataProvider, const fs::path& basePath)
+	Era2DirectoryStructure listModFiles(std::stop_token token, const std::vector<std::string>& mods,
+		mm::IModDataProvider& dataProvider, const fs::path& basePath, std::mutex& mutex,
+		std::string& progress)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure     result;
@@ -70,11 +71,27 @@ namespace
 			return it->second;
 		};
 
+		std::string progressBase;
+		std::string progressDetails;
+
+		auto reportProgress = [&mutex, &progress, &progressBase, &progressDetails]() {
+			std::lock_guard lg(mutex);
+			progress = progressBase;
+			if (!progressDetails.empty())
+				progress += ":" + progressDetails;
+		};
+
 		using rdi = fs::recursive_directory_iterator;
 		for (size_t i = 0; i < result.mods.size(); ++i)
 		{
-			const auto& mod = result.mods[i];
+			progressBase    = {};
+			progressDetails = {};
+			reportProgress();
 
+			if (token.stop_requested())
+				return {};
+
+			const auto& mod     = result.mods[i];
 			const auto& modData = dataProvider.modData(mod);
 
 			if (!exists(modData.data_path) || !is_directory(modData.data_path))
@@ -82,6 +99,9 @@ namespace
 
 			for (auto it = rdi(modData.data_path), end = rdi(); it != end; ++it)
 			{
+				if (token.stop_requested())
+					return {};
+
 				boost::system::error_code ec;
 
 				const auto relative = fs::relative(it->path(), modData.data_path, ec);
@@ -92,6 +112,9 @@ namespace
 						it->path().wstring(), wxString::FromUTF8(ec.message()), ec.value());
 					continue;
 				}
+
+				progressBase = it->path().string();
+				reportProgress();
 
 				const bool isFile = it->is_regular_file(ec);
 				if (ec)
@@ -124,9 +147,15 @@ namespace
 
 				for (uint32_t j = 0; j < totalFiles; ++j)
 				{
+					if (token.stop_requested())
+						return {};
+
 					file.seekp(92ll + 32ll * j, std::ios_base::beg);
 					std::array<char, 16> filename = {};
 					file.read(filename.data(), filename.size());
+
+					progressDetails = filename.data();
+					reportProgress();
 
 					const auto lodIndex = fileIndex(relative.parent_path() / filename.data());
 					auto&      subItem  = result.entries[lodIndex];
@@ -137,8 +166,15 @@ namespace
 			}
 		}
 
+		progressBase    = {};
+		progressDetails = {};
+		reportProgress();
+
 		for (auto it = rdi(basePath), end = rdi(); it != end; ++it)
 		{
+			if (token.stop_requested())
+				return {};
+
 			if (it->path().filename() == "Mods")
 				it.disable_recursion_pending();
 
@@ -151,6 +187,9 @@ namespace
 					it->path().wstring(), wxString::FromUTF8(ec.message()), ec.value());
 				continue;
 			}
+
+			progressBase = it->path().string();
+			reportProgress();
 
 			const bool isFile = it->is_regular_file(ec);
 			if (ec)
@@ -169,7 +208,7 @@ namespace
 
 			if (index != size_t(-1))
 			{
-				auto& item = result.entries[index];
+				auto& item    = result.entries[index];
 				item.gamePath = fs::relative(it->path(), basePath, ec).string();
 			}
 
@@ -190,9 +229,15 @@ namespace
 
 			for (uint32_t j = 0; j < totalFiles; ++j)
 			{
+				if (token.stop_requested())
+					return {};
+
 				file.seekp(92ll + 32ll * j, std::ios_base::beg);
 				std::array<char, 16> filename = {};
 				file.read(filename.data(), filename.size());
+
+				progressDetails = filename.data();
+				reportProgress();
 
 				const auto lodIndex = fileIndex(relative.parent_path() / filename.data(), false);
 				if (lodIndex == size_t(-1))
@@ -204,6 +249,10 @@ namespace
 					subItem.gamePath = fs::relative(it->path(), basePath, ec).string();
 			}
 		}
+
+		progressBase    = {};
+		progressDetails = {};
+		reportProgress();
 
 		return result;
 	}
@@ -224,6 +273,7 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 	bindEvents();
 
 	_selectModsModel->modList(_mods);
+	_progressTimer.SetOwner(this);
 }
 
 void ShowFileListDialog::createControls()
@@ -237,6 +287,9 @@ void ShowFileListDialog::createControls()
 
 	createResultList();
 	createDetailsList();
+
+	_progressStatic = new wxStaticText(this, wxID_ANY, wxEmptyString);
+	_close          = new wxButton(this, wxID_ANY, "Close"_lng);
 }
 
 void ShowFileListDialog::createResultList()
@@ -301,7 +354,11 @@ void ShowFileListDialog::createSelectModsList()
 
 void ShowFileListDialog::bindEvents()
 {
-	_continue->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { loadData(); });
+	_continue->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+		_continue->Disable();
+		loadData();
+	});
+
 	_fileList->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
 		const auto row = _fileList->GetSelectedRow();
 
@@ -329,6 +386,10 @@ void ShowFileListDialog::bindEvents()
 			_detailsList->AppendItem(data);
 		}
 	});
+
+	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { updateProgress(); });
+
+	_close->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { EndDialog(wxOK); });
 }
 
 void ShowFileListDialog::buildLayout()
@@ -341,15 +402,26 @@ void ShowFileListDialog::buildLayout()
 	rightGroupSizer->Add(_fileList, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	rightGroupSizer->Add(_detailsList, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
-	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(leftGroupSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	mainSizer->Add(rightGroupSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
+	contentSizer->Add(leftGroupSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	contentSizer->Add(rightGroupSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
+
+	auto progressSizer = new wxBoxSizer(wxHORIZONTAL);
+	progressSizer->Add(_progressStatic, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	progressSizer->Add(_close, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	mainSizer->Add(contentSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	mainSizer->Add(progressSizer, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 	this->SetSizer(mainSizer);
 }
 
 void ShowFileListDialog::loadData()
 {
+	_fileList->DeleteAllItems();
+	_detailsList->DeleteAllItems();
+
 	const auto& selected = _selectModsModel->getChecked();
 
 	std::vector<std::string> ordered;
@@ -361,9 +433,25 @@ void ShowFileListDialog::loadData()
 		if (selected.contains(item))
 			ordered.emplace_back(item);
 
-	_data = listModFiles(ordered, _dataProvider, _basePath);
+	_thread = std::jthread(std::bind_front(&ShowFileListDialog::doLoadData, this), ordered);
 
-	fillData();
+	_progressTimer.Start(1000 / 10);
+}
+
+void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::string> ordered)
+{
+	_data = listModFiles(token, ordered, _dataProvider, _basePath, _progressMutex, _progress);
+
+	if (!token.stop_requested())
+	{
+		CallAfter([&] {
+			_progressTimer.Stop();
+			_progressStatic->SetLabelText(wxEmptyString);
+			ShowFileListDialog::fillData();
+			_continue->Enable();
+
+		});
+	}
 }
 
 void ShowFileListDialog::fillData()
@@ -399,5 +487,19 @@ void ShowFileListDialog::fillData()
 		data.push_back(wxVariant(wxString::FromUTF8(entry.filePath.string())));
 
 		_fileList->AppendItem(data);
+	}
+}
+
+void ShowFileListDialog::updateProgress()
+{
+	if (!_thread.joinable())
+	{
+		_progressTimer.Stop();
+		_progressStatic->SetLabelText(wxEmptyString);
+	}
+	else
+	{
+		std::lock_guard lg(_progressMutex);
+		_progressStatic->SetLabelText(wxString::FromUTF8(_progress));
 	}
 }

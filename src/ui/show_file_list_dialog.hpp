@@ -39,6 +39,9 @@ namespace mm
 		void buildLayout();
 		void loadData();
 		void fillData();
+		void updateProgress();
+
+		void doLoadData(std::stop_token token, std::vector<std::string> ordered);
 
 	private:
 		IIconStorage&     _iconStorage;
@@ -56,6 +59,14 @@ namespace mm
 		wxWidgetsPtr<wxDataViewListCtrl> _fileList    = nullptr;
 		wxWidgetsPtr<wxDataViewListCtrl> _detailsList = nullptr;
 
+		wxWidgetsPtr<wxStaticText> _progressStatic = nullptr;
+		wxTimer                    _progressTimer;
+		wxWidgetsPtr<wxButton>     _close = nullptr;
+
+		std::jthread           _thread;
+		std::stop_token        _stopToken;
+		std::mutex             _progressMutex;
+		std::string            _progress;
 		Era2DirectoryStructure _data;
 	};
 }
