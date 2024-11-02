@@ -135,6 +135,9 @@
 	"All" : "Все",
 	"Close" : "Закрыть",
 	"Categories:" : "Категории:",
+	"All %d mods hidden (change filter)" : "Все моды (%d) скрыты (фильтр)",
+	"Mods: %d" : "Моды: %d",
+	", displayed: %d, hidden: %d" : ", показано: %d, скрыто: %d",
 
 	"category" : {
 		"gameplay" : "Геймплей",

@@ -587,3 +587,22 @@ void ModListModel::setArchivedModsDisplay(ModListModelArchivedMode value)
 	_archivedMode = value;
 	reload();
 }
+
+wxString ModListModel::status() const
+{
+	const size_t total     = _list.data.size() + _list.rest.size();
+	const size_t displayed = _displayed.items.size();
+	const auto   hidden    = total - displayed;
+
+	wxString message;
+
+	if (!displayed && hidden)
+		message = wxString::Format("All %d mods hidden (change filter)"_lng, total);
+	else
+		message = wxString::Format("Mods: %d"_lng, total);
+
+	if (displayed && displayed != total)
+		message += wxString::Format(", displayed: %d, hidden: %d"_lng, displayed, hidden);
+
+	return message;
+}

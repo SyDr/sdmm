@@ -55,6 +55,7 @@ namespace mm
 		wxWidgetsPtr<wxMenuBar>              _mainMenu = nullptr;
 		std::map<int, std::function<void()>> _menuItems;  // itemId, handler
 
-		wxWidgetsPtr<wxMenuItem> _launchMenuItem = nullptr;
+		wxWidgetsPtr<wxMenuItem>  _launchMenuItem = nullptr;
+		wxWidgetsPtr<wxStatusBar> _statusBar      = nullptr;
 	};
 }

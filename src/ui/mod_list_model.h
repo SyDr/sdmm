@@ -62,6 +62,8 @@ namespace mm
 		void setManagedModsDisplay(ModListModelManagedMode value);
 		void setArchivedModsDisplay(ModListModelArchivedMode value);
 
+		wxString status() const;
+
 	private:
 		bool passFilter(const std::string& id) const;
 

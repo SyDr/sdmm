@@ -106,15 +106,18 @@ wxBEGIN_EVENT_TABLE(mmCheckListBoxComboPopup, wxCheckListBox) EVT_KEY_UP(mmCheck
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage)
+ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, wxStatusBar* statusBar)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
 		  managedPlatform.localConfig()->managedModsDisplay(),
 		  managedPlatform.localConfig()->archivedModsDisplay()))
 	, _iconStorage(iconStorage)
+	, _statusBar(statusBar)
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
+	MM_PRECONDTION(statusBar);
+
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
 	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
@@ -349,7 +352,7 @@ void ModListView::createControls(const wxString& managedPath)
 	_filterText->SetDescriptiveText("Filter"_lng);
 
 	_filterCategory = new wxComboCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
-		{ GetTextExtent("Categories:"_lng).x + GetTextExtent(wxString::FromUTF8(" 99/99")).x + FromDIP(24),
+		{ GetTextExtent("Categories:"_lng).x + GetTextExtent(wxString::FromUTF8(" 99/99")).x + FromDIP(32),
 			-1 },
 		wxCB_READONLY);
 
@@ -466,6 +469,8 @@ void ModListView::updateControlsState()
 	// wxLogDebug(__FUNCTION__);
 
 	EX_TRY;
+
+	_statusBar->SetStatusText(_listModel->status());
 
 	if (_selectedMod.empty())
 	{

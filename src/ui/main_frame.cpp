@@ -55,14 +55,14 @@ MainFrame::MainFrame(Application& app)
 	reloadModel();
 
 	createMenuBar();
-	CreateStatusBar();
+	_statusBar = CreateStatusBar();
 
 	auto panel = new wxPanel(this);
 	auto pages = new wxNotebook(panel, wxID_ANY);
 
 	if (_currentPlatform)
 	{
-		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage);
+		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage, _statusBar);
 		pages->AddPage(modListView, "Mods"_lng);
 
 		if (auto presetManager = _currentPlatform->getPresetManager())

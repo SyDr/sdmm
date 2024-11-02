@@ -39,7 +39,8 @@ namespace mm
 	class ModListView : public wxPanel
 	{
 	public:
-		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage);
+		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
+			wxStatusBar* statusBar);
 
 	private:
 		void createControls(const wxString& managedPath);
@@ -111,5 +112,7 @@ namespace mm
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;
+
+		wxStatusBar* _statusBar = nullptr;
 	};
 }
