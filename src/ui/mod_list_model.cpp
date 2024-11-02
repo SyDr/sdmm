@@ -419,7 +419,7 @@ void ModListModel::applyFilter(const std::string& value)
 	reload();
 }
 
-void ModListModel::applyCategoryFilter(const std::optional<std::string>& value)
+void ModListModel::applyCategoryFilter(const std::set<std::string>& value)
 {
 	_categoryFilter = value;
 	reload();
@@ -429,13 +429,13 @@ bool ModListModel::passFilter(const std::string& id) const
 {
 	// TODO: move into mod itself?
 
-	if (_filter.empty() && !_categoryFilter.has_value())
+	if (_filter.empty() && _categoryFilter.empty())
 		return true;
 
 	const auto& mod  = _modDataProvider.modData(id);
 	const auto& desc = _modDataProvider.description(mod.id);
 
-	if (_categoryFilter.has_value() && mod.category != _categoryFilter)
+	if (!_categoryFilter.empty() && !_categoryFilter.contains(mod.category))
 	{
 		return false;
 	}

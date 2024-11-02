@@ -449,7 +449,6 @@ void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::stri
 			_progressStatic->SetLabelText(wxEmptyString);
 			ShowFileListDialog::fillData();
 			_continue->Enable();
-
 		});
 	}
 }

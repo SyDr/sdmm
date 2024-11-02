@@ -52,7 +52,7 @@ namespace mm
 		const std::unordered_set<std::string>& getChecked() const;
 
 		void applyFilter(const std::string& value);
-		void applyCategoryFilter(const std::optional<std::string>& value);
+		void applyCategoryFilter(const std::set<std::string>& value);
 
 		const ModData*                                   findMod(const wxDataViewItem& item) const;
 		wxDataViewItem                                   findItemById(const std::string& id) const;
@@ -74,8 +74,8 @@ namespace mm
 		ModList             _list;
 		ModListDsplayedData _displayed;
 
-		std::string                _filter;
-		std::optional<std::string> _categoryFilter;
+		std::string           _filter;
+		std::set<std::string> _categoryFilter;
 
 		std::unordered_set<std::string> _checked;
 

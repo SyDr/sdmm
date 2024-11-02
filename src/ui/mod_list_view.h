@@ -23,7 +23,9 @@ class wxInfoBarGeneric;
 class wxStaticBox;
 class wxStaticText;
 class wxWebView;
+class wxComboCtrl;
 class wxSearchCtrl;
+class mmCheckListBoxComboPopup;
 
 namespace mm
 {
@@ -75,11 +77,12 @@ namespace mm
 		wxObjectDataPtr<ModListModel>               _listModel;
 		std::set<ModListDsplayedData::GroupItemsBy> _hiddenCategories;
 
-		wxWidgetsPtr<wxStaticBox>    _group          = nullptr;
-		wxWidgetsPtr<wxSearchCtrl>   _filterText     = nullptr;
-		wxWidgetsPtr<wxChoice>       _filterCategory = nullptr;
-		std::vector<std::string>     _categories;
-		wxWidgetsPtr<wxDataViewCtrl> _list           = nullptr;
+		wxWidgetsPtr<wxStaticBox>              _group          = nullptr;
+		wxWidgetsPtr<wxSearchCtrl>             _filterText     = nullptr;
+		wxWidgetsPtr<wxComboCtrl>              _filterCategory = nullptr;
+		wxWidgetsPtr<mmCheckListBoxComboPopup> _filterPopup    = nullptr;
+		std::vector<std::string>               _categories;
+		wxWidgetsPtr<wxDataViewCtrl>           _list = nullptr;
 
 		wxWidgetsPtr<wxButton> _configure = nullptr;
 

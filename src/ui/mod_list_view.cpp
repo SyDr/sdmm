@@ -34,6 +34,7 @@
 #include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/collpane.h>
+#include <wx/combo.h>
 #include <wx/dataview.h>
 #include <wx/infobar.h>
 #include <wx/msgdlg.h>
@@ -45,6 +46,63 @@
 #include <wx/webview.h>
 
 #include <algorithm>
+
+class mmCheckListBoxComboPopup : public wxCheckListBox, public wxComboPopup
+{
+public:
+	void Init() override {}
+
+	bool Create(wxWindow* parent) override
+	{
+		return wxCheckListBox::Create(parent, wxID_ANY, wxPoint(0, 0), wxDefaultSize);
+	}
+
+	wxWindow* GetControl() override
+	{
+		return this;
+	}
+
+	void SetStringValue(const wxString&) override {}
+
+	wxString GetStringValue() const override
+	{
+		wxArrayInt selections;
+		GetCheckedItems(selections);
+
+		return "Categories:"_lng + wxString::FromUTF8(std::format(" {}/{}",
+									   selections.size() ? selections.size() : GetCount(), GetCount()));
+	}
+
+	wxSize GetAdjustedSize(int minWidth, int, int) override
+	{
+		auto res = GetBestSize();
+
+		if (res.x < minWidth)
+			res.x = minWidth;
+
+		return res;
+	}
+
+	void OnKeyUp(wxKeyEvent& event)
+	{
+		if (event.GetRawKeyCode() == VK_ESCAPE ||
+			(event.GetRawKeyCode() == VK_F4 && GetComboCtrl()->IsPopupShown()))
+		{
+			Dismiss();
+			event.Skip();
+		}
+		else
+		{
+			event.Skip();
+		}
+	}
+
+private:
+	wxDECLARE_EVENT_TABLE();
+};
+
+wxBEGIN_EVENT_TABLE(mmCheckListBoxComboPopup, wxCheckListBox) EVT_KEY_UP(mmCheckListBoxComboPopup::OnKeyUp)
+	wxEND_EVENT_TABLE();
 
 using namespace mm;
 
@@ -126,15 +184,16 @@ void ModListView::bindEvents()
 		event.Skip();
 	});
 
-	_filterCategory->Bind(wxEVT_CHOICE, [=](wxCommandEvent& event) {
-		const auto sel = event.GetSelection();
-		if (sel == wxNOT_FOUND || sel > std::ssize(_categories)) // there is also item All in the combo
-			return;
+	_filterPopup->Bind(wxEVT_CHECKLISTBOX, [=](wxCommandEvent&) {
+		_filterPopup->GetComboCtrl()->SetValueByUser(_filterPopup->GetStringValue());
 
-		if (sel == 0)
-			_listModel->applyCategoryFilter({});
-		else
-			_listModel->applyCategoryFilter(_categories[sel - 1]);
+		wxArrayInt            selections;
+		std::set<std::string> selected;
+		if (_filterPopup->GetCheckedItems(selections) != _categories.size())
+			for (const auto& i : selections)
+				selected.emplace(_categories[i]);
+
+		_listModel->applyCategoryFilter(selected);
 
 		expandChildren();
 		followSelection();
@@ -289,10 +348,13 @@ void ModListView::createControls(const wxString& managedPath)
 	_filterText = new wxSearchCtrl(this, wxID_ANY);
 	_filterText->SetDescriptiveText("Filter"_lng);
 
-	wxArrayString items;
-	items.Add("All"_lng);
-	_filterCategory = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
-	_filterCategory->SetSelection(0);
+	_filterCategory = new wxComboCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+		{ GetTextExtent("Categories:"_lng).x + GetTextExtent(wxString::FromUTF8(" 99/99")).x + FromDIP(24),
+			-1 },
+		wxCB_READONLY);
+
+	_filterPopup = new mmCheckListBoxComboPopup();
+	_filterCategory->SetPopupControl(_filterPopup);
 
 	createListControl();
 
@@ -478,9 +540,11 @@ void ModListView::updateControlsState()
 
 void ModListView::updateCategoryFilterContent()
 {
-	std::optional<std::string> selected;
-	if (_filterCategory->GetSelection() > 0)
-		selected = _categories[_filterCategory->GetSelection() - 1];
+	wxArrayInt            selections;
+	std::set<std::string> selected;
+	if (_filterPopup->GetCheckedItems(selections) != _categories.size())
+		for (const auto& i : selections)
+			selected.emplace(_categories[i]);
 
 	std::set<std::string> cats;
 	for (const auto& item : _modManager.mods().data)
@@ -502,37 +566,34 @@ void ModListView::updateCategoryFilterContent()
 	std::sort(items.begin(), items.end(), [](const auto& l, const auto& r) { return l.second < r.second; });
 
 	_categories.clear();
-	std::vector<wxString> displayedItems;
-	displayedItems.emplace_back("All"_lng);
+	wxArrayString displayedItems;
 
 	for (const auto& item : items)
 	{
 		_categories.emplace_back(item.first);
-		displayedItems.emplace_back(item.second);
+		displayedItems.Add(item.second);
 	}
 
-	_filterCategory->Set(displayedItems);
-	if (!selected.has_value())
+	_filterPopup->Clear();
+	_filterPopup->InsertItems(displayedItems, 0);
+
+	if (selected.empty())
 	{
-		_filterCategory->Select(0);
+		for (size_t i = 0; i < _categories.size(); ++i)
+			_filterPopup->Check(i);
 	}
 	else
 	{
-		auto it = std::find(_categories.cbegin(), _categories.cend(), selected);
-		if (it != _categories.cend())
+		for (const auto& item : selected)
 		{
-			_filterCategory->Select(std::distance(_categories.cbegin(), it) + 1);
-		}
-		else
-		{
-			_filterCategory->Select(0);
-			_listModel->applyCategoryFilter({});
-
-			expandChildren();
-			followSelection();
-			updateControlsState();
+			if (auto it = std::find(_categories.cbegin(), _categories.cend(), item); it != _categories.cend())
+				_filterPopup->Check(std::distance(_categories.cbegin(), it));
 		}
 	}
+
+	_filterCategory->SetText(_filterPopup->GetStringValue());
+
+	Layout();
 }
 
 void ModListView::expandChildren()
