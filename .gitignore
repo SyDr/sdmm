@@ -19,3 +19,5 @@
 /setup/log*.txt
 /setup/Portable/
 /enc_temp_folder/
+/debug-asan/
+/vcpkg_installed/

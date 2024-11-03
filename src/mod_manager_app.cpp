@@ -31,6 +31,7 @@ ModManagerApp::ModManagerApp()
 	SetAppDisplayName(wxString::FromUTF8(SystemInfo::ProgramVersion));
 	SetAppName(wxString::FromUTF8(PROGRAM_NAME));
 	wxStandardPaths::Get().IgnoreAppSubDir(L"release-static");
+	wxStandardPaths::Get().IgnoreAppSubDir(L"debug-asan");
 }
 
 bool ModManagerApp::OnInit()
