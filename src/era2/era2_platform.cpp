@@ -96,7 +96,7 @@ namespace
 	}
 }
 
-Era2Platform::Era2Platform(Application const& app)
+Era2Platform::Era2Platform(const Application& app)
 	: _app(app)
 	, _rootDir(app.appConfig().getDataPath())
 {

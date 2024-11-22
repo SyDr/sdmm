@@ -114,6 +114,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 		  managedPlatform.localConfig()->archivedModsDisplay()))
 	, _iconStorage(iconStorage)
 	, _statusBar(statusBar)
+	, _hiddenCategories(managedPlatform.localConfig()->hiddenCategories())
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	MM_PRECONDTION(statusBar);
@@ -207,14 +208,20 @@ void ModListView::bindEvents()
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
+		{
 			_hiddenCategories.emplace(*item);
+			_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
+		}
 		else
 			event.Veto();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
+		{
 			_hiddenCategories.erase(*item);
+			_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
+		}
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
@@ -747,7 +754,7 @@ void ModListView::openGalleryRequested()
 {
 	EX_TRY;
 
-	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	auto& mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 	wxLaunchDefaultApplication(wxString::FromUTF8((mod.data_path / "Screens").string()));
 

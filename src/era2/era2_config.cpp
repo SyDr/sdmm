@@ -33,6 +33,7 @@ namespace
 	constexpr const auto st_list_columns          = "list_columns";
 	constexpr const auto st_managed_mods_display  = "managed_mods_display";
 	constexpr const auto st_archived_mods_display = "archived_mods_display";
+	constexpr const auto st_hidden_categories     = "hidden_categories";
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -174,6 +175,26 @@ void Era2Config::archivedModsDisplay(ModListModelArchivedMode value)
 	save();
 }
 
+std::set<ModListDsplayedData::GroupItemsBy> Era2Config::hiddenCategories() const
+{
+	std::set<ModListDsplayedData::GroupItemsBy> result;
+
+	for (const auto& item : _data[st_hidden_categories])
+		result.emplace(ModListDsplayedData::StringToGroupItemsBy(item.get<std::string>()));
+
+	return result;
+}
+
+void Era2Config::hiddenCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value)
+{
+	_data[st_hidden_categories] = nlohmann::json::array();
+
+	for (auto& item : value)
+		_data[st_hidden_categories].emplace_back(ModListDsplayedData::GroupItemsByToString(item));
+
+	save();
+}
+
 void Era2Config::validate()
 {
 	if (!_data.count(st_active_preset) || !_data[st_active_preset].is_string())
@@ -208,4 +229,11 @@ void Era2Config::validate()
 		_data[st_archived_mods_display] >
 			static_cast<unsigned>(ModListModelArchivedMode::as_individual_groups))
 		_data[st_archived_mods_display] = 1;
+
+	if (!_data.count(st_hidden_categories) || !_data[st_hidden_categories].is_array())
+		_data[st_hidden_categories] = nlohmann::json::array();
+
+	for (auto& item : _data[st_hidden_categories])
+		if (!item.is_string())
+			item = "";
 }

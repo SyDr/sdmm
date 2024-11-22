@@ -136,5 +136,40 @@ namespace mm
 
 		std::vector<std::string>        items;
 		std::vector<CategoryAndCaption> categories;
+
+		struct GroupItemsByToStringVisitor
+		{
+			std::string operator()(const ManagedGroupTag&)
+			{
+				return "@managed";
+			}
+
+			std::string operator()(const ArchivedGroupTag&)
+			{
+				return "@archived";
+			}
+
+			std::string operator()(const std::string& value)
+			{
+				return value;
+			}
+		};
+
+		static std::string
+		GroupItemsByToString(const GroupItemsBy& value)
+		{
+			return std::visit(GroupItemsByToStringVisitor(), value);
+		}
+
+		static GroupItemsBy StringToGroupItemsBy(std::string_view value)
+		{
+			if (value == "@managed")
+				return ManagedGroupTag();
+
+			if (value == "@archived")
+				return ArchivedGroupTag();
+
+			return std::string(value);
+		}
 	};
 }

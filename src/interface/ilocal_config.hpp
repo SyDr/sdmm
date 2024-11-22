@@ -9,6 +9,8 @@
 #include "type/filesystem.hpp"
 #include "type/mod_list_model_structs.hpp"
 
+#include <set>
+
 namespace mm
 {
 	struct ILocalConfig
@@ -34,5 +36,8 @@ namespace mm
 
 		[[nodiscard]] virtual ModListModelArchivedMode archivedModsDisplay() const = 0;
 		virtual void archivedModsDisplay(ModListModelArchivedMode value)           = 0;
+
+		[[nodiscard]] virtual std::set<ModListDsplayedData::GroupItemsBy> hiddenCategories() const = 0;
+		virtual void hiddenCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value)    = 0;
 	};
 }
