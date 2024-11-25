@@ -114,7 +114,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 		  managedPlatform.localConfig()->archivedModsDisplay()))
 	, _iconStorage(iconStorage)
 	, _statusBar(statusBar)
-	, _hiddenCategories(managedPlatform.localConfig()->hiddenCategories())
+	, _hiddenCategories(managedPlatform.localConfig()->collapsedCategories())
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	MM_PRECONDTION(statusBar);
@@ -210,7 +210,7 @@ void ModListView::bindEvents()
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
 			_hiddenCategories.emplace(*item);
-			_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
+			_managedPlatform.localConfig()->collapsedCategories(_hiddenCategories);
 		}
 		else
 			event.Veto();
@@ -220,7 +220,7 @@ void ModListView::bindEvents()
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
 			_hiddenCategories.erase(*item);
-			_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
+			_managedPlatform.localConfig()->collapsedCategories(_hiddenCategories);
 		}
 	});
 

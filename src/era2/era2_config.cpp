@@ -33,7 +33,7 @@ namespace
 	constexpr const auto st_list_columns          = "list_columns";
 	constexpr const auto st_managed_mods_display  = "managed_mods_display";
 	constexpr const auto st_archived_mods_display = "archived_mods_display";
-	constexpr const auto st_hidden_categories     = "hidden_categories";
+	constexpr const auto st_collapsed_categories  = "collapsed_categories";
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -49,7 +49,7 @@ void Era2Config::createDirectories() const
 {
 	create_directories(getProgramDataPath());
 	create_directories(getPresetsPath());
-	//create_directories(getTempPath());
+	// create_directories(getTempPath());
 }
 
 void Era2Config::save()
@@ -175,22 +175,22 @@ void Era2Config::archivedModsDisplay(ModListModelArchivedMode value)
 	save();
 }
 
-std::set<ModListDsplayedData::GroupItemsBy> Era2Config::hiddenCategories() const
+std::set<ModListDsplayedData::GroupItemsBy> Era2Config::collapsedCategories() const
 {
 	std::set<ModListDsplayedData::GroupItemsBy> result;
 
-	for (const auto& item : _data[st_hidden_categories])
+	for (const auto& item : _data[st_collapsed_categories])
 		result.emplace(ModListDsplayedData::StringToGroupItemsBy(item.get<std::string>()));
 
 	return result;
 }
 
-void Era2Config::hiddenCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value)
+void Era2Config::collapsedCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value)
 {
-	_data[st_hidden_categories] = nlohmann::json::array();
+	_data[st_collapsed_categories] = nlohmann::json::array();
 
 	for (auto& item : value)
-		_data[st_hidden_categories].emplace_back(ModListDsplayedData::GroupItemsByToString(item));
+		_data[st_collapsed_categories].emplace_back(ModListDsplayedData::GroupItemsByToString(item));
 
 	save();
 }
@@ -230,10 +230,10 @@ void Era2Config::validate()
 			static_cast<unsigned>(ModListModelArchivedMode::as_individual_groups))
 		_data[st_archived_mods_display] = 1;
 
-	if (!_data.count(st_hidden_categories) || !_data[st_hidden_categories].is_array())
-		_data[st_hidden_categories] = nlohmann::json::array();
+	if (!_data.count(st_collapsed_categories) || !_data[st_collapsed_categories].is_array())
+		_data[st_collapsed_categories] = nlohmann::json::array();
 
-	for (auto& item : _data[st_hidden_categories])
+	for (auto& item : _data[st_collapsed_categories])
 		if (!item.is_string())
 			item = "";
 }

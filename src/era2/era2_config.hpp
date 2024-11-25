@@ -45,8 +45,8 @@ namespace mm
 		ModListModelArchivedMode archivedModsDisplay() const override;
 		void                     archivedModsDisplay(ModListModelArchivedMode value) override;
 
-		std::set<ModListDsplayedData::GroupItemsBy> hiddenCategories() const override;
-		void hiddenCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value) override;
+		std::set<ModListDsplayedData::GroupItemsBy> collapsedCategories() const override;
+		void collapsedCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value) override;
 
 	private:
 		fs::path getConfigFilePath() const;
