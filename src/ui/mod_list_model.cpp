@@ -435,10 +435,8 @@ bool ModListModel::passFilter(const std::string& id) const
 	const auto& mod  = _modDataProvider.modData(id);
 	const auto& desc = _modDataProvider.description(mod.id);
 
-	if (!_categoryFilter.empty() && !_categoryFilter.contains(mod.category))
-	{
+	if (!_categoryFilter.empty() && _categoryFilter.contains(mod.category))
 		return false;
-	}
 
 	if (!_filter.empty())
 	{

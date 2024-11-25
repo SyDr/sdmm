@@ -48,6 +48,9 @@ namespace mm
 		std::set<ModListDsplayedData::GroupItemsBy> collapsedCategories() const override;
 		void collapsedCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value) override;
 
+		std::set<std::string> hiddenCategories() const override;
+		void                  hiddenCategories(const std::set<std::string>& value) override;
+
 	private:
 		fs::path getConfigFilePath() const;
 		void     createDirectories() const;

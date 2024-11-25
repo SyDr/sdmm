@@ -34,6 +34,7 @@ namespace
 	constexpr const auto st_managed_mods_display  = "managed_mods_display";
 	constexpr const auto st_archived_mods_display = "archived_mods_display";
 	constexpr const auto st_collapsed_categories  = "collapsed_categories";
+	constexpr const auto st_hidden_categories  = "hidden_categories";
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -189,8 +190,28 @@ void Era2Config::collapsedCategories(const std::set<ModListDsplayedData::GroupIt
 {
 	_data[st_collapsed_categories] = nlohmann::json::array();
 
-	for (auto& item : value)
+	for (const auto& item : value)
 		_data[st_collapsed_categories].emplace_back(ModListDsplayedData::GroupItemsByToString(item));
+
+	save();
+}
+
+std::set<std::string> Era2Config::hiddenCategories() const
+{
+	std::set<std::string> result;
+
+	for (const auto& item : _data[st_hidden_categories])
+		result.emplace(item.get<std::string>());
+
+	return result;
+}
+
+void Era2Config::hiddenCategories(const std::set<std::string>& value)
+{
+	_data[st_hidden_categories] = nlohmann::json::array();
+
+	for (const auto& item : value)
+		_data[st_hidden_categories].emplace_back(item);
 
 	save();
 }
@@ -234,6 +255,16 @@ void Era2Config::validate()
 		_data[st_collapsed_categories] = nlohmann::json::array();
 
 	for (auto& item : _data[st_collapsed_categories])
+		if (!item.is_string())
+			item = "";
+
+	if (!_data.count(st_hidden_categories) || !_data[st_hidden_categories].is_array())
+	{
+		_data[st_hidden_categories] = nlohmann::json::array();
+		_data[st_hidden_categories].emplace_back("plugins");
+	}
+
+	for (auto& item : _data[st_hidden_categories])
 		if (!item.is_string())
 			item = "";
 }

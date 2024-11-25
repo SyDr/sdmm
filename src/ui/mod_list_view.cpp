@@ -69,8 +69,7 @@ public:
 		wxArrayInt selections;
 		GetCheckedItems(selections);
 
-		return "Categories:"_lng + wxString::FromUTF8(std::format(" {}/{}",
-									   selections.size() ? selections.size() : GetCount(), GetCount()));
+		return "Categories:"_lng + wxString::FromUTF8(std::format(" {}/{}", selections.size(), GetCount()));
 	}
 
 	wxSize GetAdjustedSize(int minWidth, int, int) override
@@ -106,7 +105,8 @@ wxBEGIN_EVENT_TABLE(mmCheckListBoxComboPopup, wxCheckListBox) EVT_KEY_UP(mmCheck
 
 using namespace mm;
 
-ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, wxStatusBar* statusBar)
+ModListView::ModListView(
+	wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, wxStatusBar* statusBar)
 	: _managedPlatform(managedPlatform)
 	, _modManager(*managedPlatform.modManager())
 	, _listModel(new ModListModel(*managedPlatform.modDataProvider(), iconStorage,
@@ -114,7 +114,8 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 		  managedPlatform.localConfig()->archivedModsDisplay()))
 	, _iconStorage(iconStorage)
 	, _statusBar(statusBar)
-	, _hiddenCategories(managedPlatform.localConfig()->collapsedCategories())
+	, _collapsedCategories(managedPlatform.localConfig()->collapsedCategories())
+	, _hiddenCategories(managedPlatform.localConfig()->hiddenCategories())
 {
 	MM_EXPECTS(parent, mm::no_parent_window_error);
 	MM_PRECONDTION(statusBar);
@@ -123,6 +124,7 @@ ModListView::ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconS
 
 	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
 	_listModel->modList(_modManager.mods());
+	_listModel->applyCategoryFilter(_hiddenCategories);
 	expandChildren();
 	buildLayout();
 	bindEvents();
@@ -193,11 +195,17 @@ void ModListView::bindEvents()
 
 		wxArrayInt            selections;
 		std::set<std::string> selected;
-		if (_filterPopup->GetCheckedItems(selections) != _categories.size())
-			for (const auto& i : selections)
-				selected.emplace(_categories[i]);
 
-		_listModel->applyCategoryFilter(selected);
+		_filterPopup->GetCheckedItems(selections);
+		for (const auto& i : selections)
+			selected.emplace(_categories[i]);
+
+		_hiddenCategories = { _categories.cbegin(), _categories.cend() };
+		for (const auto& item : selected)
+			_hiddenCategories.erase(item);
+
+		_listModel->applyCategoryFilter(_hiddenCategories);
+		_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
 
 		expandChildren();
 		followSelection();
@@ -209,8 +217,8 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
-			_hiddenCategories.emplace(*item);
-			_managedPlatform.localConfig()->collapsedCategories(_hiddenCategories);
+			_collapsedCategories.emplace(*item);
+			_managedPlatform.localConfig()->collapsedCategories(_collapsedCategories);
 		}
 		else
 			event.Veto();
@@ -219,8 +227,8 @@ void ModListView::bindEvents()
 	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
-			_hiddenCategories.erase(*item);
-			_managedPlatform.localConfig()->collapsedCategories(_hiddenCategories);
+			_collapsedCategories.erase(*item);
+			_managedPlatform.localConfig()->collapsedCategories(_collapsedCategories);
 		}
 	});
 
@@ -554,8 +562,9 @@ void ModListView::updateCategoryFilterContent()
 {
 	wxArrayInt            selections;
 	std::set<std::string> selected;
-	if (_filterPopup->GetCheckedItems(selections) != _categories.size())
-		for (const auto& i : selections)
+	_filterPopup->GetCheckedItems(selections);
+	for (const auto& i : selections)
+		if (!_hiddenCategories.contains(_categories[i]))
 			selected.emplace(_categories[i]);
 
 	std::set<std::string> cats;
@@ -589,19 +598,9 @@ void ModListView::updateCategoryFilterContent()
 	_filterPopup->Clear();
 	_filterPopup->InsertItems(displayedItems, 0);
 
-	if (selected.empty())
-	{
-		for (size_t i = 0; i < _categories.size(); ++i)
+	for (size_t i = 0; i < _categories.size(); ++i)
+		if (!_hiddenCategories.contains(_categories[i]))
 			_filterPopup->Check(i);
-	}
-	else
-	{
-		for (const auto& item : selected)
-		{
-			if (auto it = std::find(_categories.cbegin(), _categories.cend(), item); it != _categories.cend())
-				_filterPopup->Check(std::distance(_categories.cbegin(), it));
-		}
-	}
 
 	_filterCategory->SetText(_filterPopup->GetStringValue());
 
@@ -617,7 +616,7 @@ void ModListView::expandChildren()
 	{
 		auto cat = _listModel->itemGroupByItem(item);
 
-		if (!cat.has_value() || !_hiddenCategories.contains(*cat))
+		if (!cat.has_value() || !_collapsedCategories.contains(*cat))
 			_list->ExpandChildren(item);
 	}
 }

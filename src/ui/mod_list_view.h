@@ -76,7 +76,8 @@ namespace mm
 
 	private:
 		wxObjectDataPtr<ModListModel>               _listModel;
-		std::set<ModListDsplayedData::GroupItemsBy> _hiddenCategories;
+		std::set<ModListDsplayedData::GroupItemsBy> _collapsedCategories;
+		std::set<std::string>                       _hiddenCategories;
 
 		wxWidgetsPtr<wxStaticBox>              _group          = nullptr;
 		wxWidgetsPtr<wxSearchCtrl>             _filterText     = nullptr;

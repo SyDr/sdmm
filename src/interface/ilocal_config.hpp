@@ -39,5 +39,8 @@ namespace mm
 
 		[[nodiscard]] virtual std::set<ModListDsplayedData::GroupItemsBy> collapsedCategories() const = 0;
 		virtual void collapsedCategories(const std::set<ModListDsplayedData::GroupItemsBy>& value)    = 0;
+
+		[[nodiscard]] virtual std::set<std::string> hiddenCategories() const                             = 0;
+		virtual void                                hiddenCategories(const std::set<std::string>& value) = 0;
 	};
 }
