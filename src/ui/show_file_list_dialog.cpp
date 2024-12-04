@@ -45,8 +45,9 @@ namespace
 	};
 
 	Era2DirectoryStructure listModFiles(std::stop_token token, const std::vector<std::string>& mods,
-		ShowFileListDialog::ShowGameFiles gameFiles, mm::IModDataProvider& dataProvider,
-		const fs::path& basePath, std::mutex& mutex, std::string& progress)
+		ShowFileListDialog::ShowGameFiles gameFiles, bool includeNonOverriddenFiles,
+		mm::IModDataProvider& dataProvider, const fs::path& basePath, std::mutex& mutex,
+		std::string& progress)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure     result;
@@ -170,93 +171,100 @@ namespace
 		progressDetails = {};
 		reportProgress();
 
-		if (gameFiles == ShowFileListDialog::ShowGameFiles::none)
-			return result;
-
-		for (auto it = rdi(basePath), end = rdi(); it != end; ++it)
+		if (gameFiles != ShowFileListDialog::ShowGameFiles::none)
 		{
-			if (token.stop_requested())
-				return {};
-
-			if (it->path().filename() == "Mods")
-				it.disable_recursion_pending();
-
-			boost::system::error_code ec;
-			const auto                relative = fs::relative(it->path(), basePath, ec);
-
-			if (ec)
-			{
-				wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng),
-					it->path().wstring(), wxString::FromUTF8(ec.message()), ec.value());
-				continue;
-			}
-
-			progressBase = it->path().string();
-			reportProgress();
-
-			const bool isFile = it->is_regular_file(ec);
-			if (ec)
-				wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), it->path().wstring(),
-					wxString::FromUTF8(ec.message()), ec.value());
-
-			if (!isFile)
-				continue;
-
-			auto index = fileIndex(relative, gameFiles == ShowFileListDialog::ShowGameFiles::all);
-			if (index == size_t(-1) &&
-				!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
-			{
-				continue;
-			}
-
-			if (index != size_t(-1))
-			{
-				auto& item    = result.entries[index];
-				item.gamePath = fs::relative(it->path(), basePath, ec).string();
-			}
-
-			if (!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
-				continue;
-
-			boost::nowide::fstream file(it->path(), std::fstream::in | std::fstream::binary);
-			std::array<char, 4>    lodSignature = {};
-
-			file.read(lodSignature.data(), lodSignature.size());
-			if (strcmp(lodSignature.data(), "LOD"))
-				continue;
-
-			file.seekp(4, std::ios_base::cur);
-
-			uint32_t totalFiles = 0;
-			file.read(reinterpret_cast<char*>(&totalFiles), sizeof(totalFiles));
-
-			for (uint32_t j = 0; j < totalFiles; ++j)
+			for (auto it = rdi(basePath), end = rdi(); it != end; ++it)
 			{
 				if (token.stop_requested())
 					return {};
 
-				file.seekp(92ll + 32ll * j, std::ios_base::beg);
-				std::array<char, 16> filename = {};
-				file.read(filename.data(), filename.size());
+				if (it->path().filename() == "Mods")
+					it.disable_recursion_pending();
 
-				progressDetails = filename.data();
+				boost::system::error_code ec;
+				const auto                relative = fs::relative(it->path(), basePath, ec);
+
+				if (ec)
+				{
+					wxLogError(wxString("Can't make relative path for '%s'\r\n\r\n%s (code: %d)"_lng),
+						it->path().wstring(), wxString::FromUTF8(ec.message()), ec.value());
+					continue;
+				}
+
+				progressBase = it->path().string();
 				reportProgress();
 
-				const auto lodIndex = fileIndex(relative.parent_path() / filename.data(),
-					gameFiles == ShowFileListDialog::ShowGameFiles::all);
-				if (lodIndex == size_t(-1))
+				const bool isFile = it->is_regular_file(ec);
+				if (ec)
+					wxLogError(wxString("Can't access '%s'\r\n\r\n%s (code: %d)"_lng), it->path().wstring(),
+						wxString::FromUTF8(ec.message()), ec.value());
+
+				if (!isFile)
 					continue;
 
-				auto& subItem = result.entries[lodIndex];
+				auto index = fileIndex(relative, gameFiles == ShowFileListDialog::ShowGameFiles::all);
+				if (index == size_t(-1) &&
+					!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
+				{
+					continue;
+				}
 
-				if (subItem.gamePath.empty())
-					subItem.gamePath = fs::relative(it->path(), basePath, ec).string();
+				if (index != size_t(-1))
+				{
+					auto& item    = result.entries[index];
+					item.gamePath = fs::relative(it->path(), basePath, ec).string();
+				}
+
+				if (!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
+					continue;
+
+				boost::nowide::fstream file(it->path(), std::fstream::in | std::fstream::binary);
+				std::array<char, 4>    lodSignature = {};
+
+				file.read(lodSignature.data(), lodSignature.size());
+				if (strcmp(lodSignature.data(), "LOD"))
+					continue;
+
+				file.seekp(4, std::ios_base::cur);
+
+				uint32_t totalFiles = 0;
+				file.read(reinterpret_cast<char*>(&totalFiles), sizeof(totalFiles));
+
+				for (uint32_t j = 0; j < totalFiles; ++j)
+				{
+					if (token.stop_requested())
+						return {};
+
+					file.seekp(92ll + 32ll * j, std::ios_base::beg);
+					std::array<char, 16> filename = {};
+					file.read(filename.data(), filename.size());
+
+					progressDetails = filename.data();
+					reportProgress();
+
+					const auto lodIndex = fileIndex(relative.parent_path() / filename.data(),
+						gameFiles == ShowFileListDialog::ShowGameFiles::all);
+					if (lodIndex == size_t(-1))
+						continue;
+
+					auto& subItem = result.entries[lodIndex];
+
+					if (subItem.gamePath.empty())
+						subItem.gamePath = fs::relative(it->path(), basePath, ec).string();
+				}
 			}
 		}
 
 		progressBase    = {};
 		progressDetails = {};
 		reportProgress();
+
+		if (!includeNonOverriddenFiles)
+		{
+			std::erase_if(result.entries, [](const Era2FileEntry& entry) {
+				return (entry.modPaths.size() - std::ranges::count(entry.modPaths, "")) < 2;
+			});
+		}
 
 		return result;
 	}
@@ -286,8 +294,11 @@ void ShowFileListDialog::createControls()
 	createSelectModsList();
 
 	_showGameFiles    = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include game files"_lng);
-	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "and include not overriden"_lng);
+	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "and include not overridden"_lng);
 	_showGameFilesAll->Disable();
+	_includeNonOverriddenFiles =
+		new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include non overridden files"_lng);
+	_includeNonOverriddenFiles->SetValue(true);
 
 	_continue = new wxButton(_selectOptionsGroup, wxID_ANY, "Continue"_lng);
 
@@ -412,6 +423,7 @@ void ShowFileListDialog::buildLayout()
 	auto leftGroupSizer = new wxStaticBoxSizer(_selectOptionsGroup, wxVERTICAL);
 	leftGroupSizer->Add(_selectModsList, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	leftGroupSizer->Add(showGameFilesSizer, wxSizerFlags(0));
+	leftGroupSizer->Add(_includeNonOverriddenFiles, wxSizerFlags(0).Expand().Border(wxALL, 4));
 	leftGroupSizer->Add(_continue, wxSizerFlags(0).Right().Border(wxALL, 4));
 
 	auto rightGroupSizer = new wxStaticBoxSizer(_resultGroup, wxVERTICAL);
@@ -452,15 +464,16 @@ void ShowFileListDialog::loadData()
 	_thread = std::jthread(std::bind_front(&ShowFileListDialog::doLoadData, this), ordered,
 		_showGameFiles->IsChecked()
 			? _showGameFilesAll->IsChecked() ? ShowGameFiles::all : ShowGameFiles::overriden_only
-			: ShowGameFiles::none);
+			: ShowGameFiles::none, _includeNonOverriddenFiles->IsChecked());
 
 	_progressTimer.Start(1000 / 10);
 }
 
-void ShowFileListDialog::doLoadData(
-	std::stop_token token, std::vector<std::string> ordered, ShowGameFiles gameFiles)
+void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::string> ordered,
+	ShowGameFiles gameFiles, bool includeNonOverriddenFiles)
 {
-	_data = listModFiles(token, ordered, gameFiles, _dataProvider, _basePath, _progressMutex, _progress);
+	_data = listModFiles(token, ordered, gameFiles, includeNonOverriddenFiles, _dataProvider, _basePath,
+		_progressMutex, _progress);
 
 	if (!token.stop_requested())
 	{
