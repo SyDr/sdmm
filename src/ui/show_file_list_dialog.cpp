@@ -45,8 +45,8 @@ namespace
 	};
 
 	Era2DirectoryStructure listModFiles(std::stop_token token, const std::vector<std::string>& mods,
-		mm::IModDataProvider& dataProvider, const fs::path& basePath, std::mutex& mutex,
-		std::string& progress)
+		ShowFileListDialog::ShowGameFiles gameFiles, mm::IModDataProvider& dataProvider,
+		const fs::path& basePath, std::mutex& mutex, std::string& progress)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure     result;
@@ -170,6 +170,9 @@ namespace
 		progressDetails = {};
 		reportProgress();
 
+		if (gameFiles == ShowFileListDialog::ShowGameFiles::none)
+			return result;
+
 		for (auto it = rdi(basePath), end = rdi(); it != end; ++it)
 		{
 			if (token.stop_requested())
@@ -199,7 +202,7 @@ namespace
 			if (!isFile)
 				continue;
 
-			auto index = fileIndex(relative, false);
+			auto index = fileIndex(relative, gameFiles == ShowFileListDialog::ShowGameFiles::all);
 			if (index == size_t(-1) &&
 				!pacExtensions.count(boost::to_lower_copy(it->path().extension().wstring())))
 			{
@@ -239,7 +242,8 @@ namespace
 				progressDetails = filename.data();
 				reportProgress();
 
-				const auto lodIndex = fileIndex(relative.parent_path() / filename.data(), false);
+				const auto lodIndex = fileIndex(relative.parent_path() / filename.data(),
+					gameFiles == ShowFileListDialog::ShowGameFiles::all);
 				if (lodIndex == size_t(-1))
 					continue;
 
@@ -280,6 +284,10 @@ void ShowFileListDialog::createControls()
 {
 	_selectOptionsGroup = new wxStaticBox(this, wxID_ANY, "Options"_lng);
 	createSelectModsList();
+
+	_showGameFiles    = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include game files"_lng);
+	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "and include not overriden"_lng);
+	_showGameFilesAll->Disable();
 
 	_continue = new wxButton(_selectOptionsGroup, wxID_ANY, "Continue"_lng);
 
@@ -354,6 +362,9 @@ void ShowFileListDialog::createSelectModsList()
 
 void ShowFileListDialog::bindEvents()
 {
+	_showGameFiles->Bind(
+		wxEVT_CHECKBOX, [=](wxCommandEvent&) { _showGameFilesAll->Enable(_showGameFiles->IsChecked()); });
+
 	_continue->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
 		_continue->Disable();
 		loadData();
@@ -394,8 +405,13 @@ void ShowFileListDialog::bindEvents()
 
 void ShowFileListDialog::buildLayout()
 {
+	auto showGameFilesSizer = new wxBoxSizer(wxHORIZONTAL);
+	showGameFilesSizer->Add(_showGameFiles, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	showGameFilesSizer->Add(_showGameFilesAll, wxSizerFlags(0).Expand().Border(wxALL, 4));
+
 	auto leftGroupSizer = new wxStaticBoxSizer(_selectOptionsGroup, wxVERTICAL);
 	leftGroupSizer->Add(_selectModsList, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	leftGroupSizer->Add(showGameFilesSizer, wxSizerFlags(0));
 	leftGroupSizer->Add(_continue, wxSizerFlags(0).Right().Border(wxALL, 4));
 
 	auto rightGroupSizer = new wxStaticBoxSizer(_resultGroup, wxVERTICAL);
@@ -433,27 +449,31 @@ void ShowFileListDialog::loadData()
 		if (selected.contains(item))
 			ordered.emplace_back(item);
 
-	_thread = std::jthread(std::bind_front(&ShowFileListDialog::doLoadData, this), ordered);
+	_thread = std::jthread(std::bind_front(&ShowFileListDialog::doLoadData, this), ordered,
+		_showGameFiles->IsChecked()
+			? _showGameFilesAll->IsChecked() ? ShowGameFiles::all : ShowGameFiles::overriden_only
+			: ShowGameFiles::none);
 
 	_progressTimer.Start(1000 / 10);
 }
 
-void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::string> ordered)
+void ShowFileListDialog::doLoadData(
+	std::stop_token token, std::vector<std::string> ordered, ShowGameFiles gameFiles)
 {
-	_data = listModFiles(token, ordered, _dataProvider, _basePath, _progressMutex, _progress);
+	_data = listModFiles(token, ordered, gameFiles, _dataProvider, _basePath, _progressMutex, _progress);
 
 	if (!token.stop_requested())
 	{
-		CallAfter([&] {
+		CallAfter([=] {
 			_progressTimer.Stop();
 			_progressStatic->SetLabelText(wxEmptyString);
-			ShowFileListDialog::fillData();
+			ShowFileListDialog::fillData(gameFiles);
 			_continue->Enable();
 		});
 	}
 }
 
-void ShowFileListDialog::fillData()
+void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 {
 	_fileList->DeleteAllItems();
 
@@ -465,8 +485,10 @@ void ShowFileListDialog::fillData()
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxString(std::to_wstring(++index))));
 		data.push_back(wxVariant(
-			wxDataViewIconText(L"", _iconStorage.get(!entry.gamePath.empty() ? embedded_icon::tick_green
-																			 : embedded_icon::cross_gray))));
+			wxDataViewIconText(L"", _iconStorage.get(gameFiles != ShowGameFiles::none
+														 ? !entry.gamePath.empty() ? embedded_icon::tick_green
+																				   : embedded_icon::cross_gray
+														 : embedded_icon::question))));
 		wxVariant v;
 		v.NullList();
 

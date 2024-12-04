@@ -7,7 +7,7 @@
 
 namespace mm
 {
-	inline constexpr const auto IconBlank = "icons/blank.png"; // todo: make blank by code instead
+	inline constexpr const auto IconBlank = "icons/blank.png";  // todo: make blank by code instead
 
 	enum class IconPredefinedSize
 	{
@@ -42,6 +42,7 @@ namespace mm
 		constexpr const auto minus          = "icons/minus.png";
 		constexpr const auto minus_gray     = "icons/minus-gray.png";
 		constexpr const auto plus           = "icons/plus.png";
+		constexpr const auto question       = "icons/question.png";
 		constexpr const auto reset_position = "icons/reset-position.png";
 		constexpr const auto save_to_file   = "icons/save-to-file.png";
 		constexpr const auto sort           = "icons/sort.png";

@@ -17,6 +17,7 @@
 
 class wxDataViewListCtrl;
 class wxDataViewCtrl;
+class wxCheckBox;
 
 namespace mm
 {
@@ -27,6 +28,13 @@ namespace mm
 	class ShowFileListDialog : public wxDialog
 	{
 	public:
+		enum class ShowGameFiles
+		{
+			none,
+			overriden_only,
+			all
+		};
+
 		ShowFileListDialog(wxWindow* parent, IIconStorage& iconStorage, IModDataProvider& dataProvider,
 			ModList list, const fs::path& basePath);
 
@@ -38,10 +46,11 @@ namespace mm
 		void bindEvents();
 		void buildLayout();
 		void loadData();
-		void fillData();
+		void fillData(ShowGameFiles gameFiles);
 		void updateProgress();
 
-		void doLoadData(std::stop_token token, std::vector<std::string> ordered);
+		void doLoadData(
+			std::stop_token token, std::vector<std::string> ordered, ShowGameFiles gameFiles);
 
 	private:
 		IIconStorage&     _iconStorage;
@@ -52,6 +61,8 @@ namespace mm
 		wxObjectDataPtr<ModListModel> _selectModsModel;
 		wxWidgetsPtr<wxDataViewCtrl>  _selectModsList = nullptr;
 		ModList                       _mods;
+		wxWidgetsPtr<wxCheckBox>      _showGameFiles    = nullptr;
+		wxWidgetsPtr<wxCheckBox>      _showGameFilesAll = nullptr;
 
 		wxWidgetsPtr<wxButton> _continue = nullptr;
 
