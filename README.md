@@ -21,7 +21,6 @@ TODO (In no particular order)
 -----------------------------
 - Allow sent disabled mods into archive on loading preset.
 - Use wxWidgets from trunk to test dark theme support.
-- Save and load expanded/collapsed categories.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and include debug symbols?).
 - Use UPX or something else to reduce release binary size.
