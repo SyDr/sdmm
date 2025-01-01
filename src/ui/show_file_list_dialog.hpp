@@ -70,6 +70,8 @@ namespace mm
 		wxWidgetsPtr<wxDataViewListCtrl> _fileList    = nullptr;
 		wxWidgetsPtr<wxDataViewListCtrl> _detailsList = nullptr;
 
+		wxWidgetsPtr<wxButton> _openFolder = nullptr;
+
 		wxWidgetsPtr<wxStaticText> _progressStatic = nullptr;
 		wxTimer                    _progressTimer;
 		wxWidgetsPtr<wxButton>     _close = nullptr;

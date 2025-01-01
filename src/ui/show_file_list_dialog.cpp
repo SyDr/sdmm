@@ -31,6 +31,8 @@
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 
+#include <shlobj_core.h>
+
 #include <algorithm>
 
 using namespace mm;
@@ -307,6 +309,9 @@ void ShowFileListDialog::createControls()
 	createResultList();
 	createDetailsList();
 
+	_openFolder = new wxButton(_resultGroup, wxID_ANY, "Open folder"_lng);
+	_openFolder->Disable();
+
 	_progressStatic = new wxStaticText(this, wxID_ANY, wxEmptyString);
 	_close          = new wxButton(this, wxID_ANY, "Close"_lng);
 }
@@ -407,6 +412,48 @@ void ShowFileListDialog::bindEvents()
 
 			_detailsList->AppendItem(data);
 		}
+
+		_openFolder->Disable();
+	});
+
+	_detailsList->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
+		const auto row = _fileList->GetSelectedRow();
+
+		_openFolder->Enable(row != -1);
+	});
+
+	_openFolder->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+		const auto row = _fileList->GetSelectedRow();
+		if (row < 0 || row >= std::ssize(_data.entries))
+			return;
+
+		const auto& entry  = _data.entries[row];
+		const auto  modRow = _detailsList->GetSelectedRow();
+
+		int actualRow = 0;
+		for (size_t j = 0; j < entry.modPaths.size(); ++j)
+		{
+			if (entry.modPaths[j].empty())
+				continue;
+
+			if (actualRow != modRow)
+			{
+				++actualRow;
+				continue;
+			}
+
+			// TODO: move into separate function
+			const auto path = (_basePath / entry.modPaths[j]).wstring();
+
+			PIDLIST_ABSOLUTE pidl;
+			SHParseDisplayName(path.c_str(), nullptr, &pidl, 0, nullptr);
+			SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
+
+			//wxLaunchDefaultApplication(
+			//	wxString::FromUTF8((_basePath / entry.modPaths[j]).parent_path().string()));
+
+			break;
+		}
 	});
 
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { updateProgress(); });
@@ -426,9 +473,13 @@ void ShowFileListDialog::buildLayout()
 	leftGroupSizer->Add(_includeNonOverriddenFiles, wxSizerFlags(0).Expand().Border(wxALL, 4));
 	leftGroupSizer->Add(_continue, wxSizerFlags(0).Right().Border(wxALL, 4));
 
+	auto rightBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	rightBottomSizer->Add(_detailsList, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	rightBottomSizer->Add(_openFolder, wxSizerFlags(0).Border(wxALL, 4));
+
 	auto rightGroupSizer = new wxStaticBoxSizer(_resultGroup, wxVERTICAL);
 	rightGroupSizer->Add(_fileList, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	rightGroupSizer->Add(_detailsList, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	rightGroupSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
 	contentSizer->Add(leftGroupSizer, wxSizerFlags(1).Expand().Border(wxALL, 4));
@@ -447,6 +498,7 @@ void ShowFileListDialog::buildLayout()
 
 void ShowFileListDialog::loadData()
 {
+	_openFolder->Disable();
 	_fileList->DeleteAllItems();
 	_detailsList->DeleteAllItems();
 
@@ -464,7 +516,8 @@ void ShowFileListDialog::loadData()
 	_thread = std::jthread(std::bind_front(&ShowFileListDialog::doLoadData, this), ordered,
 		_showGameFiles->IsChecked()
 			? _showGameFilesAll->IsChecked() ? ShowGameFiles::all : ShowGameFiles::overriden_only
-			: ShowGameFiles::none, _includeNonOverriddenFiles->IsChecked());
+			: ShowGameFiles::none,
+		_includeNonOverriddenFiles->IsChecked());
 
 	_progressTimer.Start(1000 / 10);
 }
