@@ -7,8 +7,6 @@
 #define MyAppURL "http://wforum.heroes35.net/"
 #define MyAppExeName "main.exe"
 
-#include <idp.iss>
-
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -44,7 +42,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "..\Release\main.exe"; DestDir: "{app}"
 Source: "..\LICENSE"; DestDir: "{app}"
-Source: "..\src\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\lng\*.json"; DestDir: "{app}\lng"
 Source: "..\icons\*.png"; DestDir: "{app}\icons"
@@ -84,6 +82,7 @@ ru.redist_status=Устанавливается Microsoft Visual C++ Redistribut
 [Code]
 var
   RedistLocalPath : String;
+  DownloadPage: TDownloadWizardPage;
 
 function IsRedistInstallRequired() : boolean;
 begin
@@ -92,11 +91,11 @@ end;
 
 function InstallRedist(var NeedsRestart: boolean): String;
 var
-	ResultCode: Integer;
+  ResultCode: Integer;
   RedistPage: TOutputProgressWizardPage;
 begin
-	RedistPage := CreateOutputProgressPage(CustomMessage('redist_title'), CustomMessage('redist_description'));
-	RedistPage.Show;
+  RedistPage := CreateOutputProgressPage(CustomMessage('redist_title'), CustomMessage('redist_description'));
+  RedistPage.Show;
 
   try
     RedistPage.SetText(CustomMessage('redist_status'), '');
@@ -106,7 +105,7 @@ begin
         if (ResultCode = 3010) then
           begin
             Result := CustomMessage('redist');
-			      NeedsRestart := true;
+            NeedsRestart := true;
             RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
           end
       end
@@ -120,10 +119,18 @@ begin
   end;
 end;
 
+function OnDownloadProgress(const Url, FileName: String; const Progress, ProgressMax: Int64): Boolean;
+begin
+  if Progress = ProgressMax then
+    Log(Format('Successfully downloaded file to {tmp}: %s', [FileName]));
+  Result := True;
+end;
+
 procedure InitializeWizard();
 begin
-  idpDownloadAfter(wpReady);
   RedistLocalPath := ExpandConstant('{tmp}{\}') + 'vc_redist.x86.exe';
+  DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), @OnDownloadProgress);
+ // DownloadPage.ShowBaseNameInsteadOfUrl := True;
 end;
 
 function PrepareToInstall(var NeedsRestart: boolean): String;
@@ -134,10 +141,27 @@ end;
 
 function NextButtonClick(CurPageID: Integer): boolean;
 begin
-	Result := true;
+  Result := true;
 
-	if (CurPageID = wpReady) and IsRedistInstallRequired() then
+  if (CurPageID = wpReady) and IsRedistInstallRequired() then
   begin
-    idpAddFile('https://aka.ms/vs/16/release/vc_redist.x86.exe', RedistLocalPath);
-  end;   
+    DownloadPage.Clear;
+    // Use AddEx to specify a username and password
+    DownloadPage.Add('https://aka.ms/vs/16/release/vc_redist.x86.exe', 'vc_redist.x86.exe', '');
+    DownloadPage.Show;
+    try
+      try
+        DownloadPage.Download; // This downloads the files to {tmp}
+        Result := True;
+      except
+        if DownloadPage.AbortedByUser then
+          Log('Aborted by user.')
+        else
+          SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
+        Result := False;
+      end;
+    finally
+      DownloadPage.Hide;
+    end;
+  end;
 end;
