@@ -13,6 +13,7 @@
 #include "service/platform_service.h"
 #include "system_info.hpp"
 #include "ui/main_frame.h"
+#include "utility/program_update_helper.hpp"
 #include "utility/sdlexcept.h"
 
 #include <boost/locale.hpp>
@@ -32,6 +33,7 @@ ModManagerApp::ModManagerApp()
 	SetAppName(wxString::FromUTF8(PROGRAM_NAME));
 	wxStandardPaths::Get().IgnoreAppSubDir(L"release-static");
 	wxStandardPaths::Get().IgnoreAppSubDir(L"debug-asan");
+	_updateHelper = std::make_unique<UpdateCheckHelper>();
 }
 
 bool ModManagerApp::OnInit()
@@ -143,6 +145,21 @@ void ModManagerApp::initServices()
 	_appConfig       = std::make_unique<AppConfig>();
 	_i18nService     = std::make_unique<I18nService>(*_appConfig);
 	_platformService = std::make_unique<PlatformService>(*this);
+}
+
+void ModManagerApp::requestUpdateCheck()
+{
+	_updateHelper->checkForUpdate([=](nlohmann::json update) {
+		CallAfter([=] {
+			if (update["tag_name"] == PROGRAM_VERSION_TAG)
+				return;
+
+			const int answer = wxMessageBox("New program version is available. Open release page?"_lng,
+				"New version available"_lng, wxYES_NO);
+			if (answer == wxYES)
+				wxLaunchDefaultBrowser(wxString::FromUTF8(update["html_url"].get<std::string>()));
+		});
+	});
 }
 
 wxString operator""_lng(const char* s, std::size_t)

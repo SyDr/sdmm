@@ -183,7 +183,12 @@ void MainFrame::createMenuBar()
 
 	toolsMenu->AppendSubMenu(languageMenu, "Language"_lng, "Allows selecting other language for program"_lng);
 
-	auto helpMenu              = new wxMenu();
+	auto helpMenu = new wxMenu();
+
+	auto updateCheck =
+		helpMenu->Append(wxID_ANY, "Check for updates"_lng, nullptr, "Check for program updates"_lng);
+	_menuItems[updateCheck->GetId()] = [&] { OnMenuCheckForUpdates(); };
+
 	auto about                 = helpMenu->Append(wxID_ABOUT, "About"_lng, nullptr, "About"_lng);
 	_menuItems[about->GetId()] = [&] { OnAbout(); };
 
@@ -289,7 +294,7 @@ void MainFrame::OnMenuCheckForUpdates()
 {
 	EX_TRY;
 
-	throw std::runtime_error("Hey, you found a bug here... No... Not a bug.");
+	wxGetApp().requestUpdateCheck();
 
 	EX_UNEXPECTED;
 }

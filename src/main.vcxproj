@@ -56,6 +56,7 @@
     <ClCompile Include="ui\show_file_list_dialog.cpp" />
     <ClCompile Include="utility\fs_util.cpp" />
     <ClCompile Include="utility\json_util.cpp" />
+    <ClCompile Include="utility\program_update_helper.cpp" />
     <ClCompile Include="utility\shell_util.cpp" />
     <ClCompile Include="wx\data_view_multiple_icons_renderer.cpp" />
     <ClCompile Include="wx\priority_data_renderer.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\mod_list_view.h" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
+    <ClInclude Include="utility\program_update_helper.hpp" />
     <ClInclude Include="utility\sdlexcept.h" />
     <ClInclude Include="utility\wx_widgets_ptr.hpp" />
     <ClInclude Include="utility\fs_util.h" />

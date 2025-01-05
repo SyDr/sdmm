@@ -36,6 +36,7 @@
     <ClCompile Include="ui\export_preset_dialog.cpp" />
     <ClCompile Include="ui\import_preset_dialog.cpp" />
     <ClCompile Include="ui\configure_main_list_view.cpp" />
+    <ClCompile Include="utility\program_update_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -99,6 +100,7 @@
     <ClInclude Include="version.hpp" />
     <ClInclude Include="type\mod_list_model_structs.hpp" />
     <ClInclude Include="ui\configure_main_list_view.h" />
+    <ClInclude Include="utility\program_update_helper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

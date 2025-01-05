@@ -138,6 +138,10 @@
 	"All %d mods hidden (change filter)" : "Все моды (%d) скрыты (фильтр)",
 	"Mods: %d" : "Моды: %d",
 	", displayed: %d, hidden: %d" : ", показано: %d, скрыто: %d",
+	"Check for updates" : "Проверить наличие обновлений",
+	"Check for program updates" : "Проверить наличие обновлений программы",
+	"New version available" : "Доступна новая версия",
+	"New program version is available. Open release page?" : "Доступна новая версия программы. Перейти на страницу загрузки?",
 
 	"category" : {
 		"gameplay" : "Геймплей",

@@ -18,6 +18,7 @@ namespace mm
 	struct I18nService;
 	struct IPlatformService;
 	struct IIconStorage;
+	struct UpdateCheckHelper;
 	class MainFrame;
 
 	class ModManagerApp : public wxApp, public Application
@@ -25,22 +26,20 @@ namespace mm
 	public:
 		ModManagerApp();
 
-		std::string translationString(const std::string& key) const;
-		std::string categoryTranslationString(const std::string& key) const;
-
-		void scheduleRestart();
-
 		bool OnInit() override;
-
-		void initServices();
-
 		int OnExit() override;
-
 		void OnUnhandledException() override;
 
 		IAppConfig&       appConfig() const override;
 		II18nService&     i18nService() const override;
 		IPlatformService& platformService() const override;
+
+		void scheduleRestart();
+		void initServices();
+		void requestUpdateCheck();
+
+		std::string translationString(const std::string& key) const;
+		std::string categoryTranslationString(const std::string& key) const;
 
 	private:
 		void initView();
@@ -54,6 +53,8 @@ namespace mm
 
 		std::unique_ptr<I18nService>      _i18nService;
 		std::unique_ptr<IPlatformService> _platformService;
+
+		std::unique_ptr<UpdateCheckHelper> _updateHelper;
 	};
 }
 
