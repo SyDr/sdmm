@@ -37,6 +37,7 @@
     <ClCompile Include="ui\import_preset_dialog.cpp" />
     <ClCompile Include="ui\configure_main_list_view.cpp" />
     <ClCompile Include="utility\program_update_helper.cpp" />
+    <ClCompile Include="ui\application_settings_dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -101,6 +102,9 @@
     <ClInclude Include="type\mod_list_model_structs.hpp" />
     <ClInclude Include="ui\configure_main_list_view.h" />
     <ClInclude Include="utility\program_update_helper.hpp" />
+    <ClInclude Include="type\chrono.hpp" />
+    <ClInclude Include="type\update_check_mode.hpp" />
+    <ClInclude Include="ui\application_settings_dialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

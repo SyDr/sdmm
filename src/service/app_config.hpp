@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -52,6 +52,12 @@ namespace mm
 		bool dataPathHasStar(const fs::path& path) const override;
 		void starDataPath(const fs::path& path, bool star = true) override;
 		void unstarDataPath(const fs::path& path) override;
+
+		UpdateCheckMode updateCheckMode() const override;
+		void            updateCheckMode(UpdateCheckMode value) override;
+
+		time_point lastUpdateCheck() const override;
+		void       lastUpdateCheck(time_point value) override;
 
 	private:
 		fs::path configFilePath() const;

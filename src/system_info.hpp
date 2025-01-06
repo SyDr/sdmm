@@ -9,13 +9,13 @@
 
 namespace mm::SystemInfo
 {
-	constexpr const auto AppDataDirectory = "_MM_Data";
-	constexpr const auto BaseDirFile      = "base_dir.txt";
-	constexpr const auto SettingsFile     = "settings.json";
+	inline constexpr const auto AppDataDirectory = "_MM_Data";
+	inline constexpr const auto BaseDirFile      = "base_dir.txt";
+	inline constexpr const auto SettingsFile     = "settings.json";
 
-	constexpr const auto DataDir         = "data";
-	constexpr const auto ModInfoFilename = "mod.json";
-	constexpr const auto DefaultLanguage = "en";
+	inline constexpr const auto DataDir         = "data";
+	inline constexpr const auto ModInfoFilename = "mod.json";
+	inline constexpr const auto DefaultLanguage = "en";
 
-	constexpr const auto ProgramVersion = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
+	inline constexpr const auto ProgramVersion = PROGRAM_NAME " [" PROGRAM_VERSION " - " PROGRAM_ALIAS "]";
 }

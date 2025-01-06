@@ -13,6 +13,8 @@
 
 #include "utility/wx_widgets_ptr.hpp"
 
+class wxInfoBarGeneric;
+
 namespace mm
 {
 	struct Application;
@@ -25,6 +27,7 @@ namespace mm
 		explicit MainFrame(Application& app);
 
 		void reloadModelIfNeeded();
+		void updateCheckCompleted(const nlohmann::json& value, bool automatic);
 
 	private:
 		void createMenuBar();
@@ -34,6 +37,7 @@ namespace mm
 		void OnAbout();
 		void OnMenuToolsChangeDirectory();
 		void OnMenuToolsReloadDataFromDisk();
+		void OnMenuToolsChangeSettings();
 		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
 		void OnMenuToolsListModFiles();
@@ -51,6 +55,10 @@ namespace mm
 		std::unique_ptr<IIconStorage> _iconStorage;
 
 		std::unique_ptr<IModPlatform> _currentPlatform;
+
+		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
+		wxTimer                        _infoBarTimer;
+		wxString                       _newVersionUrl;
 
 		wxWidgetsPtr<wxMenuBar>              _mainMenu = nullptr;
 		std::map<int, std::function<void()>> _menuItems;  // itemId, handler

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <string>
 
 namespace mm
@@ -21,10 +22,9 @@ namespace mm
 		void installUpdate();
 
 	private:
+		std::chrono::sys_seconds _nextRequestCanBeMadeAt;
+
 		std::jthread    _thread;
 		std::stop_token _stopToken;
-
-		std::mutex     _dataMutex;
-		nlohmann::json _latestRelease;
 	};
 }

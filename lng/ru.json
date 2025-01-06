@@ -141,8 +141,23 @@
 	"Check for updates" : "Проверить наличие обновлений",
 	"Check for program updates" : "Проверить наличие обновлений программы",
 	"New version available" : "Доступна новая версия",
-	"New program version is available. Open release page?" : "Доступна новая версия программы. Перейти на страницу загрузки?",
+	"Settings" : "Настройки",
+	"Change program settings" : "Изменить поведение программы",
+	"Program updates" : "Обновления программы",
+	"Check for program updates:" : "Проверять наличие новых версий:",
+	"You have latest program version" : "Установлена актуальная версия программы",
+	"Open page" : "Перейти на страницу",
+	"Cannot check for program update" : "Не удалось проверить обновления программы",
+	"New program version is available" : "Доступна новая версия программы",
+	"Download" : "Загрузить",
 
+	"update_mode" : {
+		"manual" : "только вручную",
+		"on_every_launch" : "при каждом запуске (раз в 1 час)",
+		"once_per_day" : "раз в день",
+		"once_per_week" : "раз в неделю",
+		"once_per_month" : "раз в месяц"
+	},
 	"category" : {
 		"gameplay" : "Геймплей",
 		"graphics" : "Графика",

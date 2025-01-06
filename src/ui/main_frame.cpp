@@ -8,6 +8,7 @@
 #include "main_frame.h"
 
 #include "application.h"
+#include "application_settings_dialog.h"
 #include "choose_conflict_resolve_mode_view.hpp"
 #include "interface/iapp_config.hpp"
 #include "interface/ii18n_service.hpp"
@@ -33,6 +34,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
 #include <wx/busyinfo.h>
+#include <wx/infobar.h>
 #include <wx/menu.h>
 #include <wx/sizer.h>
 
@@ -57,6 +59,9 @@ MainFrame::MainFrame(Application& app)
 	createMenuBar();
 	_statusBar = CreateStatusBar();
 
+	_infoBar = new wxInfoBar(this);
+	_infoBarTimer.SetOwner(this);
+
 	auto panel = new wxPanel(this);
 	auto pages = new wxNotebook(panel, wxID_ANY);
 
@@ -79,6 +84,7 @@ MainFrame::MainFrame(Application& app)
 
 	auto mainLayout = new wxBoxSizer(wxVERTICAL);
 	mainLayout->Add(panel, wxSizerFlags(1).Expand());
+	mainLayout->Add(_infoBar, wxSizerFlags(0).Expand());
 
 	SetSizer(mainLayout);
 
@@ -86,6 +92,16 @@ MainFrame::MainFrame(Application& app)
 	Maximize(app.appConfig().mainWindow().maximized);
 
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnCloseWindow, this);
+	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
+
+	_infoBar->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event) {
+		if (event.GetId() == wxID_OPEN)
+			wxLaunchDefaultBrowser(L"https://github.com/SyDr/sdmm/releases/latest");
+		else if (event.GetId() == wxID_DOWN)
+			wxLaunchDefaultBrowser(_newVersionUrl);
+
+		event.Skip();
+	});
 
 	if (_currentPlatform)
 	{
@@ -163,9 +179,15 @@ void MainFrame::createMenuBar()
 		toolsMenu->Append(wxID_ANY, "List active mod files"_lng, nullptr, "List active mod files"_lng);
 	_menuItems[listModFiles->GetId()] = [&] { OnMenuToolsListModFiles(); };
 
+	toolsMenu->AppendSeparator();
+
 	auto conflictResolveMode =
 		toolsMenu->Append(wxID_ANY, "conflicts/caption"_lng, nullptr, "conflicts/caption"_lng);
 	_menuItems[conflictResolveMode->GetId()] = [&] { OnMenuToolsChooseConflictResolveMode(); };
+
+	auto changeProgramSettings =
+		toolsMenu->Append(wxID_ANY, "Settings"_lng, nullptr, "Change program settings"_lng);
+	_menuItems[changeProgramSettings->GetId()] = [&] { OnMenuToolsChangeSettings(); };
 
 	toolsMenu->AppendSeparator();
 
@@ -226,6 +248,16 @@ void MainFrame::OnMenuToolsReloadDataFromDisk()
 
 	if (_currentPlatform)
 		_currentPlatform->reload(true);
+
+	EX_UNEXPECTED;
+}
+
+void MainFrame::OnMenuToolsChangeSettings()
+{
+	EX_TRY;
+
+	ApplicationSettingsDialog asd(this, _app);
+	asd.ShowModal();
 
 	EX_UNEXPECTED;
 }
@@ -357,6 +389,48 @@ void MainFrame::onLaunchGameRequested()
 	}
 
 	EX_UNEXPECTED;
+}
+
+void MainFrame::updateCheckCompleted(const nlohmann::json& value, bool automatic)
+{
+	for (const auto& id : { wxID_DOWN, wxID_OPEN, wxID_CLOSE })
+		if (_infoBar->HasButtonId(id))
+			_infoBar->RemoveButton(id);
+
+	if (value.is_discarded() || value.is_null())
+	{
+		_infoBar->AddButton(wxID_OPEN, "Open page"_lng);
+		_infoBar->AddButton(wxID_CLOSE, "Close"_lng);
+
+		_infoBar->ShowMessage("Cannot check for program update"_lng);
+		_infoBarTimer.StartOnce(10000);
+		return;
+	}
+
+	if (value["tag_name"] == PROGRAM_VERSION_TAG)
+	{
+		if (!automatic)
+			_infoBar->ShowMessage("You have latest program version"_lng);
+		_infoBarTimer.StartOnce(5000);
+		return;
+	}
+
+	for (const auto& item : value["assets"])
+	{
+		static const auto ending = _app.appConfig().portableMode() ? ".zip" : ".exe";
+
+		const auto url = item["browser_download_url"].get<std::string>();
+		if (url.ends_with(ending))
+		{
+			_newVersionUrl = wxString::FromUTF8(url);
+			break;
+		}
+	}
+
+	_infoBar->AddButton(wxID_DOWN, "Download"_lng);
+	_infoBar->AddButton(wxID_OPEN, "Open page"_lng);
+	_infoBar->AddButton(wxID_CLOSE, "Close"_lng);
+	_infoBar->ShowMessage("New program version is available"_lng);
 }
 
 void MainFrame::updateExecutableRelatedData()

@@ -36,7 +36,7 @@ namespace mm
 
 		void scheduleRestart();
 		void initServices();
-		void requestUpdateCheck();
+		void requestUpdateCheck(bool automatic = false);
 
 		std::string translationString(const std::string& key) const;
 		std::string categoryTranslationString(const std::string& key) const;

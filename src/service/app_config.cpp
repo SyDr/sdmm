@@ -16,6 +16,7 @@
 
 #include "system_info.hpp"
 #include "type/main_window_properties.h"
+#include "type/update_check_mode.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
@@ -120,6 +121,15 @@ fs::path AppConfig::programPath() const
 	return fs::path(wxStandardPaths::Get().GetDataDir().ToStdString(wxConvUTF8));
 }
 
+namespace
+{
+	namespace Key
+	{
+		inline constexpr const auto UpdateCheckMode      = "update_check_mode";
+		inline constexpr const auto LastCheckForUpdateOn = "last_check_for_update_on";
+	}
+}
+
 #define SD_LNG_CODE "language"
 constexpr auto sd_game = "game";
 #define SD_KNOWN     "directories"
@@ -168,7 +178,8 @@ std::string AppConfig::selectedPlatform() const
 fs::path AppConfig::getDataPath() const
 {
 	if (!portableMode())
-		return fs::path(_data[sd_game][selectedPlatform()][SD_SELECTED].get<std::string>()).lexically_normal();
+		return fs::path(_data[sd_game][selectedPlatform()][SD_SELECTED].get<std::string>())
+			.lexically_normal();
 
 	return dataPath().parent_path();
 }
@@ -253,6 +264,42 @@ void AppConfig::validate()
 	if (!_data[sd_game][selectedPlatform].count(SD_FAVS) ||
 		!_data[sd_game][selectedPlatform][SD_FAVS].is_array())
 		_data[sd_game][selectedPlatform][SD_FAVS] = nlohmann::json::array({});
+
+	if (!_data.count(Key::UpdateCheckMode) || !_data[Key::UpdateCheckMode].is_number_unsigned())
+		_data[Key::UpdateCheckMode] = static_cast<int>(UpdateCheckMode::once_per_week);
+
+	if (_data[Key::UpdateCheckMode] < 0 ||
+		_data[Key::UpdateCheckMode] > static_cast<int>(UpdateCheckMode::once_per_month))
+		_data[Key::UpdateCheckMode] = static_cast<int>(UpdateCheckMode::once_per_week);
+
+	if (!_data.count(Key::LastCheckForUpdateOn) || !_data[Key::LastCheckForUpdateOn].is_string())
+		_data[Key::LastCheckForUpdateOn] = std::string();
+}
+
+UpdateCheckMode AppConfig::updateCheckMode() const
+{
+	return static_cast<UpdateCheckMode>(_data[Key::UpdateCheckMode]);
+}
+
+void AppConfig::updateCheckMode(UpdateCheckMode value)
+{
+	_data[Key::UpdateCheckMode] = static_cast<int>(value);
+}
+
+time_point AppConfig::lastUpdateCheck() const
+{
+	const auto        s = _data[Key::LastCheckForUpdateOn].get<std::string>();
+	std::istringstream in(s);
+
+	time_point tp;
+	in >> std::chrono::parse(TimeInputFormat, tp);
+
+	return tp;
+}
+
+void AppConfig::lastUpdateCheck(time_point value)
+{
+	_data[Key::LastCheckForUpdateOn] = std::format(TimeOutputFormat, value);
 }
 
 void AppConfig::setMainWindowProperties(const MainWindowProperties& props)

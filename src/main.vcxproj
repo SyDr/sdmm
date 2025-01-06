@@ -40,6 +40,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release-static|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ui\application_settings_dialog.cpp" />
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\configure_main_list_view.cpp" />
     <ClCompile Include="ui\error_view.cpp" />
@@ -96,10 +97,13 @@
     <ClInclude Include="interface\iplatform_service.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system_info.hpp" />
+    <ClInclude Include="type\chrono.hpp" />
     <ClInclude Include="type\conflict_resolve_mode.hpp" />
     <ClInclude Include="type\embedded_icon.h" />
     <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="type\main_window_properties.h" />
+    <ClInclude Include="type\update_check_mode.hpp" />
+    <ClInclude Include="ui\application_settings_dialog.h" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="ui\configure_main_list_view.h" />
     <ClInclude Include="ui\error_view.h" />

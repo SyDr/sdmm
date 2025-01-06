@@ -12,6 +12,7 @@
 #include "service/icon_storage.hpp"
 #include "service/platform_service.h"
 #include "system_info.hpp"
+#include "type/update_check_mode.hpp"
 #include "ui/main_frame.h"
 #include "utility/program_update_helper.hpp"
 #include "utility/sdlexcept.h"
@@ -61,6 +62,29 @@ bool ModManagerApp::OnInit()
 		if (event.GetActive())
 			_mainFrame->reloadModelIfNeeded();
 	});
+
+	bool autoCheckForUpdate = false;
+	if (auto ucm = _appConfig->updateCheckMode(); ucm != UpdateCheckMode::manual)
+	{
+		const auto lastCheck = _appConfig->lastUpdateCheck();
+		const auto now       = clock::now();
+		const auto diff      = now - lastCheck;
+
+		// TODO: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api?apiVersion=2022-11-28#use-conditional-requests-if-appropriate
+		// for now making delay of one hour seems to be good enough
+
+		if (ucm == UpdateCheckMode::on_every_launch && diff >= std::chrono::hours(1))
+			autoCheckForUpdate = true;
+		else if (ucm == UpdateCheckMode::once_per_day && diff >= std::chrono::days(1))
+			autoCheckForUpdate = true;
+		else if (ucm == UpdateCheckMode::once_per_week && diff >= std::chrono::days(7))
+			autoCheckForUpdate = true;
+		else if (ucm == UpdateCheckMode::once_per_month && diff >= std::chrono::days(30))
+			autoCheckForUpdate = true;
+	}
+
+	if (autoCheckForUpdate)
+		requestUpdateCheck(true);
 
 	return true;
 }
@@ -147,17 +171,14 @@ void ModManagerApp::initServices()
 	_platformService = std::make_unique<PlatformService>(*this);
 }
 
-void ModManagerApp::requestUpdateCheck()
+void ModManagerApp::requestUpdateCheck(bool automatic)
 {
 	_updateHelper->checkForUpdate([=](nlohmann::json update) {
 		CallAfter([=] {
-			if (update["tag_name"] == PROGRAM_VERSION_TAG)
-				return;
+			_appConfig->lastUpdateCheck(clock::now());
 
-			const int answer = wxMessageBox("New program version is available. Open release page?"_lng,
-				"New version available"_lng, wxYES_NO);
-			if (answer == wxYES)
-				wxLaunchDefaultBrowser(wxString::FromUTF8(update["html_url"].get<std::string>()));
+			if (_mainFrame)
+				_mainFrame->updateCheckCompleted(update, automatic);
 		});
 	});
 }

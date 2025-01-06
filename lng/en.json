@@ -25,5 +25,12 @@
 		"automatic_note" : "Automatically resolve mod conflicts when you enable or disable any mod",
 		"manual" : "Manual",
 		"manual_note" : "Don't resolve conflicts automatically"
+	},
+	"update_mode" : {
+		"manual" : "only manual",
+		"on_every_launch" : "on every launch (once every hour)",
+		"once_per_day" : "once per day",
+		"once_per_week" : "once per week",
+		"once_per_month" : "once per month"
 	}
 }

@@ -29,38 +29,34 @@ UpdateCheckHelper::~UpdateCheckHelper()
 void UpdateCheckHelper::clear()
 {
 	stop();
-	_latestRelease = {};
 }
 
 void UpdateCheckHelper::stop()
 {
 	_thread.get_stop_source().request_stop();
+	if (_thread.joinable())
+		_thread.join();
 }
 
 void UpdateCheckHelper::checkForUpdate(std::function<void(nlohmann::json)> callback)
 {
 	stop();
-	if (_thread.joinable())
-		_thread.join();
-
-	MM_PRECONDTION(!_thread.joinable());
 
 	_thread = std::jthread([=](std::stop_token stopToken) {
 		cpr::Response r =
-			cpr::Get(cpr::Url(LastRelease), cpr::Header { { "Accept", "application/vnd.github+json" },
-												{ "X-GitHub-Api-Version", "2022-11-28" } });
+			cpr::Get(cpr::Url(LastRelease), cpr::Header { { "Accept", "application/vnd.github+json" }, { "X-GitHub-Api-Version", "2022-11-28" } },
+			cpr::ProgressCallback([&](cpr::cpr_off_t, cpr::cpr_off_t,
+									  cpr::cpr_off_t, cpr::cpr_off_t,
+									  intptr_t) -> bool { return !stopToken.stop_requested();
+			}));
 
 		if (stopToken.stop_requested())
 			return;
 
-		MM_PRECONDTION(r.status_code == 200);
-
-		{
-			std::lock_guard lg(_dataMutex);
-			_latestRelease = nlohmann::json::parse(r.text);
-		}
-
-		callback(_latestRelease);
+		if (r.status_code == 200)
+			callback(nlohmann::json::parse(r.text));
+		else
+			callback({}); // TODO: check errors
 	});
 }
 
