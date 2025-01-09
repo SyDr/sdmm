@@ -30,7 +30,6 @@ TODO (In no particular order)
 - Use IE7 mode for preview, if Edge is not available (or ignore?).
 - Implement mod installtion from archives.
 - Add settings dialog and move/copy all settings here.
-- Implement update checking.
 - Implement auto update.
 - Implement mod editor (or not?).
 - WebPreview check width.
