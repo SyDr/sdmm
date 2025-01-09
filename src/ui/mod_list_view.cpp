@@ -357,6 +357,16 @@ void ModListView::bindEvents()
 	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown); });
 
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
+
+	Bind(wxEVT_CHAR_HOOK, [=](wxKeyEvent& event) {
+		if (!event.ControlDown() || event.GetKeyCode() != 'F')
+		{
+			event.Skip();
+			return;
+		}
+
+		_filterText->SetFocusFromKbd();
+	});
 }
 
 void ModListView::createControls(const wxString& managedPath)
