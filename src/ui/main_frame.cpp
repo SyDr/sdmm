@@ -75,6 +75,8 @@ MainFrame::MainFrame(Application& app)
 			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, *_iconStorage);
 			pages->AddPage(presetManagerView, "Profiles"_lng);
 		}
+
+		modListView->SetFocus();
 	}
 
 	auto layout = new wxBoxSizer(wxVERTICAL);
