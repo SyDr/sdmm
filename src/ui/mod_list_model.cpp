@@ -236,7 +236,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 
 		if (position)
 		{
-			text = wxString::Format(L"%u", *position);
+			text = wxString::Format(L"%u", *position + 1);
 
 			const auto& icon_ = [&]() {
 				switch (*_list.state(id))
