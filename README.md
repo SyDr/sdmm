@@ -34,3 +34,4 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Navigate in mod list via keys?
+- Make screenshot area expanded by default and save it's state in config
