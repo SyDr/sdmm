@@ -34,5 +34,6 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Navigate in mod list via keys?
-- Make screenshot area expanded by default and save it's state in config
+- Make screenshot area expanded by default and save it's state in config.
 - Use wxWebView for all mod decsriptions?
+- Don't block multiple copies of program, if they are working on different catalogues.
