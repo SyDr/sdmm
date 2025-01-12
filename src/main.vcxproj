@@ -136,7 +136,7 @@
     <SccProjectName />
     <SccLocalPath />
     <ProjectGuid>{D022CE6F-72CB-437C-8242-34EE53F96812}</ProjectGuid>
-    <ProjectName>main</ProjectName>
+    <ProjectName>Mod Manager</ProjectName>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

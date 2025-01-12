@@ -6,7 +6,7 @@ $StaticDirBuild = ".\Portable\SD Mod Manager"
 &"$MSBuild" /noconsolelogger /fileLogger /flp:logfile=log-release-static.txt /property:Configuration=release-static "..\\SD MM.sln"
 &"$InnoSetup" setup.iss
 
-$MMVersion = (Get-Item -Path '..\Release\main.exe').VersionInfo.ProductVersion
+$MMVersion = (Get-Item -Path '..\Release\Mod Manager.exe').VersionInfo.ProductVersion
 Remove-Item -Path "Output\sdmm_setup_v_$MMVersion.exe" -ErrorAction Ignore
 Rename-Item -Path "Output\mm_setup.exe" -NewName "sdmm_setup_v_$MMVersion.exe"
 Remove-Item -Path "$StaticDirBuild" -Recurse -ErrorAction Ignore
@@ -14,7 +14,7 @@ Remove-Item -Path "Output\sdmm_v_$MMVersion.zip" -ErrorAction Ignore
 
 New-Item -ItemType Directory -Path "$StaticDirBuild" | Out-Null
 New-Item -ItemType File -Path "$StaticDirBuild\base_dir.txt" -Value "../../" | Out-Null
-Copy-Item -Path "..\release-static\main.exe" -Destination "$StaticDirBuild" -Recurse
+Copy-Item -Path "..\release-static\Mod Manager.exe" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\LICENSE" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\lng\" -Destination "$StaticDirBuild\" -Recurse -Container

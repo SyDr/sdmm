@@ -5,7 +5,7 @@
 #define MyAppVersion "0.98.0.alpha"
 #define MyAppPublisher "Aliaksei SyDr Karalenka"
 #define MyAppURL "http://wforum.heroes35.net/"
-#define MyAppExeName "main.exe"
+#define MyAppExeName "Mod Manager.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -40,7 +40,7 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\Release\main.exe"; DestDir: "{app}"
+Source: "..\Release\Mod Manager.exe"; DestDir: "{app}"
 Source: "..\LICENSE"; DestDir: "{app}"
 Source: "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
