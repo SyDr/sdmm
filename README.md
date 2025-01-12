@@ -35,3 +35,4 @@ TODO (In no particular order)
 - WebPreview check width.
 - Navigate in mod list via keys?
 - Make screenshot area expanded by default and save it's state in config
+- Use wxWebView for all mod decsriptions?
