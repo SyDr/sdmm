@@ -34,9 +34,9 @@ ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs:
 	SetScrollRate(0, 40);
 	_gallerySizer = new wxWrapSizer();
 	SetSizer(_gallerySizer);
+	SetMinSize({ 240, 200 });
 
 	Bind(wxEVT_SHOW, [=](const wxShowEvent&) {
-		SetMinSize({ 240, 200 });
 		Reload();
 	});
 

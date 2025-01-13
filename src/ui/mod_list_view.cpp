@@ -422,7 +422,7 @@ void ModListView::createControls(const wxString& managedPath)
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_showGallery = new wxButton(this, wxID_ANY, "Screenshots"_lng);
-	_showGallery->SetBitmap(_iconStorage.get(embedded_icon::double_up));
+	_showGallery->SetBitmap(_iconStorage.get(embedded_icon::double_down));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());

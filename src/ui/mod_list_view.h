@@ -109,7 +109,7 @@ namespace mm
 		wxWidgetsPtr<wxButton>         _showGallery  = nullptr;
 		wxWidgetsPtr<wxButton>         _openGallery  = nullptr;
 		wxWidgetsPtr<ImageGalleryView> _galleryView  = nullptr;
-		bool                           _galleryShown = false;
+		bool                           _galleryShown = true;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;
