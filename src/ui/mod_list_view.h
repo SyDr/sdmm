@@ -26,6 +26,7 @@ class wxWebView;
 class wxComboCtrl;
 class wxSearchCtrl;
 class mmCheckListBoxComboPopup;
+class wxWebViewEvent;
 
 namespace mm
 {
@@ -53,6 +54,7 @@ namespace mm
 
 		void OnListItemContextMenu(const wxDataViewItem& item);
 		void OnMenuItemSelected(const wxCommandEvent& event);
+		void OnWebViewNavigating(wxWebViewEvent& event);
 
 		void onSwitchSelectedModStateRequested();
 		void onResetSelectedModStateRequested();
@@ -94,8 +96,7 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
-		wxWidgetsPtr<wxWebView>  _modDescription      = nullptr;
-		wxWidgetsPtr<wxTextCtrl> _modDescriptionPlain = nullptr;
+		wxWidgetsPtr<wxWebView>  _modDescription = nullptr;
 
 		struct  // Menu
 		{

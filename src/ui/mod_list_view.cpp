@@ -161,7 +161,6 @@ void ModListView::buildLayout()
 
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
 	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	rightSizer->Add(_modDescriptionPlain, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	rightSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand());
 	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
@@ -341,17 +340,6 @@ void ModListView::bindEvents()
 
 	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
-	_modDescriptionPlain->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
-		if (!event.GetMouseEvent().ButtonDClick(wxMOUSE_BTN_LEFT))
-		{
-			event.Skip();
-			return;
-		}
-
-		const auto url = _modDescriptionPlain->GetRange(event.GetURLStart(), event.GetURLEnd());
-		wxLaunchDefaultBrowser(url);
-	});
-
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
 	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown); });
@@ -366,6 +354,10 @@ void ModListView::bindEvents()
 		}
 
 		_filterText->SetFocusFromKbd();
+	});
+
+	_modDescription->Bind(wxEVT_WEBVIEW_LOADED, [=](wxWebViewEvent&) {
+		_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
 	});
 }
 
@@ -391,10 +383,6 @@ void ModListView::createControls(const wxString& managedPath)
 	_modDescription->EnableContextMenu(false);
 	_modDescription->EnableHistory(false);
 	_modDescription->SetPage(L"", L"");
-	_modDescription->Hide();
-
-	_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-		wxTE_MULTILINE | wxTE_READONLY | wxTE_RICH2 | wxTE_AUTO_URL | wxTE_BESTWRAP | wxTE_NOHIDESEL);
 
 	_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::cog), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
@@ -503,7 +491,6 @@ void ModListView::updateControlsState()
 		_moveDown->Disable();
 		_changeState->Disable();
 		_modDescription->SetPage(L"", L"");
-		_modDescriptionPlain->SetValue(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
@@ -521,8 +508,7 @@ void ModListView::updateControlsState()
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
 
-	bool useRichDescription = false;
-	auto description        = "No description available"_lng;
+	auto description = "No description available"_lng;
 
 	if (mod.virtual_mod)
 	{
@@ -530,14 +516,10 @@ void ModListView::updateControlsState()
 	}
 	else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
 	{
-		if (mod.description.extension() == ".md")
-		{
-			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
-				cmark_markdown_to_html(desc.c_str(), desc.size(), 0), &std::free);
+		auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
+			cmark_markdown_to_html(desc.c_str(), desc.size(), CMARK_OPT_DEFAULT), &std::free);
 
-			desc               = cnvt.get();
-			useRichDescription = true;
-		}
+		desc = cnvt.get();
 
 		auto asString = wxString::FromUTF8(desc);
 
@@ -548,18 +530,17 @@ void ModListView::updateControlsState()
 			std::swap(asString, description);
 	}
 
-	if (useRichDescription)
-	{
-		_modDescription->Show();
-		_modDescription->SetPage(description, L"");
-		_modDescriptionPlain->Hide();
-	}
-	else
-	{
-		_modDescriptionPlain->Show();
-		_modDescriptionPlain->SetValue(description);
-		_modDescription->Hide();
-	}
+	description = wxString::Format(
+		L"<!DOCTYPE html>"
+		"<html><title>Mod description</title>"
+		"<body>%s</body></html>",
+		description);
+
+	auto f = ::GetFocus(); // is there a better way to stop web view from stealing focus?
+	_modDescription->Unbind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
+	_modDescription->SetPage(description, L"");
+	::SetFocus(f);
+
 	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
 	_galleryView->SetPath(mod.data_path / "Screens");
 
@@ -672,6 +653,12 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 		onResetSelectedModStateRequested();
 	else if (itemId == _menu.deleteOrRemove->GetId())
 		onRemoveModRequested();
+}
+
+void ModListView::OnWebViewNavigating(wxWebViewEvent& event)
+{
+	wxLaunchDefaultBrowser(event.GetURL());
+	event.Veto();
 }
 
 void ModListView::onSwitchSelectedModStateRequested()

@@ -118,6 +118,9 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 		if (!hasIncompatible)
 			result.incompatible = defaultIncompatible;
 
+		if (result.description.empty())
+			result.description = "readme.txt";
+
 		return result;
 	};
 
