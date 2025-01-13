@@ -29,6 +29,7 @@ namespace mm
 		bool OnInit() override;
 		int OnExit() override;
 		void OnUnhandledException() override;
+		void OnInitCmdLine(wxCmdLineParser& parser) override;
 
 		IAppConfig&       appConfig() const override;
 		II18nService&     i18nService() const override;

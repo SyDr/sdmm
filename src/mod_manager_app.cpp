@@ -25,6 +25,7 @@
 #include <wx/image.h>
 #include <wx/snglinst.h>
 #include <wx/stdpaths.h>
+#include <wx/cmdline.h>
 
 using namespace mm;
 
@@ -117,6 +118,14 @@ void ModManagerApp::OnUnhandledException()
 		"Program will be closed now. Sorry :( \n\n"
 		"Exception info: \n%s",
 		what);
+}
+
+void ModManagerApp::OnInitCmdLine(wxCmdLineParser& parser)
+{
+	wxApp::OnInitCmdLine(parser);
+
+	parser.AddParam(wxEmptyString, wxCMD_LINE_VAL_STRING,
+		wxCMD_LINE_PARAM_OPTIONAL);  // ignore 1 param for now (should be changed in the future)
 }
 
 int ModManagerApp::OnExit()
