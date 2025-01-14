@@ -19,13 +19,14 @@
 
 #include <boost/locale.hpp>
 #include <boost/nowide/filesystem.hpp>
+#include <hash-library/md5.h>
 #include <wx/app.h>
 #include <wx/aui/framemanager.h>
+#include <wx/cmdline.h>
 #include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/snglinst.h>
 #include <wx/stdpaths.h>
-#include <wx/cmdline.h>
 
 using namespace mm;
 
@@ -51,10 +52,31 @@ bool ModManagerApp::OnInit()
 	initServices();
 
 	_singleInstanceChecker = std::make_unique<wxSingleInstanceChecker>();
-	if (_singleInstanceChecker->IsAnotherRunning())
+
+	bool alreadyRunning = false;
+	if (!_appConfig->portableMode())
 	{
-		wxLogError(L"Application is already running...");
-		return false;
+		// use default cheking (i.e. one instance of program for user)
+		alreadyRunning = _singleInstanceChecker->IsAnotherRunning();
+	}
+	else
+	{
+		const auto path = _appConfig->getDataPath();
+
+		const auto pathHash = MD5()(path.string());
+
+		if (_singleInstanceChecker->Create(GetAppName() + L"_" + wxString::FromUTF8(pathHash)))
+			alreadyRunning = _singleInstanceChecker->IsAnotherRunning();
+	}
+
+	if (alreadyRunning)
+	{
+		const int answer = wxMessageBox(
+			"Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?"_lng,
+			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+
+		if (answer != wxYES)
+			return false;
 	}
 
 	initView();
@@ -71,7 +93,8 @@ bool ModManagerApp::OnInit()
 		const auto now       = clock::now();
 		const auto diff      = now - lastCheck;
 
-		// TODO: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api?apiVersion=2022-11-28#use-conditional-requests-if-appropriate
+		// TODO:
+		// https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api?apiVersion=2022-11-28#use-conditional-requests-if-appropriate
 		// for now making delay of one hour seems to be good enough
 
 		if (ucm == UpdateCheckMode::on_every_launch && diff >= std::chrono::hours(1))
