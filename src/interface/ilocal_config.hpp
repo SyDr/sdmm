@@ -42,5 +42,8 @@ namespace mm
 
 		[[nodiscard]] virtual std::set<std::string> hiddenCategories() const                             = 0;
 		virtual void                                hiddenCategories(const std::set<std::string>& value) = 0;
+
+		[[nodiscard]] virtual bool screenshotsExpanded() const     = 0;
+		virtual void               screenshotsExpanded(bool value) = 0;
 	};
 }

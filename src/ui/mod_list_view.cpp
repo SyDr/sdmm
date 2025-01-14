@@ -342,7 +342,10 @@ void ModListView::bindEvents()
 
 	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
 
-	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { updateGalleryState(!_galleryShown); });
+	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+		_managedPlatform.localConfig()->screenshotsExpanded(!_galleryShown);
+		updateGalleryState(!_galleryShown);
+	});
 
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
 
@@ -409,8 +412,9 @@ void ModListView::createControls(const wxString& managedPath)
 	_menu.archive        = _menu.menu.Append(wxID_ANY, "Archive"_lng);
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
-	_showGallery = new wxButton(this, wxID_ANY, "Screenshots"_lng);
-	_showGallery->SetBitmap(_iconStorage.get(embedded_icon::double_down));
+	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
+	_showGallery  = new wxButton(this, wxID_ANY, "Screenshots"_lng);
+	_showGallery->SetBitmap(_iconStorage.get(_galleryShown ? embedded_icon::double_down : embedded_icon::double_up));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
@@ -536,7 +540,7 @@ void ModListView::updateControlsState()
 		"<body>%s</body></html>",
 		description);
 
-	auto f = ::GetFocus(); // is there a better way to stop web view from stealing focus?
+	auto f = ::GetFocus();  // is there a better way to stop web view from stealing focus?
 	_modDescription->Unbind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
 	_modDescription->SetPage(description, L"");
 	::SetFocus(f);

@@ -34,7 +34,8 @@ namespace
 	constexpr const auto st_managed_mods_display  = "managed_mods_display";
 	constexpr const auto st_archived_mods_display = "archived_mods_display";
 	constexpr const auto st_collapsed_categories  = "collapsed_categories";
-	constexpr const auto st_hidden_categories  = "hidden_categories";
+	constexpr const auto st_hidden_categories     = "hidden_categories";
+	constexpr const auto st_screenshots_expanded  = "screenshots_expanded";
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -216,6 +217,17 @@ void Era2Config::hiddenCategories(const std::set<std::string>& value)
 	save();
 }
 
+bool Era2Config::screenshotsExpanded() const
+{
+	return _data[st_screenshots_expanded].get<bool>();
+}
+
+void Era2Config::screenshotsExpanded(bool value)
+{
+	_data[st_screenshots_expanded] = value;
+	save();
+}
+
 void Era2Config::validate()
 {
 	if (!_data.count(st_active_preset) || !_data[st_active_preset].is_string())
@@ -267,4 +279,7 @@ void Era2Config::validate()
 	for (auto& item : _data[st_hidden_categories])
 		if (!item.is_string())
 			item = "";
+
+	if (!_data.count(st_screenshots_expanded) || !_data[st_screenshots_expanded].is_boolean())
+		_data[st_screenshots_expanded] = true;
 }

@@ -51,6 +51,9 @@ namespace mm
 		std::set<std::string> hiddenCategories() const override;
 		void                  hiddenCategories(const std::set<std::string>& value) override;
 
+		bool screenshotsExpanded() const override;
+		void screenshotsExpanded(bool value) override;
+
 	private:
 		fs::path getConfigFilePath() const;
 		void     createDirectories() const;
