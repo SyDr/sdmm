@@ -24,6 +24,7 @@
 #include "mod_manager_app.h"
 #include "select_exe.h"
 #include "type/embedded_icon.h"
+#include "type/mod_description_used_control.hpp"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
@@ -36,6 +37,7 @@
 #include <wx/collpane.h>
 #include <wx/combo.h>
 #include <wx/dataview.h>
+#include <wx/html/htmlwin.h>
 #include <wx/infobar.h>
 #include <wx/msgdlg.h>
 #include <wx/notifmsg.h>
@@ -128,7 +130,7 @@ ModListView::ModListView(
 	expandChildren();
 	buildLayout();
 	bindEvents();
-	updateControlsState();
+	updateControlsState(true);
 	updateCategoryFilterContent();
 }
 
@@ -160,7 +162,12 @@ void ModListView::buildLayout()
 	rightBottomSizer->Add(_openGallery, wxSizerFlags(0).Border(wxALL, 4));
 
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
-	rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	if (_modDescription)
+		rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	else if (_modDescriptionFallback)
+		rightSizer->Add(_modDescriptionFallback, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	else if (_modDescriptionPlain)
+		rightSizer->Add(_modDescriptionPlain, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	rightSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand());
 	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
@@ -359,9 +366,28 @@ void ModListView::bindEvents()
 		_filterText->SetFocusFromKbd();
 	});
 
-	_modDescription->Bind(wxEVT_WEBVIEW_LOADED, [=](wxWebViewEvent&) {
+	if (_modDescription)
+	{
 		_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
-	});
+	}
+	else if (_modDescriptionFallback)
+	{
+		_modDescriptionFallback->Bind(wxEVT_HTML_LINK_CLICKED,
+			[=](wxHtmlLinkEvent& event) { wxLaunchDefaultBrowser(event.GetLinkInfo().GetHref()); });
+	}
+	else if (_modDescriptionPlain)
+	{
+		_modDescriptionPlain->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
+			if (!event.GetMouseEvent().ButtonDClick(wxMOUSE_BTN_LEFT))
+			{
+				event.Skip();
+				return;
+			}
+
+			const auto url = _modDescriptionPlain->GetRange(event.GetURLStart(), event.GetURLEnd());
+			wxLaunchDefaultBrowser(url);
+		});
+	}
 }
 
 void ModListView::createControls(const wxString& managedPath)
@@ -381,11 +407,26 @@ void ModListView::createControls(const wxString& managedPath)
 
 	createListControl();
 
-	_modDescription = wxWebView::New();
-	_modDescription->Create(this, wxID_ANY);
-	_modDescription->EnableContextMenu(false);
-	_modDescription->EnableHistory(false);
-	_modDescription->SetPage(L"", L"");
+	// TODO: create separate method (and use variant for control itself)
+	const auto descriptionControl = wxGetApp().appConfig().modDescriptionUsedControl();
+	if (descriptionControl == ModDescriptionUsedControl::try_to_use_webview2 &&
+		wxWebView::IsBackendAvailable(wxString::FromUTF8(wxWebViewBackendEdge)))
+	{
+		_modDescription = wxWebView::New();
+		_modDescription->Create(this, wxID_ANY);
+		_modDescription->EnableContextMenu(false);
+		_modDescription->EnableHistory(false);
+		_modDescription->SetPage(L"", L"");
+	}
+	else if (descriptionControl != ModDescriptionUsedControl::use_plain_text_control)
+	{
+		_modDescriptionFallback = new wxHtmlWindow(this);
+	}
+	else
+	{
+		_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+			wxTE_MULTILINE | wxTE_READONLY | wxTE_NOHIDESEL);
+	}
 
 	_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::cog), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
@@ -414,7 +455,8 @@ void ModListView::createControls(const wxString& managedPath)
 
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
 	_showGallery  = new wxButton(this, wxID_ANY, "Screenshots"_lng);
-	_showGallery->SetBitmap(_iconStorage.get(_galleryShown ? embedded_icon::double_down : embedded_icon::double_up));
+	_showGallery->SetBitmap(
+		_iconStorage.get(_galleryShown ? embedded_icon::double_down : embedded_icon::double_up));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
@@ -481,7 +523,7 @@ void ModListView::createListColumns()
 	}
 }
 
-void ModListView::updateControlsState()
+void ModListView::updateControlsState(bool skipDescriptionReset)
 {
 	// wxLogDebug(__FUNCTION__);
 
@@ -489,12 +531,34 @@ void ModListView::updateControlsState()
 
 	_statusBar->SetStatusText(_listModel->status());
 
+	auto setDescription = [=](wxString content) {
+		if (_modDescription)
+		{
+			content.Replace(L"$", L"${sign}");
+			content.Replace(L"`", L"${tick}");
+
+			_modDescription->RunScript(
+				wxString::Format(L"const tick = '`'; const sign = '$'; document.open(); "
+								 L"document.write(String.raw`%s`); document.close(); ",
+					content));
+		}
+		else if (_modDescriptionFallback)
+		{
+			_modDescriptionFallback->SetPage(content);
+		}
+		else if (_modDescriptionPlain)
+		{
+			_modDescriptionPlain->SetValue(content);
+		}
+	};
+
 	if (_selectedMod.empty())
 	{
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		_modDescription->SetPage(L"", L"");
+		if (!skipDescriptionReset)
+			setDescription(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
@@ -520,30 +584,28 @@ void ModListView::updateControlsState()
 	}
 	else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
 	{
-		auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
-			cmark_markdown_to_html(desc.c_str(), desc.size(), CMARK_OPT_DEFAULT), &std::free);
+		if (!_modDescriptionPlain)
+		{
+			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
+				cmark_markdown_to_html(desc.c_str(), desc.size(), CMARK_OPT_DEFAULT), &std::free);
 
-		desc = cnvt.get();
+			desc = cnvt.get();
 
-		auto asString = wxString::FromUTF8(desc);
+			auto asString = wxString::FromUTF8(desc);
 
-		if (asString.empty())
-			asString = wxString(desc.c_str(), wxConvLocal, desc.size());
+			if (asString.empty())
+				asString = wxString(desc.c_str(), wxConvLocal, desc.size());
 
-		if (!asString.empty())
-			std::swap(asString, description);
+			if (!asString.empty())
+				std::swap(asString, description);
+		}
+		else
+		{
+			description = wxString::FromUTF8(desc);
+		}
 	}
 
-	description = wxString::Format(
-		L"<!DOCTYPE html>"
-		"<html><title>Mod description</title>"
-		"<body>%s</body></html>",
-		description);
-
-	auto f = ::GetFocus();  // is there a better way to stop web view from stealing focus?
-	_modDescription->Unbind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
-	_modDescription->SetPage(description, L"");
-	::SetFocus(f);
+	setDescription(description);
 
 	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
 	_galleryView->SetPath(mod.data_path / "Screens");

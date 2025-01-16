@@ -15,6 +15,7 @@ namespace mm
 {
 	struct MainWindowProperties;
 	enum class UpdateCheckMode;
+	enum class ModDescriptionUsedControl;
 
 	struct IAppConfig
 	{
@@ -54,5 +55,8 @@ namespace mm
 		// TODO: maybe
 		//		[[nodiscard]] virtual std::string lastUpdateTag() const                    = 0;
 		//		virtual void                      lastUpdateTag(const std::string& value)  = 0;
+
+		[[nodiscard]] virtual ModDescriptionUsedControl modDescriptionUsedControl() const = 0;
+		virtual void modDescriptionUsedControl(ModDescriptionUsedControl value)           = 0;
 	};
 }

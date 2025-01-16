@@ -27,6 +27,7 @@ class wxComboCtrl;
 class wxSearchCtrl;
 class mmCheckListBoxComboPopup;
 class wxWebViewEvent;
+class wxHtmlWindow;
 
 namespace mm
 {
@@ -61,7 +62,7 @@ namespace mm
 
 		void expandChildren();
 		void followSelection();
-		void updateControlsState();
+		void updateControlsState(bool skipDescriptionReset = false);
 		void updateCategoryFilterContent();
 		void onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod);
 		void onRemoveModRequested();
@@ -96,7 +97,9 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
-		wxWidgetsPtr<wxWebView>  _modDescription = nullptr;
+		wxWidgetsPtr<wxWebView>    _modDescription         = nullptr;
+		wxWidgetsPtr<wxHtmlWindow> _modDescriptionFallback = nullptr;
+		wxWidgetsPtr<wxTextCtrl>   _modDescriptionPlain   = nullptr;
 
 		struct  // Menu
 		{

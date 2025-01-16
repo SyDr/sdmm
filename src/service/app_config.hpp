@@ -59,6 +59,9 @@ namespace mm
 		time_point lastUpdateCheck() const override;
 		void       lastUpdateCheck(time_point value) override;
 
+		ModDescriptionUsedControl modDescriptionUsedControl() const override;
+		void                      modDescriptionUsedControl(ModDescriptionUsedControl value) override;
+
 	private:
 		fs::path configFilePath() const;
 		void     validate();

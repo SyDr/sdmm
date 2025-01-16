@@ -105,6 +105,7 @@
     <ClInclude Include="type\chrono.hpp" />
     <ClInclude Include="type\update_check_mode.hpp" />
     <ClInclude Include="ui\application_settings_dialog.h" />
+    <ClInclude Include="type\mod_description_used_control.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

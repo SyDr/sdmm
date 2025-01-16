@@ -17,6 +17,7 @@
 #include "system_info.hpp"
 #include "type/main_window_properties.h"
 #include "type/update_check_mode.hpp"
+#include "type/mod_description_used_control.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
@@ -125,8 +126,9 @@ namespace
 {
 	namespace Key
 	{
-		inline constexpr const auto UpdateCheckMode      = "update_check_mode";
-		inline constexpr const auto LastCheckForUpdateOn = "last_check_for_update_on";
+		inline constexpr const auto UpdateCheckMode           = "update_check_mode";
+		inline constexpr const auto LastCheckForUpdateOn      = "last_check_for_update_on";
+		inline constexpr const auto ModDescriptionUsedControl = "mod_description_use_control";
 	}
 }
 
@@ -274,6 +276,14 @@ void AppConfig::validate()
 
 	if (!_data.count(Key::LastCheckForUpdateOn) || !_data[Key::LastCheckForUpdateOn].is_string())
 		_data[Key::LastCheckForUpdateOn] = std::string();
+
+	if (!_data.count(Key::ModDescriptionUsedControl) ||
+		!_data[Key::ModDescriptionUsedControl].is_number_unsigned())
+		_data[Key::ModDescriptionUsedControl] = static_cast<int>(ModDescriptionUsedControl::try_to_use_webview2);
+
+	if (_data[Key::ModDescriptionUsedControl] < 0 ||
+		_data[Key::ModDescriptionUsedControl] > static_cast<int>(ModDescriptionUsedControl::use_plain_text_control))
+		_data[Key::ModDescriptionUsedControl] = static_cast<int>(ModDescriptionUsedControl::try_to_use_webview2);
 }
 
 UpdateCheckMode AppConfig::updateCheckMode() const
@@ -300,6 +310,16 @@ time_point AppConfig::lastUpdateCheck() const
 void AppConfig::lastUpdateCheck(time_point value)
 {
 	_data[Key::LastCheckForUpdateOn] = std::format(TimeOutputFormat, value);
+}
+
+ModDescriptionUsedControl AppConfig::modDescriptionUsedControl() const
+{
+	return static_cast<ModDescriptionUsedControl>(_data[Key::ModDescriptionUsedControl]);
+}
+
+void AppConfig::modDescriptionUsedControl(ModDescriptionUsedControl value)
+{
+	_data[Key::ModDescriptionUsedControl] = static_cast<int>(value);
 }
 
 void AppConfig::setMainWindowProperties(const MainWindowProperties& props)
