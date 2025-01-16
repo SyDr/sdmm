@@ -34,5 +34,4 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Navigate in mod list via keys?
-- Use wxWebView for all mod decsriptions? Allow using plain text control instead? Look into replacing mod description instead of overriding page?
-
+- Don't show files from root in show files dialog by default.

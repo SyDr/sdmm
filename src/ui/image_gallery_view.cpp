@@ -98,23 +98,7 @@ void ImageGalleryView::createImageControls()
 
 			control->SetCursor(cursor);
 			control->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) {
-				auto frame = new wxDialog(this, wxID_ANY, "Screenshot"_lng);
-
-				wxImage image;
-				image.LoadFile(wxString::FromUTF8(item.first.string()));
-
-				auto gsb = new wxGenericStaticBitmap(frame, wxID_ANY, wxBitmap(image));
-				gsb->Bind(wxEVT_LEFT_UP, [=](wxMouseEvent&) { frame->Destroy(); });
-				gsb->Bind(wxEVT_RIGHT_UP, [=](wxMouseEvent&) { frame->Destroy(); });
-
-				auto sizer = new wxBoxSizer(wxVERTICAL);
-				sizer->Add(gsb);
-
-				frame->SetSizer(sizer);
-				frame->Fit();
-				frame->CenterOnParent();
-
-				frame->Show();
+				wxLaunchDefaultApplication(wxString::FromUTF8(item.first.string()));
 			});
 		}
 	}
