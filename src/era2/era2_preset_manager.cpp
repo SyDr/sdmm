@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -113,6 +113,8 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 	nlohmann::json data;
 
 	data["mm_version"] = PROGRAM_VERSION;
+	if (!preset.executable.empty())
+		data["exe"] = preset.executable;
 
 	auto& ref = data["list"] = nlohmann::json::array();
 
