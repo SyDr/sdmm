@@ -270,9 +270,33 @@ namespace
 
 		if (!includeFilesFromRootDir)
 		{
-			std::erase_if(result.entries, [](const Era2FileEntry& entry) {
-				return !entry.filePath.has_parent_path();
-			});
+			std::erase_if(
+				result.entries, [](const Era2FileEntry& entry) { return !entry.filePath.has_parent_path(); });
+		}
+
+		for (size_t i = 0; i < result.mods.size();)
+		{
+			bool hasAnyEntry = false;
+
+			for (const auto& item : result.entries)
+			{
+				if (!item.modPaths[i].empty())
+				{
+					hasAnyEntry = true;
+					break;
+				}
+			}
+
+			if (!hasAnyEntry)
+			{
+				result.mods.erase(result.mods.begin() + i);
+				for (auto& entry : result.entries)
+					entry.modPaths.erase(entry.modPaths.begin() + i);
+			}
+			else
+			{
+				++i;
+			}
 		}
 
 		return result;
@@ -534,8 +558,7 @@ void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::stri
 	ShowGameFiles gameFiles, bool includeNonOverriddenFiles, bool includeFilesFromRootDir)
 {
 	_data = listModFiles(token, ordered, gameFiles, includeNonOverriddenFiles, includeFilesFromRootDir,
-		_dataProvider, _basePath,
-		_progressMutex, _progress);
+		_dataProvider, _basePath, _progressMutex, _progress);
 
 	if (!token.stop_requested())
 	{
