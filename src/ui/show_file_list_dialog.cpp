@@ -48,8 +48,8 @@ namespace
 
 	Era2DirectoryStructure listModFiles(std::stop_token token, const std::vector<std::string>& mods,
 		ShowFileListDialog::ShowGameFiles gameFiles, bool includeNonOverriddenFiles,
-		mm::IModDataProvider& dataProvider, const fs::path& basePath, std::mutex& mutex,
-		std::string& progress)
+		bool includeFilesFromRootDir, mm::IModDataProvider& dataProvider, const fs::path& basePath,
+		std::mutex& mutex, std::string& progress)
 	{
 		std::map<fs::path, size_t> temp;  // [path] -> index
 		Era2DirectoryStructure     result;
@@ -268,6 +268,13 @@ namespace
 			});
 		}
 
+		if (!includeFilesFromRootDir)
+		{
+			std::erase_if(result.entries, [](const Era2FileEntry& entry) {
+				return !entry.filePath.has_parent_path();
+			});
+		}
+
 		return result;
 	}
 }
@@ -298,9 +305,9 @@ void ShowFileListDialog::createControls()
 	_showGameFiles    = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include game files"_lng);
 	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "and include not overridden"_lng);
 	_showGameFilesAll->Disable();
-	_includeNonOverriddenFiles =
-		new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include non overridden files"_lng);
-	_includeNonOverriddenFiles->SetValue(true);
+	_skipNonOverriddenFiles = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Skip non overridden files"_lng);
+	_includeFilesFromRootDir =
+		new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include files from root directory"_lng);
 
 	_continue = new wxButton(_selectOptionsGroup, wxID_ANY, "Continue"_lng);
 
@@ -449,7 +456,7 @@ void ShowFileListDialog::bindEvents()
 			SHParseDisplayName(path.c_str(), nullptr, &pidl, 0, nullptr);
 			SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0);
 
-			//wxLaunchDefaultApplication(
+			// wxLaunchDefaultApplication(
 			//	wxString::FromUTF8((_basePath / entry.modPaths[j]).parent_path().string()));
 
 			break;
@@ -470,7 +477,8 @@ void ShowFileListDialog::buildLayout()
 	auto leftGroupSizer = new wxStaticBoxSizer(_selectOptionsGroup, wxVERTICAL);
 	leftGroupSizer->Add(_selectModsList, wxSizerFlags(1).Expand().Border(wxALL, 4));
 	leftGroupSizer->Add(showGameFilesSizer, wxSizerFlags(0));
-	leftGroupSizer->Add(_includeNonOverriddenFiles, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	leftGroupSizer->Add(_skipNonOverriddenFiles, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	leftGroupSizer->Add(_includeFilesFromRootDir, wxSizerFlags(0).Expand().Border(wxALL, 4));
 	leftGroupSizer->Add(_continue, wxSizerFlags(0).Right().Border(wxALL, 4));
 
 	auto rightBottomSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -517,15 +525,16 @@ void ShowFileListDialog::loadData()
 		_showGameFiles->IsChecked()
 			? _showGameFilesAll->IsChecked() ? ShowGameFiles::all : ShowGameFiles::overriden_only
 			: ShowGameFiles::none,
-		_includeNonOverriddenFiles->IsChecked());
+		!_skipNonOverriddenFiles->IsChecked(), _includeFilesFromRootDir->IsChecked());
 
 	_progressTimer.Start(1000 / 10);
 }
 
 void ShowFileListDialog::doLoadData(std::stop_token token, std::vector<std::string> ordered,
-	ShowGameFiles gameFiles, bool includeNonOverriddenFiles)
+	ShowGameFiles gameFiles, bool includeNonOverriddenFiles, bool includeFilesFromRootDir)
 {
-	_data = listModFiles(token, ordered, gameFiles, includeNonOverriddenFiles, _dataProvider, _basePath,
+	_data = listModFiles(token, ordered, gameFiles, includeNonOverriddenFiles, includeFilesFromRootDir,
+		_dataProvider, _basePath,
 		_progressMutex, _progress);
 
 	if (!token.stop_requested())

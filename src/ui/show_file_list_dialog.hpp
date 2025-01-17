@@ -49,7 +49,8 @@ namespace mm
 		void fillData(ShowGameFiles gameFiles);
 		void updateProgress();
 
-		void doLoadData(std::stop_token token, std::vector<std::string> ordered, ShowGameFiles gameFiles, bool includeNonOverridenFiles);
+		void doLoadData(std::stop_token token, std::vector<std::string> ordered, ShowGameFiles gameFiles,
+			bool includeNonOverridenFiles, bool includeFilesFromRootDir);
 
 	private:
 		IIconStorage&     _iconStorage;
@@ -60,9 +61,10 @@ namespace mm
 		wxObjectDataPtr<ModListModel> _selectModsModel;
 		wxWidgetsPtr<wxDataViewCtrl>  _selectModsList = nullptr;
 		ModList                       _mods;
-		wxWidgetsPtr<wxCheckBox>      _showGameFiles            = nullptr;
-		wxWidgetsPtr<wxCheckBox>      _showGameFilesAll         = nullptr;
-		wxWidgetsPtr<wxCheckBox>      _includeNonOverriddenFiles = nullptr;
+		wxWidgetsPtr<wxCheckBox>      _showGameFiles           = nullptr;
+		wxWidgetsPtr<wxCheckBox>      _showGameFilesAll        = nullptr;
+		wxWidgetsPtr<wxCheckBox>      _skipNonOverriddenFiles  = nullptr;
+		wxWidgetsPtr<wxCheckBox>      _includeFilesFromRootDir = nullptr;
 
 		wxWidgetsPtr<wxButton> _continue = nullptr;
 
