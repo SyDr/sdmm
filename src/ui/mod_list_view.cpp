@@ -538,8 +538,12 @@ void ModListView::createListColumns()
 		if (typed != ModListModelColumn::version)
 			flags |= wxDATAVIEW_COL_SORTABLE;
 
+		int width = FromDIP(120);
+		if (typed != ModListModelColumn::author)
+			width = wxCOL_WIDTH_AUTOSIZE;
+
 		auto c = new wxDataViewColumn(wxString::FromUTF8(wxGetApp().translationString(to_string(typed))), r,
-			column, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, flags);
+			column, width, wxALIGN_LEFT, flags);
 
 		_list->AppendColumn(c);
 
