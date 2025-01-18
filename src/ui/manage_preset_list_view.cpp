@@ -127,7 +127,7 @@ void ManagePresetListView::createControls()
 
 void ManagePresetListView::createListColumns()
 {
-	auto r0 = new mmPriorityDataRenderer();
+	auto r0 = new mmPriorityDataRenderer(FromDIP(32));
 	auto r1 = new wxDataViewIconTextRenderer();
 
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);

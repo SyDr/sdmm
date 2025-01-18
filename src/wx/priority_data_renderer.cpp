@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -9,5 +9,9 @@
 
 wxSize mmPriorityDataRenderer::GetSize() const
 {
-	return { 40, wxDataViewIconTextRenderer::GetSize().y };
+	return { _basicXSize, wxDataViewIconTextRenderer::GetSize().y };
 }
+
+mmPriorityDataRenderer::mmPriorityDataRenderer(int basicXSize)
+	: _basicXSize(basicXSize)
+{}

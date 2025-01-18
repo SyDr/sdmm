@@ -524,7 +524,7 @@ void ModListView::createListColumns()
 		{
 			using enum ModListModelColumn;
 		case ModListModelColumn::name: r = new wxDataViewIconTextRenderer(); break;
-		case ModListModelColumn::priority: r = new mmPriorityDataRenderer(); break;
+		case ModListModelColumn::priority: r = new mmPriorityDataRenderer(FromDIP(32)); break;
 		default: r = new wxDataViewTextRenderer(); break;
 		}
 

@@ -378,7 +378,7 @@ void ShowFileListDialog::createSelectModsList()
 	_selectModsList->AssociateModel(_selectModsModel.get());
 	auto r0 =
 		new wxDataViewToggleRenderer(wxDataViewToggleRenderer::GetDefaultType(), wxDATAVIEW_CELL_ACTIVATABLE);
-	auto r1 = new mmPriorityDataRenderer();
+	auto r1 = new mmPriorityDataRenderer(FromDIP(32));
 	auto r2 = new wxDataViewIconTextRenderer();
 
 	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
