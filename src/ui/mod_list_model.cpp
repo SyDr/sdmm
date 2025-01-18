@@ -108,8 +108,7 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 	if (type == ItemType::container)
 		return wxDataViewItem();
 
-	const auto pos     = _list.position(_displayed.items[row]);
-	const auto enabled = _list.enabled(_displayed.items[row]);
+	const auto pos = _list.position(_displayed.items[row]);
 
 	if (pos)
 	{
@@ -128,9 +127,9 @@ wxDataViewItem ModListModel::GetParent(const wxDataViewItem& item) const
 				[&](auto&& arg) {
 					using T = std::decay_t<decltype(arg)>;
 					if constexpr (std::is_same_v<T, ModListDsplayedData::ManagedGroupTag>)
-						return enabled;
+						return pos.has_value();
 					else if constexpr (std::is_same_v<T, ModListDsplayedData::ArchivedGroupTag>)
-						return !pos;
+						return !pos.has_value();
 					else  // T == std::string
 						return _modDataProvider.modData(_displayed.items[row]).category == arg;
 				},
