@@ -25,6 +25,9 @@ namespace
 
 		return { std::max(1, initSize.GetWidth() * maxHeight / initSize.GetHeight()), maxHeight };
 	}
+
+	inline const std::unordered_set<std::string> SupportedImageTypes = { ".bmp", ".png", ".jpeg", ".jpg",
+		".gif", ".pcx", ".pnm", ".tiff", ".tga" };
 }
 
 ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs::path& directory,
@@ -36,9 +39,7 @@ ImageGalleryView::ImageGalleryView(wxWindow* parent, wxWindowID winid, const fs:
 	SetSizer(_gallerySizer);
 	SetMinSize({ 240, 200 });
 
-	Bind(wxEVT_SHOW, [=](const wxShowEvent&) {
-		Reload();
-	});
+	Bind(wxEVT_SHOW, [=](const wxShowEvent&) { Reload(); });
 
 	SetPath(directory);
 }
@@ -66,7 +67,7 @@ void ImageGalleryView::Reload()
 
 	using di = fs::directory_iterator;
 	for (di it(_path); it != di(); ++it)
-		if (!is_directory(it->status()))
+		if (!is_directory(it->status()) && SupportedImageTypes.contains(it->path().extension().string()))
 			_images.emplace_back(it->path(), wxNullBitmap);
 
 	start();
@@ -97,9 +98,8 @@ void ImageGalleryView::createImageControls()
 			_gallerySizer->Add(control, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 			control->SetCursor(cursor);
-			control->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) {
-				wxLaunchDefaultApplication(wxString::FromUTF8(item.first.string()));
-			});
+			control->Bind(wxEVT_LEFT_UP,
+				[&](wxMouseEvent&) { wxLaunchDefaultApplication(wxString::FromUTF8(item.first.string())); });
 		}
 	}
 
