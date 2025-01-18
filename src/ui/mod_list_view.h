@@ -61,7 +61,7 @@ namespace mm
 		void onResetSelectedModStateRequested();
 
 		void expandChildren();
-		void followSelection();
+		bool followSelection();
 		void updateControlsState();
 		void updateCategoryFilterContent();
 		void onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod);

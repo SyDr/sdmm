@@ -187,8 +187,8 @@ void ModListView::bindEvents()
 		const auto str = event.GetString();
 		_listModel->applyFilter(str.ToStdString(wxConvUTF8));
 		expandChildren();
-		followSelection();
-		updateControlsState();
+		if (!followSelection())
+			updateControlsState();
 
 		_filterText->ShowCancelButton(!str.IsEmpty());
 
@@ -213,8 +213,8 @@ void ModListView::bindEvents()
 		_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
 
 		expandChildren();
-		followSelection();
-		updateControlsState();
+		if (!followSelection())
+			updateControlsState();
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
@@ -301,8 +301,8 @@ void ModListView::bindEvents()
 		_listModel->modList(_modManager.mods());
 
 		expandChildren();
-		followSelection();
-		updateControlsState();
+		if (!followSelection())
+			updateControlsState();
 		updateCategoryFilterContent();
 	});
 
@@ -335,8 +335,8 @@ void ModListView::bindEvents()
 			_listModel->setArchivedModsDisplay(newArchived);
 
 			expandChildren();
-			followSelection();
-			updateControlsState();
+			if (!followSelection())
+				updateControlsState();
 		}
 	});
 
@@ -542,7 +542,8 @@ void ModListView::updateControlsState()
 
 			_modDescription->RunScript(
 				wxString::Format(L"const tick = '`'; const sign = '$'; document.open(); "
-								 L"document.write(String.raw`%s`); document.close(); ",
+								 L"document.write(String.raw`%s`); document.close(); "
+								 L"window.scrollTo(0, 0); ",
 					content));
 		}
 		else if (_modDescriptionFallback)
@@ -680,7 +681,7 @@ void ModListView::expandChildren()
 	}
 }
 
-void ModListView::followSelection()
+bool ModListView::followSelection()
 {
 	// wxLogDebug(__FUNCTION__);
 	const auto itemToSelect = _listModel->findItemById(_selectedMod);
@@ -689,11 +690,16 @@ void ModListView::followSelection()
 	{
 		_list->EnsureVisible(itemToSelect);
 		_list->Select(itemToSelect);
+
+		return true;
 	}
-	else
-	{
-		_selectedMod.clear();
-	}
+
+	if (_selectedMod.empty())
+		return true;
+
+	_selectedMod.clear();
+
+	return false;
 }
 
 void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
@@ -769,6 +775,8 @@ void ModListView::onResetSelectedModStateRequested()
 	std::swap(next, _selectedMod);
 
 	_modManager.archive(next);
+
+	updateControlsState();
 
 	EX_UNEXPECTED;
 }
