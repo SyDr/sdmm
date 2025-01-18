@@ -130,7 +130,6 @@ ModListView::ModListView(
 	expandChildren();
 	buildLayout();
 	bindEvents();
-	updateControlsState(true);
 	updateCategoryFilterContent();
 }
 
@@ -435,14 +434,17 @@ void ModListView::createControls(const wxString& managedPath)
 	_moveUp = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::up), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveUp->SetToolTip("Move Up"_lng);
+	_moveUp->Disable();
 
 	_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::down), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveDown->SetToolTip("Move Down"_lng);
+	_moveDown->Disable();
 
 	_changeState = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::tick_green),
 		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
+	_changeState->Disable();
 
 	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(embedded_icon::sort), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
@@ -462,6 +464,7 @@ void ModListView::createControls(const wxString& managedPath)
 	goodSize.SetWidth(goodSize.GetHeight());
 
 	_openGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+	_openGallery->Disable();
 	_openGallery->SetBitmap(_iconStorage.get(embedded_icon::folder));
 
 	_galleryView = new ImageGalleryView(this, wxID_ANY);
@@ -523,7 +526,7 @@ void ModListView::createListColumns()
 	}
 }
 
-void ModListView::updateControlsState(bool skipDescriptionReset)
+void ModListView::updateControlsState()
 {
 	// wxLogDebug(__FUNCTION__);
 
@@ -557,8 +560,7 @@ void ModListView::updateControlsState(bool skipDescriptionReset)
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
-		if (!skipDescriptionReset)
-			setDescription(L"");
+		setDescription(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
 
