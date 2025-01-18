@@ -266,6 +266,14 @@ void ModListView::bindEvents()
 			return;
 		}
 
+		auto moveTarget = _listModel->itemGroupByItem(event.GetItem());
+		if (moveTarget.has_value() &&
+			!std::holds_alternative<ModListDsplayedData::ManagedGroupTag>(*moveTarget))
+		{
+			// i.e. hover over archived group
+			return;
+		}
+
 		auto moveTo = _listModel->findIdByItem(event.GetItem());
 		if (moveTo.empty())
 		{
@@ -282,6 +290,16 @@ void ModListView::bindEvents()
 		from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
 
 		const auto moveFrom = from.GetText().utf8_string();
+
+		auto moveTarget = _listModel->itemGroupByItem(event.GetItem());
+		if (moveTarget.has_value() &&
+			!std::holds_alternative<ModListDsplayedData::ManagedGroupTag>(*moveTarget))
+		{
+			// i.e. hover over archived group
+			_modManager.archive(moveFrom);
+			return;
+		}
+
 		_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
 	});
 
