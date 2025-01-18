@@ -367,7 +367,10 @@ void ModListView::bindEvents()
 
 	if (_modDescription)
 	{
-		_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
+		// WebView2 sends wxEVT_WEBVIEW_NAVIGATING events even for SetPage calls
+		_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATED, [=](wxWebViewEvent&) {
+			_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
+		});
 	}
 	else if (_modDescriptionFallback)
 	{
@@ -415,7 +418,8 @@ void ModListView::createControls(const wxString& managedPath)
 		_modDescription->Create(this, wxID_ANY);
 		_modDescription->EnableContextMenu(false);
 		_modDescription->EnableHistory(false);
-		_modDescription->SetPage(L"", L"");
+		_modDescription->EnableAccessToDevTools(false);
+		_modDescription->SetPage(L"<html></html>", L"");
 	}
 	else if (descriptionControl != ModDescriptionUsedControl::use_plain_text_control)
 	{
