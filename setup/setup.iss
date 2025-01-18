@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SD Mod Manager"
-#define MyAppVersion "0.98.0.alpha"
+#define MyAppVersion "0.98"
 #define MyAppPublisher "Aliaksei SyDr Karalenka"
 #define MyAppURL "http://wforum.heroes35.net/"
 #define MyAppExeName "Mod Manager.exe"
@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=..\LICENSE
+LicenseFile=..\LICENSE.txt
 OutputBaseFilename=mm_setup
 SetupIconFile=..\icons\main-icon.ico
 Compression=lzma
@@ -41,7 +41,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\Release\Mod Manager.exe"; DestDir: "{app}"
-Source: "..\LICENSE"; DestDir: "{app}"
+Source: "..\LICENSE.txt"; DestDir: "{app}"
+Source: "..\THIRD_PARTY.txt"; DestDir: "{app}"
 Source: "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\lng\*.json"; DestDir: "{app}\lng"
