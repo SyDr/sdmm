@@ -60,7 +60,7 @@ namespace mm
 		void       lastUpdateCheck(time_point value) override;
 
 		ModDescriptionUsedControl modDescriptionUsedControl() const override;
-		void                      modDescriptionUsedControl(ModDescriptionUsedControl value) override;
+		bool                      modDescriptionUsedControl(ModDescriptionUsedControl value) override;
 
 		InterfaceSize interfaceSize() const override;
 		bool          interfaceSize(InterfaceSize value) override;

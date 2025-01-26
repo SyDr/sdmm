@@ -58,7 +58,7 @@ namespace mm
 		//		virtual void                      lastUpdateTag(const std::string& value)  = 0;
 
 		[[nodiscard]] virtual ModDescriptionUsedControl modDescriptionUsedControl() const = 0;
-		virtual void modDescriptionUsedControl(ModDescriptionUsedControl value)           = 0;
+		virtual bool modDescriptionUsedControl(ModDescriptionUsedControl value)           = 0;
 
 		[[nodiscard]] virtual InterfaceSize interfaceSize() const              = 0;
 		virtual bool                        interfaceSize(InterfaceSize value) = 0;

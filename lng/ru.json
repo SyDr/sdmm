@@ -152,6 +152,7 @@
 	"Download" : "Загрузить",
 	"Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?" : "Другая копия программы уже запущена. Запуск более одной копии может привести к неправильном управлению модами/конфигурации. Запустить всё равно?",
 	"Interface size (mod list + some buttons):" : "Размер интерфейса (список модов и некоторые кнопки):",
+	"Mod description:" : "Описание модов:",
 
 	"update_mode" : {
 		"manual" : "только вручную",
@@ -159,6 +160,11 @@
 		"once_per_day" : "раз в день",
 		"once_per_week" : "раз в неделю",
 		"once_per_month" : "раз в месяц"
+	},
+	"mod_description_control" : {
+		"try_to_use_webview2" : "использовать WebView2 (если получится)",
+		"use_wxhtml_control" : "использовать wxHtmlWindow (по умолчанию)",
+		"use_plain_text_control" : "использовать обычный текст"
 	},
 	"interface_size" : {
 		"big" : "большой",

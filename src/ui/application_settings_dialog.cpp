@@ -15,6 +15,7 @@
 #include "type/embedded_icon.h"
 #include "type/filesystem.hpp"
 #include "type/interface_size.hpp"
+#include "type/mod_description_used_control.hpp"
 #include "type/update_check_mode.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -66,6 +67,17 @@ void ApplicationSettingsDialog::createControls()
 	_interfaceSizeChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_interfaceSizeChoice->SetSelection(static_cast<int>(_app.appConfig().interfaceSize()));
 
+	_modDescriptionControlStatic = new wxStaticText(this, wxID_ANY, "Mod description:"_lng);
+	items.clear();
+
+	for (const auto& item : ModDescriptionUsedControlValues)
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"mod_description_control/" + std::string(magic_enum::enum_name(item)))));
+
+	_modDescriptionControlChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+	_modDescriptionControlChoice->SetSelection(
+		static_cast<int>(_app.appConfig().modDescriptionUsedControl()));
+
 	_save   = new wxButton(this, wxID_OK, "Save"_lng);
 	_cancel = new wxButton(this, wxID_CANCEL, "Cancel"_lng);
 }
@@ -73,11 +85,16 @@ void ApplicationSettingsDialog::createControls()
 void ApplicationSettingsDialog::bindEvents()
 {
 	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-		bool restartRequired = false; // TODO: make something better;
+		bool restartRequired = false;  // TODO: make something better;
 		_app.appConfig().updateCheckMode(static_cast<UpdateCheckMode>(_updateChoice->GetSelection()));
 		restartRequired = _app.appConfig().interfaceSize(
 							  static_cast<InterfaceSize>(_interfaceSizeChoice->GetSelection())) ||
 						  restartRequired;
+
+		restartRequired = _app.appConfig().modDescriptionUsedControl(static_cast<ModDescriptionUsedControl>(
+							  _modDescriptionControlChoice->GetSelection())) ||
+						  restartRequired;
+
 		EndModal(restartRequired ? wxID_APPLY : wxID_OK);
 	});
 	_cancel->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { EndModal(wxID_CANCEL); });
@@ -92,6 +109,11 @@ void ApplicationSettingsDialog::buildLayout()
 	comboSizer->Add(_interfaceSizeStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	comboSizer->Add(
 		_interfaceSizeChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+
+	comboSizer->Add(
+		_modDescriptionControlStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	comboSizer->Add(_modDescriptionControlChoice,
+		wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
 	auto topSizer = new wxStaticBoxSizer(_globalGroup, wxVERTICAL);
 	topSizer->Add(comboSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));

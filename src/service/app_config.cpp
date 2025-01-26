@@ -7,13 +7,6 @@
 
 #include "app_config.hpp"
 
-#include <fstream>
-#include <sstream>
-#include <unordered_set>
-
-#include <wx/log.h>
-#include <wx/stdpaths.h>
-
 #include "system_info.hpp"
 #include "type/interface_size.hpp"
 #include "type/main_window_properties.h"
@@ -23,7 +16,19 @@
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 
+#include <fstream>
+#include <sstream>
+#include <unordered_set>
+
+#include <boost/convert.hpp>
+#include <boost/convert/lexical_cast.hpp>
+#include <wx/log.h>
+#include <wx/stdpaths.h>
+
 using namespace mm;
+
+struct boost::cnv::by_default : boost::cnv::lexical_cast
+{};
 
 namespace
 {
@@ -96,6 +101,35 @@ namespace
 			return mm.programDataPath / SystemInfo::SettingsFile;
 		}
 	};
+
+	struct ProgramVersion
+	{
+		size_t major = 0;
+		size_t minor = 0;
+		size_t patch = 0;
+
+		ProgramVersion(std::string_view version)
+		{
+			std::vector<std::string_view> v;
+			boost::split(v, version, boost::is_any_of("."));
+
+			if (v.size() == 3)
+			{
+				major = boost::convert<size_t>(v[0]).value_or(0);
+				minor = boost::convert<size_t>(v[1]).value_or(0);
+				patch = boost::convert<size_t>(v[2]).value_or(0);
+			}
+		}
+
+		ProgramVersion(size_t major, size_t minor, size_t patch)
+			: major(major)
+			, minor(minor)
+			, patch(patch)
+		{}
+
+		auto operator<=>(const ProgramVersion& r) const = default;
+		bool operator==(const ProgramVersion& r) const = default;
+	};
 }
 
 AppConfig::AppConfig()
@@ -127,6 +161,7 @@ namespace
 {
 	namespace Key
 	{
+		inline constexpr const auto MMVersion                 = "mm_version";
 		inline constexpr const auto UpdateCheckMode           = "update_check_mode";
 		inline constexpr const auto LastCheckForUpdateOn      = "last_check_for_update_on";
 		inline constexpr const auto ModDescriptionUsedControl = "mod_description_use_control";
@@ -224,7 +259,7 @@ void AppConfig::setSelectedPlatformCode(const std::string& newPlatform)
 void AppConfig::validate()
 {
 	if (_data.is_discarded())
-		_data = {};
+		_data = { { Key::MMVersion, PROGRAM_VERSION_BASE } };
 
 	if (!_data.count(SD_LNG_CODE) || !_data[SD_LNG_CODE].is_string())
 		_data[SD_LNG_CODE] = SystemInfo::DefaultLanguage;
@@ -282,10 +317,24 @@ void AppConfig::validate()
 	if (!_data.count(Key::LastCheckForUpdateOn) || !_data[Key::LastCheckForUpdateOn].is_string())
 		_data[Key::LastCheckForUpdateOn] = std::string();
 
-	simpleEnumCheck(Key::ModDescriptionUsedControl, ModDescriptionUsedControl::try_to_use_webview2,
+	simpleEnumCheck(Key::ModDescriptionUsedControl, ModDescriptionUsedControl::use_wxhtml_control,
 		ModDescriptionUsedControl::use_plain_text_control);
 
 	simpleEnumCheck(Key::InterfaceSize, InterfaceSize::big, InterfaceSize::big);
+
+	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
+		_data[Key::MMVersion] = "";
+
+	auto cfgVersion = ProgramVersion(_data[Key::MMVersion].get<std::string>());
+	if (cfgVersion <= ProgramVersion(0, 98, 53))
+	{
+		// 0.98.55: wxHtmlWindow is now used by default instead
+		if (modDescriptionUsedControl() == ModDescriptionUsedControl::try_to_use_webview2)
+			modDescriptionUsedControl(ModDescriptionUsedControl::use_wxhtml_control);
+	}
+
+	if (ProgramVersion(PROGRAM_VERSION_BASE) > cfgVersion)
+		_data[Key::MMVersion] = PROGRAM_VERSION_BASE;
 }
 
 UpdateCheckMode AppConfig::updateCheckMode() const
@@ -319,9 +368,14 @@ ModDescriptionUsedControl AppConfig::modDescriptionUsedControl() const
 	return static_cast<ModDescriptionUsedControl>(_data[Key::ModDescriptionUsedControl]);
 }
 
-void AppConfig::modDescriptionUsedControl(ModDescriptionUsedControl value)
+bool AppConfig::modDescriptionUsedControl(ModDescriptionUsedControl value)
 {
+	if (value == modDescriptionUsedControl())
+		return false;
+
 	_data[Key::ModDescriptionUsedControl] = static_cast<int>(value);
+
+	return true;
 }
 
 InterfaceSize AppConfig::interfaceSize() const

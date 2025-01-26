@@ -40,6 +40,9 @@ namespace mm
 		wxWidgetsPtr<wxStaticText> _interfaceSizeStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _interfaceSizeChoice = nullptr;
 
+		wxWidgetsPtr<wxStaticText> _modDescriptionControlStatic = nullptr;
+		wxWidgetsPtr<wxChoice>     _modDescriptionControlChoice = nullptr;
+
 		// wxWidgetsPtr<wxStaticBox>   _conflictResolveModeDialog = nullptr;
 		// wxWidgetsPtr<wxRadioButton> _rupdateStatic             = nullptr;
 		// wxWidgetsPtr<wxRadioButton> _rupdateChoice             = nullptr;
