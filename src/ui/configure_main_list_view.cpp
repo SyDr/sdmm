@@ -30,7 +30,8 @@ ConfigureMainListView::ConfigureMainListView(wxWindow* parent, IIconStorage& ico
 	const std::vector<int>& columns, ModListModelManagedMode initialManagedMode,
 	ModListModelArchivedMode initialArchivedMode)
 	: wxDialog(parent, wxID_ANY, "Configure view"_lng, wxDefaultPosition, wxSize(500, 600))
-	, _listModel(new ModListModel(*this, iconStorage))
+	, _listModel(new ModListModel(*this, iconStorage, ModListModelManagedMode::as_flat_list,
+		  ModListModelArchivedMode::as_single_group, IconPredefinedSize::x16))
 	, _initialManagedMode(initialManagedMode)
 	, _initialArchivedMode(initialArchivedMode)
 {

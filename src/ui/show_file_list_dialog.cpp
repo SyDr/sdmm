@@ -309,7 +309,8 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 		  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(iconStorage)
 	, _dataProvider(dataProvider)
-	, _selectModsModel(new ModListModel(dataProvider, iconStorage))
+	, _selectModsModel(new ModListModel(dataProvider, iconStorage, ModListModelManagedMode::as_flat_list,
+		  ModListModelArchivedMode::as_single_group, IconPredefinedSize::x16))
 	, _basePath(basePath)
 	, _mods(list)
 {
@@ -436,8 +437,8 @@ void ShowFileListDialog::bindEvents()
 
 			wxVector<wxVariant> data;
 
-			data.push_back(wxVariant(wxDataViewIconText(
-				wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon))));
+			data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(mod.name),
+				loadModIcon(_iconStorage, mod.data_path, mod.icon, IconPredefinedSize::x16))));
 
 			data.push_back(wxVariant(wxString::FromUTF8(entry.modPaths[j])));
 
@@ -586,7 +587,8 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 			wxDataViewIconText(L"", _iconStorage.get(gameFiles != ShowGameFiles::none
 														 ? !entry.gamePath.empty() ? embedded_icon::tick_green
 																				   : embedded_icon::cross_gray
-														 : embedded_icon::question))));
+														 : embedded_icon::question,
+										IconPredefinedSize::x16))));
 		wxVariant v;
 		v.NullList();
 
@@ -596,10 +598,11 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 			{
 				const auto& mod = _dataProvider.modData(_data.mods[j]);
 
-				v.Append(wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon)));
+				v.Append(
+					wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon, IconPredefinedSize::x16)));
 			}
 			else
-				v.Append(wxVariant(_iconStorage.get(embedded_icon::cross_gray)));
+				v.Append(wxVariant(_iconStorage.get(embedded_icon::cross_gray, IconPredefinedSize::x16)));
 		}
 
 		data.push_back(v);

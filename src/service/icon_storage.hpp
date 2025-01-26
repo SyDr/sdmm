@@ -16,14 +16,20 @@ std::size_t hash_value(const wxSize& v);
 
 namespace mm
 {
+	enum class InterfaceSize;
+
 	struct IconStorage : public IIconStorage
 	{
-		wxBitmap get(IconPredefined icon, IconPredefinedSize targetSize) override;
-		wxBitmap get(const std::string& name) override;
+		IconStorage(InterfaceSize interfaceSize);
+
+		wxBitmap get(IconPredefined icon, std::optional<IconPredefinedSize> targetSize) override;
+		wxBitmap get(const std::string& name, std::optional<IconPredefinedSize> resizeTo) override;
 
 		wxBitmap get(const std::string& name, const wxSize& targetSize);
 
 	private:
+		IconPredefinedSize _defaultSize = IconPredefinedSize::x16;
+
 		using IconCacheKey = std::pair<std::string, wxSize>;
 		std::unordered_map<IconCacheKey, wxBitmap, boost::hash<IconCacheKey>> _iconCache;
 	};

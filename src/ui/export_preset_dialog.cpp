@@ -72,9 +72,9 @@ void ExportPresetDialog::createControls()
 	_exportName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 
 	_copyToClipboard = new wxButton(this, wxID_ANY, "Copy"_lng);
-	_copyToClipboard->SetBitmap(_iconStorage.get(embedded_icon::copy));
+	_copyToClipboard->SetBitmap(_iconStorage.get(embedded_icon::copy, IconPredefinedSize::x16));
 	_saveToFile = new wxButton(this, wxID_ANY, "Save to file"_lng);
-	_saveToFile->SetBitmap(_iconStorage.get(embedded_icon::save_to_file));
+	_saveToFile->SetBitmap(_iconStorage.get(embedded_icon::save_to_file, IconPredefinedSize::x16));
 
 	_infoBar = new wxInfoBar(this);
 	_ok      = new wxButton(this, wxID_ANY, "OK"_lng);

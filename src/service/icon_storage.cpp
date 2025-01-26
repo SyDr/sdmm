@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -11,6 +11,7 @@
 #include <wx/log.h>
 
 #include "type/embedded_icon.h"
+#include "type/interface_size.hpp"
 
 using namespace mm;
 
@@ -53,7 +54,7 @@ wxBitmap IconStorage::get(const std::string& name, const wxSize& targetSize)
 	if (!icon.IsOk())
 	{
 		if (name != "icons/blank.svg")
-			return get("icons/blank.svg");
+			return get("icons/blank.svg", targetSize);
 
 		return wxNullIcon;
 	}
@@ -65,7 +66,11 @@ wxBitmap IconStorage::get(const std::string& name, const wxSize& targetSize)
 	return _iconCache[{ name, targetSize }] = icon;
 }
 
-wxBitmap IconStorage::get(IconPredefined icon, IconPredefinedSize targetSize)
+mm::IconStorage::IconStorage(InterfaceSize interfaceSize)
+	: _defaultSize(toIconPredefinedSize(interfaceSize))
+{}
+
+wxBitmap IconStorage::get(IconPredefined icon, std::optional<IconPredefinedSize> targetSize)
 {
 	std::string name = "icons/";
 	wxSize      size = { 16, 16 };
@@ -77,19 +82,10 @@ wxBitmap IconStorage::get(IconPredefined icon, IconPredefinedSize targetSize)
 	default: break;
 	}
 
-	switch (targetSize)
-	{
-	case IconPredefinedSize::x16: size = { 16, 16 }; break;
-	case IconPredefinedSize::x24: size = { 24, 24 }; break;
-	case IconPredefinedSize::x32: size = { 32, 32 }; break;
-	case IconPredefinedSize::x48: size = { 48, 48 }; break;
-	case IconPredefinedSize::x64: size = { 64, 64 }; break;
-	}
-
-	return get(name, size);
+	return get(name, iconSize(targetSize.value_or(_defaultSize)));
 }
 
-wxBitmap IconStorage::get(const std::string& name)
+wxBitmap IconStorage::get(const std::string& name, std::optional<IconPredefinedSize> resizeTo)
 {
-	return get(name, { 16, 16 });
+	return get(name, iconSize(resizeTo.value_or(_defaultSize)));
 }

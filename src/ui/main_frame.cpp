@@ -49,7 +49,7 @@ MainFrame::MainFrame(Application& app)
 	: wxFrame(nullptr, wxID_ANY, wxString::FromUTF8(SystemInfo::ProgramVersion),
 		  app.appConfig().mainWindow().position, app.appConfig().mainWindow().size)
 	, _app(app)
-	, _iconStorage(std::make_unique<IconStorage>())
+	, _iconStorage(std::make_unique<IconStorage>(app.appConfig().interfaceSize()))
 {
 	SetIcon(wxICON(MainMMIcon));
 	SetSizeHints(minFrameSize, wxDefaultSize);
@@ -149,7 +149,8 @@ void MainFrame::createMenuBar()
 			wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "Launch game with selected executable"_lng);
 
-		_launchMenuItem->SetBitmap(_iconStorage->get(launchHelper->getLaunchString()));
+		_launchMenuItem->SetBitmap(
+			_iconStorage->get(launchHelper->getLaunchString(), IconPredefinedSize::x16));
 
 		gameMenu->AppendSeparator();
 
@@ -158,7 +159,7 @@ void MainFrame::createMenuBar()
 				wxString("Change executable for launch"_lng), wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "Change executable for launch"_lng);
 
-		launchManage->SetBitmap(_iconStorage->get(embedded_icon::cog));
+		launchManage->SetBitmap(_iconStorage->get(embedded_icon::cog, IconPredefinedSize::x16));
 
 		_menuItems[_launchMenuItem->GetId()] = [&] { onLaunchGameRequested(); };
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
@@ -259,7 +260,8 @@ void MainFrame::OnMenuToolsChangeSettings()
 	EX_TRY;
 
 	ApplicationSettingsDialog asd(this, _app);
-	asd.ShowModal();
+	if (asd.ShowModal() == wxID_APPLY)
+		wxGetApp().scheduleRestart();
 
 	EX_UNEXPECTED;
 }
@@ -443,7 +445,7 @@ void MainFrame::updateExecutableRelatedData()
 	if (auto helper = _currentPlatform->launchHelper())
 	{
 		auto text = wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption()));
-		auto icon = _iconStorage->get(helper->getLaunchString());
+		auto icon = _iconStorage->get(helper->getLaunchString(), IconPredefinedSize::x16);
 
 		_launchMenuItem->SetItemLabel(text);
 		_launchMenuItem->SetBitmap(icon);

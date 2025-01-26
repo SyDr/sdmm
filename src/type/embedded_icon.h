@@ -1,14 +1,14 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
 
+#include <wx/gdicmn.h>
+
 namespace mm
 {
-	inline constexpr const auto IconBlank = "icons/blank.png";  // todo: make blank by code instead
-
 	enum class IconPredefinedSize
 	{
 		x16,
@@ -50,5 +50,19 @@ namespace mm
 		constexpr const auto tick_gray      = "icons/tick-gray.png";
 		constexpr const auto tick_green     = "icons/tick-green.png";
 		constexpr const auto up             = "icons/up.png";
+	}
+
+	inline wxSize iconSize(IconPredefinedSize value)
+	{
+		switch (value)
+		{
+		case IconPredefinedSize::x16: return { 16, 16 };
+		case IconPredefinedSize::x24: return { 24, 24 };
+		case IconPredefinedSize::x32: return { 32, 32 };
+		case IconPredefinedSize::x48: return { 48, 48 };
+		case IconPredefinedSize::x64: return { 64, 64 };
+		}
+
+		return { 16, 16 };
 	}
 }

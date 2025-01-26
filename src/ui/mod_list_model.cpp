@@ -48,11 +48,13 @@ namespace
 }
 
 ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
-	ModListModelManagedMode managedMode, ModListModelArchivedMode archivedMode)
+	ModListModelManagedMode managedMode, ModListModelArchivedMode archivedMode,
+	std::optional<IconPredefinedSize> iconSize)
 	: _modDataProvider(modDataProvider)
 	, _iconStorage(iconStorage)
 	, _managedMode(managedMode)
 	, _archivedMode(archivedMode)
+	, _iconSize(iconSize)
 {
 	reload();
 }
@@ -210,7 +212,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 		{
 		case ModListModelColumn::priority:
 		{
-			variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(embedded_icon::blank)));
+			variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(embedded_icon::blank, _iconSize)));
 			break;
 		}
 		case ModListModelColumn::name:
@@ -247,7 +249,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 				return embedded_icon::blank;
 			}();
 
-			icon = _iconStorage.get(icon_);
+			icon = _iconStorage.get(icon_, _iconSize);
 		}
 
 		variant = wxVariant(wxDataViewIconText(text, icon));
@@ -256,7 +258,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	case ModListModelColumn::name:
 	{
 		variant = wxVariant(wxDataViewIconText(
-			wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon)));
+			wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon, _iconSize)));
 		break;
 	}
 	case ModListModelColumn::author:
@@ -286,8 +288,8 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case ModListModelColumn::status:
 	{
-		variant = wxVariant(wxDataViewIconText(
-			L"", _iconStorage.get(position ? embedded_icon::tick_green : embedded_icon::cross_gray)));
+		variant = wxVariant(wxDataViewIconText(L"",
+			_iconStorage.get(position ? embedded_icon::tick_green : embedded_icon::cross_gray, _iconSize)));
 		break;
 	}
 	case ModListModelColumn::load_order:

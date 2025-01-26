@@ -62,6 +62,9 @@ namespace mm
 		ModDescriptionUsedControl modDescriptionUsedControl() const override;
 		void                      modDescriptionUsedControl(ModDescriptionUsedControl value) override;
 
+		InterfaceSize interfaceSize() const override;
+		bool          interfaceSize(InterfaceSize value) override;
+
 	private:
 		fs::path configFilePath() const;
 		void     validate();

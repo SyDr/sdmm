@@ -32,10 +32,18 @@ namespace mm
 	private:
 		Application& _app;
 
-		wxWidgetsPtr<wxStaticBox>  _updateGroup  = nullptr;
+		wxWidgetsPtr<wxStaticBox> _globalGroup = nullptr;
+
 		wxWidgetsPtr<wxStaticText> _updateStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _updateChoice = nullptr;
 
+		wxWidgetsPtr<wxStaticText> _interfaceSizeStatic = nullptr;
+		wxWidgetsPtr<wxChoice>     _interfaceSizeChoice = nullptr;
+
+		// wxWidgetsPtr<wxStaticBox>   _conflictResolveModeDialog = nullptr;
+		// wxWidgetsPtr<wxRadioButton> _rupdateStatic             = nullptr;
+		// wxWidgetsPtr<wxRadioButton> _rupdateChoice             = nullptr;
+		//
 		wxWidgetsPtr<wxButton> _save   = nullptr;
 		wxWidgetsPtr<wxButton> _cancel = nullptr;
 	};

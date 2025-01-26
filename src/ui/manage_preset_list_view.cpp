@@ -7,12 +7,13 @@
 
 #include "manage_preset_list_view.hpp"
 
-#include "application.h"
+#include "mod_manager_app.h"
 #include "domain/mod_list.hpp"
 #include "error_view.h"
 #include "export_preset_dialog.hpp"
 #include "import_preset_dialog.hpp"
 #include "interface/iicon_storage.hpp"
+#include "interface/iapp_config.hpp"
 #include "interface/ilaunch_helper.hpp"
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
@@ -22,6 +23,7 @@
 #include "type/embedded_icon.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
+#include "type/interface_size.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -82,7 +84,8 @@ void ManagePresetListView::refreshListContent()
 	{
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(preset),
-			_iconStorage.get(preset == _selected ? embedded_icon::tick : embedded_icon::blank))));
+			_iconStorage.get(
+				preset == _selected ? embedded_icon::tick : embedded_icon::blank, IconPredefinedSize::x16))));
 		_list->AppendItem(data);
 
 		_profiles.emplace_back(preset);
@@ -118,6 +121,8 @@ void ManagePresetListView::createControls()
 	_mods = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
 	_mods->AssociateModel(_listModel.get());
+	if (auto interfaceSize = wxGetApp().appConfig().interfaceSize(); interfaceSize != InterfaceSize::standard)
+		_mods->SetRowHeight(FromDIP(toBaseSize(interfaceSize)));
 
 	_infoBar = new wxInfoBar(this);
 	_infoBarTimer.SetOwner(this);
@@ -127,7 +132,10 @@ void ManagePresetListView::createControls()
 
 void ManagePresetListView::createListColumns()
 {
-	auto r0 = new mmPriorityDataRenderer(FromDIP(32));
+	int size = FromDIP(32);
+	if (auto interfaceSize = wxGetApp().appConfig().interfaceSize(); interfaceSize != InterfaceSize::standard)
+		size = FromDIP(16 + toBaseSize(wxGetApp().appConfig().interfaceSize()));
+	auto r0 = new mmPriorityDataRenderer(size);
 	auto r1 = new wxDataViewIconTextRenderer();
 
 	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);

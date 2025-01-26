@@ -21,13 +21,15 @@ namespace mm
 	struct IModManager;
 	struct IModDataProvider;
 	struct ModData;
+	enum class IconPredefinedSize;
 
 	class ModListModel : public wxDataViewModel
 	{
 	public:
 		explicit ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
 			ModListModelManagedMode  managedMode  = ModListModelManagedMode::as_flat_list,
-			ModListModelArchivedMode archivedMode = ModListModelArchivedMode::as_single_group);
+			ModListModelArchivedMode          archivedMode = ModListModelArchivedMode::as_single_group,
+			std::optional<IconPredefinedSize> iconSize     = {});
 
 		bool IsListModel() const override;
 
@@ -70,8 +72,9 @@ namespace mm
 		void reload();
 
 	private:
-		ModListModelManagedMode  _managedMode  = ModListModelManagedMode::as_flat_list;
-		ModListModelArchivedMode _archivedMode = ModListModelArchivedMode::as_single_group;
+		ModListModelManagedMode           _managedMode  = ModListModelManagedMode::as_flat_list;
+		ModListModelArchivedMode          _archivedMode = ModListModelArchivedMode::as_single_group;
+		std::optional<IconPredefinedSize> _iconSize;
 
 		ModList             _list;
 		ModListDsplayedData _displayed;

@@ -19,7 +19,8 @@ namespace mm
 		virtual ~IIconStorage() = default;
 
 		[[nodiscard]] virtual wxBitmap get(
-			IconPredefined icon, IconPredefinedSize targetSize = IconPredefinedSize::x16) = 0;
-		[[nodiscard]] virtual wxBitmap get(const std::string& name)                       = 0;
+			IconPredefined icon, std::optional<IconPredefinedSize> targetSize = {}) = 0;
+		[[nodiscard]] virtual wxBitmap get(
+			const std::string& name, std::optional<IconPredefinedSize> resizeTo = {}) = 0;
 	};
 }

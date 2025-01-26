@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -15,9 +15,10 @@
 #include <wx/stdpaths.h>
 
 #include "system_info.hpp"
+#include "type/interface_size.hpp"
 #include "type/main_window_properties.h"
-#include "type/update_check_mode.hpp"
 #include "type/mod_description_used_control.hpp"
+#include "type/update_check_mode.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
@@ -129,6 +130,7 @@ namespace
 		inline constexpr const auto UpdateCheckMode           = "update_check_mode";
 		inline constexpr const auto LastCheckForUpdateOn      = "last_check_for_update_on";
 		inline constexpr const auto ModDescriptionUsedControl = "mod_description_use_control";
+		inline constexpr const auto InterfaceSize             = "interface_size";
 	}
 }
 
@@ -267,23 +269,23 @@ void AppConfig::validate()
 		!_data[sd_game][selectedPlatform][SD_FAVS].is_array())
 		_data[sd_game][selectedPlatform][SD_FAVS] = nlohmann::json::array({});
 
-	if (!_data.count(Key::UpdateCheckMode) || !_data[Key::UpdateCheckMode].is_number_unsigned())
-		_data[Key::UpdateCheckMode] = static_cast<int>(UpdateCheckMode::once_per_week);
+	auto simpleEnumCheck = [&](const auto& key, const auto& defaultValue, const auto& lastValue) {
+		if (!_data.count(key) || !_data[key].is_number_unsigned())
+			_data[key] = static_cast<int>(defaultValue);
 
-	if (_data[Key::UpdateCheckMode] < 0 ||
-		_data[Key::UpdateCheckMode] > static_cast<int>(UpdateCheckMode::once_per_month))
-		_data[Key::UpdateCheckMode] = static_cast<int>(UpdateCheckMode::once_per_week);
+		if (_data[key] < 0 || _data[key] > lastValue)
+			_data[key] = static_cast<int>(defaultValue);
+	};
+
+	simpleEnumCheck(Key::UpdateCheckMode, UpdateCheckMode::once_per_week, UpdateCheckMode::once_per_month);
 
 	if (!_data.count(Key::LastCheckForUpdateOn) || !_data[Key::LastCheckForUpdateOn].is_string())
 		_data[Key::LastCheckForUpdateOn] = std::string();
 
-	if (!_data.count(Key::ModDescriptionUsedControl) ||
-		!_data[Key::ModDescriptionUsedControl].is_number_unsigned())
-		_data[Key::ModDescriptionUsedControl] = static_cast<int>(ModDescriptionUsedControl::try_to_use_webview2);
+	simpleEnumCheck(Key::ModDescriptionUsedControl, ModDescriptionUsedControl::try_to_use_webview2,
+		ModDescriptionUsedControl::use_plain_text_control);
 
-	if (_data[Key::ModDescriptionUsedControl] < 0 ||
-		_data[Key::ModDescriptionUsedControl] > static_cast<int>(ModDescriptionUsedControl::use_plain_text_control))
-		_data[Key::ModDescriptionUsedControl] = static_cast<int>(ModDescriptionUsedControl::try_to_use_webview2);
+	simpleEnumCheck(Key::InterfaceSize, InterfaceSize::big, InterfaceSize::big);
 }
 
 UpdateCheckMode AppConfig::updateCheckMode() const
@@ -298,7 +300,7 @@ void AppConfig::updateCheckMode(UpdateCheckMode value)
 
 time_point AppConfig::lastUpdateCheck() const
 {
-	const auto        s = _data[Key::LastCheckForUpdateOn].get<std::string>();
+	const auto         s = _data[Key::LastCheckForUpdateOn].get<std::string>();
 	std::istringstream in(s);
 
 	time_point tp;
@@ -320,6 +322,21 @@ ModDescriptionUsedControl AppConfig::modDescriptionUsedControl() const
 void AppConfig::modDescriptionUsedControl(ModDescriptionUsedControl value)
 {
 	_data[Key::ModDescriptionUsedControl] = static_cast<int>(value);
+}
+
+InterfaceSize AppConfig::interfaceSize() const
+{
+	return static_cast<InterfaceSize>(_data[Key::InterfaceSize]);
+}
+
+bool AppConfig::interfaceSize(InterfaceSize value)
+{
+	if (value == interfaceSize())
+		return false;
+
+	_data[Key::InterfaceSize] = static_cast<int>(value);
+
+	return true;
 }
 
 void AppConfig::setMainWindowProperties(const MainWindowProperties& props)

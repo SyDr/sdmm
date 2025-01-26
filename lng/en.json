@@ -32,5 +32,9 @@
 		"once_per_day" : "once per day",
 		"once_per_week" : "once per week",
 		"once_per_month" : "once per month"
+	},
+	"interface_size" : {
+		"big" : "big",
+		"standard" : "standard"
 	}
 }

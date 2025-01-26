@@ -16,6 +16,7 @@ namespace mm
 	struct MainWindowProperties;
 	enum class UpdateCheckMode;
 	enum class ModDescriptionUsedControl;
+	enum class InterfaceSize;
 
 	struct IAppConfig
 	{
@@ -58,5 +59,8 @@ namespace mm
 
 		[[nodiscard]] virtual ModDescriptionUsedControl modDescriptionUsedControl() const = 0;
 		virtual void modDescriptionUsedControl(ModDescriptionUsedControl value)           = 0;
+
+		[[nodiscard]] virtual InterfaceSize interfaceSize() const              = 0;
+		virtual bool                        interfaceSize(InterfaceSize value) = 0;
 	};
 }
