@@ -583,12 +583,12 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxString(std::to_wstring(++index))));
-		data.push_back(wxVariant(
-			wxDataViewIconText(L"", _iconStorage.get(gameFiles != ShowGameFiles::none
-														 ? !entry.gamePath.empty() ? embedded_icon::tick_green
-																				   : embedded_icon::cross_gray
-														 : embedded_icon::question,
-										IconPredefinedSize::x16))));
+		data.push_back(wxVariant(wxDataViewIconText(L"",
+			_iconStorage.get(
+				gameFiles != ShowGameFiles::none
+					? !entry.gamePath.empty() ? IconPredefined::checkmark_green : IconPredefined::cross_gray
+					: IconPredefined::question,
+				IconPredefinedSize::x16))));
 		wxVariant v;
 		v.NullList();
 
@@ -602,7 +602,7 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 					wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon, IconPredefinedSize::x16)));
 			}
 			else
-				v.Append(wxVariant(_iconStorage.get(embedded_icon::cross_gray, IconPredefinedSize::x16)));
+				v.Append(wxVariant(_iconStorage.get(IconPredefined::cross_gray, IconPredefinedSize::x16)));
 		}
 
 		data.push_back(v);

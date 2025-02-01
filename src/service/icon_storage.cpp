@@ -26,44 +26,59 @@ std::size_t hash_value(const wxSize& v)
 	return r;
 }
 
-wxBitmap IconStorage::get(const std::string& name, const wxSize& targetSize)
+namespace
 {
-	if (name.empty())
-		return get("icons/blank.svg", targetSize);
-
-	const auto it = _iconCache.find({ name, targetSize });
-
-	if (it != std::end(_iconCache))
-		return it->second;
-
-	wxLogNull noLogging;  // suppress wxWidgets messages about inability to load icon
-
-	const auto path = wxString::FromUTF8(name);
-
-	wxIcon icon;
-
-	if (path.ends_with(L".svg"))
-		icon.CopyFromBitmap(wxBitmapBundle::FromSVGFile(path, targetSize).GetBitmap(targetSize));
-
-	if (!icon.IsOk())
-		icon = wxIcon(path, wxBITMAP_TYPE_ANY);
-
-	if (!icon.IsOk())
-		icon = wxIcon(path, wxBITMAP_TYPE_ICO);
-
-	if (!icon.IsOk())
+	wxString toPath(IconPredefined value)
 	{
-		if (name != "icons/blank.svg")
-			return get("icons/blank.svg", targetSize);
-
-		return wxNullIcon;
+		return wxString(L"icons/") + wxString::FromUTF8(std::string(magic_enum::enum_name(value))) + L".svg";
 	}
 
-	if (icon.GetSize() != targetSize)
-		icon.CopyFromBitmap(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(
-			targetSize.GetWidth(), targetSize.GetHeight(), wxIMAGE_QUALITY_NEAREST)));
+	wxIcon loadSvgIcon(IconPredefined location, const wxSize& targetSize)
+	{
+		wxIcon icon;
+		icon.CopyFromBitmap(wxBitmapBundle::FromSVGFile(toPath(location), targetSize).GetBitmap(targetSize));
 
-	return _iconCache[{ name, targetSize }] = icon;
+		return icon;
+	}
+
+	wxIcon loadNormalIcon(const wxString& location)
+	{
+		wxIcon icon(location, wxBITMAP_TYPE_ANY);
+
+		if (!icon.IsOk())
+			icon = wxIcon(location, wxBITMAP_TYPE_ICO);
+
+		return icon;
+	}
+
+	wxBitmap loadImpl(
+		IconStorage::IconCache& cache, const IconStorage::IconLocation& location, const wxSize& targetSize)
+	{
+		const auto it = cache.find({ location, targetSize });
+
+		if (it != std::end(cache))
+			return it->second;
+
+		wxLogNull noLogging;  // suppress wxWidgets messages about inability to load icon
+
+		wxIcon icon;
+		if (std::holds_alternative<IconPredefined>(location))
+			icon = loadSvgIcon(std::get<IconPredefined>(location), targetSize);
+		else
+		{
+			const auto path = wxString::FromUTF8(std::get<std::string>(location));
+			icon = loadNormalIcon(path);
+		}
+
+		if (!icon.IsOk())
+			return loadImpl(cache, IconPredefined::blank, targetSize);
+
+		if (icon.GetSize() != targetSize)
+			icon.CopyFromBitmap(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(
+				targetSize.GetWidth(), targetSize.GetHeight(), wxIMAGE_QUALITY_NEAREST)));
+
+		return cache[{ location, targetSize }] = icon;
+	}
 }
 
 mm::IconStorage::IconStorage(InterfaceSize interfaceSize)
@@ -72,20 +87,10 @@ mm::IconStorage::IconStorage(InterfaceSize interfaceSize)
 
 wxBitmap IconStorage::get(IconPredefined icon, std::optional<IconPredefinedSize> targetSize)
 {
-	std::string name = "icons/";
-	wxSize      size = { 16, 16 };
-
-	switch (icon)
-	{
-	case IconPredefined::blank: name += "blank.png"; break;
-	case IconPredefined::circle: name += "circle.svg"; break;
-	default: break;
-	}
-
-	return get(name, iconSize(targetSize.value_or(_defaultSize)));
+	return loadImpl(_iconCache, icon, iconSize(targetSize.value_or(_defaultSize)));
 }
 
 wxBitmap IconStorage::get(const std::string& name, std::optional<IconPredefinedSize> resizeTo)
 {
-	return get(name, iconSize(resizeTo.value_or(_defaultSize)));
+	return loadImpl(_iconCache, name, iconSize(resizeTo.value_or(_defaultSize)));
 }

@@ -212,7 +212,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 		{
 		case ModListModelColumn::priority:
 		{
-			variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(embedded_icon::blank, _iconSize)));
+			variant = wxVariant(wxDataViewIconText(L"", wxIcon()));
 			break;
 		}
 		case ModListModelColumn::name:
@@ -242,11 +242,11 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 			const auto& icon_ = [&]() {
 				switch (*_list.state(id))
 				{
-				case ModList::ModState::enabled: return embedded_icon::tick_green;
-				case ModList::ModState::disabled: return embedded_icon::cross_gray;
+				case ModList::ModState::enabled: return IconPredefined::checkmark_green;
+				case ModList::ModState::disabled: return IconPredefined::cross_gray;
 				}
 
-				return embedded_icon::blank;
+				return IconPredefined::blank;
 			}();
 
 			icon = _iconStorage.get(icon_, _iconSize);
@@ -288,8 +288,9 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case ModListModelColumn::status:
 	{
-		variant = wxVariant(wxDataViewIconText(L"",
-			_iconStorage.get(position ? embedded_icon::tick_green : embedded_icon::cross_gray, _iconSize)));
+		variant = wxVariant(wxDataViewIconText(
+			L"", _iconStorage.get(
+					 position ? IconPredefined::checkmark_green : IconPredefined::cross_gray, _iconSize)));
 		break;
 	}
 	case ModListModelColumn::load_order:

@@ -159,7 +159,7 @@ void MainFrame::createMenuBar()
 				wxString("Change executable for launch"_lng), wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "Change executable for launch"_lng);
 
-		launchManage->SetBitmap(_iconStorage->get(embedded_icon::cog, IconPredefinedSize::x16));
+		launchManage->SetBitmap(_iconStorage->get(IconPredefined::cog, IconPredefinedSize::x16));
 
 		_menuItems[_launchMenuItem->GetId()] = [&] { onLaunchGameRequested(); };
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };

@@ -66,16 +66,16 @@ void ImportPresetDialog::createControls()
 	_importNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "Import with name:"_lng);
 	_importName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 	_clearName       = new wxBitmapButton(
-        _optionsBox, wxID_ANY, _iconStorage.get(embedded_icon::clear, IconPredefinedSize::x16));
+        _optionsBox, wxID_ANY, _iconStorage.get(IconPredefined::cross_gray, IconPredefinedSize::x16));
 	_loadNow         = new wxCheckBox(_optionsBox, wxID_ANY, "Apply immediately"_lng);
 	_loadNow->SetValue(true);
 
 	_infoBar = new wxInfoBar(this);
 
 	_fromClipboard = new wxButton(this, wxID_ANY, "Paste"_lng);
-	_fromClipboard->SetBitmap(_iconStorage.get(embedded_icon::copy, IconPredefinedSize::x16));
+	_fromClipboard->SetBitmap(_iconStorage.get(IconPredefined::copy, IconPredefinedSize::x16));
 	_fromFile = new wxButton(this, wxID_ANY, "Load from file"_lng);
-	_fromFile->SetBitmap(_iconStorage.get(embedded_icon::save_to_file, IconPredefinedSize::x16));
+	_fromFile->SetBitmap(_iconStorage.get(IconPredefined::save_to_file, IconPredefinedSize::x16));
 	_ok = new wxButton(this, wxID_ANY, L"");
 
 	_infoBarTimer.SetOwner(this);

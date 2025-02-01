@@ -25,12 +25,12 @@ namespace mm
 		wxBitmap get(IconPredefined icon, std::optional<IconPredefinedSize> targetSize) override;
 		wxBitmap get(const std::string& name, std::optional<IconPredefinedSize> resizeTo) override;
 
-		wxBitmap get(const std::string& name, const wxSize& targetSize);
+		using IconLocation = std::variant<IconPredefined, std::string>;
+		using IconCacheKey = std::pair<IconLocation, wxSize>;
+		using IconCache    = std::unordered_map<IconCacheKey, wxBitmap, boost::hash<IconCacheKey>>;
 
 	private:
+		IconCache _iconCache;
 		IconPredefinedSize _defaultSize = IconPredefinedSize::x16;
-
-		using IconCacheKey = std::pair<std::string, wxSize>;
-		std::unordered_map<IconCacheKey, wxBitmap, boost::hash<IconCacheKey>> _iconCache;
 	};
 }
