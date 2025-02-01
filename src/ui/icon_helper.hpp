@@ -11,9 +11,13 @@ class wxBitmap;
 
 namespace mm
 {
+	namespace Icon
+	{
+		enum class Size;
+	}
+
 	struct IIconStorage;
-	enum class IconPredefinedSize;
 
 	wxBitmap loadModIcon(
-		IIconStorage& storage, const fs::path& parent, const std::string& filename, std::optional<IconPredefinedSize> size);
+		IIconStorage& storage, const fs::path& parent, const std::string& filename, std::optional<Icon::Size> size);
 }

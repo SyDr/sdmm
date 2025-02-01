@@ -10,7 +10,7 @@
 #include <wx/icon.h>
 #include <wx/log.h>
 
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/interface_size.hpp"
 
 using namespace mm;
@@ -28,12 +28,12 @@ std::size_t hash_value(const wxSize& v)
 
 namespace
 {
-	wxString toPath(IconPredefined value)
+	wxString toPath(Icon::Stock value)
 	{
 		return wxString(L"icons/") + wxString::FromUTF8(std::string(magic_enum::enum_name(value))) + L".svg";
 	}
 
-	wxIcon loadSvgIcon(IconPredefined location, const wxSize& targetSize)
+	wxIcon loadSvgIcon(Icon::Stock location, const wxSize& targetSize)
 	{
 		wxIcon icon;
 		icon.CopyFromBitmap(wxBitmapBundle::FromSVGFile(toPath(location), targetSize).GetBitmap(targetSize));
@@ -62,8 +62,8 @@ namespace
 		wxLogNull noLogging;  // suppress wxWidgets messages about inability to load icon
 
 		wxIcon icon;
-		if (std::holds_alternative<IconPredefined>(location))
-			icon = loadSvgIcon(std::get<IconPredefined>(location), targetSize);
+		if (std::holds_alternative<Icon::Stock>(location))
+			icon = loadSvgIcon(std::get<Icon::Stock>(location), targetSize);
 		else
 		{
 			const auto path = wxString::FromUTF8(std::get<std::string>(location));
@@ -71,7 +71,7 @@ namespace
 		}
 
 		if (!icon.IsOk())
-			return loadImpl(cache, IconPredefined::blank, targetSize);
+			return loadImpl(cache, Icon::Stock::blank, targetSize);
 
 		if (icon.GetSize() != targetSize)
 			icon.CopyFromBitmap(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(
@@ -85,12 +85,12 @@ mm::IconStorage::IconStorage(InterfaceSize interfaceSize)
 	: _defaultSize(toIconPredefinedSize(interfaceSize))
 {}
 
-wxBitmap IconStorage::get(IconPredefined icon, std::optional<IconPredefinedSize> targetSize)
+wxBitmap IconStorage::get(Icon::Stock icon, std::optional<Icon::Size> targetSize)
 {
 	return loadImpl(_iconCache, icon, iconSize(targetSize.value_or(_defaultSize)));
 }
 
-wxBitmap IconStorage::get(const std::string& name, std::optional<IconPredefinedSize> resizeTo)
+wxBitmap IconStorage::get(const std::string& name, std::optional<Icon::Size> resizeTo)
 {
 	return loadImpl(_iconCache, name, iconSize(resizeTo.value_or(_defaultSize)));
 }

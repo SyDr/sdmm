@@ -22,7 +22,7 @@
 #include "application.h"
 #include "interface/iapp_config.hpp"
 #include "interface/iicon_storage.hpp"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/sdlexcept.h"
 
 using namespace mm;
@@ -142,8 +142,8 @@ void SelectDirectoryDialog::fillData()
 	for (const auto& value : _appConfig.getKnownDataPathList())
 	{
 		auto icon = _iconStorage.get(
-			_appConfig.dataPathHasStar(value) ? IconPredefined::bookmark : IconPredefined::blank,
-			IconPredefinedSize::x16);
+			_appConfig.dataPathHasStar(value) ? Icon::Stock::bookmark : Icon::Stock::blank,
+			Icon::Size::x16);
 
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(value.string()), icon)));

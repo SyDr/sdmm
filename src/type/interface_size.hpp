@@ -9,7 +9,7 @@
 
 #include <magic_enum.hpp>
 
-#include "embedded_icon.h"
+#include "icon.hpp"
 
 namespace mm
 {
@@ -21,15 +21,15 @@ namespace mm
 
 	inline constexpr const auto InterfaceSizeValues = magic_enum::enum_values<InterfaceSize>();
 
-	inline IconPredefinedSize toIconPredefinedSize(InterfaceSize value)
+	inline Icon::Size toIconPredefinedSize(InterfaceSize value)
 	{
 		switch (value)
 		{
-		case InterfaceSize::standard: return IconPredefinedSize::x16;
-		case InterfaceSize::big: return IconPredefinedSize::x32;
+		case InterfaceSize::standard: return Icon::Size::x16;
+		case InterfaceSize::big: return Icon::Size::x32;
 		}
 
-		return IconPredefinedSize::x16;
+		return Icon::Size::x16;
 	}
 
 	inline int toBaseSize(InterfaceSize value)

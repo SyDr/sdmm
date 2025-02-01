@@ -45,7 +45,7 @@
     <ClInclude Include="mod_manager_app.h" />
     <ClInclude Include="service\platform_service.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="type\embedded_icon.h" />
+    <ClInclude Include="type\icon.hpp" />
     <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="ui\error_view.h" />
     <ClInclude Include="ui\main_frame.h" />

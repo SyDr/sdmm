@@ -99,7 +99,7 @@
     <ClInclude Include="system_info.hpp" />
     <ClInclude Include="type\chrono.hpp" />
     <ClInclude Include="type\conflict_resolve_mode.hpp" />
-    <ClInclude Include="type\embedded_icon.h" />
+    <ClInclude Include="type\icon.hpp" />
     <ClInclude Include="type\filesystem.hpp" />
     <ClInclude Include="type\interface_size.hpp" />
     <ClInclude Include="type\main_window_properties.h" />

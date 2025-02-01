@@ -15,7 +15,7 @@
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
 #include "mod_manager_app.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/sdlexcept.h"
 
 #include <boost/locale.hpp>
@@ -49,7 +49,7 @@ namespace
 
 ModListModel::ModListModel(IModDataProvider& modDataProvider, IIconStorage& iconStorage,
 	ModListModelManagedMode managedMode, ModListModelArchivedMode archivedMode,
-	std::optional<IconPredefinedSize> iconSize)
+	std::optional<Icon::Size> iconSize)
 	: _modDataProvider(modDataProvider)
 	, _iconStorage(iconStorage)
 	, _managedMode(managedMode)
@@ -242,11 +242,11 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 			const auto& icon_ = [&]() {
 				switch (*_list.state(id))
 				{
-				case ModList::ModState::enabled: return IconPredefined::checkmark_green;
-				case ModList::ModState::disabled: return IconPredefined::cross_gray;
+				case ModList::ModState::enabled: return Icon::Stock::checkmark_green;
+				case ModList::ModState::disabled: return Icon::Stock::cross_gray;
 				}
 
-				return IconPredefined::blank;
+				return Icon::Stock::blank;
 			}();
 
 			icon = _iconStorage.get(icon_, _iconSize);
@@ -290,7 +290,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	{
 		variant = wxVariant(wxDataViewIconText(
 			L"", _iconStorage.get(
-					 position ? IconPredefined::checkmark_green : IconPredefined::cross_gray, _iconSize)));
+					 position ? Icon::Stock::checkmark_green : Icon::Stock::cross_gray, _iconSize)));
 		break;
 	}
 	case ModListModelColumn::load_order:

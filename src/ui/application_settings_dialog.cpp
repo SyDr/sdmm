@@ -12,7 +12,7 @@
 #include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.hpp"
 #include "mod_manager_app.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/filesystem.hpp"
 #include "type/interface_size.hpp"
 #include "type/mod_description_used_control.hpp"

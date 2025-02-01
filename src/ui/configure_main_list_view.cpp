@@ -11,7 +11,7 @@
 #include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.hpp"
 #include "mod_manager_app.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/filesystem.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -31,7 +31,7 @@ ConfigureMainListView::ConfigureMainListView(wxWindow* parent, IIconStorage& ico
 	ModListModelArchivedMode initialArchivedMode)
 	: wxDialog(parent, wxID_ANY, "Configure view"_lng, wxDefaultPosition, wxSize(500, 600))
 	, _listModel(new ModListModel(*this, iconStorage, ModListModelManagedMode::as_flat_list,
-		  ModListModelArchivedMode::as_single_group, IconPredefinedSize::x16))
+		  ModListModelArchivedMode::as_single_group, Icon::Size::x16))
 	, _initialManagedMode(initialManagedMode)
 	, _initialArchivedMode(initialArchivedMode)
 {

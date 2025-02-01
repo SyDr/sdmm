@@ -14,7 +14,7 @@
 #include "interface/iicon_storage.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "mod_list_model.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/sdlexcept.h"
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "wx/priority_data_renderer.h"
@@ -310,7 +310,7 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 	, _iconStorage(iconStorage)
 	, _dataProvider(dataProvider)
 	, _selectModsModel(new ModListModel(dataProvider, iconStorage, ModListModelManagedMode::as_flat_list,
-		  ModListModelArchivedMode::as_single_group, IconPredefinedSize::x16))
+		  ModListModelArchivedMode::as_single_group, Icon::Size::x16))
 	, _basePath(basePath)
 	, _mods(list)
 {
@@ -438,7 +438,7 @@ void ShowFileListDialog::bindEvents()
 			wxVector<wxVariant> data;
 
 			data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(mod.name),
-				loadModIcon(_iconStorage, mod.data_path, mod.icon, IconPredefinedSize::x16))));
+				loadModIcon(_iconStorage, mod.data_path, mod.icon, Icon::Size::x16))));
 
 			data.push_back(wxVariant(wxString::FromUTF8(entry.modPaths[j])));
 
@@ -586,9 +586,9 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 		data.push_back(wxVariant(wxDataViewIconText(L"",
 			_iconStorage.get(
 				gameFiles != ShowGameFiles::none
-					? !entry.gamePath.empty() ? IconPredefined::checkmark_green : IconPredefined::cross_gray
-					: IconPredefined::question,
-				IconPredefinedSize::x16))));
+					? !entry.gamePath.empty() ? Icon::Stock::checkmark_green : Icon::Stock::cross_gray
+					: Icon::Stock::question,
+				Icon::Size::x16))));
 		wxVariant v;
 		v.NullList();
 
@@ -599,10 +599,10 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 				const auto& mod = _dataProvider.modData(_data.mods[j]);
 
 				v.Append(
-					wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon, IconPredefinedSize::x16)));
+					wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon, Icon::Size::x16)));
 			}
 			else
-				v.Append(wxVariant(_iconStorage.get(IconPredefined::cross_gray, IconPredefinedSize::x16)));
+				v.Append(wxVariant(_iconStorage.get(Icon::Stock::cross_gray, Icon::Size::x16)));
 		}
 
 		data.push_back(v);

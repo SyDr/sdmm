@@ -17,7 +17,7 @@
 
 #include "application.h"
 #include "interface/iicon_storage.hpp"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/filesystem.hpp"
 
 using namespace mm;
@@ -97,7 +97,7 @@ void SelectExe::refreshListContent()
 		int index = _list->GetItemCount();
 		_list->InsertItem(index, it->path().filename().wstring());
 
-		_imageList->Add(_iconStorage.get(it->path().string(), IconPredefinedSize::x16));
+		_imageList->Add(_iconStorage.get(it->path().string(), Icon::Size::x16));
 		_list->SetItemImage(index, index);
 
 		if (it->path().filename().wstring() == _selectedFile)

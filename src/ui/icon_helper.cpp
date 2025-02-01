@@ -7,14 +7,14 @@
 
 #include "icon_helper.hpp"
 #include "interface/iicon_storage.hpp"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 
 wxBitmap mm::loadModIcon(IIconStorage& storage, const fs::path& parent, const std::string& filename,
-	std::optional<IconPredefinedSize> size)
+	std::optional<Icon::Size> size)
 {
 	if (!filename.empty())
 		return storage.get((parent / filename).lexically_normal().string(), size);
 
-	return storage.get(IconPredefined::circle, size);
+	return storage.get(Icon::Stock::circle, size);
 }
 

@@ -23,7 +23,7 @@
 #include "mod_list_model.h"
 #include "mod_manager_app.h"
 #include "select_exe.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/interface_size.hpp"
 #include "type/mod_description_used_control.hpp"
 #include "utility/fs_util.h"
@@ -451,30 +451,30 @@ void ModListView::createControls(const wxString& managedPath)
 	}
 
 	_configure =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(IconPredefined::cog, IconPredefinedSize::x16),
+		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_configure->SetToolTip("Configure view"_lng);
 
 	_moveUp =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(IconPredefined::up, IconPredefinedSize::x16),
+		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveUp->SetToolTip("Move Up"_lng);
 	_moveUp->Disable();
 
 	_moveDown =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(IconPredefined::down, IconPredefinedSize::x16),
+		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveDown->SetToolTip("Move Down"_lng);
 	_moveDown->Disable();
 
 	_changeState = new wxBitmapButton(_group, wxID_ANY,
-		_iconStorage.get(IconPredefined::checkmark_green, IconPredefinedSize::x16), wxDefaultPosition,
+		_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16), wxDefaultPosition,
 		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
 	_changeState->Disable();
 
 	_sort =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(IconPredefined::sort, IconPredefinedSize::x16),
+		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_sort->SetToolTip("Sort"_lng);
 
@@ -486,14 +486,14 @@ void ModListView::createControls(const wxString& managedPath)
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
 	_showGallery  = new wxButton(this, wxID_ANY, "Screenshots"_lng);
 	_showGallery->SetBitmap(_iconStorage.get(
-		_galleryShown ? IconPredefined::double_down : IconPredefined::double_up, IconPredefinedSize::x16));
+		_galleryShown ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
 
 	_openGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
 	_openGallery->Disable();
-	_openGallery->SetBitmap(_iconStorage.get(IconPredefined::folder, IconPredefinedSize::x16));
+	_openGallery->SetBitmap(_iconStorage.get(Icon::Stock::folder, Icon::Size::x16));
 
 	_galleryView = new ImageGalleryView(this, wxID_ANY);
 	_galleryView->Show(_galleryShown);
@@ -615,8 +615,8 @@ void ModListView::updateControlsState()
 	_changeState->Enable();
 	_changeState->SetBitmap(wxNullBitmap);
 	_changeState->SetBitmap(_iconStorage.get(
-		_modManager.mods().enabled(mod.id) ? IconPredefined::cross_gray : IconPredefined::checkmark_green,
-		IconPredefinedSize::x16));
+		_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
+		Icon::Size::x16));
 	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
@@ -883,7 +883,7 @@ void ModListView::updateGalleryState(bool show)
 	_galleryShown = show;
 
 	_showGallery->SetBitmap(_iconStorage.get(
-		show ? IconPredefined::double_down : IconPredefined::double_up, IconPredefinedSize::x16));
+		show ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 	_galleryView->Show(show);
 
 	Layout();

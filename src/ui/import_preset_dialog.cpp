@@ -17,7 +17,7 @@
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
@@ -66,16 +66,16 @@ void ImportPresetDialog::createControls()
 	_importNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "Import with name:"_lng);
 	_importName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 	_clearName       = new wxBitmapButton(
-        _optionsBox, wxID_ANY, _iconStorage.get(IconPredefined::cross_gray, IconPredefinedSize::x16));
+        _optionsBox, wxID_ANY, _iconStorage.get(Icon::Stock::cross_gray, Icon::Size::x16));
 	_loadNow         = new wxCheckBox(_optionsBox, wxID_ANY, "Apply immediately"_lng);
 	_loadNow->SetValue(true);
 
 	_infoBar = new wxInfoBar(this);
 
 	_fromClipboard = new wxButton(this, wxID_ANY, "Paste"_lng);
-	_fromClipboard->SetBitmap(_iconStorage.get(IconPredefined::copy, IconPredefinedSize::x16));
+	_fromClipboard->SetBitmap(_iconStorage.get(Icon::Stock::copy, Icon::Size::x16));
 	_fromFile = new wxButton(this, wxID_ANY, "Load from file"_lng);
-	_fromFile->SetBitmap(_iconStorage.get(IconPredefined::save_to_file, IconPredefinedSize::x16));
+	_fromFile->SetBitmap(_iconStorage.get(Icon::Stock::save_to_file, Icon::Size::x16));
 	_ok = new wxButton(this, wxID_ANY, L"");
 
 	_infoBarTimer.SetOwner(this);

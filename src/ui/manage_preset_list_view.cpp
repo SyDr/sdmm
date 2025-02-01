@@ -20,7 +20,7 @@
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 #include "type/interface_size.hpp"
@@ -85,7 +85,7 @@ void ManagePresetListView::refreshListContent()
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(preset),
 			_iconStorage.get(
-				preset == _selected ? IconPredefined::checkmark : IconPredefined::blank, IconPredefinedSize::x16))));
+				preset == _selected ? Icon::Stock::checkmark : Icon::Stock::blank, Icon::Size::x16))));
 		_list->AppendItem(data);
 
 		_profiles.emplace_back(preset);

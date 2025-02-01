@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 
 #include <string>
 
@@ -19,8 +19,8 @@ namespace mm
 		virtual ~IIconStorage() = default;
 
 		[[nodiscard]] virtual wxBitmap get(
-			IconPredefined icon, std::optional<IconPredefinedSize> targetSize = {}) = 0;
+			Icon::Stock icon, std::optional<Icon::Size> targetSize = {}) = 0;
 		[[nodiscard]] virtual wxBitmap get(
-			const std::string& name, std::optional<IconPredefinedSize> resizeTo = {}) = 0;
+			const std::string& name, std::optional<Icon::Size> resizeTo = {}) = 0;
 	};
 }

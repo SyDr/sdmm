@@ -17,7 +17,7 @@
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
@@ -72,9 +72,9 @@ void ExportPresetDialog::createControls()
 	_exportName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 
 	_copyToClipboard = new wxButton(this, wxID_ANY, "Copy"_lng);
-	_copyToClipboard->SetBitmap(_iconStorage.get(IconPredefined::copy, IconPredefinedSize::x16));
+	_copyToClipboard->SetBitmap(_iconStorage.get(Icon::Stock::copy, Icon::Size::x16));
 	_saveToFile = new wxButton(this, wxID_ANY, "Save to file"_lng);
-	_saveToFile->SetBitmap(_iconStorage.get(IconPredefined::save_to_file, IconPredefinedSize::x16));
+	_saveToFile->SetBitmap(_iconStorage.get(Icon::Stock::save_to_file, Icon::Size::x16));
 
 	_infoBar = new wxInfoBar(this);
 	_ok      = new wxButton(this, wxID_ANY, "OK"_lng);

@@ -27,7 +27,7 @@
 #include "service/icon_storage.hpp"
 #include "show_file_list_dialog.hpp"
 #include "system_info.hpp"
-#include "type/embedded_icon.h"
+#include "type/icon.hpp"
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 
@@ -150,7 +150,7 @@ void MainFrame::createMenuBar()
 			nullptr, "Launch game with selected executable"_lng);
 
 		_launchMenuItem->SetBitmap(
-			_iconStorage->get(launchHelper->getLaunchString(), IconPredefinedSize::x16));
+			_iconStorage->get(launchHelper->getLaunchString(), Icon::Size::x16));
 
 		gameMenu->AppendSeparator();
 
@@ -159,7 +159,7 @@ void MainFrame::createMenuBar()
 				wxString("Change executable for launch"_lng), wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "Change executable for launch"_lng);
 
-		launchManage->SetBitmap(_iconStorage->get(IconPredefined::cog, IconPredefinedSize::x16));
+		launchManage->SetBitmap(_iconStorage->get(Icon::Stock::cog, Icon::Size::x16));
 
 		_menuItems[_launchMenuItem->GetId()] = [&] { onLaunchGameRequested(); };
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
@@ -445,7 +445,7 @@ void MainFrame::updateExecutableRelatedData()
 	if (auto helper = _currentPlatform->launchHelper())
 	{
 		auto text = wxString::Format(wxString("Launch (%s)"_lng), wxString::FromUTF8(helper->getCaption()));
-		auto icon = _iconStorage->get(helper->getLaunchString(), IconPredefinedSize::x16);
+		auto icon = _iconStorage->get(helper->getLaunchString(), Icon::Size::x16);
 
 		_launchMenuItem->SetItemLabel(text);
 		_launchMenuItem->SetBitmap(icon);
