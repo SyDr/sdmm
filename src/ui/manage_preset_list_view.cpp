@@ -85,7 +85,7 @@ void ManagePresetListView::refreshListContent()
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxDataViewIconText(wxString::FromUTF8(preset),
 			_iconStorage.get(
-				preset == _selected ? Icon::Stock::checkmark : Icon::Stock::blank, Icon::Size::x16))));
+				preset == _selected ? Icon::Stock::checkmark : Icon::Stock::empty, Icon::Size::x16))));
 		_list->AppendItem(data);
 
 		_profiles.emplace_back(preset);

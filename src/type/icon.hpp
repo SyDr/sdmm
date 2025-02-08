@@ -13,7 +13,8 @@ namespace mm
 	{
 		enum class Stock
 		{
-			blank,
+			blank, // gradient to denote invalid icon
+			empty,
 			bookmark,
 			checkmark,
 			checkmark_green,

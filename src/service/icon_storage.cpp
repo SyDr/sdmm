@@ -7,6 +7,7 @@
 
 #include "icon_storage.hpp"
 
+#include <wx/dcgraph.h>
 #include <wx/icon.h>
 #include <wx/log.h>
 
@@ -62,12 +63,25 @@ namespace
 		wxLogNull noLogging;  // suppress wxWidgets messages about inability to load icon
 
 		wxIcon icon;
-		if (std::holds_alternative<Icon::Stock>(location))
-			icon = loadSvgIcon(std::get<Icon::Stock>(location), targetSize);
+		if (auto stock = std::get_if<Icon::Stock>(&location))
+		{
+			if (*stock == Icon::Stock::empty)
+			{
+				wxBitmap bitmap(targetSize, 32);
+				auto     mask = new wxMask(bitmap, *wxBLACK);
+				bitmap.SetMask(mask);
+
+				icon.CopyFromBitmap(bitmap);
+			}
+			else
+			{
+				icon = loadSvgIcon(*stock, targetSize);
+			}
+		}
 		else
 		{
 			const auto path = wxString::FromUTF8(std::get<std::string>(location));
-			icon = loadNormalIcon(path);
+			icon            = loadNormalIcon(path);
 		}
 
 		if (!icon.IsOk())
