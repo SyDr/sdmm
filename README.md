@@ -33,3 +33,4 @@ TODO (In no particular order)
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Navigate in mod list via keys?
+- On first launch, ask some important settings.
