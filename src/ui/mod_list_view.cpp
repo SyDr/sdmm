@@ -161,19 +161,26 @@ void ModListView::buildLayout()
 	rightBottomSizer->Add(_showGallery, wxSizerFlags(0).Border(wxALL, 4));
 	rightBottomSizer->Add(_openGallery, wxSizerFlags(0).Border(wxALL, 4));
 
+	auto descriptionSizer = new wxStaticBoxSizer(_modDescriptionGroup, wxHORIZONTAL);
+
+	if (_modDescriptionWebView)
+		descriptionSizer->Add(_modDescriptionWebView, wxSizerFlags(1).Expand());
+	else if (_modDescriptionHtmlWindow)
+		descriptionSizer->Add(_modDescriptionHtmlWindow, wxSizerFlags(1).Expand());
+	else if (_modDescriptionTextCtrl)
+		descriptionSizer->Add(_modDescriptionTextCtrl, wxSizerFlags(1).Expand());
+
+	auto gallerySizer = new wxStaticBoxSizer(_gallery, wxVERTICAL);
+	gallerySizer->Add(_galleryView, wxSizerFlags(1).Expand());
+
 	auto rightSizer = new wxBoxSizer(wxVERTICAL);
-	if (_modDescription)
-		rightSizer->Add(_modDescription, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	else if (_modDescriptionFallback)
-		rightSizer->Add(_modDescriptionFallback, wxSizerFlags(1).Expand().Border(wxALL, 4));
-	else if (_modDescriptionPlain)
-		rightSizer->Add(_modDescriptionPlain, wxSizerFlags(1).Expand().Border(wxALL, 4));
+	rightSizer->Add(descriptionSizer, wxSizerFlags(1).Expand());
 	rightSizer->Add(rightBottomSizer, wxSizerFlags(0).Expand());
-	rightSizer->Add(_galleryView, wxSizerFlags(0).Expand().Border(wxALL, 4));
+	rightSizer->Add(gallerySizer, wxSizerFlags(0).Expand());
 
 	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
 	contentSizer->Add(leftGroupSizer, wxSizerFlags(168).Expand());
-	contentSizer->Add(rightSizer, wxSizerFlags(100).Expand().Border(wxALL, 4));
+	contentSizer->Add(rightSizer, wxSizerFlags(100).Expand().Border(wxLEFT, 4));
 
 	auto vertSizer = new wxBoxSizer(wxVERTICAL);
 	vertSizer->Add(contentSizer, wxSizerFlags(1).Expand());
@@ -184,7 +191,7 @@ void ModListView::buildLayout()
 
 void ModListView::bindEvents()
 {
-	_filterText->Bind(wxEVT_TEXT, [=](wxCommandEvent& event) {
+	_filterText->Bind(wxEVT_TEXT, [&](wxCommandEvent& event) {
 		const auto str = event.GetString();
 		_listModel->applyFilter(str.ToStdString(wxConvUTF8));
 		expandChildren();
@@ -196,7 +203,7 @@ void ModListView::bindEvents()
 		event.Skip();
 	});
 
-	_filterPopup->Bind(wxEVT_CHECKLISTBOX, [=](wxCommandEvent&) {
+	_filterPopup->Bind(wxEVT_CHECKLISTBOX, [&](wxCommandEvent&) {
 		_filterPopup->GetComboCtrl()->SetValueByUser(_filterPopup->GetStringValue());
 
 		wxArrayInt            selections;
@@ -218,9 +225,9 @@ void ModListView::bindEvents()
 			updateControlsState();
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [=](wxDataViewEvent&) { followSelection(); });
+	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [&](wxDataViewEvent&) { followSelection(); });
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_COLLAPSING, [&](wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
 			_collapsedCategories.emplace(*item);
@@ -230,7 +237,7 @@ void ModListView::bindEvents()
 			event.Veto();
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_EXPANDING, [&](const wxDataViewEvent& event) {
 		if (auto item = _listModel->itemGroupByItem(event.GetItem()); item.has_value())
 		{
 			_collapsedCategories.erase(*item);
@@ -238,7 +245,7 @@ void ModListView::bindEvents()
 		}
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [=](wxDataViewEvent&) {
+	_list->Bind(wxEVT_DATAVIEW_SELECTION_CHANGED, [&](wxDataViewEvent&) {
 		const auto item = _list->GetSelection();
 		const auto mod  = _listModel->findMod(item);
 		_selectedMod    = mod ? mod->id : "";
@@ -246,9 +253,9 @@ void ModListView::bindEvents()
 	});
 
 	_list->Bind(
-		wxEVT_DATAVIEW_ITEM_ACTIVATED, [=](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
+		wxEVT_DATAVIEW_ITEM_ACTIVATED, [&](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [&](wxDataViewEvent& event) {
 		auto moveFrom = _listModel->findIdByItem(event.GetItem());
 		if (moveFrom.empty())
 		{
@@ -260,7 +267,7 @@ void ModListView::bindEvents()
 		event.SetDragFlags(wxDrag_DefaultMove);
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE, [&](wxDataViewEvent& event) {
 		if (!event.GetItem().IsOk())
 		{
 			event.Veto();
@@ -286,7 +293,7 @@ void ModListView::bindEvents()
 			event.Veto();
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_DROP, [&](const wxDataViewEvent& event) {
 		wxTextDataObject from;
 		from.SetData(wxDF_UNICODETEXT, event.GetDataSize(), event.GetDataBuffer());
 
@@ -304,7 +311,7 @@ void ModListView::bindEvents()
 		_modManager.move(moveFrom, _listModel->findIdByItem(event.GetItem()));
 	});
 
-	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [=](wxDataViewEvent& event) {
+	_list->Bind(wxEVT_DATAVIEW_ITEM_CONTEXT_MENU, [&](wxDataViewEvent& event) {
 		if (!event.GetItem().IsOk())
 		{
 			event.Veto();
@@ -320,12 +327,12 @@ void ModListView::bindEvents()
 		_listModel->modList(_modManager.mods());
 
 		expandChildren();
-		if (!followSelection())
-			updateControlsState();
+		followSelection();
+		updateControlsState();
 		updateCategoryFilterContent();
 	});
 
-	_configure->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+	_configure->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
 		const auto columns  = _managedPlatform.localConfig()->listColumns();
 		const auto managed  = _managedPlatform.localConfig()->managedModsDisplay();
 		const auto archived = _managedPlatform.localConfig()->archivedModsDisplay();
@@ -384,28 +391,28 @@ void ModListView::bindEvents()
 		_filterText->SetFocusFromKbd();
 	});
 
-	if (_modDescription)
+	if (_modDescriptionWebView)
 	{
 		// WebView2 sends wxEVT_WEBVIEW_NAVIGATING events even for SetPage calls
-		_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATED, [=](wxWebViewEvent&) {
-			_modDescription->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
+		_modDescriptionWebView->Bind(wxEVT_WEBVIEW_NAVIGATED, [&](wxWebViewEvent&) {
+			_modDescriptionWebView->Bind(wxEVT_WEBVIEW_NAVIGATING, &ModListView::OnWebViewNavigating, this);
 		});
 	}
-	else if (_modDescriptionFallback)
+	else if (_modDescriptionHtmlWindow)
 	{
-		_modDescriptionFallback->Bind(wxEVT_HTML_LINK_CLICKED,
-			[=](wxHtmlLinkEvent& event) { wxLaunchDefaultBrowser(event.GetLinkInfo().GetHref()); });
+		_modDescriptionHtmlWindow->Bind(wxEVT_HTML_LINK_CLICKED,
+			[&](const wxHtmlLinkEvent& event) { wxLaunchDefaultBrowser(event.GetLinkInfo().GetHref()); });
 	}
-	else if (_modDescriptionPlain)
+	else if (_modDescriptionTextCtrl)
 	{
-		_modDescriptionPlain->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
+		_modDescriptionTextCtrl->Bind(wxEVT_TEXT_URL, [=](wxTextUrlEvent& event) {
 			if (!event.GetMouseEvent().ButtonDClick(wxMOUSE_BTN_LEFT))
 			{
 				event.Skip();
 				return;
 			}
 
-			const auto url = _modDescriptionPlain->GetRange(event.GetURLStart(), event.GetURLEnd());
+			const auto url = _modDescriptionTextCtrl->GetRange(event.GetURLStart(), event.GetURLEnd());
 			wxLaunchDefaultBrowser(url);
 		});
 	}
@@ -428,25 +435,28 @@ void ModListView::createControls(const wxString& managedPath)
 
 	createListControl();
 
-	// TODO: create separate method (and use variant for control itself)
+	_modDescriptionGroup = new wxStaticBox(this, wxID_ANY, L"");
+
+	// TODO: create separate method (and use variant for control itself?)
 	const auto descriptionControl = wxGetApp().appConfig().modDescriptionUsedControl();
 	if (descriptionControl == ModDescriptionUsedControl::try_to_use_webview2 &&
 		wxWebView::IsBackendAvailable(wxString::FromUTF8(wxWebViewBackendEdge)))
 	{
-		_modDescription = wxWebView::New();
-		_modDescription->Create(this, wxID_ANY);
-		_modDescription->EnableContextMenu(false);
-		_modDescription->EnableHistory(false);
-		_modDescription->EnableAccessToDevTools(false);
-		_modDescription->SetPage(L"<html></html>", L"");
+		_modDescriptionWebView = wxWebView::New();
+		_modDescriptionWebView->Create(_modDescriptionGroup, wxID_ANY);
+		_modDescriptionWebView->EnableContextMenu(false);
+		_modDescriptionWebView->EnableHistory(false);
+		_modDescriptionWebView->EnableAccessToDevTools(false);
+		_modDescriptionWebView->SetPage(L"<html></html>", L"");
 	}
 	else if (descriptionControl != ModDescriptionUsedControl::use_plain_text_control)
 	{
-		_modDescriptionFallback = new wxHtmlWindow(this);
+		_modDescriptionHtmlWindow = new wxHtmlWindow(_modDescriptionGroup);
 	}
 	else
 	{
-		_modDescriptionPlain = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+		_modDescriptionTextCtrl = new wxTextCtrl(_modDescriptionGroup, wxID_ANY, wxEmptyString,
+			wxDefaultPosition, wxDefaultSize,
 			wxTE_MULTILINE | wxTE_READONLY | wxTE_NOHIDESEL);
 	}
 
@@ -495,8 +505,11 @@ void ModListView::createControls(const wxString& managedPath)
 	_openGallery->Disable();
 	_openGallery->SetBitmap(_iconStorage.get(Icon::Stock::folder, Icon::Size::x16));
 
-	_galleryView = new ImageGalleryView(this, wxID_ANY);
+	_gallery = new wxStaticBox(this, wxID_ANY, L"");
+
+	_galleryView = new ImageGalleryView(_gallery, wxID_ANY);
 	_galleryView->Show(_galleryShown);
+	_galleryView->Show(_gallery);
 
 	_infoBar = new wxInfoBar(this);
 	_infoBarTimer.SetOwner(this);
@@ -576,25 +589,25 @@ void ModListView::updateControlsState()
 
 	_statusBar->SetStatusText(_listModel->status());
 
-	auto setDescription = [=](wxString content) {
-		if (_modDescription)
+	auto setDescription = [&](wxString content) {
+		if (_modDescriptionWebView)
 		{
 			content.Replace(L"$", L"${sign}");
 			content.Replace(L"`", L"${tick}");
 
-			_modDescription->RunScript(
+			_modDescriptionWebView->RunScript(
 				wxString::Format(L"const tick = '`'; const sign = '$'; document.open(); "
 								 L"document.write(String.raw`%s`); document.close(); "
 								 L"window.scrollTo(0, 0); ",
 					content));
 		}
-		else if (_modDescriptionFallback)
+		else if (_modDescriptionHtmlWindow)
 		{
-			_modDescriptionFallback->SetPage(content);
+			_modDescriptionHtmlWindow->SetPage(content);
 		}
-		else if (_modDescriptionPlain)
+		else if (_modDescriptionTextCtrl)
 		{
-			_modDescriptionPlain->SetValue(content);
+			_modDescriptionTextCtrl->SetValue(content);
 		}
 	};
 
@@ -622,39 +635,44 @@ void ModListView::updateControlsState()
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
 
-	auto description = "No description available"_lng;
-
-	if (mod.virtual_mod)
+	if (_selectedMod != _selectedModCached)
 	{
-		description = "This mod is virtual, there is no corresponding directory on disk"_lng;
-	}
-	else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
-	{
-		if (!_modDescriptionPlain)
+		auto description = "No description available"_lng;
+
+		if (mod.virtual_mod)
 		{
-			auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
-				cmark_markdown_to_html(desc.c_str(), desc.size(), CMARK_OPT_DEFAULT), &std::free);
-
-			desc = cnvt.get();
-
-			auto asString = wxString::FromUTF8(desc);
-
-			if (asString.empty())
-				asString = wxString(desc.c_str(), wxConvLocal, desc.size());
-
-			if (!asString.empty())
-				std::swap(asString, description);
+			description = "This mod is virtual, there is no corresponding directory on disk"_lng;
 		}
-		else
+		else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
 		{
-			description = wxString::FromUTF8(desc);
+			if (!_modDescriptionTextCtrl)
+			{
+				auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
+					cmark_markdown_to_html(desc.c_str(), desc.size(), CMARK_OPT_DEFAULT), &std::free);
+
+				desc = cnvt.get();
+
+				auto asString = wxString::FromUTF8(desc);
+
+				if (asString.empty())
+					asString = wxString(desc.c_str(), wxConvLocal, desc.size());
+
+				if (!asString.empty())
+					std::swap(asString, description);
+			}
+			else
+			{
+				description = wxString::FromUTF8(desc);
+			}
 		}
+
+		setDescription(description);
+
+		_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
+		_galleryView->SetPath(mod.data_path / "Screens");
+
+		_selectedModCached = _selectedMod;
 	}
-
-	setDescription(description);
-
-	_openGallery->Enable(fs::exists(mod.data_path / "Screens"));
-	_galleryView->SetPath(mod.data_path / "Screens");
 
 	Layout();
 
@@ -885,6 +903,7 @@ void ModListView::updateGalleryState(bool show)
 	_showGallery->SetBitmap(_iconStorage.get(
 		show ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 	_galleryView->Show(show);
+	_gallery->Show(show);
 
 	Layout();
 

@@ -76,6 +76,7 @@ namespace mm
 		IIconStorage& _iconStorage;
 
 		std::string _selectedMod;
+		std::string _selectedModCached;
 
 	private:
 		wxObjectDataPtr<ModListModel>               _listModel;
@@ -97,9 +98,10 @@ namespace mm
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 
-		wxWidgetsPtr<wxWebView>    _modDescription         = nullptr;
-		wxWidgetsPtr<wxHtmlWindow> _modDescriptionFallback = nullptr;
-		wxWidgetsPtr<wxTextCtrl>   _modDescriptionPlain   = nullptr;
+		wxWidgetsPtr<wxStaticBox>  _modDescriptionGroup      = nullptr;
+		wxWidgetsPtr<wxWebView>    _modDescriptionWebView    = nullptr;
+		wxWidgetsPtr<wxHtmlWindow> _modDescriptionHtmlWindow = nullptr;
+		wxWidgetsPtr<wxTextCtrl>   _modDescriptionTextCtrl   = nullptr;
 
 		struct  // Menu
 		{
@@ -112,6 +114,7 @@ namespace mm
 
 		wxWidgetsPtr<wxButton>         _showGallery  = nullptr;
 		wxWidgetsPtr<wxButton>         _openGallery  = nullptr;
+		wxWidgetsPtr<wxStaticBox>      _gallery      = nullptr;
 		wxWidgetsPtr<ImageGalleryView> _galleryView  = nullptr;
 		bool                           _galleryShown = true;
 
