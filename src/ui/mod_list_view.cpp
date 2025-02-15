@@ -366,22 +366,22 @@ void ModListView::bindEvents()
 		}
 	});
 
-	_moveUp->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
-	_moveDown->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
-	_changeState->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
+	_moveUp->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
+	_moveDown->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
+	_changeState->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
 
-	_sort->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onSortModsRequested({}, {}); });
+	_sort->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
-	_openGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { openGalleryRequested(); });
+	_openGallery->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { openGalleryRequested(); });
 
-	_showGallery->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+	_showGallery->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
 		_managedPlatform.localConfig()->screenshotsExpanded(!_galleryShown);
 		updateGalleryState(!_galleryShown);
 	});
 
-	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
+	Bind(wxEVT_TIMER, [&](wxTimerEvent&) { _infoBar->Dismiss(); });
 
-	Bind(wxEVT_CHAR_HOOK, [=](wxKeyEvent& event) {
+	Bind(wxEVT_CHAR_HOOK, [&](wxKeyEvent& event) {
 		if (!event.ControlDown() || event.GetKeyCode() != 'F')
 		{
 			event.Skip();
@@ -452,40 +452,37 @@ void ModListView::createControls(const wxString& managedPath)
 	else if (descriptionControl != ModDescriptionUsedControl::use_plain_text_control)
 	{
 		_modDescriptionHtmlWindow = new wxHtmlWindow(_modDescriptionGroup);
+		_modDescriptionHtmlWindow->SetHTMLBackgroundColour(_modDescriptionGroup->GetBackgroundColour());
 	}
 	else
 	{
 		_modDescriptionTextCtrl = new wxTextCtrl(_modDescriptionGroup, wxID_ANY, wxEmptyString,
-			wxDefaultPosition, wxDefaultSize,
-			wxTE_MULTILINE | wxTE_READONLY | wxTE_NOHIDESEL);
+			wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY | wxTE_NOHIDESEL);
+		_modDescriptionTextCtrl->SetBackgroundColour(_modDescriptionGroup->GetBackgroundColour());
 	}
 
-	_configure =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
-			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_configure->SetToolTip("Configure view"_lng);
 
-	_moveUp =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
-			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_moveUp = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveUp->SetToolTip("Move Up"_lng);
 	_moveUp->Disable();
 
-	_moveDown =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
-			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_moveDown->SetToolTip("Move Down"_lng);
 	_moveDown->Disable();
 
-	_changeState = new wxBitmapButton(_group, wxID_ANY,
-		_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16), wxDefaultPosition,
-		{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_changeState =
+		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16),
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_changeState->SetToolTip("Enable"_lng);
 	_changeState->Disable();
 
-	_sort =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
-			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
+		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	_sort->SetToolTip("Sort"_lng);
 
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
@@ -495,8 +492,8 @@ void ModListView::createControls(const wxString& managedPath)
 
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
 	_showGallery  = new wxButton(this, wxID_ANY, "Screenshots"_lng);
-	_showGallery->SetBitmap(_iconStorage.get(
-		_galleryShown ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
+	_showGallery->SetBitmap(
+		_iconStorage.get(_galleryShown ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
@@ -597,17 +594,21 @@ void ModListView::updateControlsState()
 
 			_modDescriptionWebView->RunScript(
 				wxString::Format(L"const tick = '`'; const sign = '$'; document.open(); "
-								 L"document.write(String.raw`%s`); document.close(); "
+								 L"document.write(String.raw`%s`);"
+								 L"document.close(); "
 								 L"window.scrollTo(0, 0); ",
 					content));
 		}
 		else if (_modDescriptionHtmlWindow)
 		{
 			_modDescriptionHtmlWindow->SetPage(content);
+			_modDescriptionHtmlWindow->Scroll(0, 0);
+			_modDescriptionHtmlWindow->SetHTMLBackgroundColour(_modDescriptionGroup->GetBackgroundColour());
 		}
 		else if (_modDescriptionTextCtrl)
 		{
 			_modDescriptionTextCtrl->SetValue(content);
+			_modDescriptionTextCtrl->SetBackgroundColour(_modDescriptionGroup->GetBackgroundColour());
 		}
 	};
 
@@ -901,8 +902,8 @@ void ModListView::updateGalleryState(bool show)
 
 	_galleryShown = show;
 
-	_showGallery->SetBitmap(_iconStorage.get(
-		show ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
+	_showGallery->SetBitmap(
+		_iconStorage.get(show ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 	_galleryView->Show(show);
 	_gallery->Show(show);
 
