@@ -613,6 +613,7 @@ void ModListView::updateControlsState()
 
 	if (_selectedMod.empty())
 	{
+		_selectedModCached.clear();
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
