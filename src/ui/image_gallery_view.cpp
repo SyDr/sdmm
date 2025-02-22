@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2023-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2023-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -8,9 +8,11 @@
 #include "image_gallery_view.hpp"
 
 #include "application.h"
+#include "utility/wx_current_dir_helper.hpp"
 
 #include <wx/generic/statbmpg.h>
 #include <wx/wrapsizer.h>
+
 
 using namespace mm;
 
@@ -98,8 +100,10 @@ void ImageGalleryView::createImageControls()
 			_gallerySizer->Add(control, wxSizerFlags(0).Expand().Border(wxALL, 4));
 
 			control->SetCursor(cursor);
-			control->Bind(wxEVT_LEFT_UP,
-				[&](wxMouseEvent&) { wxLaunchDefaultApplication(wxString::FromUTF8(item.first.string())); });
+			control->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent&) {
+				CurrentDirHelper cdh(item.first.parent_path().wstring());
+				wxLaunchDefaultApplication(wxString::FromUTF8(item.first.string()));
+			});
 		}
 	}
 

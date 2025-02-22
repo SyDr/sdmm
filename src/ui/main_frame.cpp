@@ -30,6 +30,7 @@
 #include "type/icon.hpp"
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
+#include "utility/wx_current_dir_helper.hpp"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
@@ -37,6 +38,7 @@
 #include <wx/infobar.h>
 #include <wx/menu.h>
 #include <wx/sizer.h>
+
 
 using namespace mm;
 
@@ -385,11 +387,8 @@ void MainFrame::onLaunchGameRequested()
 
 	if (!helper->getExecutable().empty())
 	{
-		const auto currentWorkDir = wxGetCwd();
-
-		wxSetWorkingDirectory(config->getDataPath().wstring());
+		CurrentDirHelper cdh(config->getDataPath().wstring());
 		wxExecute(wxString::FromUTF8('\"' + helper->getLaunchString()) + '\"');
-		wxSetWorkingDirectory(currentWorkDir);
 	}
 
 	EX_UNEXPECTED;

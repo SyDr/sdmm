@@ -38,6 +38,7 @@
     <ClCompile Include="ui\configure_main_list_view.cpp" />
     <ClCompile Include="utility\program_update_helper.cpp" />
     <ClCompile Include="ui\application_settings_dialog.cpp" />
+    <ClCompile Include="utility\wx_current_dir_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="ui\application_settings_dialog.h" />
     <ClInclude Include="type\mod_description_used_control.hpp" />
     <ClInclude Include="type\interface_size.hpp" />
+    <ClInclude Include="utility\wx_current_dir_helper.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />
