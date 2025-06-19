@@ -26,7 +26,7 @@ std::string Era2PlatfromDescriptor::getId() const
 
 std::string Era2PlatfromDescriptor::getPlatformName() const
 {
-	return "Era II (HoMM III: In the Wake of Gods)";
+	return "Era (HoMM III: In the Wake of Gods)";
 }
 
 std::unique_ptr<IModPlatform> Era2PlatfromDescriptor::create() const

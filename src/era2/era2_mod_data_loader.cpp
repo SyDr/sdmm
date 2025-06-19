@@ -12,6 +12,8 @@
 
 #include "interface/ii18n_service.hpp"
 
+#include <boost/locale.hpp>
+
 using namespace mm;
 
 namespace
@@ -153,26 +155,26 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 
 	result.name = get_i18n_string_from_json_object(
 		data, "name", preferredLng, mm::SystemInfo::DefaultLanguage, i18Service, result.legacy_format)
-						 .value_or("");
+					  .value_or("");
 
 	if (result.name.empty())
 		result.name = get_i18n_string_from_json_object(
 			data, "caption", preferredLng, mm::SystemInfo::DefaultLanguage, i18Service, result.legacy_format)
-							 .value_or("");
+						  .value_or("");
 
 	result.description = get_i18n_string_from_json_object(
 		data, "description", preferredLng, mm::SystemInfo::DefaultLanguage, i18Service, result.legacy_format)
-								  .value_or("");
+							 .value_or("");
 
 	if (result.description.empty())
 	{
 		const auto description = data.find("description");
 		if (description != data.cend() && description->is_object())
 		{
-			result.legacy_format    = true;
-			result.description = get_i18n_string_from_json_object(*description, "full", preferredLng,
-				mm::SystemInfo::DefaultLanguage, i18Service, result.legacy_format)
-										  .value_or("readme.txt");
+			result.legacy_format = true;
+			result.description   = get_i18n_string_from_json_object(*description, "full", preferredLng,
+				  mm::SystemInfo::DefaultLanguage, i18Service, result.legacy_format)
+									 .value_or("readme.txt");
 		}
 	}
 
@@ -183,12 +185,12 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 		if (const auto ico = find_object_value(&data, "icon"))
 		{
 			result.legacy_format = true;
-			result.icon = get_string_from_json_object(*ico, "file").value_or("");
+			result.icon          = get_string_from_json_object(*ico, "file").value_or("");
 		}
 	}
 
-	result.category      = get_string_from_json_object(data, "category").value_or("");
-	result.author       = get_string_from_json_object(data, "author").value_or("");
+	result.category = boost::locale::fold_case(get_string_from_json_object(data, "category").value_or(""));
+	result.author   = get_string_from_json_object(data, "author").value_or("");
 	result.homepage = get_string_from_json_object(data, "homepage").value_or("");
 
 	if (const auto compat = data.find("compatibility"); compat != data.end())
