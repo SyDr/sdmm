@@ -112,7 +112,8 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 
 		if (!hasLoadAfter)
 		{
-			result.load_after = defaultLoadAfter;
+			result.load_after = result.requires_;
+			result.load_after.insert(defaultLoadAfter.cbegin(), defaultLoadAfter.cend());
 			if (result.id != "WoG")
 				result.load_after.emplace("WoG");
 		}
@@ -197,14 +198,16 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 	{
 		if (const auto req = compat->find("requires"); req != compat->end() && req->is_array())
 		{
-			result.requires_ = get_string_set_from_json(*req);
-			hasRequires      = true;
+			result.requires_  = get_string_set_from_json(*req);
+			result.load_after = result.requires_;
+			hasRequires       = true;
+			hasLoadAfter      = true;
 		}
 
 		if (const auto after = compat->find("load_after"); after != compat->end() && after->is_array())
 		{
-			result.load_after = get_string_set_from_json(*after);
-			hasLoadAfter      = true;
+			result.load_after.merge(get_string_set_from_json(*after));
+			hasLoadAfter = true;
 		}
 
 		if (const auto inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())

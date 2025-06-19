@@ -23,17 +23,10 @@
 		"requires": [
 			"WoG Scripts",
 			"WoG"
-		],
-		"load_after": [
-			"WoG Scripts",
-			"WoG"
 		]
 	},
 	"Advanced Classes Mod Rus": {
 		"requires": [
-			"Advanced Classes Mod"
-		],
-		"load_after": [
 			"Advanced Classes Mod"
 		]
 	},
