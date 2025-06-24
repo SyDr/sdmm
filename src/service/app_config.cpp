@@ -8,8 +8,8 @@
 #include "app_config.hpp"
 
 #include "system_info.hpp"
-#include "type/interface_size.hpp"
 #include "type/interface_label.hpp"
+#include "type/interface_size.hpp"
 #include "type/main_window_properties.h"
 #include "type/mod_description_used_control.hpp"
 #include "type/update_check_mode.hpp"
@@ -129,7 +129,7 @@ namespace
 		{}
 
 		auto operator<=>(const ProgramVersion& r) const = default;
-		bool operator==(const ProgramVersion& r) const = default;
+		bool operator==(const ProgramVersion& r) const  = default;
 	};
 }
 
@@ -314,7 +314,9 @@ void AppConfig::validate()
 			_data[key] = static_cast<int>(defaultValue);
 	};
 
-	simpleEnumCheck(Key::UpdateCheckMode, UpdateCheckMode::once_per_week, UpdateCheckMode::once_per_month);
+	simpleEnumCheck(Key::UpdateCheckMode,
+		portableMode() ? UpdateCheckMode::manual : UpdateCheckMode::once_per_week,
+		UpdateCheckMode::once_per_month);
 
 	if (!_data.count(Key::LastCheckForUpdateOn) || !_data[Key::LastCheckForUpdateOn].is_string())
 		_data[Key::LastCheckForUpdateOn] = std::string();
