@@ -123,6 +123,7 @@
 	"Managed" : "Управляемые",
 	"Column" : "Столбец",
 	"Configure view" : "Настроить отображение",
+	"Configure" : "Настроить",
 	"Show managed mods" : "Показать управляемые моды",
 	"as a flat list" : "плоским списком",
 	"as a group" : "группой",
@@ -152,6 +153,7 @@
 	"Download" : "Загрузить",
 	"Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?" : "Другая копия программы уже запущена. Запуск более одной копии может привести к неправильном управлению модами/конфигурации. Запустить всё равно?",
 	"Interface size (mod list + some buttons):" : "Размер интерфейса (список модов и некоторые кнопки):",
+	"Show labels for buttons in list view:" : "Показывать подписи для кнопок в списке модов:",
 	"Mod description:" : "Описание модов:",
 
 	"update_mode" : {
@@ -169,6 +171,10 @@
 	"interface_size" : {
 		"big" : "большой",
 		"standard" : "стандартный"
+	},
+	"interface_label" : {
+		"show" : "показывать",
+		"dont_show" : "не показывать"
 	},
 	"category" : {
 		"gameplay" : "Геймплей",

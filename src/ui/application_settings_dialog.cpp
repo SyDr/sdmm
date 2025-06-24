@@ -15,6 +15,7 @@
 #include "type/icon.hpp"
 #include "type/filesystem.hpp"
 #include "type/interface_size.hpp"
+#include "type/interface_label.hpp"
 #include "type/mod_description_used_control.hpp"
 #include "type/update_check_mode.hpp"
 
@@ -67,6 +68,16 @@ void ApplicationSettingsDialog::createControls()
 	_interfaceSizeChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_interfaceSizeChoice->SetSelection(static_cast<int>(_app.appConfig().interfaceSize()));
 
+	_interfaceLabelStatic = new wxStaticText(this, wxID_ANY, "Show labels for buttons in list view:"_lng);
+	items.clear();
+
+	for (const auto& item : InterfaceLabelValues)
+		items.Add(wxString::FromUTF8(
+			wxGetApp().translationString("interface_label/" + std::string(magic_enum::enum_name(item)))));
+
+	_interfaceLabelChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+	_interfaceLabelChoice->SetSelection(static_cast<int>(_app.appConfig().interfaceLabel()));
+
 	_modDescriptionControlStatic = new wxStaticText(this, wxID_ANY, "Mod description:"_lng);
 	items.clear();
 
@@ -91,6 +102,10 @@ void ApplicationSettingsDialog::bindEvents()
 							  static_cast<InterfaceSize>(_interfaceSizeChoice->GetSelection())) ||
 						  restartRequired;
 
+		restartRequired = _app.appConfig().interfaceLabel(
+							  static_cast<InterfaceLabel>(_interfaceLabelChoice->GetSelection())) ||
+						  restartRequired;
+
 		restartRequired = _app.appConfig().modDescriptionUsedControl(static_cast<ModDescriptionUsedControl>(
 							  _modDescriptionControlChoice->GetSelection())) ||
 						  restartRequired;
@@ -109,6 +124,10 @@ void ApplicationSettingsDialog::buildLayout()
 	comboSizer->Add(_interfaceSizeStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	comboSizer->Add(
 		_interfaceSizeChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+
+	comboSizer->Add(_interfaceLabelStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	comboSizer->Add(
+		_interfaceLabelChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
 	comboSizer->Add(
 		_modDescriptionControlStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));

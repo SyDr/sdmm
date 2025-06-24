@@ -102,6 +102,7 @@
     <ClInclude Include="type\conflict_resolve_mode.hpp" />
     <ClInclude Include="type\icon.hpp" />
     <ClInclude Include="type\filesystem.hpp" />
+    <ClInclude Include="type\interface_label.hpp" />
     <ClInclude Include="type\interface_size.hpp" />
     <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="type\mod_description_used_control.hpp" />

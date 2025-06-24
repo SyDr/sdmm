@@ -9,6 +9,7 @@
 
 #include "system_info.hpp"
 #include "type/interface_size.hpp"
+#include "type/interface_label.hpp"
 #include "type/main_window_properties.h"
 #include "type/mod_description_used_control.hpp"
 #include "type/update_check_mode.hpp"
@@ -166,6 +167,7 @@ namespace
 		inline constexpr const auto LastCheckForUpdateOn      = "last_check_for_update_on";
 		inline constexpr const auto ModDescriptionUsedControl = "mod_description_use_control";
 		inline constexpr const auto InterfaceSize             = "interface_size";
+		inline constexpr const auto InterfaceLabel            = "interface_label";
 	}
 }
 
@@ -322,6 +324,8 @@ void AppConfig::validate()
 
 	simpleEnumCheck(Key::InterfaceSize, InterfaceSize::big, InterfaceSize::big);
 
+	simpleEnumCheck(Key::InterfaceLabel, InterfaceLabel::show, InterfaceLabel::dont_show);
+
 	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
 		_data[Key::MMVersion] = "";
 
@@ -389,6 +393,21 @@ bool AppConfig::interfaceSize(InterfaceSize value)
 		return false;
 
 	_data[Key::InterfaceSize] = static_cast<int>(value);
+
+	return true;
+}
+
+InterfaceLabel AppConfig::interfaceLabel() const
+{
+	return static_cast<InterfaceLabel>(_data[Key::InterfaceLabel]);
+}
+
+bool AppConfig::interfaceLabel(InterfaceLabel value)
+{
+	if (value == interfaceLabel())
+		return false;
+
+	_data[Key::InterfaceLabel] = static_cast<int>(value);
 
 	return true;
 }

@@ -109,6 +109,7 @@
     <ClInclude Include="type\mod_description_used_control.hpp" />
     <ClInclude Include="type\interface_size.hpp" />
     <ClInclude Include="utility\wx_current_dir_helper.hpp" />
+    <ClInclude Include="type\interface_label.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

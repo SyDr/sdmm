@@ -65,6 +65,9 @@ namespace mm
 		InterfaceSize interfaceSize() const override;
 		bool          interfaceSize(InterfaceSize value) override;
 
+		InterfaceLabel interfaceLabel() const override;
+		bool           interfaceLabel(InterfaceLabel value) override;
+
 	private:
 		fs::path configFilePath() const;
 		void     validate();

@@ -17,6 +17,7 @@ namespace mm
 	enum class UpdateCheckMode;
 	enum class ModDescriptionUsedControl;
 	enum class InterfaceSize;
+	enum class InterfaceLabel;
 
 	struct IAppConfig
 	{
@@ -62,5 +63,8 @@ namespace mm
 
 		[[nodiscard]] virtual InterfaceSize interfaceSize() const              = 0;
 		virtual bool                        interfaceSize(InterfaceSize value) = 0;
+
+		[[nodiscard]] virtual InterfaceLabel interfaceLabel() const               = 0;
+		virtual bool                         interfaceLabel(InterfaceLabel value) = 0;
 	};
 }

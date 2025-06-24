@@ -24,6 +24,7 @@
 #include "mod_manager_app.h"
 #include "select_exe.h"
 #include "type/icon.hpp"
+#include "type/interface_label.hpp"
 #include "type/interface_size.hpp"
 #include "type/mod_description_used_control.hpp"
 #include "utility/fs_util.h"
@@ -145,12 +146,12 @@ void ModListView::buildLayout()
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
-	buttonSizer->Add(_configure, wxSizerFlags(0).Border(wxALL, 4));
-	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4));
-	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4));
-	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4));
+	buttonSizer->Add(_configure, wxSizerFlags(0).Border(wxALL, 4).Expand());
+	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4).Expand());
+	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4).Expand());
+	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->AddStretchSpacer(1);
-	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4));
+	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4).Expand());
 
 	auto leftGroupSizer = new wxStaticBoxSizer(_group, wxHORIZONTAL);
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
@@ -461,29 +462,46 @@ void ModListView::createControls(const wxString& managedPath)
 		_modDescriptionTextCtrl->SetBackgroundColour(_modDescriptionGroup->GetBackgroundColour());
 	}
 
-	_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
-		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
-	_configure->SetToolTip("Configure view"_lng);
+	const bool useLabels = wxGetApp().appConfig().interfaceLabel() != InterfaceLabel::dont_show;
 
-	_moveUp = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
-		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
-	_moveUp->SetToolTip("Move Up"_lng);
-	_moveUp->Disable();
+	if (useLabels)
+	{
+		_configure   = new wxButton(_group, wxID_ANY, "Configure"_lng);
+		_moveUp      = new wxButton(_group, wxID_ANY, "Move Up"_lng);
+		_moveDown    = new wxButton(_group, wxID_ANY, "Move Down"_lng);
+		_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
+		_sort        = new wxButton(_group, wxID_ANY, "Sort"_lng);
 
-	_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
-		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
-	_moveDown->SetToolTip("Move Down"_lng);
-	_moveDown->Disable();
-
-	_changeState =
-		new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16),
+		_configure->SetBitmap(_iconStorage.get(Icon::Stock::cog, Icon::Size::x16));
+		_moveUp->SetBitmap(_iconStorage.get(Icon::Stock::up, Icon::Size::x16));
+		_moveDown->SetBitmap(_iconStorage.get(Icon::Stock::down, Icon::Size::x16));
+		_changeState->SetBitmap(_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16));
+		_sort->SetBitmap(_iconStorage.get(Icon::Stock::sort, Icon::Size::x16));
+	}
+	else
+	{
+		_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
-	_changeState->SetToolTip("Enable"_lng);
-	_changeState->Disable();
+		_moveUp    = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
+			   wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_changeState = new wxBitmapButton(_group, wxID_ANY,
+			_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16), wxDefaultPosition,
+			{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	}
 
-	_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
-		wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_configure->SetToolTip("Configure view"_lng);
+	_moveUp->SetToolTip("Move Up"_lng);
+	_moveDown->SetToolTip("Move Down"_lng);
+	_changeState->SetToolTip("Enable"_lng);
 	_sort->SetToolTip("Sort"_lng);
+
+	_moveUp->Disable();
+	_moveDown->Disable();
+	_changeState->Disable();
 
 	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
 	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
@@ -628,10 +646,24 @@ void ModListView::updateControlsState()
 	const auto& mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 	_changeState->Enable();
-	_changeState->SetBitmap(wxNullBitmap);
-	_changeState->SetBitmap(_iconStorage.get(
-		_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
-		Icon::Size::x16));
+
+	if (wxGetApp().appConfig().interfaceLabel() == InterfaceLabel::dont_show)
+	{
+		_changeState->SetBitmap(wxNullBitmap);
+		_changeState->SetBitmap(_iconStorage.get(
+			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
+			Icon::Size::x16));
+	}
+	else
+	{
+		_changeState->SetBitmap(wxNullBitmap);
+		_changeState->SetBitmap(_iconStorage.get(
+			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
+			Icon::Size::x16));
+
+		_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
+	}
+
 	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
