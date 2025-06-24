@@ -38,5 +38,7 @@ See files in "lng" directory for list of available values.
 When looking for a some file, Era II will start from mod with greatest priority. I will refer to load order - exact opposite thing. For example if i say `Mod 2` loaded after `Mod 1` this means that `Mod 2` will have greater priority, and game will took files from it instead of `Mod 1` where it possible. Don't be confused :).
 
 `incompatible` lists mods, with which game cannot be loaded or this action will not make any sense in combination with this mod.  
-`requires` lists mods, without which game cannot be loaded or this action will not make any sense in combination with this mod (this will not restrict mod load order).  
+`requires` lists mods, without which game cannot be loaded or this action will not make any sense in combination with this mod (this will also automatically adds this mod to load order).  
 `load_after` lists mods, which should have less priority than this mod (i.e. game will load files from this mod if they are sorted correctly).
+
+`WoG` is implicitly added to `requires` and `load_after`, unless you modify them (i.e., you probably want add WoG to `requires` too).
