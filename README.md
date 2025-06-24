@@ -34,3 +34,4 @@ TODO (In no particular order)
 - WebPreview check width.
 - Navigate in mod list via keys?
 - On first launch, ask some important settings.
+- Would be nice to have at least the possibiliy to see what plugins are tied to a mod - for users helpful when its about bugfixing/testing
