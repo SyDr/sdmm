@@ -20,19 +20,27 @@ using namespace mm;
 
 namespace
 {
-	void expandRequirements(
-		std::vector<std::string>& where, IModDataProvider& modDataProvider, const std::string& currentId)
+	struct ModCompatibility
+	{
+		std::set<std::string> incompatible;
+		std::set<std::string> requires_;
+		std::set<std::string> load_after;
+	};
+
+	using CompatMap = std::unordered_map<std::string, ModCompatibility>;
+
+	void expandRequirements(std::vector<std::string>& where, CompatMap& cm, const std::string& currentId)
 	{
 		if (std::find(where.begin(), where.end(), currentId) == where.end())
 			where.emplace_back(currentId);
 
-		const auto& modData = modDataProvider.modData(currentId);
+		const auto& modData = cm[currentId];
 		for (const auto& id : modData.requires_)
-			expandRequirements(where, modDataProvider, id);
+			expandRequirements(where, cm, id);
 	}
 
 	void reduceRequirements(std::set<std::string>& where, const std::vector<std::string>& active,
-		IModDataProvider& modDataProvider, const std::string& currentId)
+		CompatMap& cm, const std::string& currentId)
 	{
 		if (where.contains(currentId))  // requirements chain already added
 			return;
@@ -41,58 +49,81 @@ namespace
 
 		for (const auto& id : active)
 		{
-			const auto& modData = modDataProvider.modData(id);
+			const auto& modData = cm[id];
 			if (modData.requires_.contains(currentId))
-				reduceRequirements(where, active, modDataProvider, id);
+				reduceRequirements(where, active, cm, id);
 		}
 	}
 
-	void reduceRequirementsTop(
-		std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
+	void reduceRequirementsTop(std::vector<std::string>& active, CompatMap& cm, const std::string& currentId)
 	{
 		if (currentId.empty())
 			return;
 
 		std::set<std::string> reducedRequirements;
-		reduceRequirements(reducedRequirements, active, modDataProvider, currentId);
+		reduceRequirements(reducedRequirements, active, cm, currentId);
 
 		boost::range::remove_erase_if(
 			active, [&](const std::string& item) { return reducedRequirements.contains(item); });
 	}
 
 	void reduceIncompatibleChain(
-		std::vector<std::string>& active, IModDataProvider& modDataProvider, const std::string& currentId)
+		std::vector<std::string>& active, CompatMap& cm, const std::string& currentId)
 	{
 		if (currentId.empty())
 			return;
 
-		for (const auto& id : modDataProvider.modData(currentId).incompatible)
-			reduceRequirementsTop(active, modDataProvider, id);
+		for (const auto& id : cm[currentId].incompatible)
+			reduceRequirementsTop(active, cm, id);
 
-		for (const auto& id : modDataProvider.modData(currentId).requires_)
-			reduceIncompatibleChain(active, modDataProvider, id);
+		for (const auto& id : cm[currentId].requires_)
+			reduceIncompatibleChain(active, cm, id);
 	}
 }
 
 std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataProvider& modDataProvider,
 	const std::string& enablingMod, const std::string& disablingMod)
 {
+	// copy compatibility info from data provider
+	CompatMap cm;
+	for (const auto& mod : mods.data)
+	{
+		auto [it, _] = cm.insert({ mod.id, {} });
+
+		auto data = modDataProvider.modData(mod.id);
+
+		it->second.incompatible = data.incompatible;
+		it->second.requires_    = data.requires_;
+		it->second.load_after   = data.load_after;
+	}
+
+	// incompatibility info is viral
+	for (auto& [key, value] : cm)
+	{
+		for (const auto& item : value.incompatible)
+			cm[item].incompatible.insert(key);
+	}
+
 	// expand current mod list to contain all mods, required by active mods
 	std::vector<std::string> expandedRequirements;
 	for (const auto& mod : mods.data)
 		if (mod.state == ModList::ModState::enabled)
-			expandRequirements(expandedRequirements, modDataProvider, mod.id);
+			expandedRequirements.emplace_back(mod.id);
+
+	for (const auto& mod : mods.data)
+		if (mod.state == ModList::ModState::enabled)
+			expandRequirements(expandedRequirements, cm, mod.id);
 
 	// remove mods if user disables mod
 	// then remove mods, incompatible with mod, which user enables
 	// then remove mods, incompatible with top mods
-	reduceRequirementsTop(expandedRequirements, modDataProvider, disablingMod);
-	reduceIncompatibleChain(expandedRequirements, modDataProvider, enablingMod);
+	reduceRequirementsTop(expandedRequirements, cm, disablingMod);
+	reduceIncompatibleChain(expandedRequirements, cm, enablingMod);
 
 	for (size_t i = 0; i < expandedRequirements.size(); ++i)
 	{
 		const auto copy = expandedRequirements[i];
-		reduceIncompatibleChain(expandedRequirements, modDataProvider, copy);
+		reduceIncompatibleChain(expandedRequirements, cm, copy);
 	}
 
 	std::vector<std::string> sortedActive;
@@ -107,7 +138,7 @@ std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataPr
 			if (i == j)
 				continue;
 
-			if (modDataProvider.modData(expandedRequirements[j]).load_after.contains(candidate))
+			if (cm[expandedRequirements[j]].load_after.contains(candidate))
 				ok = false;
 		}
 
