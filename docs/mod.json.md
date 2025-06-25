@@ -8,7 +8,7 @@ Any section, defined as `"section": lng` means that section is defined as follow
 "section": {
   "en" : "value",
   "ru" : "value",
-  "<code" : "value"
+  "<code>" : "value"
 }
 ```
 MM will try to load entry for current language first. If it's not possible - english will be used instead. 
@@ -26,9 +26,9 @@ MM will try to load data from deprecated fields if data is not present in expect
   "version" : "1.0",
   "category" : "gameplay",
   "compatibility" : {
-    "requires" : [ "WoG", "Test1"],
-    "load_after" : [ "WoG", "Test2"],
-    "incompatible" : ["Test3"]
+    "requires" : [ "WoG", "Test1" ],
+    "load_after" : [ "WoG", "Test2" ],
+    "incompatible" : [ "Test3" ]
   }
 ```
 ### Category
