@@ -13,11 +13,15 @@
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 
+#include <boost/locale/conversion.hpp>
+
 using namespace mm;
 
-Era2ModDataProvider::Era2ModDataProvider(
-	fs::path basePath, std::string preferredLng, const II18nService& i18Service)
+Era2ModDataProvider::Era2ModDataProvider(fs::path basePath,
+	std::unordered_map<std::string, std::string> fsNameMapping, std::string preferredLng,
+	const II18nService& i18Service)
 	: _basePath(std::move(basePath))
+	, _fsNameMapping(std::move(fsNameMapping))
 	, _preferredLng(std::move(preferredLng))
 	, _i18Service(i18Service)
 {
@@ -28,9 +32,13 @@ const ModData& Era2ModDataProvider::modData(const std::string& id)
 {
 	auto it = _data.find(id);
 
+	std::string dirName = id;
+	if (auto fsIt = _fsNameMapping.find(id); fsIt != _fsNameMapping.cend())
+		dirName = fsIt->second;
+
 	if (it == _data.cend())
 	{
-		auto modData = mm::Era2ModDataLoader::load(_basePath / id, _preferredLng, _defaultIncompatible[id],
+		auto modData = mm::Era2ModDataLoader::load(id, _basePath / dirName, _preferredLng, _defaultIncompatible[id],
 			_defaultRequires[id], _defaultLoadAfter[id], _i18Service);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(modData));
@@ -67,18 +75,20 @@ void Era2ModDataProvider::loadDefaults()
 
 	for (const auto& [modId, modData] : data.items())
 	{
+		auto id = boost::locale::fold_case(modId);
+
 		for (const auto& item : modData["incompatible"])
 		{
-			auto value = item.get<std::string>();
+			auto value = boost::locale::fold_case(item.get<std::string>());
 
-			_defaultIncompatible[modId].emplace(value);
-			_defaultIncompatible[value].emplace(modId);
+			_defaultIncompatible[id].emplace(value);
+			_defaultIncompatible[value].emplace(id);
 		}
 
 		for (const auto& item : modData["requires"])
-			_defaultRequires[modId].emplace(item.get<std::string>());
+			_defaultRequires[id].emplace(boost::locale::fold_case(item.get<std::string>()));
 
 		for (const auto& item : modData["load_after"])
-			_defaultLoadAfter[modId].emplace(item.get<std::string>());
+			_defaultLoadAfter[id].emplace(boost::locale::fold_case(item.get<std::string>()));
 	}
 }

@@ -895,7 +895,7 @@ void ModListView::onRemoveModRequested()
 {
 	EX_TRY;
 
-	auto mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	auto& mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
 
 	if (!mod.virtual_mod)
 	{

@@ -41,7 +41,6 @@ namespace mm
 	private:
 		fs::path getModsDirPath() const;
 		fs::path getActiveListPath() const;
-		fs::path getHiddenListPath() const;
 		fs::path getPluginListPath() const;
 
 		void save();

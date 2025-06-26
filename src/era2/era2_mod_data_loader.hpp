@@ -17,8 +17,7 @@ namespace mm
 
 namespace mm::Era2ModDataLoader
 {
-
-	ModData load(const fs::path& loadFrom, const std::string& preferredLng,
+	ModData load(const std::string& id, const fs::path& loadFrom, const std::string& preferredLng,
 		const std::set<std::string>& defaultIncompatible, const std::set<std::string>& defaultRequires,
 		const std::set<std::string>& defaultLoadAfter, const II18nService& i18Service);
 }

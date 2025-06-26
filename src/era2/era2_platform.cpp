@@ -27,10 +27,33 @@
 #include "utility/json_util.h"
 #include "utility/sdlexcept.h"
 
+#include <boost/locale/conversion.hpp>
+
 using namespace mm;
 
 namespace
 {
+	std::unordered_map<std::string, std::string> loadFsMapNames(const fs::path& modsPath)
+	{
+		std::unordered_map<std::string, std::string> result;
+
+		if (exists(modsPath))
+		{
+			using di = fs::directory_iterator;
+			for (auto it = di(modsPath), end = di(); it != end; ++it)
+			{
+				if (!it->is_directory())
+					continue;
+
+				const auto item = it->path().filename().string();
+
+				result[boost::locale::fold_case(item)] = item;
+			}
+		}
+
+		return result;
+	}
+
 	bool validateModId(std::string& id, ModList::ModState& state)
 	{
 		boost::trim(id);
@@ -47,7 +70,7 @@ namespace
 		return true;
 	}
 
-	ModList loadMods(const fs::path& activePath, const fs::path&, const fs::path& modsPath)
+	ModList loadMods(const fs::path& activePath, const fs::path& modsPath)
 	{
 		ModList           items;
 		ModList::ModState state = ModList::ModState::enabled;
@@ -58,8 +81,10 @@ namespace
 
 		for (auto& item : boost::adaptors::reverse(activeMods))
 		{
-			if (validateModId(item, state) && !items.managed(item))
-				items.data.emplace_back(item, state);
+			auto id = boost::locale::fold_case(item);
+
+			if (validateModId(id, state) && !items.managed(id))
+				items.data.emplace_back(id, state);
 		}
 
 		// remaining items from directory
@@ -72,23 +97,32 @@ namespace
 					continue;
 
 				const auto item = it->path().filename().string();
-				if (!items.managed(item))
-					items.rest.emplace(item);
+				const auto id   = boost::locale::fold_case(item);
+
+				if (!items.managed(id))
+					items.rest.emplace(id);
 			}
 		}
 
 		return items;
 	}
 
-	void saveMods(const fs::path& activePath, const fs::path&, const ModList& mods)
+	void saveMods(const fs::path& activePath, const fs::path& modsPath, const ModList& mods)
 	{
+		auto map = loadFsMapNames(modsPath);
+
 		std::vector<std::string> toSave;
+
 		for (const auto& item : boost::adaptors::reverse(mods.data))
 		{
+			auto value = map[item.id];
+			if (value.empty())
+				value = item.id;
+
 			switch (item.state)
 			{
-			case ModList::ModState::enabled: toSave.emplace_back(item.id); break;
-			case ModList::ModState::disabled: toSave.emplace_back('*' + item.id); break;
+			case ModList::ModState::enabled: toSave.emplace_back(value); break;
+			case ModList::ModState::disabled: toSave.emplace_back('*' + value); break;
 			}
 		}
 
@@ -103,10 +137,10 @@ Era2Platform::Era2Platform(const Application& app)
 	_localConfig     = std::make_unique<Era2Config>(_rootDir);
 	_presetManager   = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
 	_launchHelper    = std::make_unique<Era2LaunchHelper>(*_localConfig);
-	_modDataProvider = std::make_unique<Era2ModDataProvider>(
-		getModsDirPath(), _app.appConfig().currentLanguageCode(), _app.i18nService());
+	_modDataProvider = std::make_unique<Era2ModDataProvider>(getModsDirPath(),
+		loadFsMapNames(getModsDirPath()), _app.appConfig().currentLanguageCode(), _app.i18nService());
 
-	_modList    = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
+	_modList    = loadMods(getActiveListPath(), getModsDirPath());
 	_modManager = std::make_unique<Era2ModManager>(_modList);
 
 	_modListChanged = _modManager->onListChanged().connect([this] { save(); });
@@ -119,7 +153,7 @@ fs::path Era2Platform::managedPath() const
 
 void Era2Platform::reload(bool force)
 {
-	auto mods = loadMods(getActiveListPath(), getHiddenListPath(), getModsDirPath());
+	auto mods = loadMods(getActiveListPath(), getModsDirPath());
 	if (!force && mods == _modManager->mods())
 		return;
 
@@ -175,11 +209,6 @@ fs::path Era2Platform::getActiveListPath() const
 	return getModsDirPath() / "list.txt";
 }
 
-fs::path Era2Platform::getHiddenListPath() const
-{
-	return _localConfig->getProgramDataPath() / "hidden_mods.txt";
-}
-
 fs::path Era2Platform::getPluginListPath() const
 {
 	return _localConfig->getProgramDataPath() / "plugins.json";
@@ -187,5 +216,5 @@ fs::path Era2Platform::getPluginListPath() const
 
 void Era2Platform::save()
 {
-	saveMods(getActiveListPath(), getHiddenListPath(), _modManager->mods());
+	saveMods(getActiveListPath(), getModsDirPath(), _modManager->mods());
 }

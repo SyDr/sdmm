@@ -278,7 +278,7 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case ModListModelColumn::directory:
 	{
-		variant = wxVariant(wxString::FromUTF8(mod.id));
+		variant = wxVariant(wxString::FromUTF8(mod.dir));
 		break;
 	}
 	case ModListModelColumn::checkbox:
@@ -443,7 +443,7 @@ bool ModListModel::passFilter(const std::string& id) const
 	if (!_filter.empty())
 	{
 		return std::ranges::any_of(
-			std::initializer_list { mod.id, mod.name, mod.author, mod.category, mod.version, desc },
+			std::initializer_list { mod.dir, mod.name, mod.author, mod.category, mod.version, desc },
 			[&](const std::string& from) {
 				return boost::contains(boost::locale::fold_case(from), _filter);
 			});

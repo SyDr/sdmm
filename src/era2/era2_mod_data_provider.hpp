@@ -20,7 +20,8 @@ namespace mm
 
 	struct Era2ModDataProvider : IModDataProvider
 	{
-		Era2ModDataProvider(fs::path basePath, std::string preferredLng, const II18nService& i18Service);
+		Era2ModDataProvider(fs::path basePath, std::unordered_map<std::string, std::string> fsNameMapping,
+			std::string preferredLng, const II18nService& i18Service);
 
 		const ModData&     modData(const std::string& id) override;
 		const std::string& description(const std::string& id) override;
@@ -31,9 +32,10 @@ namespace mm
 		void loadDefaults();
 
 	private:
-		const fs::path      _basePath;
-		const std::string   _preferredLng;
-		const II18nService& _i18Service;
+		const fs::path                                     _basePath;
+		const std::string                                  _preferredLng;
+		const II18nService&                                _i18Service;
+		const std::unordered_map<std::string, std::string> _fsNameMapping;
 
 		std::map<std::string, ModData>     _data;
 		std::map<std::string, std::string> _description;

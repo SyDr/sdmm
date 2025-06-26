@@ -74,21 +74,22 @@ namespace
 			*section, defaultLng, i18Service.legacyCode(defaultLng), legacyUsed);
 	}
 
-	std::set<std::string> get_string_set_from_json(const nlohmann::json& data)
+	std::set<std::string> get_folded_string_set_from_json(const nlohmann::json& data)
 	{
 		std::set<std::string> result;
 
 		for (const auto& item : data)
 			if (item.is_string())
-				result.emplace(item.get<std::string>());
+				result.emplace(boost::locale::fold_case(item.get<std::string>()));
 
 		return result;
 	}
 }
 
-ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& preferredLng,
-	const std::set<std::string>& defaultIncompatible, const std::set<std::string>& defaultRequires,
-	const std::set<std::string>& defaultLoadAfter, const II18nService& i18Service)
+ModData Era2ModDataLoader::load(const std::string& id, const fs::path& loadFrom,
+	const std::string& preferredLng, const std::set<std::string>& defaultIncompatible,
+	const std::set<std::string>& defaultRequires, const std::set<std::string>& defaultLoadAfter,
+	const II18nService& i18Service)
 {
 	bool hasRequires     = false;
 	bool hasLoadAfter    = false;
@@ -96,26 +97,27 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 
 	ModData result;
 	result.data_path   = loadFrom;
-	result.id          = loadFrom.filename().string();
+	result.id          = id;
+	result.dir         = loadFrom.filename().string();
 	result.virtual_mod = !is_directory(loadFrom);
 
 	auto supplyResultWithDefaults = [&] {
 		if (result.name.empty())
-			result.name = result.id;
+			result.name = result.dir;
 
 		if (!hasRequires)
 		{
 			result.requires_ = defaultRequires;
-			if (result.id != "WoG")
-				result.requires_.emplace("WoG");
+			if (result.id != "wog")
+				result.requires_.emplace("wog");
 		}
 
 		if (!hasLoadAfter)
 		{
 			result.load_after = result.requires_;
 			result.load_after.insert(defaultLoadAfter.cbegin(), defaultLoadAfter.cend());
-			if (result.id != "WoG")
-				result.load_after.emplace("WoG");
+			if (result.id != "wog")
+				result.load_after.emplace("wog");
 		}
 
 		if (!hasIncompatible)
@@ -198,7 +200,7 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 	{
 		if (const auto req = compat->find("requires"); req != compat->end() && req->is_array())
 		{
-			result.requires_  = get_string_set_from_json(*req);
+			result.requires_  = get_folded_string_set_from_json(*req);
 			result.load_after = result.requires_;
 			hasRequires       = true;
 			hasLoadAfter      = true;
@@ -206,13 +208,13 @@ ModData Era2ModDataLoader::load(const fs::path& loadFrom, const std::string& pre
 
 		if (const auto after = compat->find("load_after"); after != compat->end() && after->is_array())
 		{
-			result.load_after.merge(get_string_set_from_json(*after));
+			result.load_after.merge(get_folded_string_set_from_json(*after));
 			hasLoadAfter = true;
 		}
 
 		if (const auto inc = compat->find("incompatible"); inc != compat->end() && inc->is_array())
 		{
-			result.incompatible = get_string_set_from_json(*inc);
+			result.incompatible = get_folded_string_set_from_json(*inc);
 			hasIncompatible     = true;
 		}
 	}
