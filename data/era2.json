@@ -48,12 +48,6 @@
 			"BattleQueue"
 		]
 	},
-	"Enhanced Henchmen": {
-		"load_after": [
-			"WoG Scripts",
-			"WoG Rus"
-		]
-	},
 	"Difficulty Mod": {
 		"load_after": [
 			"WoG Scripts"

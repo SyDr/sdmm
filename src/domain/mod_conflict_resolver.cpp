@@ -20,14 +20,16 @@ using namespace mm;
 
 namespace
 {
-	struct ModCompatibility
+	struct CompatibilityInfo
 	{
+		int priority = 0;
+
 		std::set<std::string> incompatible;
 		std::set<std::string> requires_;
 		std::set<std::string> load_after;
 	};
 
-	using CompatMap = std::unordered_map<std::string, ModCompatibility>;
+	using CompatMap = std::unordered_map<std::string, CompatibilityInfo>;
 
 	void expandRequirements(std::vector<std::string>& where, CompatMap& cm, const std::string& currentId)
 	{
@@ -90,7 +92,9 @@ std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataPr
 	{
 		auto [it, _] = cm.insert({ mod.id, {} });
 
-		auto data = modDataProvider.modData(mod.id);
+		auto& data = modDataProvider.modData(mod.id);
+
+		it->second.priority = data.priority;
 
 		it->second.incompatible = data.incompatible;
 		it->second.requires_    = data.requires_;
@@ -139,6 +143,9 @@ std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataPr
 				continue;
 
 			if (cm[expandedRequirements[j]].load_after.contains(candidate))
+				ok = false;
+
+			if (cm[expandedRequirements[j]].priority > cm[candidate].priority)
 				ok = false;
 		}
 

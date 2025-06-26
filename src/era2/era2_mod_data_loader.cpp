@@ -196,6 +196,9 @@ ModData Era2ModDataLoader::load(const std::string& id, const fs::path& loadFrom,
 	result.author   = get_string_from_json_object(data, "author").value_or("");
 	result.homepage = get_string_from_json_object(data, "homepage").value_or("");
 
+	if (const auto& priority = data.find("priority"); priority != data.end() && priority->is_number_integer())
+		result.priority = priority->get<int>();
+
 	if (const auto compat = data.find("compatibility"); compat != data.end())
 	{
 		if (const auto req = compat->find("requires"); req != compat->end() && req->is_array())

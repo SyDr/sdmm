@@ -24,6 +24,8 @@ namespace mm
 		std::string category;
 		std::string version;
 
+		int priority = 0;
+
 		std::set<std::string> incompatible;
 		std::set<std::string> requires_;
 		std::set<std::string> load_after;
