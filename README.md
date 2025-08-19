@@ -2,7 +2,7 @@ SD Mod Manager
 ==============
 
 `SD Mod Manager` is a mod manager for [ERA](http://wforum.heroes35.net/showthread.php?tid=5830) mod platform.  
-TODO: write here more information.
+TODO: write more information.
 
 Installing
 ----------
@@ -10,10 +10,13 @@ Download and install from [releases](./releases) page.
 
 Development
 -----------
-Instal Visual Studio (2022) with C++ support.
+Install Visual Studio (2022) with C++ support.
+Install Git for Windows (`winget install --id Git.Git -e --source winget`)
 
 `git clone https://github.com/microsoft/vcpkg/`  
-`setx VCPKG_ROOT=<vcpkg_root>`
+`setx VCPKG_ROOT <vcpkg_root>`
+`bootstrap-vcpkg.bat`
+`vcpkg.exe integrate install`
 
 Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
