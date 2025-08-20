@@ -40,6 +40,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release-static|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="type\program_version.cpp" />
     <ClCompile Include="ui\application_settings_dialog.cpp" />
     <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\configure_main_list_view.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="type\interface_size.hpp" />
     <ClInclude Include="type\main_window_properties.h" />
     <ClInclude Include="type\mod_description_used_control.hpp" />
+    <ClInclude Include="type\program_version.hpp" />
     <ClInclude Include="type\update_check_mode.hpp" />
     <ClInclude Include="ui\application_settings_dialog.h" />
     <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />

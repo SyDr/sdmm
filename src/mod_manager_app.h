@@ -14,7 +14,7 @@ class wxSingleInstanceChecker;
 
 namespace mm
 {
-	struct AppConfig;
+	struct IAppConfig;
 	struct I18nService;
 	struct IPlatformService;
 	struct IIconStorage;
@@ -50,7 +50,7 @@ namespace mm
 
 		std::unique_ptr<wxSingleInstanceChecker> _singleInstanceChecker;
 
-		std::unique_ptr<AppConfig> _appConfig;
+		std::unique_ptr<IAppConfig> _appConfig;
 
 		std::unique_ptr<I18nService>      _i18nService;
 		std::unique_ptr<IPlatformService> _platformService;

@@ -1,4 +1,4 @@
-// SD Mod Manager
+﻿// SD Mod Manager
 
 // Copyright (c) 2024 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -21,19 +21,20 @@ namespace mm
 		status     = 1,
 		priority   = 2,
 		name       = 3,
-		author     = 4,
-		category   = 5,
-		version    = 6,
-		checkbox   = 7,
-		load_order = 8,
-		directory  = 9,
+		support    = 4,
+		author     = 5,
+		category   = 6,
+		version    = 7,
+		checkbox   = 8,
+		load_order = 9,
+		directory  = 10,
 
 		total = directory + 1,
 	};
 
 	constexpr const std::array MainListColumns = { ModListModelColumn::priority, ModListModelColumn::name,
-		ModListModelColumn::category, ModListModelColumn::version, ModListModelColumn::author,
-		ModListModelColumn::directory };
+		ModListModelColumn::category, ModListModelColumn::version, ModListModelColumn::support,
+		ModListModelColumn::author, ModListModelColumn::directory };
 
 	inline std::string to_string(ModListModelColumn value)
 	{
@@ -42,6 +43,7 @@ namespace mm
 			using enum ModListModelColumn;
 		case priority: return "Priority";
 		case name: return "Mod";
+		case support: return "Support";
 		case author: return "Author";
 		case category: return "Category";
 		case version: return "Version";
@@ -59,6 +61,9 @@ namespace mm
 
 		if (value == "Mod")
 			return ModListModelColumn::name;
+
+		if (value == "Support")
+			return ModListModelColumn::support;
 
 		if (value == "Author")
 			return ModListModelColumn::author;
@@ -155,8 +160,7 @@ namespace mm
 			}
 		};
 
-		static std::string
-		GroupItemsByToString(const GroupItemsBy& value)
+		static std::string GroupItemsByToString(const GroupItemsBy& value)
 		{
 			return std::visit(GroupItemsByToStringVisitor(), value);
 		}

@@ -7,6 +7,13 @@
 
 #include "era2_config.hpp"
 
+#include "system_info.hpp"
+#include "type/mod_list_model_structs.hpp"
+#include "type/program_version.hpp"
+#include "utility/fs_util.h"
+#include "utility/json_util.h"
+#include "utility/sdlexcept.h"
+
 #include <fstream>
 #include <ranges>
 #include <sstream>
@@ -17,12 +24,6 @@
 #include <wx/log.h>
 #include <wx/stdpaths.h>
 
-#include "system_info.hpp"
-#include "type/mod_list_model_structs.hpp"
-#include "utility/fs_util.h"
-#include "utility/json_util.h"
-#include "utility/sdlexcept.h"
-
 using namespace mm;
 
 namespace
@@ -30,12 +31,20 @@ namespace
 	constexpr const auto st_active_preset         = "active_preset";
 	constexpr const auto st_executable            = "executable";
 	constexpr const auto st_conflict_resolve_mode = "conflict_resolve_mode";
-	constexpr const auto st_list_columns          = "list_columns";
 	constexpr const auto st_managed_mods_display  = "managed_mods_display";
 	constexpr const auto st_archived_mods_display = "archived_mods_display";
 	constexpr const auto st_collapsed_categories  = "collapsed_categories";
 	constexpr const auto st_hidden_categories     = "hidden_categories";
 	constexpr const auto st_screenshots_expanded  = "screenshots_expanded";
+}
+
+namespace
+{
+	namespace Key
+	{
+		inline constexpr auto MMVersion   = "mm_version";
+		inline constexpr auto ListColumns = "list_columns";
+	}
 }
 
 Era2Config::Era2Config(const fs::path& path)
@@ -130,7 +139,7 @@ void Era2Config::conflictResolveMode(ConflictResolveMode value)
 
 std::vector<int> Era2Config::listColumns() const
 {
-	auto result = _data[st_list_columns].get<std::vector<int>>();
+	auto result = _data[Key::ListColumns].get<std::vector<int>>();
 
 	for (size_t i = 0; i < result.size(); ++i)
 	{
@@ -151,7 +160,7 @@ std::vector<int> Era2Config::listColumns() const
 
 void Era2Config::listColumns(const std::vector<int>& value)
 {
-	_data[st_list_columns] = value;
+	_data[Key::ListColumns] = value;
 	save();
 }
 
@@ -230,6 +239,9 @@ void Era2Config::screenshotsExpanded(bool value)
 
 void Era2Config::validate()
 {
+	if (_data.is_discarded())
+		_data = { { Key::MMVersion, PROGRAM_VERSION_BASE } };
+
 	if (!_data.count(st_active_preset) || !_data[st_active_preset].is_string())
 		_data[st_active_preset] = std::string();
 
@@ -240,10 +252,10 @@ void Era2Config::validate()
 		_data[st_conflict_resolve_mode] > static_cast<unsigned>(ConflictResolveMode::automatic))
 		_data[st_conflict_resolve_mode] = ConflictResolveMode::automatic;
 
-	if (!_data.count(st_list_columns) || !_data[st_list_columns].is_array())
-		_data[st_list_columns] = nlohmann::json::array();
+	if (!_data.count(Key::ListColumns) || !_data[Key::ListColumns].is_array())
+		_data[Key::ListColumns] = nlohmann::json::array();
 
-	auto& lc = _data[st_list_columns];
+	auto& lc = _data[Key::ListColumns];
 
 	size_t i = 0;
 	while (i < lc.size())
@@ -282,4 +294,41 @@ void Era2Config::validate()
 
 	if (!_data.count(st_screenshots_expanded) || !_data[st_screenshots_expanded].is_boolean())
 		_data[st_screenshots_expanded] = true;
+
+	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
+		_data[Key::MMVersion] = "";
+
+	auto cfgVersion = ProgramVersion(_data[Key::MMVersion].get<std::string>());
+	if (cfgVersion < ProgramVersion(0, 98, 69))
+	{
+		// 0.98.69: added new column before author
+
+		for (auto& value : lc)
+		{
+			auto v = value.get<int>();
+			auto c = static_cast<ModListModelColumn>(std::abs(v));
+
+			// author was 3 (or -3 if disabled) -> now it's 4 (or - 4)
+			if (c >= ModListModelColumn::support)
+			{
+				v     = v > 0 ? v + 1 : v - 1;
+				value = v;
+			}
+		}
+
+		for (auto it = lc.begin(); it < lc.end(); ++it)
+		{
+			const auto v = it->get<int>();
+			const auto c = static_cast<ModListModelColumn>(std::abs(v));
+
+			if (c != ModListModelColumn::author)
+				continue;
+
+			lc.insert(it, static_cast<int>(ModListModelColumn::support) * (v > 0 ? 1 : -1));
+			break;
+		}
+	}
+
+	if (ProgramVersion(PROGRAM_VERSION_BASE) > cfgVersion)
+		_data[Key::MMVersion] = PROGRAM_VERSION_BASE;
 }

@@ -18,11 +18,12 @@ namespace mm
 		std::string name;
 		fs::path    description;
 
-		std::string icon;
-		std::string author;
-		std::string homepage;
-		std::string category;
-		std::string version;
+		std::string              icon;
+		std::string              author;
+		std::string              homepage;
+		std::vector<std::string> support;
+		std::string              category;
+		std::string              version;
 
 		int priority = 0;
 

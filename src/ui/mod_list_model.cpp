@@ -76,6 +76,7 @@ wxString ModListModel::GetColumnType(unsigned int col) const
 	{
 	case ModListModelColumn::priority:
 	case ModListModelColumn::name: return wxDataViewIconTextRenderer::GetDefaultType();
+	case ModListModelColumn::support: return wxDataViewBitmapRenderer::GetDefaultType();
 	case ModListModelColumn::author:
 	case ModListModelColumn::category:
 	case ModListModelColumn::load_order:
@@ -259,6 +260,15 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	{
 		variant = wxVariant(wxDataViewIconText(
 			wxString::FromUTF8(mod.name), loadModIcon(_iconStorage, mod.data_path, mod.icon, _iconSize)));
+		break;
+	}
+	case ModListModelColumn::support:
+	{
+		wxBitmap icon;
+		if (!mod.support.empty())
+			icon = _iconStorage.get(Icon::Stock::heart);
+
+		variant = wxVariant(wxBitmapBundle(icon));
 		break;
 	}
 	case ModListModelColumn::author:

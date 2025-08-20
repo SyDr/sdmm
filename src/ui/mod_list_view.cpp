@@ -256,6 +256,69 @@ void ModListView::bindEvents()
 	_list->Bind(
 		wxEVT_DATAVIEW_ITEM_ACTIVATED, [&](wxDataViewEvent&) { onSwitchSelectedModStateRequested(); });
 
+	_list->GetMainWindow()->Bind(wxEVT_MOTION, [&](wxMouseEvent& event) {
+		wxDataViewItem    item;
+		wxDataViewColumn* column = nullptr;
+
+		wxPoint pos = _list->ScreenToClient(_list->GetMainWindow()->ClientToScreen(event.GetPosition()));
+		_list->HitTest(pos, item, column);
+
+		if (item.IsOk() && column &&
+			static_cast<ModListModelColumn>(column->GetModelColumn()) == ModListModelColumn::support)
+		{
+			auto id = _listModel->findIdByItem(item);
+			if (!id.empty())
+			{
+				const auto& mod = _managedPlatform.modDataProvider()->modData(id);
+
+				if (!mod.support.empty())
+				{
+					SetCursor(wxCursor(wxCURSOR_HAND));
+
+					event.Skip();
+					return;
+				}
+			}
+		}
+
+		SetCursor(*wxSTANDARD_CURSOR);
+
+		event.Skip();
+	});
+
+	_list->GetMainWindow()->Bind(wxEVT_LEFT_UP, [&](wxMouseEvent& event) {
+		wxDataViewItem    item;
+		wxDataViewColumn* column = nullptr;
+
+		wxPoint pos = _list->ScreenToClient(_list->GetMainWindow()->ClientToScreen(event.GetPosition()));
+		_list->HitTest(pos, item, column);
+
+		if (item.IsOk() && column &&
+			static_cast<ModListModelColumn>(column->GetModelColumn()) == ModListModelColumn::support)
+		{
+			auto id = _listModel->findIdByItem(item);
+			if (!id.empty())
+			{
+				const auto& mod = _managedPlatform.modDataProvider()->modData(id);
+
+				if (!mod.support.empty())
+				{
+					wxMenu menu;
+
+					for (const auto& i : mod.support)
+						menu.Append(wxID_ANY, wxString::FromUTF8(i));
+
+					_list->PopupMenu(&menu, pos);
+
+					event.Skip();
+					return;
+				}
+			}
+		}
+
+		event.Skip();
+	});
+
 	_list->Bind(wxEVT_DATAVIEW_ITEM_BEGIN_DRAG, [&](wxDataViewEvent& event) {
 		auto moveFrom = _listModel->findIdByItem(event.GetItem());
 		if (moveFrom.empty())
@@ -558,8 +621,11 @@ void ModListView::createListColumns()
 		wxWidgetsPtr<wxDataViewRenderer> r = nullptr;
 		switch (typed)
 		{
-			using enum ModListModelColumn;
 		case ModListModelColumn::name: r = new wxDataViewIconTextRenderer(); break;
+		case ModListModelColumn::support:
+			r = new wxDataViewBitmapRenderer(
+				wxDataViewBitmapRenderer::GetDefaultType(), wxDATAVIEW_CELL_ACTIVATABLE);
+			break;
 		case ModListModelColumn::priority:
 		{
 			int size = FromDIP(32);
@@ -579,15 +645,25 @@ void ModListView::createListColumns()
 		int flags = wxDATAVIEW_COL_RESIZABLE;  // | wxDATAVIEW_COL_REORDERABLE; // TODO: give it back and
 											   // allow sorting on main window instead
 
-		if (typed != ModListModelColumn::version)
+		if (typed != ModListModelColumn::version && typed != ModListModelColumn::support)
 			flags |= wxDATAVIEW_COL_SORTABLE;
 
 		int width = FromDIP(120);
 		if (typed != ModListModelColumn::author)
 			width = wxCOL_WIDTH_AUTOSIZE;
 
-		auto c = new wxDataViewColumn(wxString::FromUTF8(wxGetApp().translationString(to_string(typed))), r,
-			column, width, wxALIGN_LEFT, flags);
+		wxString    name      = wxString::FromUTF8(wxGetApp().translationString(to_string(typed)));
+		wxAlignment alignment = wxALIGN_LEFT;
+
+		if (typed == ModListModelColumn::support)
+		{
+			flags &= ~wxDATAVIEW_COL_RESIZABLE;
+			alignment = wxALIGN_CENTER;
+			name.clear();
+			width = FromDIP(18);
+		}
+
+		auto c = new wxDataViewColumn(name, r, column, width, alignment, flags);
 
 		_list->AppendColumn(c);
 
@@ -810,18 +886,39 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 
 void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 {
-	const auto itemId = event.GetId();
+	if (event.GetEventObject() == &_menu.menu)
+	{
+		const auto itemId = event.GetId();
 
-	const auto mod = _listModel->findMod(_list->GetSelection());
+		const auto mod = _listModel->findMod(_list->GetSelection());
 
-	if (itemId == _menu.openHomepage->GetId())
-		wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage));
-	else if (itemId == _menu.openDir->GetId())
-		wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
-	else if (itemId == _menu.archive->GetId())
-		onResetSelectedModStateRequested();
-	else if (itemId == _menu.deleteOrRemove->GetId())
-		onRemoveModRequested();
+		if (itemId == _menu.openHomepage->GetId())
+			wxLaunchDefaultBrowser(wxString::FromUTF8(mod->homepage));
+		else if (itemId == _menu.openDir->GetId())
+			wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
+		else if (itemId == _menu.archive->GetId())
+			onResetSelectedModStateRequested();
+		else if (itemId == _menu.deleteOrRemove->GetId())
+			onRemoveModRequested();
+
+		return;
+	}
+
+	// otherwise this is menu for support (TODO: rewrite this mess)
+
+	auto menu = dynamic_cast<wxMenu*>(event.GetEventObject());
+	if (!menu)
+		return;
+
+	auto items = menu->GetMenuItems();
+	for (const auto& item : items)
+	{
+		if (item->GetId() == event.GetId())
+		{
+			wxLaunchDefaultBrowser(item->GetItemLabel());
+			break;
+		}
+	}
 }
 
 void ModListView::OnWebViewNavigating(wxWebViewEvent& event)

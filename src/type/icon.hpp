@@ -31,6 +31,7 @@ namespace mm
 			save_to_file,
 			sort,
 			up,
+			heart,
 		};
 
 		enum class Size

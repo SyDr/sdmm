@@ -12,6 +12,7 @@
 #include "type/interface_size.hpp"
 #include "type/main_window_properties.h"
 #include "type/mod_description_used_control.hpp"
+#include "type/program_version.hpp"
 #include "type/update_check_mode.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
@@ -101,35 +102,6 @@ namespace
 		{
 			return mm.programDataPath / SystemInfo::SettingsFile;
 		}
-	};
-
-	struct ProgramVersion
-	{
-		size_t major = 0;
-		size_t minor = 0;
-		size_t patch = 0;
-
-		ProgramVersion(std::string_view version)
-		{
-			std::vector<std::string_view> v;
-			boost::split(v, version, boost::is_any_of("."));
-
-			if (v.size() == 3)
-			{
-				major = boost::convert<size_t>(v[0]).value_or(0);
-				minor = boost::convert<size_t>(v[1]).value_or(0);
-				patch = boost::convert<size_t>(v[2]).value_or(0);
-			}
-		}
-
-		ProgramVersion(size_t major, size_t minor, size_t patch)
-			: major(major)
-			, minor(minor)
-			, patch(patch)
-		{}
-
-		auto operator<=>(const ProgramVersion& r) const = default;
-		bool operator==(const ProgramVersion& r) const  = default;
 	};
 }
 
