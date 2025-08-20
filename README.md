@@ -12,6 +12,7 @@ Development
 -----------
 Install Visual Studio (2022) with C++ support.
 Install Git for Windows (`winget install --id Git.Git -e --source winget`)
+Install InnoSetup if you want to make builds (`winget install -e --id JRSoftware.InnoSetup')
 
 `git clone https://github.com/microsoft/vcpkg/`  
 `setx VCPKG_ROOT <vcpkg_root>`

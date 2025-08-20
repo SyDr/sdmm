@@ -1,5 +1,5 @@
 $MSBuild = &"${Env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
-$InnoSetup = "C:\Program Files (x86)\Inno Setup 6\iscc.exe"
+$InnoSetup = "${Env:LocalAppData}\Programs\Inno Setup 6\iscc.exe"
 $StaticDirBuild = ".\Portable\SD Mod Manager"
 
 &"$MSBuild" /noconsolelogger /fileLogger /flp:logfile=log-release.txt /property:Configuration=release "..\\SD MM.sln"
