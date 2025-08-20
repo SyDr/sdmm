@@ -21,4 +21,5 @@ Copy-Item -Path "..\THIRD_PARTY.txt" -Destination "$StaticDirBuild\" -Recurse -C
 Copy-Item -Path "..\lng\" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\icons\" -Filter "*.svg" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\data\" -Destination "$StaticDirBuild\" -Recurse -Container
+Copy-Item -Path "..\docs\" -Destination "$StaticDirBuild\" -Recurse -Container
 Compress-Archive -Path $StaticDirBuild -DestinationPath "Output\sdmm_v$MMVersion.zip"
