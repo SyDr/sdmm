@@ -660,7 +660,10 @@ void ModListView::createListColumns()
 			flags &= ~wxDATAVIEW_COL_RESIZABLE;
 			alignment = wxALIGN_CENTER;
 			name.clear();
-			width = FromDIP(18);
+			width = FromDIP(24);
+			if (auto interfaceSize = wxGetApp().appConfig().interfaceSize();
+				interfaceSize == InterfaceSize::big)
+				width *= 2;
 		}
 
 		auto c = new wxDataViewColumn(name, r, column, width, alignment, flags);
