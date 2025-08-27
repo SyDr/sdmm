@@ -133,6 +133,7 @@ ModListView::ModListView(
 	buildLayout();
 	bindEvents();
 	updateCategoryFilterContent();
+	updateControlsState();
 }
 
 void ModListView::buildLayout()
@@ -199,6 +200,7 @@ void ModListView::bindEvents()
 		if (!followSelection())
 			updateControlsState();
 
+		_statusBar->SetStatusText(_listModel->status());
 		_filterText->ShowCancelButton(!str.IsEmpty());
 
 		event.Skip();
@@ -224,6 +226,8 @@ void ModListView::bindEvents()
 		expandChildren();
 		if (!followSelection())
 			updateControlsState();
+
+		_statusBar->SetStatusText(_listModel->status());
 	});
 
 	_list->Bind(wxEVT_DATAVIEW_COLUMN_SORTED, [&](wxDataViewEvent&) { followSelection(); });
