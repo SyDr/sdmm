@@ -31,6 +31,7 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
+
 #include <wx/app.h>
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -46,10 +47,9 @@
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
+#include <cmark.h>
 
 #include <algorithm>
-
-#include <cmark.h>
 
 class mmCheckListBoxComboPopup : public wxCheckListBox, public wxComboPopup
 {
@@ -285,7 +285,7 @@ void ModListView::bindEvents()
 			}
 		}
 
-		SetCursor(*wxSTANDARD_CURSOR);
+		SetCursor(wxCursor());
 
 		event.Skip();
 	});
