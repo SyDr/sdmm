@@ -59,6 +59,7 @@ namespace mm
 
 		void onSwitchSelectedModStateRequested();
 		void onResetSelectedModStateRequested();
+		void onEditModRequested();
 
 		void expandChildren();
 		bool followSelection();
@@ -109,6 +110,7 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> openHomepage   = nullptr;
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> archive        = nullptr;
+			wxWidgetsPtr<wxMenuItem> edit        = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 

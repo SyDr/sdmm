@@ -24,6 +24,7 @@
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 #include "type/interface_size.hpp"
+#include "enter_file_name.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/indexed.hpp>
@@ -41,21 +42,6 @@
 #include <format>
 
 using namespace mm;
-
-namespace
-{
-	wxString showEnterNameDialog(wxWindow* parent, wxString message, wxString caption, wxString name)
-	{
-		wxTextEntryDialog ted(parent, message, caption, name);
-		ted.SetTextValidator(wxTextValidatorStyle::wxFILTER_EMPTY);
-		ted.GetTextValidator()->SetCharExcludes(L"\\/:*?\"<>|");
-
-		if (ted.ShowModal() != wxID_OK)
-			return {};
-
-		return ted.GetValue();
-	}
-}
 
 ManagePresetListView::ManagePresetListView(
 	wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage)
@@ -212,7 +198,7 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 
 	if (baseName.empty())
 		baseName =
-			showEnterNameDialog(this, "Enter profile name"_lng, "Create"_lng, wxString::FromUTF8(baseName))
+			enterFileName(this, "Enter profile name"_lng, "Create"_lng, wxString::FromUTF8(baseName))
 				.ToStdString(wxConvUTF8);
 
 	if (baseName.empty())
@@ -288,7 +274,7 @@ void ManagePresetListView::onRenamePreset()
 
 	const auto selected = getSelection();
 	const auto newName =
-		showEnterNameDialog(this, "Enter profile name"_lng, "Rename"_lng, wxString::FromUTF8(selected))
+		enterFileName(this, "Enter profile name"_lng, "Rename"_lng, wxString::FromUTF8(selected))
 			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())
@@ -315,7 +301,7 @@ void ManagePresetListView::onCopyPreset()
 
 	const auto selected = getSelection();
 	const auto newName =
-		showEnterNameDialog(this, "Enter profile name"_lng, "Copy"_lng, wxString::FromUTF8(selected))
+		enterFileName(this, "Enter profile name"_lng, "Copy"_lng, wxString::FromUTF8(selected))
 			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())

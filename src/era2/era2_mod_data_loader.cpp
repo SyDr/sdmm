@@ -196,14 +196,14 @@ ModData Era2ModDataLoader::load(const std::string& id, const fs::path& loadFrom,
 	result.author   = get_string_from_json_object(data, "author").value_or("");
 	result.homepage = get_string_from_json_object(data, "homepage").value_or("");
 
-	if (auto s = get_string_from_json_object(data, "support"); s.has_value())
+	if (auto s = get_string_from_json_object(data, "support"); s.has_value() && !s.value().empty())
 	{
 		result.support.emplace_back(s.value());
 	}
 	else if (auto v = data.find("support"); v != data.end() && v.value().is_array())
 	{
 		for (const auto& item : v.value())
-			if (item.is_string())
+			if (item.is_string() && !item.get<std::string>().empty())
 				result.support.emplace_back(item.get<std::string>());
 	}
 

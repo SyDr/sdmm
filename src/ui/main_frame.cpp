@@ -31,6 +31,8 @@
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 #include "utility/wx_current_dir_helper.hpp"
+#include "edit_mod_dialog.hpp"
+#include "enter_file_name.hpp"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
@@ -38,7 +40,7 @@
 #include <wx/infobar.h>
 #include <wx/menu.h>
 #include <wx/sizer.h>
-
+#include <wx/notifmsg.h>
 
 using namespace mm;
 
@@ -184,6 +186,10 @@ void MainFrame::createMenuBar()
 		toolsMenu->Append(wxID_ANY, "List active mod files"_lng, nullptr, "List active mod files"_lng);
 	_menuItems[listModFiles->GetId()] = [&] { OnMenuToolsListModFiles(); };
 
+	auto createNewMod =
+		toolsMenu->Append(wxID_ANY, "Create new mod"_lng, nullptr, "Create new mod"_lng);
+	_menuItems[createNewMod->GetId()] = [&] { OnMenuToolsCreateNewMod(); };
+
 	toolsMenu->AppendSeparator();
 
 	auto conflictResolveMode =
@@ -275,6 +281,44 @@ void MainFrame::OnMenuToolsListModFiles()
 	ShowFileListDialog sfld(this, *_iconStorage, *_currentPlatform->modDataProvider(),
 		_currentPlatform->modManager()->mods(), _currentPlatform->managedPath());
 	sfld.ShowModal();
+
+	EX_UNEXPECTED;
+}
+
+void MainFrame::OnMenuToolsCreateNewMod()
+{
+	EX_TRY;
+
+	wxString modName;
+	while (true)
+	{
+		modName = enterFileName(this, "Enter new mod name"_lng, "Create"_lng, modName);
+		if (modName.empty())
+			return;
+
+		const auto targetPath = _currentPlatform->managedPath() / "Mods" / modName.ToUTF8();
+
+		if (fs::exists(targetPath))
+		{
+			wxNotificationMessage nm(wxEmptyString, "Directory already exist"_lng, this);
+			nm.Show();
+			continue;
+		}
+
+		fs::create_directory(targetPath);
+		fs::copy_file(_app.appConfig().programPath() / SystemInfo::DataDir / SystemInfo::ModInfoFilename,
+				_currentPlatform->managedPath() / "Mods" / modName.ToUTF8() / SystemInfo::ModInfoFilename);
+
+		_currentPlatform->reload();
+
+		_currentPlatform->modManager()->enable(modName.ToStdString(wxConvUTF8));
+
+		break;
+	}
+
+	EditModDialog cnmd(
+		this, *_currentPlatform, modName.ToStdString(wxConvUTF8));
+	cnmd.ShowModal();
 
 	EX_UNEXPECTED;
 }

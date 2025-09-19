@@ -31,7 +31,9 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
+#include "edit_mod_dialog.hpp"
 
+#include <cmark.h>
 #include <wx/app.h>
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -47,7 +49,6 @@
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
-#include <cmark.h>
 
 #include <algorithm>
 
@@ -126,7 +127,7 @@ ModListView::ModListView(
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
-	createControls(wxString::FromUTF8(managedPlatform.managedPath().string()));
+	createControls(wxString::FromUTF8(_managedPlatform.managedPath().string()));
 	_listModel->modList(_modManager.mods());
 	_listModel->applyCategoryFilter(_hiddenCategories);
 	expandChildren();
@@ -570,9 +571,11 @@ void ModListView::createControls(const wxString& managedPath)
 	_moveDown->Disable();
 	_changeState->Disable();
 
-	_menu.openHomepage   = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
-	_menu.openDir        = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
-	_menu.archive        = _menu.menu.Append(wxID_ANY, "Archive"_lng);
+	_menu.openHomepage = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
+	_menu.openDir      = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
+	_menu.archive      = _menu.menu.Append(wxID_ANY, "Archive"_lng);
+	_menu.edit         = _menu.menu.Append(wxID_ANY, "Edit"_lng);
+	_menu.menu.AppendSeparator();
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
@@ -905,6 +908,8 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 			wxLaunchDefaultApplication(wxString::FromUTF8(mod->data_path.string()));
 		else if (itemId == _menu.archive->GetId())
 			onResetSelectedModStateRequested();
+		else if (itemId == _menu.edit->GetId())
+			onEditModRequested();
 		else if (itemId == _menu.deleteOrRemove->GetId())
 			onRemoveModRequested();
 
@@ -976,6 +981,19 @@ void ModListView::onResetSelectedModStateRequested()
 	_modManager.archive(next);
 
 	updateControlsState();
+
+	EX_UNEXPECTED;
+}
+
+void ModListView::onEditModRequested()
+{
+	EX_TRY;
+
+	if (_selectedMod.empty())
+		return;
+
+	EditModDialog cnmd(this, _managedPlatform, _selectedMod);
+	cnmd.ShowModal();
 
 	EX_UNEXPECTED;
 }
