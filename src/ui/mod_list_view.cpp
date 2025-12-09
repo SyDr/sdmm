@@ -594,7 +594,7 @@ void ModListView::createControls(const wxString& managedPath)
 
 	_galleryView = new ImageGalleryView(_gallery, wxID_ANY);
 	_galleryView->Show(_galleryShown);
-	_galleryView->Show(_gallery);
+	_gallery->Show(_galleryShown);
 
 	_infoBar = new wxInfoBar(this);
 	_infoBarTimer.SetOwner(this);
