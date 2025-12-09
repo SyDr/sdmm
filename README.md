@@ -27,7 +27,6 @@ TODO (In no particular order)
 - Use wxWidgets from trunk to test dark theme support.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and include debug symbols?).
-- Update icons.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
 - Implement mod installtion from archives.
@@ -38,3 +37,4 @@ TODO (In no particular order)
 - Navigate in mod list via keys?
 - On first launch, ask some important settings.
 - Would be nice to have at least the possibiliy to see what plugins are tied to a mod - for users helpful when its about bugfixing/testing
+- Add wiki with usage information (or video?)
