@@ -311,6 +311,15 @@ void AppConfig::validate()
 			modDescriptionUsedControl(ModDescriptionUsedControl::use_wxhtml_control);
 	}
 
+	if (cfgVersion < ProgramVersion(0, 98, 73))
+	{
+		// 0.98.73: somewhere along the line I forgot that language codes were changed
+		if (auto clc = currentLanguageCode(); clc == "english")
+			setCurrentLanguageCode("en");
+		else if (clc == "russian")
+			setCurrentLanguageCode("ru");
+	}
+
 	if (ProgramVersion(PROGRAM_VERSION_BASE) > cfgVersion)
 		_data[Key::MMVersion] = PROGRAM_VERSION_BASE;
 }
