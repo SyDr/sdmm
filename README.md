@@ -27,7 +27,6 @@ TODO (In no particular order)
 - Use wxWidgets from trunk to test dark theme support.
 - Check why WebView2Loader.dll from VCPKG location not copied automatically.
 - Write memory dump on crash (and include debug symbols?).
-- Use UPX or something else to reduce release binary size.
 - Update icons.
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
