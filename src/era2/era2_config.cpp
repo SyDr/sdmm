@@ -141,7 +141,7 @@ std::vector<int> Era2Config::listColumns() const
 {
 	auto result = _data[Key::ListColumns].get<std::vector<int>>();
 
-	for (size_t i = 0; i < result.size(); ++i)
+	for (size_t i = 0; i < result.size();)
 	{
 		const auto v = static_cast<ModListModelColumn>(std::abs(result[i]));
 
