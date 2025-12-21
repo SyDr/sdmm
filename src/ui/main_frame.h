@@ -42,7 +42,6 @@ namespace mm
 		void OnMenuCheckForUpdates();
 		void OnMenuToolsListModFiles();
 		void OnMenuToolsCreateNewMod();
-		void OnMenuToolsChooseConflictResolveMode();
 		void OnCloseWindow(wxCloseEvent& event);
 
 		void saveWindowProperties();

@@ -42,7 +42,6 @@
     </ClCompile>
     <ClCompile Include="type\program_version.cpp" />
     <ClCompile Include="ui\application_settings_dialog.cpp" />
-    <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="ui\configure_main_list_view.cpp" />
     <ClCompile Include="ui\edit_mod_dialog.cpp" />
     <ClCompile Include="ui\enter_file_name.cpp" />
@@ -112,7 +111,6 @@
     <ClInclude Include="type\program_version.hpp" />
     <ClInclude Include="type\update_check_mode.hpp" />
     <ClInclude Include="ui\application_settings_dialog.h" />
-    <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="ui\configure_main_list_view.h" />
     <ClInclude Include="ui\edit_mod_dialog.hpp" />
     <ClInclude Include="ui\enter_file_name.hpp" />

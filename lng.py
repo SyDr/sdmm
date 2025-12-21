@@ -17,7 +17,8 @@ MAYBE_USED = ('category/',
     'dialog/settings/interface_label/',
     'dialog/settings/interface_size/',
     'dialog/settings/mod_description_control/',
-    'dialog/settings/update_mode/'
+    'dialog/settings/update_mode/',
+    'dialog/settings/conflict_resolve_mode/'
 )
 
 def load_json(filename: str):

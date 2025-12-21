@@ -29,7 +29,6 @@
     <ClCompile Include="era2\era2_mod_data_loader.cpp" />
     <ClCompile Include="era2\era2_mod_data_provider.cpp" />
     <ClCompile Include="domain\mod_list.cpp" />
-    <ClCompile Include="ui\choose_conflict_resolve_mode_view.cpp" />
     <ClCompile Include="domain\mod_conflict_resolver.cpp" />
     <ClCompile Include="ui\image_gallery_view.cpp" />
     <ClCompile Include="ui\icon_helper.cpp" />
@@ -81,7 +80,6 @@
     <ClInclude Include="utility\wx_widgets_ptr.hpp" />
     <ClInclude Include="domain\mod_conflict_resolver.hpp" />
     <ClInclude Include="type\conflict_resolve_mode.hpp" />
-    <ClInclude Include="ui\choose_conflict_resolve_mode_view.hpp" />
     <ClInclude Include="interface\ipreset_manager.hpp" />
     <ClInclude Include="ui\manage_preset_list_view.hpp" />
     <ClInclude Include="type\filesystem.hpp" />

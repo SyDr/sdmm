@@ -18,10 +18,11 @@
 namespace mm
 {
 	struct Application;
+	struct ILocalConfig;
 
 	struct ApplicationSettingsDialog : public wxDialog
 	{
-		ApplicationSettingsDialog(wxWindow* parent, Application& app);
+		ApplicationSettingsDialog(wxWindow* parent, Application& app, ILocalConfig* localConfig);
 
 	private:
 		void createControls();
@@ -30,7 +31,8 @@ namespace mm
 		void buildLayout();
 
 	private:
-		Application& _app;
+		Application&  _app;
+		ILocalConfig* _localConfig = nullptr;
 
 		wxWidgetsPtr<wxStaticBox> _globalGroup = nullptr;
 
@@ -49,10 +51,11 @@ namespace mm
 		wxWidgetsPtr<wxStaticText> _modDescriptionControlStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _modDescriptionControlChoice = nullptr;
 
-		// wxWidgetsPtr<wxStaticBox>   _conflictResolveModeDialog = nullptr;
-		// wxWidgetsPtr<wxRadioButton> _rupdateStatic             = nullptr;
-		// wxWidgetsPtr<wxRadioButton> _rupdateChoice             = nullptr;
-		//
+		wxWidgetsPtr<wxStaticBox> _platformGroup = nullptr;
+
+		wxWidgetsPtr<wxStaticText> _conflictResolveStatic = nullptr;
+		wxWidgetsPtr<wxChoice>     _conflictResolveChoice = nullptr;
+
 		wxWidgetsPtr<wxButton> _save   = nullptr;
 		wxWidgetsPtr<wxButton> _cancel = nullptr;
 	};

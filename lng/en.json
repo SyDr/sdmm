@@ -96,13 +96,6 @@
       },
       "program_options": "Program options",
       "caption": "Program settings",
-      "conflicts": {
-        "caption": "Choose conflict resolve mode",
-        "automatic": "Automatic",
-        "automatic_note": "Automatically resolve mod conflicts when you enable or disable any mod",
-        "manual": "Manual",
-        "manual_note": "Don't resolve conflicts automatically"
-      },
       "configure_main_view": {
         "caption": "Configure view",
         "column": "Column",
@@ -117,7 +110,13 @@
           "as_single_group": "as a single group",
           "as_individual_groups": "grouped by category"
         }
-      }
+      },
+      "conflict_resolve_mode": {
+        "label": "Resolve mods conflicts:",
+        "automatic": "automatically (on enable/disable)",
+        "manual": "manually (by clicking on \"Sort\" button)"
+      },
+      "platform_options": "Platform settings"
     },
     "edit_mod": {
       "caption": "Edit mod",

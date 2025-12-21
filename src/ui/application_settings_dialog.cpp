@@ -11,7 +11,9 @@
 #include "interface/iapp_config.hpp"
 #include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.hpp"
+#include "interface/ilocal_config.hpp"
 #include "mod_manager_app.h"
+#include "type/conflict_resolve_mode.hpp"
 #include "type/filesystem.hpp"
 #include "type/icon.hpp"
 #include "type/interface_label.hpp"
@@ -31,9 +33,11 @@
 
 using namespace mm;
 
-ApplicationSettingsDialog::ApplicationSettingsDialog(wxWindow* parent, Application& app)
+ApplicationSettingsDialog::ApplicationSettingsDialog(
+	wxWindow* parent, Application& app, ILocalConfig* localConfig)
 	: wxDialog(parent, wxID_ANY, "dialog/settings/caption"_lng, wxDefaultPosition, wxDefaultSize)
 	, _app(app)
+	, _localConfig(localConfig)
 {
 	createControls();
 	buildLayout();
@@ -106,6 +110,19 @@ void ApplicationSettingsDialog::createControls()
 	_modDescriptionControlChoice->SetSelection(
 		static_cast<int>(_app.appConfig().modDescriptionUsedControl()));
 
+	_platformGroup = new wxStaticBox(this, wxID_ANY, "dialog/settings/platform_options"_lng);
+
+	_conflictResolveStatic =
+		new wxStaticText(this, wxID_ANY, "dialog/settings/conflict_resolve_mode/label"_lng);
+	items.clear();
+
+	for (const auto& item : ConflictResolveModeValues)
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"dialog/settings/conflict_resolve_mode/" + std::string(magic_enum::enum_name(item)))));
+
+	_conflictResolveChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+	_conflictResolveChoice->SetSelection(static_cast<int>(_localConfig->conflictResolveMode()));
+
 	_save   = new wxButton(this, wxID_OK, "dialog/button/save"_lng);
 	_cancel = new wxButton(this, wxID_CANCEL, "dialog/cancel"_lng);
 }
@@ -132,6 +149,9 @@ void ApplicationSettingsDialog::bindEvents()
 		restartRequired = _app.appConfig().modDescriptionUsedControl(static_cast<ModDescriptionUsedControl>(
 							  _modDescriptionControlChoice->GetSelection())) ||
 						  restartRequired;
+
+		_localConfig->conflictResolveMode(
+			static_cast<ConflictResolveMode>(_conflictResolveChoice->GetSelection()));
 
 		EndModal(restartRequired ? wxID_APPLY : wxID_OK);
 	});
@@ -165,6 +185,14 @@ void ApplicationSettingsDialog::buildLayout()
 	auto topSizer = new wxStaticBoxSizer(_globalGroup, wxVERTICAL);
 	topSizer->Add(comboSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
+	auto sizer2 = new wxBoxSizer(wxHORIZONTAL);
+	sizer2->Add(_conflictResolveStatic, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	sizer2->AddStretchSpacer();
+	sizer2->Add(_conflictResolveChoice, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+
+	auto sizer3 = new wxStaticBoxSizer(_platformGroup, wxVERTICAL);
+	sizer3->Add(sizer2, wxSizerFlags(1).Expand().Border(wxALL, 5));
+
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->AddStretchSpacer();
 	buttonSizer->Add(_save, wxSizerFlags(0).Expand().Border(wxALL, 5));
@@ -172,6 +200,7 @@ void ApplicationSettingsDialog::buildLayout()
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	mainSizer->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	mainSizer->Add(sizer3, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	mainSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
 	this->SetSizer(mainSizer);

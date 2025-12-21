@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -9,7 +9,6 @@
 
 #include "application.h"
 #include "application_settings_dialog.h"
-#include "choose_conflict_resolve_mode_view.hpp"
 #include "edit_mod_dialog.hpp"
 #include "enter_file_name.hpp"
 #include "interface/iapp_config.hpp"
@@ -192,10 +191,6 @@ void MainFrame::createMenuBar()
 
 	toolsMenu->AppendSeparator();
 
-	auto conflictResolveMode =
-		toolsMenu->Append(wxID_ANY, "dialog/settings/conflicts/caption"_lng, nullptr, "dialog/settings/conflicts/caption"_lng);
-	_menuItems[conflictResolveMode->GetId()] = [&] { OnMenuToolsChooseConflictResolveMode(); };
-
 	auto changeProgramSettings = toolsMenu->Append(
 		wxID_ANY, "dialog/main_frame/menu/tools/settings"_lng, nullptr, "dialog/main_frame/menu/tools/settings_tip"_lng);
 	_menuItems[changeProgramSettings->GetId()] = [&] { OnMenuToolsChangeSettings(); };
@@ -269,7 +264,7 @@ void MainFrame::OnMenuToolsChangeSettings()
 {
 	EX_TRY;
 
-	ApplicationSettingsDialog asd(this, _app);
+	ApplicationSettingsDialog asd(this, _app, _currentPlatform->localConfig());
 	if (asd.ShowModal() == wxID_APPLY)
 		wxGetApp().scheduleRestart();
 
@@ -320,20 +315,6 @@ void MainFrame::OnMenuToolsCreateNewMod()
 
 	EditModDialog cnmd(this, *_currentPlatform, modName.ToStdString(wxConvUTF8));
 	cnmd.ShowModal();
-
-	EX_UNEXPECTED;
-}
-
-void MainFrame::OnMenuToolsChooseConflictResolveMode()
-{
-	EX_TRY;
-
-	ChooseConflictResolveModeView dialog(this);
-
-	if (dialog.ShowModal() != wxID_OK)
-		return;
-
-	_currentPlatform->localConfig()->conflictResolveMode(dialog.conflictResolveMode());
 
 	EX_UNEXPECTED;
 }
