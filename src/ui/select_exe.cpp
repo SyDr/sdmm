@@ -24,7 +24,7 @@ using namespace mm;
 
 SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	const wxString& initiallySelectedFile, IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Select executable"_lng, wxDefaultPosition, wxSize(300, 450))
+	: wxDialog(parent, wxID_ANY, "dialog/select_executable/caption"_lng, wxDefaultPosition, wxSize(300, 450))
 	, _basePath(basePath)
 	, _selectedFile(initiallySelectedFile)
 	, _iconStorage(iconStorage)
@@ -42,7 +42,7 @@ SelectExe::SelectExe(wxWindow* parent, const fs::path& basePath,
 	wxBusyCursor busy;
 	refreshListContent();
 
-	auto buttonOk = new wxButton(mainPanel, wxID_ANY, "OK"_lng);
+	auto buttonOk = new wxButton(mainPanel, wxID_ANY, "dialog/button/ok"_lng);
 	buttonOk->Enable(!_selectedFile.empty());
 
 	auto bHorizontal = new wxBoxSizer(wxHORIZONTAL);

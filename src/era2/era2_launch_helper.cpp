@@ -23,7 +23,7 @@ std::string Era2LaunchHelper::getCaption() const
 	if (auto result = getExecutable(); !result.empty())
 		return result;
 
-	return "not selected"_lng.ToStdString(wxConvUTF8);
+	return "message/info/exe_not_selected"_lng.ToStdString(wxConvUTF8);
 }
 
 std::string Era2LaunchHelper::getLaunchString() const

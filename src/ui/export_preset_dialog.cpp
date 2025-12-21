@@ -42,7 +42,7 @@ using namespace mm;
 
 ExportPresetDialog::ExportPresetDialog(
 	wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage, const std::string& preset)
-	: wxDialog(parent, wxID_ANY, "Export"_lng, wxDefaultPosition, { 600, 800 })
+	: wxDialog(parent, wxID_ANY, "dialog/export_preset/caption"_lng, wxDefaultPosition, { 600, 800 })
 	, _platform(platform)
 	, _selected(preset)
 	, _iconStorage(iconStorage)
@@ -60,24 +60,24 @@ ExportPresetDialog::ExportPresetDialog(
 
 void ExportPresetDialog::createControls()
 {
-	_previewGroup = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
+	_previewGroup = new wxStaticBox(this, wxID_ANY, "dialog/label/preview"_lng);
 
 	_exportData = new wxTextCtrl(_previewGroup, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_READONLY | wxTE_BESTWRAP);
 
-	_optionsBox     = new wxStaticBox(this, wxID_ANY, "Export options"_lng);
-	_saveExecutable = new wxCheckBox(_optionsBox, wxID_ANY, "Save selected executable"_lng);
+	_optionsBox     = new wxStaticBox(this, wxID_ANY, "dialog/export_preset/options"_lng);
+	_saveExecutable = new wxCheckBox(_optionsBox, wxID_ANY, "dialog/export_preset/save_exe_option"_lng);
 	_saveExecutable->SetValue(true);
-	_exportNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "Profile name:"_lng);
+	_exportNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "dialog/label/profile_name"_lng);
 	_exportName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 
-	_copyToClipboard = new wxButton(this, wxID_ANY, "Copy"_lng);
+	_copyToClipboard = new wxButton(this, wxID_ANY, "dialog/button/copy"_lng);
 	_copyToClipboard->SetBitmap(_iconStorage.get(Icon::Stock::copy, Icon::Size::x16));
-	_saveToFile = new wxButton(this, wxID_ANY, "Save to file"_lng);
+	_saveToFile = new wxButton(this, wxID_ANY, "dialog/button/save_to_file"_lng);
 	_saveToFile->SetBitmap(_iconStorage.get(Icon::Stock::save_to_file, Icon::Size::x16));
 
 	_infoBar = new wxInfoBar(this);
-	_ok      = new wxButton(this, wxID_ANY, "OK"_lng);
+	_ok      = new wxButton(this, wxID_ANY, "dialog/button/close"_lng);
 
 	_infoBarTimer.SetOwner(this);
 }
@@ -162,12 +162,12 @@ void ExportPresetDialog::onCopyToClipboardRequested()
 		wxTheClipboard->SetData(new wxTextDataObject(_exportData->GetValue()));
 		wxTheClipboard->Close();
 
-		_infoBar->ShowMessage("Copied"_lng);
+		_infoBar->ShowMessage("message/notification/copied"_lng);
 		_infoBarTimer.StartOnce(5000);
 	}
 	else
 	{
-		_infoBar->ShowMessage("Cannot open clipboard"_lng, wxICON_EXCLAMATION);
+		_infoBar->ShowMessage("message/error/cannot_open_clipboard"_lng, wxICON_EXCLAMATION);
 		_infoBarTimer.StartOnce(5000);
 	}
 
@@ -183,7 +183,7 @@ void ExportPresetDialog::onSaveToFileRequested()
 		filename += L".json";
 
 	wxFileDialog saveFileDialog(
-		this, {}, {}, filename, "json files (*.json)|*json"_lng, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		this, {}, {}, filename, "dialog/filter/json"_lng, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
 	if (saveFileDialog.ShowModal() != wxID_OK)
 		return;
@@ -194,7 +194,7 @@ void ExportPresetDialog::onSaveToFileRequested()
 
 	overwriteFile(targetPath, _exportData->GetValue().utf8_string());
 
-	_infoBar->ShowMessage("Saved"_lng);
+	_infoBar->ShowMessage("message/notification/saved"_lng);
 	_infoBarTimer.StartOnce(5000);
 
 	EX_UNEXPECTED;

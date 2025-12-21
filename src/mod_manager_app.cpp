@@ -71,9 +71,8 @@ bool ModManagerApp::OnInit()
 
 	if (alreadyRunning)
 	{
-		const int answer = wxMessageBox(
-			"Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?"_lng,
-			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+		const int answer =
+			wxMessageBox("message/question/copy_already_running"_lng, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 		if (answer != wxYES)
 			return false;

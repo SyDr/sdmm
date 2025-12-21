@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -14,12 +14,12 @@
 using namespace mm;
 
 ChooseConflictResolveModeView::ChooseConflictResolveModeView(wxWindow* parent)
-	: wxDialog(parent, wxID_ANY, "conflicts/caption"_lng, wxDefaultPosition, wxSize(600, 200))
+	: wxDialog(parent, wxID_ANY, "dialog/settings/conflicts/caption"_lng, wxDefaultPosition, wxSize(600, 200))
 {
 	auto automatic =
-		new wxCommandLinkButton(this, wxID_ANY, "conflicts/automatic"_lng, "conflicts/automatic_note"_lng);
+		new wxCommandLinkButton(this, wxID_ANY, "dialog/settings/conflicts/automatic"_lng, "dialog/settings/conflicts/automatic_note"_lng);
 	auto manual =
-		new wxCommandLinkButton(this, wxID_ANY, "conflicts/manual"_lng, "conflicts/manual_note"_lng);
+		new wxCommandLinkButton(this, wxID_ANY, "dialog/settings/conflicts/manual"_lng, "dialog/settings/conflicts/manual_note"_lng);
 
 	automatic->Bind(wxEVT_BUTTON,
 					[=](wxCommandEvent&)

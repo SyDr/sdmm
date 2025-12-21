@@ -22,7 +22,7 @@
 using namespace mm;
 
 ErrorView::ErrorView(wxWindow *parent)
-	: wxDialog(parent, wxID_ANY, "Unexpected error occurred"_lng, wxDefaultPosition, wxSize(800, 444))
+	: wxDialog(parent, wxID_ANY, "dialog/error/caption"_lng, wxDefaultPosition, wxSize(800, 444))
 {
 	SetIcon(wxICON(sample));
 
@@ -35,9 +35,8 @@ void ErrorView::createControls()
 {
 	_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 	_text = new wxTextCtrl(_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	_ok = new wxButton(_panel, wxID_OK, "OK"_lng);
-	_label = new wxStaticText(_panel, wxID_ANY, "Internal error happened (only if you didn't wanted to to get exactly "
-		"this result). Please, make report, describing your actions and include following information:"_lng);
+	_ok = new wxButton(_panel, wxID_OK, "dialog/close"_lng);
+	_label = new wxStaticText(_panel, wxID_ANY, "dialog/error/prompt"_lng);
 	_link = new wxHyperlinkCtrl(_panel, wxID_ANY, L"https://github.com/SyDr/sdmm/issues",
 		L"https://github.com/SyDr/sdmm/issues");
 }
@@ -49,7 +48,7 @@ void ErrorView::buildLayout()
 	bHorizontal->AddStretchSpacer();
 	bHorizontal->Add(_ok, wxSizerFlags().Proportion(0));
 
-	auto bVertical = new wxStaticBoxSizer(wxVERTICAL, _panel, "Error details"_lng);
+	auto bVertical = new wxStaticBoxSizer(wxVERTICAL, _panel, "dialog/error/details"_lng);
 	bVertical->Add(_label, wxSizerFlags().Proportion(0).Border(wxALL, 5));
 	bVertical->Add(_text, wxSizerFlags().Proportion(1).Expand().Border(wxALL, 5));
 	bVertical->Add(bHorizontal, wxSizerFlags().Proportion(0).Expand().Border(wxALL, 5));

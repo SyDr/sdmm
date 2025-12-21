@@ -41,7 +41,7 @@
 using namespace mm;
 
 ImportPresetDialog::ImportPresetDialog(wxWindow* parent, IModPlatform& platform, IIconStorage& iconStorage)
-	: wxDialog(parent, wxID_ANY, "Import"_lng, wxDefaultPosition, { 600, 800 })
+	: wxDialog(parent, wxID_ANY, "dialog/import_preset/caption"_lng, wxDefaultPosition, { 600, 800 })
 	, _platform(platform)
 	, _iconStorage(iconStorage)
 {
@@ -57,24 +57,24 @@ ImportPresetDialog::ImportPresetDialog(wxWindow* parent, IModPlatform& platform,
 
 void ImportPresetDialog::createControls()
 {
-	_previewGroup = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
+	_previewGroup = new wxStaticBox(this, wxID_ANY, "dialog/label/preview"_lng);
 
 	_importData = new wxTextCtrl(_previewGroup, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
 		wxTE_MULTILINE | wxTE_BESTWRAP);
 
-	_optionsBox      = new wxStaticBox(this, wxID_ANY, "Import options"_lng);
-	_importNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "Import with name:"_lng);
+	_optionsBox      = new wxStaticBox(this, wxID_ANY, "dialog/import_preset/options"_lng);
+	_importNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "dialog/import_preset/name"_lng);
 	_importName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 	_clearName       = new wxBitmapButton(
         _optionsBox, wxID_ANY, _iconStorage.get(Icon::Stock::cross_gray, Icon::Size::x16));
-	_loadNow         = new wxCheckBox(_optionsBox, wxID_ANY, "Apply immediately"_lng);
+	_loadNow         = new wxCheckBox(_optionsBox, wxID_ANY, "dialog/import_preset/apply_now"_lng);
 	_loadNow->SetValue(true);
 
 	_infoBar = new wxInfoBar(this);
 
-	_fromClipboard = new wxButton(this, wxID_ANY, "Paste"_lng);
+	_fromClipboard = new wxButton(this, wxID_ANY, "dialog/button/paste"_lng);
 	_fromClipboard->SetBitmap(_iconStorage.get(Icon::Stock::copy, Icon::Size::x16));
-	_fromFile = new wxButton(this, wxID_ANY, "Load from file"_lng);
+	_fromFile = new wxButton(this, wxID_ANY, "dialog/button/load_from_file"_lng);
 	_fromFile->SetBitmap(_iconStorage.get(Icon::Stock::save_to_file, Icon::Size::x16));
 	_ok = new wxButton(this, wxID_ANY, L"");
 
@@ -159,15 +159,15 @@ void ImportPresetDialog::updateOkButton()
 
 	if (!_loadNow->IsChecked() && _importName->IsEmpty())
 	{
-		_ok->SetLabel("Select option"_lng);
+		_ok->SetLabel("dialog/import_preset/no_option"_lng);
 		_ok->Disable();
 	}
 	else if (_loadNow->IsChecked() && !_importName->IsEmpty())
-		_ok->SetLabel("Save and apply"_lng);
+		_ok->SetLabel("dialog/import_preset/save_and_apply"_lng);
 	else if (!_importName->IsEmpty())
-		_ok->SetLabel("Save only"_lng);
+		_ok->SetLabel("dialog/import_preset/save_only"_lng);
 	else  // if (_loadNow->IsChecked())
-		_ok->SetLabel("Apply only"_lng);
+		_ok->SetLabel("dialog/import_preset/apply_only"_lng);
 
 	Layout();
 
@@ -210,12 +210,12 @@ void ImportPresetDialog::onPasteFromClipboardRequested()
 			updateOkButton();
 		}
 
-		_infoBar->ShowMessage("Copied from clipboard"_lng);
+		_infoBar->ShowMessage("message/notification/copied_from_clipboard"_lng);
 		_infoBarTimer.StartOnce(5000);
 	}
 	else
 	{
-		_infoBar->ShowMessage("Cannot open clipboard"_lng, wxICON_EXCLAMATION);
+		_infoBar->ShowMessage("message/error/cannot_open_clipboard"_lng, wxICON_EXCLAMATION);
 		_infoBarTimer.StartOnce(5000);
 	}
 
@@ -227,7 +227,7 @@ void ImportPresetDialog::onImportFromFileRequested()
 	EX_TRY;
 
 	wxFileDialog fileDialog(
-		this, {}, {}, {}, "json files (*.json)|*json"_lng, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+		this, {}, {}, {}, "dialog/filter/json"_lng, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 	if (fileDialog.ShowModal() != wxID_OK)
 		return;
@@ -236,7 +236,7 @@ void ImportPresetDialog::onImportFromFileRequested()
 
 	_importData->SetValue(wxString::FromUTF8(readFile(targetPath)));
 
-	_infoBar->ShowMessage("Loaded from file"_lng);
+	_infoBar->ShowMessage("message/notification/loaded_from_file"_lng);
 	_infoBarTimer.StartOnce(5000);
 
 	EX_UNEXPECTED;

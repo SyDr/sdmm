@@ -19,6 +19,7 @@
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
+#include "interface/ii18n_service.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
 #include "mod_manager_app.h"
@@ -74,7 +75,7 @@ public:
 		wxArrayInt selections;
 		GetCheckedItems(selections);
 
-		return "Categories:"_lng + wxString::FromUTF8(std::format(" {}/{}", selections.size(), GetCount()));
+		return "dialog/label/categories"_lng + wxString::FromUTF8(std::format(": {}/{}", selections.size(), GetCount()));
 	}
 
 	wxSize GetAdjustedSize(int minWidth, int, int) override
@@ -489,13 +490,13 @@ void ModListView::bindEvents()
 
 void ModListView::createControls(const wxString& managedPath)
 {
-	_group = new wxStaticBox(this, wxID_ANY, wxString::Format("Mod list (%s)"_lng, managedPath));
+	_group = new wxStaticBox(this, wxID_ANY, managedPath);
 
 	_filterText = new wxSearchCtrl(this, wxID_ANY);
-	_filterText->SetDescriptiveText("Filter"_lng);
+	_filterText->SetDescriptiveText("dialog/label/filter"_lng);
 
 	_filterCategory = new wxComboCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
-		{ GetTextExtent("Categories:"_lng).x + GetTextExtent(wxString::FromUTF8(" 99/99")).x + FromDIP(32),
+		{ GetTextExtent("dialog/label/categories"_lng).x + GetTextExtent(wxString::FromUTF8(": 99/99")).x + FromDIP(32),
 			-1 },
 		wxCB_READONLY);
 
@@ -534,11 +535,11 @@ void ModListView::createControls(const wxString& managedPath)
 
 	if (useLabels)
 	{
-		_configure   = new wxButton(_group, wxID_ANY, "Configure"_lng);
-		_moveUp      = new wxButton(_group, wxID_ANY, "Move Up"_lng);
-		_moveDown    = new wxButton(_group, wxID_ANY, "Move Down"_lng);
-		_changeState = new wxButton(_group, wxID_ANY, "Enable"_lng);
-		_sort        = new wxButton(_group, wxID_ANY, "Sort"_lng);
+		_configure   = new wxButton(_group, wxID_ANY, "dialog/button/configure"_lng);
+		_moveUp      = new wxButton(_group, wxID_ANY, "dialog/button/move_up"_lng);
+		_moveDown    = new wxButton(_group, wxID_ANY, "dialog/button/move_down"_lng);
+		_changeState = new wxButton(_group, wxID_ANY, "dialog/button/enable"_lng);
+		_sort        = new wxButton(_group, wxID_ANY, "dialog/button/sort"_lng);
 
 		_configure->SetBitmap(_iconStorage.get(Icon::Stock::cog, Icon::Size::x16));
 		_moveUp->SetBitmap(_iconStorage.get(Icon::Stock::up, Icon::Size::x16));
@@ -561,25 +562,25 @@ void ModListView::createControls(const wxString& managedPath)
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	}
 
-	_configure->SetToolTip("Configure view"_lng);
-	_moveUp->SetToolTip("Move Up"_lng);
-	_moveDown->SetToolTip("Move Down"_lng);
-	_changeState->SetToolTip("Enable"_lng);
-	_sort->SetToolTip("Sort"_lng);
+	_configure->SetToolTip("dialog/settings/configure_main_view/caption"_lng); // TODO: own lng entry?
+	_moveUp->SetToolTip("dialog/button/move_up"_lng);
+	_moveDown->SetToolTip("dialog/button/move_down"_lng);
+	_changeState->SetToolTip("dialog/button/enable"_lng);
+	_sort->SetToolTip("dialog/button/sort"_lng);
 
 	_moveUp->Disable();
 	_moveDown->Disable();
 	_changeState->Disable();
 
-	_menu.openHomepage = _menu.menu.Append(wxID_ANY, "Go to homepage"_lng);
-	_menu.openDir      = _menu.menu.Append(wxID_ANY, "Open directory"_lng);
-	_menu.archive      = _menu.menu.Append(wxID_ANY, "Archive"_lng);
-	_menu.edit         = _menu.menu.Append(wxID_ANY, "Edit"_lng);
+	_menu.openHomepage = _menu.menu.Append(wxID_ANY, "dialog/button/open_homepage"_lng);
+	_menu.openDir      = _menu.menu.Append(wxID_ANY, "dialog/button/open_directory"_lng);
+	_menu.archive      = _menu.menu.Append(wxID_ANY, "dialog/button/archive"_lng);
+	_menu.edit         = _menu.menu.Append(wxID_ANY, "dialog/button/edit"_lng);
 	_menu.menu.AppendSeparator();
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
-	_showGallery  = new wxButton(this, wxID_ANY, "Screenshots"_lng);
+	_showGallery  = new wxButton(this, wxID_ANY, "dialog/button/screenshots"_lng);
 	_showGallery->SetBitmap(
 		_iconStorage.get(_galleryShown ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 
@@ -659,7 +660,8 @@ void ModListView::createListColumns()
 		if (typed != ModListModelColumn::author)
 			width = wxCOL_WIDTH_AUTOSIZE;
 
-		wxString    name      = wxString::FromUTF8(wxGetApp().translationString(to_string(typed)));
+		wxString name =
+			wxString::FromUTF8(wxGetApp().i18nService().column(std::string(magic_enum::enum_name((typed)))));
 		wxAlignment alignment = wxALIGN_LEFT;
 
 		if (typed == ModListModelColumn::support)
@@ -747,21 +749,21 @@ void ModListView::updateControlsState()
 			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
 			Icon::Size::x16));
 
-		_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
+		_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
 	}
 
-	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "Disable"_lng : "Enable"_lng);
+	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
 
 	if (_selectedMod != _selectedModCached)
 	{
-		auto description = "No description available"_lng;
+		auto description = "message/status/no_description_available"_lng;
 
 		if (mod.virtual_mod)
 		{
-			description = "This mod is virtual, there is no corresponding directory on disk"_lng;
+			description = "message/info/virtual_mod"_lng;
 		}
 		else if (auto desc = _managedPlatform.modDataProvider()->description(mod.id); !desc.empty())
 		{
@@ -822,7 +824,7 @@ void ModListView::updateCategoryFilterContent()
 		if (!item.empty())
 			items.emplace_back(item, wxString::FromUTF8(wxGetApp().categoryTranslationString(item)));
 		else
-			items.emplace_back(item, "Without category"_lng);
+			items.emplace_back(item, "column/without_category"_lng);
 	}
 
 	std::sort(items.begin(), items.end(), [](const auto& l, const auto& r) { return l.second < r.second; });
@@ -889,7 +891,7 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 	{
 		_menu.openHomepage->Enable(!mod->homepage.empty());
 		_menu.openDir->Enable(!mod->virtual_mod);
-		_menu.deleteOrRemove->SetItemLabel(mod->virtual_mod ? "Remove from list"_lng : "Delete"_lng);
+		_menu.deleteOrRemove->SetItemLabel(mod->virtual_mod ? "dialog/button/remove_from_list"_lng : "dialog/button/delete"_lng);
 		_list->PopupMenu(&_menu.menu);
 	}
 }
@@ -958,7 +960,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 		static bool messageWasShown = false;
 		if (!messageWasShown)
 		{
-			_infoBar->ShowMessage(wxString::Format("Automatic mod conflict resolve mode selected"_lng));
+			_infoBar->ShowMessage(wxString::Format("message/notification/automatic_resolve_mode_enabled"_lng));
 			_infoBarTimer.StartOnce(5000);
 			messageWasShown = true;
 		}
@@ -1021,11 +1023,9 @@ void ModListView::onRemoveModRequested()
 
 	if (!mod.virtual_mod)
 	{
-		const auto formatMessage =
-			"Are you sure want to delete mod \"%s\"?\n\n"
-			"It will be deleted to recycle bin, if possible."_lng;
-		const auto answer = wxMessageBox(wxString::Format(formatMessage, wxString::FromUTF8(mod.name)),
-			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
+		const auto formatMessage = "message/question/delete_mod"_lng;
+		const auto answer        = wxMessageBox(wxString::Format(formatMessage, wxString::FromUTF8(mod.name)),
+				   wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING);
 
 		if (answer != wxYES)
 			return;

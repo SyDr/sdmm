@@ -43,7 +43,7 @@
 using namespace mm;
 
 EditModDialog::EditModDialog(wxWindow* parent, IModPlatform& managedPlatform, const std::string& name)
-	: wxDialog(parent, wxID_ANY, "Edit mod"_lng + L" " + wxString::FromUTF8(name), wxDefaultPosition,
+	: wxDialog(parent, wxID_ANY, "dialog/edit_mod/caption"_lng + L" " + wxString::FromUTF8(name), wxDefaultPosition,
 		  wxSize(1280, 720), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _managedPlatform(managedPlatform)
 	, _basePath(managedPlatform.managedPath() / "Mods")
@@ -57,23 +57,23 @@ EditModDialog::EditModDialog(wxWindow* parent, IModPlatform& managedPlatform, co
 
 void EditModDialog::createControls()
 {
-	_modOptionsGroup = new wxStaticBox(this, wxID_ANY, "Mod"_lng);
+	_modOptionsGroup = new wxStaticBox(this, wxID_ANY, "dialog/label/mod"_lng);
 	_modDataEdit     = new wxTextCtrl(
         _modOptionsGroup, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 
 	_editTimer.SetOwner(this);
 
-	_docsGroup = new wxStaticBox(this, wxID_ANY, "Docs"_lng);
+	_docsGroup = new wxStaticBox(this, wxID_ANY, "dialog/edit_mod/docs"_lng);
 
 	_docHtmlWindow = new wxHtmlWindow(_docsGroup);
 	_docHtmlWindow->SetHTMLBackgroundColour(_docsGroup->GetBackgroundColour());
 
-	_openFolder = new wxButton(this, wxID_ANY, "Open directory"_lng);
-	_reload     = new wxButton(this, wxID_ANY, "Reload from disk"_lng);
-	_save       = new wxButton(this, wxID_ANY, "Save"_lng);
-	_status     = new wxStaticText(this, wxID_ANY, "OK"_lng);
+	_openFolder = new wxButton(this, wxID_ANY, "dialog/button/open_directory"_lng);
+	_reload     = new wxButton(this, wxID_ANY, "dialog/button/reload_from_disk"_lng);
+	_save       = new wxButton(this, wxID_ANY, "dialog/button/save"_lng);
+	_status     = new wxStaticText(this, wxID_ANY, "message/status/ok"_lng);
 
-	_close = new wxButton(this, wxID_ANY, "Close"_lng);
+	_close = new wxButton(this, wxID_OK, "dialog/button/ok"_lng);
 }
 
 void EditModDialog::bindEvents()
@@ -120,7 +120,7 @@ void EditModDialog::OnDataEditTextChanged()
 	try
 	{
 		[[maybe_unused]] const auto parsed = nlohmann::json::parse(text);
-		_status->SetLabelText("OK"_lng);
+		_status->SetLabelText("message/status/ok"_lng);
 	}
 	catch (const nlohmann::json::parse_error& pe)
 	{

@@ -80,6 +80,17 @@ std::string I18nService::category(const std::string& category) const
 	return boost::to_upper_copy(category.substr(0, 1)) + category.substr(1);
 }
 
+std::string I18nService::column(const std::string& key) const
+{
+	if (key.empty())
+		return {};
+
+	if (const auto it = _data.find("column/" + boost::to_lower_copy(key)); it != _data.cend())
+		return it->second;
+
+	return boost::to_upper_copy(key.substr(0, 1)) + key.substr(1);
+}
+
 std::string I18nService::get(const std::string& key) const
 {
 	if (const auto it = _data.find(key); it != _data.cend())

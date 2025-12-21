@@ -85,24 +85,24 @@ void ManagePresetListView::refreshListContent()
 
 void ManagePresetListView::createControls()
 {
-	_presets = new wxStaticBox(this, wxID_ANY, "Profiles"_lng);
+	_presets = new wxStaticBox(this, wxID_ANY, "dialog/main_frame/page_profiles"_lng);
 
 	_list = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
-	_list->AppendIconTextColumn("Profile"_lng, wxDATAVIEW_CELL_INERT);
+	_list->AppendIconTextColumn("dialog/label/profile"_lng, wxDATAVIEW_CELL_INERT);
 
-	_load = new wxButton(_presets, wxID_ANY, "Load"_lng);
-	_save = new wxButton(_presets, wxID_ANY, "Save"_lng);
+	_load = new wxButton(_presets, wxID_ANY, "dialog/button/load"_lng);
+	_save = new wxButton(_presets, wxID_ANY, "dialog/button/save"_lng);
 
-	_export = new wxButton(_presets, wxID_ANY, "Export"_lng);
-	_import = new wxButton(_presets, wxID_ANY, "Import"_lng);
+	_export = new wxButton(_presets, wxID_ANY, "dialog/export_preset/caption"_lng); // TODO: have own lng entry?
+	_import = new wxButton(_presets, wxID_ANY, "dialog/import_preset/caption"_lng);
 
-	_rename = new wxButton(_presets, wxID_ANY, "Rename"_lng);
-	_copy   = new wxButton(_presets, wxID_ANY, "Copy"_lng);
+	_rename = new wxButton(_presets, wxID_ANY, "dialog/button/rename"_lng);
+	_copy   = new wxButton(_presets, wxID_ANY, "dialog/button/copy"_lng);
 
-	_remove = new wxButton(_presets, wxID_ANY, "Delete"_lng);
+	_remove = new wxButton(_presets, wxID_ANY, "dialog/button/delete"_lng);
 
-	_preview = new wxStaticBox(this, wxID_ANY, "Preview"_lng);
+	_preview = new wxStaticBox(this, wxID_ANY, "dialog/label/preview"_lng);
 
 	_mods = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
@@ -129,7 +129,7 @@ void ManagePresetListView::createListColumns()
 
 	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModelColumn::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column1 = new wxDataViewColumn("Mod"_lng, r1, static_cast<unsigned int>(ModListModelColumn::name),
+	auto column1 = new wxDataViewColumn("dialog/label/mod"_lng, r1, static_cast<unsigned int>(ModListModelColumn::name),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_mods->AppendColumn(column0);
@@ -198,7 +198,7 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 
 	if (baseName.empty())
 		baseName =
-			enterFileName(this, "Enter profile name"_lng, "Create"_lng, wxString::FromUTF8(baseName))
+			enterFileName(this, "dialog/label/enter_profile_name"_lng, "dialog/main_frame/new_mod_prompt_label"_lng, wxString::FromUTF8(baseName))
 				.ToStdString(wxConvUTF8);
 
 	if (baseName.empty())
@@ -207,7 +207,7 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 	if (_platform.getPresetManager()->exists(baseName))
 	{
 		int const answer = wxMessageBox(
-			wxString::Format("'%s' already exists, overwrite?"_lng, wxString::FromUTF8(baseName)),
+			wxString::Format("message/question/overwrite_existing_file"_lng, wxString::FromUTF8(baseName)),
 			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 		if (answer != wxYES)
@@ -261,7 +261,7 @@ void ManagePresetListView::onLoadPresetRequested()
 
 	refreshListContent();
 
-	_infoBar->ShowMessage(wxString::Format("Profile \"%s\" loaded."_lng, wxString::FromUTF8(selected)));
+	_infoBar->ShowMessage(wxString::Format("message/info/profile_loaded"_lng, wxString::FromUTF8(selected)));
 	_infoBarTimer.StartOnce(5000);
 
 	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
@@ -274,7 +274,7 @@ void ManagePresetListView::onRenamePreset()
 
 	const auto selected = getSelection();
 	const auto newName =
-		enterFileName(this, "Enter profile name"_lng, "Rename"_lng, wxString::FromUTF8(selected))
+		enterFileName(this, "dialog/label/enter_profile_name"_lng, "dialog/button/rename"_lng, wxString::FromUTF8(selected))
 			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())
@@ -283,7 +283,7 @@ void ManagePresetListView::onRenamePreset()
 	if (_platform.getPresetManager()->exists(newName))
 	{
 		_infoBar->ShowMessage(
-			wxString::Format("Profile \"%s\" already exists."_lng, wxString::FromUTF8(newName)));
+			wxString::Format("message/warning/profile_already_exists"_lng, wxString::FromUTF8(newName)));
 		_infoBarTimer.StartOnce(5000);
 		return;
 	}
@@ -301,7 +301,7 @@ void ManagePresetListView::onCopyPreset()
 
 	const auto selected = getSelection();
 	const auto newName =
-		enterFileName(this, "Enter profile name"_lng, "Copy"_lng, wxString::FromUTF8(selected))
+		enterFileName(this, "dialog/label/enter_profile_name"_lng, "dialog/button/copy"_lng, wxString::FromUTF8(selected))
 			.ToStdString(wxConvUTF8);
 
 	if (newName.empty())
@@ -310,7 +310,7 @@ void ManagePresetListView::onCopyPreset()
 	if (_platform.getPresetManager()->exists(newName))
 	{
 		_infoBar->ShowMessage(
-			wxString::Format("Profile \"%s\" already exists."_lng, wxString::FromUTF8(newName)));
+			wxString::Format("message/warning/profile_already_exists"_lng, wxString::FromUTF8(newName)));
 		_infoBarTimer.StartOnce(5000);
 		return;
 	}
@@ -327,7 +327,7 @@ void ManagePresetListView::onDeletePreset()
 
 	auto      selected = getSelection();
 	const int answer =
-		wxMessageBox(wxString::Format(wxString("Delete profile '%s'?"_lng), wxString::FromUTF8(selected)),
+		wxMessageBox(wxString::Format(wxString("dialog/label/delete_profile"_lng), wxString::FromUTF8(selected)),
 			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
 
 	if (answer == wxYES)
@@ -340,9 +340,7 @@ void ManagePresetListView::onDeletePreset()
 void ManagePresetListView::onFilesystemError(const fs::filesystem_error& e)
 {
 	wxMessageOutputMessageBox().Printf(
-		"Error happened during execution of operation. "
-		"Details:\n\n %s"_lng,
-		wxString::FromUTF8(e.what()));
+		"message/error/operation_exception_details"_lng, wxString::FromUTF8(e.what()));
 }
 
 void ManagePresetListView::updatePreview()
@@ -379,7 +377,7 @@ void ManagePresetListView::onSelectionChanged()
 
 	updatePreview();
 
-	_save->SetLabel(selected.empty() ? "Save as"_lng : "Save"_lng);
+	_save->SetLabel(selected.empty() ? "dialog/button/save_as"_lng : "dialog/button/save"_lng);
 
 	_load->Enable(!selected.empty());
 	_rename->Enable(!selected.empty());

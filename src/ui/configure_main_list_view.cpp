@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2024-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -23,13 +23,14 @@
 #include <wx/listctrl.h>
 #include <wx/rearrangectrl.h>
 #include <wx/sizer.h>
+#include <magic_enum.hpp>
 
 using namespace mm;
 
 ConfigureMainListView::ConfigureMainListView(wxWindow* parent, IIconStorage& iconStorage,
 	const std::vector<int>& columns, ModListModelManagedMode initialManagedMode,
 	ModListModelArchivedMode initialArchivedMode)
-	: wxDialog(parent, wxID_ANY, "Configure view"_lng, wxDefaultPosition, wxSize(500, 600))
+	: wxDialog(parent, wxID_ANY, "dialog/settings/configure_main_view/caption"_lng, wxDefaultPosition, wxSize(500, 600))
 	, _listModel(new ModListModel(*this, iconStorage, ModListModelManagedMode::as_flat_list,
 		  ModListModelArchivedMode::as_single_group, Icon::Size::x16))
 	, _initialManagedMode(initialManagedMode)
@@ -40,7 +41,8 @@ ConfigureMainListView::ConfigureMainListView(wxWindow* parent, IIconStorage& ico
 	bindEvents();
 
 	for (const auto& item : columns)
-		_mods.data.emplace_back(to_string(static_cast<ModListModelColumn>(std::abs(item))),
+		_mods.data.emplace_back(
+			std::string(magic_enum::enum_name(static_cast<ModListModelColumn>(std::abs(item)))),
 			item > 0 ? ModList::ModState::enabled : ModList::ModState::disabled);
 
 	_listModel->modList(_mods);
@@ -60,7 +62,11 @@ std::vector<int> ConfigureMainListView::getColumns() const
 	const auto& checked = _listModel->getChecked();
 	for (const auto& item : _mods.data)
 	{
-		int i = static_cast<int>(ModListModelColumn_from_string(item.id));
+		const auto mlmc = magic_enum::enum_cast<ModListModelColumn>(item.id);
+		if (!mlmc.has_value()) // hmm???
+			continue;
+
+		int i = static_cast<int>(mlmc.value());
 		if (!checked.contains(item.id))
 			i = -i;
 
@@ -82,16 +88,16 @@ ModListModelArchivedMode ConfigureMainListView::getArchivedMode() const
 
 void ConfigureMainListView::createControls()
 {
-	_managedStatic = new wxStaticText(this, wxID_ANY, "Show managed mods"_lng);
+	_managedStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/configure_main_view/managed_mods"_lng);
 	createManagedControl();
 
-	_archivedStatic = new wxStaticText(this, wxID_ANY, "Show archived mods"_lng);
+	_archivedStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/configure_main_view/archived_mods"_lng);
 	createArchivedControl();
 
 	createListControl();
 
-	_save   = new wxButton(this, wxID_OK, "Save"_lng);
-	_cancel = new wxButton(this, wxID_CANCEL, "Cancel"_lng);
+	_save   = new wxButton(this, wxID_OK, "dialog/button/save"_lng);
+	_cancel = new wxButton(this, wxID_CANCEL, "dialog/cancel"_lng);
 }
 
 void ConfigureMainListView::createListControl()
@@ -146,7 +152,8 @@ void ConfigureMainListView::createManagedControl()
 {
 	wxArrayString items;
 	for (const auto& item : ManagedModeValues)
-		items.Add(wxString::FromUTF8(wxGetApp().translationString(to_string(item))));
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"dialog/settings/configure_main_view/managed_mods_value/" + std::string(magic_enum::enum_name(item)))));
 
 	_managedChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_managedChoice->SetSelection(static_cast<int>(_initialManagedMode));
@@ -156,7 +163,8 @@ void ConfigureMainListView::createArchivedControl()
 {
 	wxArrayString items;
 	for (const auto& item : ArchivedModeValues)
-		items.Add(wxString::FromUTF8(wxGetApp().translationString(to_string(item))));
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"dialog/settings/configure_main_view/archived_mods_value/" + std::string(magic_enum::enum_name(item)))));
 
 	_archivedChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_archivedChoice->SetSelection(static_cast<int>(_initialArchivedMode));
@@ -172,7 +180,7 @@ void ConfigureMainListView::createListColumns()
 
 	auto column0 = new wxDataViewColumn(L" ", r0, static_cast<unsigned int>(ModListModelColumn::checkbox),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column2 = new wxDataViewColumn("Column"_lng, r2, static_cast<unsigned int>(ModListModelColumn::name),
+	auto column2 = new wxDataViewColumn("dialog/settings/configure_main_view/column"_lng, r2, static_cast<unsigned int>(ModListModelColumn::name),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_list->AppendColumn(column0);
@@ -217,7 +225,7 @@ const ModData& ConfigureMainListView::modData(const std::string& id)
 	{
 		ModData md;
 		md.id   = id;
-		md.name = wxGetApp().translationString(id);
+		md.name = wxGetApp().i18nService().column(id);
 
 		std::tie(it, std::ignore) = _data.emplace(id, std::move(md));
 	}

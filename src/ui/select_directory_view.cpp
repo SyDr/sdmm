@@ -29,7 +29,7 @@ using namespace mm;
 
 SelectDirectoryDialog::SelectDirectoryDialog(wxWindow* parent, IAppConfig& config, IIconStorage& iconStorage)
 	: wxDialog(
-		  parent, wxID_ANY, "Select game directory for management"_lng, wxDefaultPosition, wxSize(1000, 666))
+		  parent, wxID_ANY, "dialog/select_game_directory/caption"_lng, wxDefaultPosition, wxSize(1000, 666))
 	, _appConfig(config)
 	, _iconStorage(iconStorage)
 {
@@ -54,15 +54,15 @@ void SelectDirectoryDialog::createControls()
 
 	_recentDirsList = new wxDataViewListCtrl(
 		this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_HORIZ_RULES | wxDV_ROW_LINES | wxDV_NO_HEADER);
-	_recentDirsList->AppendIconTextColumn("Path"_lng);
+	_recentDirsList->AppendIconTextColumn("column/path"_lng);
 
-	_selectedLabel    = new wxStaticText(this, wxID_ANY, "Selected:"_lng);
+	_selectedLabel    = new wxStaticText(this, wxID_ANY, "dialog/label/selected"_lng);
 	_selectedPathEdit =
 		new wxTextCtrl(this, wxID_ANY, dirToSelect, wxDefaultPosition, wxDefaultSize, wxTE_READONLY);
-	_accept = new wxButton(this, wxID_ANY, "Accept"_lng);
+	_accept = new wxButton(this, wxID_ANY, "dialog/button/accept"_lng);
 
 	_menu.starUnstar     = _menu.menu.Append(wxID_ANY, L"placeholder");
-	_menu.removeFromList = _menu.menu.Append(wxID_ANY, "Remove from list"_lng);
+	_menu.removeFromList = _menu.menu.Append(wxID_ANY, "dialog/button/remove_from_list"_lng);
 }
 
 void SelectDirectoryDialog::bindEvents()
@@ -113,10 +113,10 @@ void SelectDirectoryDialog::bindEvents()
 
 void SelectDirectoryDialog::buildLayout()
 {
-	auto leftGroupSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Explorer"_lng);
+	auto leftGroupSizer = new wxStaticBoxSizer(wxVERTICAL, this, "dialog/label/explorer"_lng);
 	leftGroupSizer->Add(_explorerList, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
-	auto rightGroupSizer = new wxStaticBoxSizer(wxVERTICAL, this, "Recent"_lng);
+	auto rightGroupSizer = new wxStaticBoxSizer(wxVERTICAL, this, "dialog/label/recent"_lng);
 	rightGroupSizer->Add(_recentDirsList, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto contentSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -204,7 +204,7 @@ void SelectDirectoryDialog::OnListItemContextMenu()
 
 	auto path = _appConfig.getKnownDataPathList().at(row);
 	_menu.starUnstar->SetItemLabel(
-		!_appConfig.dataPathHasStar(path) ? "Add to favorites"_lng : "Remove from favorites"_lng);
+		!_appConfig.dataPathHasStar(path) ? "dialog/button/add_to_favs"_lng : "dialog/button/remove_from_favs"_lng);
 
 	_recentDirsList->PopupMenu(&_menu.menu);
 	EX_UNEXPECTED;

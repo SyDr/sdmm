@@ -11,6 +11,8 @@
 #include <variant>
 #include <vector>
 
+#include <magic_enum.hpp>
+
 class wxString;
 
 namespace mm
@@ -36,70 +38,13 @@ namespace mm
 		ModListModelColumn::category, ModListModelColumn::version, ModListModelColumn::support,
 		ModListModelColumn::author, ModListModelColumn::directory };
 
-	inline std::string to_string(ModListModelColumn value)
-	{
-		switch (value)
-		{
-			using enum ModListModelColumn;
-		case priority: return "Priority";
-		case name: return "Mod";
-		case support: return "Support";
-		case author: return "Author";
-		case category: return "Category";
-		case version: return "Version";
-		case directory: return "Directory";
-		}
-
-		return "";
-	}
-
-	inline ModListModelColumn ModListModelColumn_from_string(
-		const std::string& value)  // TODO: do something with this ugly name
-	{
-		if (value == "Priority")
-			return ModListModelColumn::priority;
-
-		if (value == "Mod")
-			return ModListModelColumn::name;
-
-		if (value == "Support")
-			return ModListModelColumn::support;
-
-		if (value == "Author")
-			return ModListModelColumn::author;
-
-		if (value == "Category")
-			return ModListModelColumn::category;
-
-		if (value == "Version")
-			return ModListModelColumn::version;
-
-		if (value == "Directory")
-			return ModListModelColumn::directory;
-
-		return ModListModelColumn::undefined;
-	}
-
 	enum class ModListModelManagedMode
 	{
 		as_flat_list = 0,
 		as_group     = 1,
 	};
 
-	constexpr const std::array ManagedModeValues = { ModListModelManagedMode::as_flat_list,
-		ModListModelManagedMode::as_group };
-
-	inline std::string to_string(ModListModelManagedMode value)
-	{
-		switch (value)
-		{
-			using enum ModListModelManagedMode;
-		case as_flat_list: return "as a flat list";
-		case as_group: return "as a group";
-		}
-
-		return "";
-	}
+	inline constexpr auto ManagedModeValues = magic_enum::enum_values<ModListModelManagedMode>();
 
 	enum class ModListModelArchivedMode
 	{
@@ -108,21 +53,7 @@ namespace mm
 		as_individual_groups = 2,
 	};
 
-	constexpr const std::array ArchivedModeValues = { ModListModelArchivedMode::as_flat_list,
-		ModListModelArchivedMode::as_single_group, ModListModelArchivedMode::as_individual_groups };
-
-	inline std::string to_string(ModListModelArchivedMode value)
-	{
-		switch (value)
-		{
-			using enum ModListModelArchivedMode;
-		case as_flat_list: return "as a flat list";
-		case as_single_group: return "as a single group";
-		case as_individual_groups: return "grouped by category";
-		}
-
-		return "";
-	}
+	inline constexpr auto ArchivedModeValues = magic_enum::enum_values<ModListModelArchivedMode>();
 
 	struct ModListDsplayedData
 	{

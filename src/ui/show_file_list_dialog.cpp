@@ -39,7 +39,7 @@ using namespace mm;
 
 namespace
 {
-	const std::unordered_set<std::wstring> pacExtensions = {
+	inline const std::unordered_set<std::wstring> pacExtensions = {
 		L".lod",
 		L".snd",
 		L".vid",
@@ -305,7 +305,7 @@ namespace
 
 ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStorage,
 	IModDataProvider& dataProvider, ModList list, const fs::path& basePath)
-	: wxDialog(parent, wxID_ANY, "Mod file list"_lng, wxDefaultPosition, wxSize(1280, 720),
+	: wxDialog(parent, wxID_ANY, "dialog/mod_file_list/caption"_lng, wxDefaultPosition, wxSize(1280, 720),
 		  wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 	, _iconStorage(iconStorage)
 	, _dataProvider(dataProvider)
@@ -324,43 +324,43 @@ ShowFileListDialog::ShowFileListDialog(wxWindow* parent, IIconStorage& iconStora
 
 void ShowFileListDialog::createControls()
 {
-	_selectOptionsGroup = new wxStaticBox(this, wxID_ANY, "Options"_lng);
+	_selectOptionsGroup = new wxStaticBox(this, wxID_ANY, "dialog/label/options"_lng);
 	createSelectModsList();
 
-	_showGameFiles    = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include game files"_lng);
-	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "and include not overridden"_lng);
+	_showGameFiles    = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "dialog/mod_file_list/include_game_files"_lng);
+	_showGameFilesAll = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "dialog/mod_file_list/include_not_overridden"_lng);
 	_showGameFilesAll->Disable();
-	_skipNonOverriddenFiles = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Skip non overridden files"_lng);
+	_skipNonOverriddenFiles = new wxCheckBox(_selectOptionsGroup, wxID_ANY, "dialog/mod_file_list/skip_not_overriden"_lng);
 	_includeFilesFromRootDir =
-		new wxCheckBox(_selectOptionsGroup, wxID_ANY, "Include files from root directory"_lng);
+		new wxCheckBox(_selectOptionsGroup, wxID_ANY, "dialog/mod_file_list/include_from_root"_lng);
 
-	_continue = new wxButton(_selectOptionsGroup, wxID_ANY, "Continue"_lng);
+	_continue = new wxButton(_selectOptionsGroup, wxID_ANY, "dialog/button/continue"_lng);
 
-	_resultGroup = new wxStaticBox(this, wxID_ANY, "Results"_lng);
+	_resultGroup = new wxStaticBox(this, wxID_ANY, "column/results"_lng);
 
 	createResultList();
 	createDetailsList();
 
-	_openFolder = new wxButton(_resultGroup, wxID_ANY, "Open folder"_lng);
+	_openFolder = new wxButton(_resultGroup, wxID_ANY, "dialog/button/open_directory"_lng);
 	_openFolder->Disable();
 
 	_progressStatic = new wxStaticText(this, wxID_ANY, wxEmptyString);
-	_close          = new wxButton(this, wxID_ANY, "Close"_lng);
+	_close          = new wxButton(this, wxID_ANY, "dialog/button/close"_lng);
 }
 
 void ShowFileListDialog::createResultList()
 {
 	_fileList = new wxDataViewListCtrl(_resultGroup, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
-	_fileList->AppendTextColumn("Index"_lng, wxDATAVIEW_CELL_INERT, 60, wxALIGN_LEFT);
-	_fileList->AppendIconTextColumn("Game"_lng, wxDATAVIEW_CELL_INERT, 50);
+	_fileList->AppendTextColumn("column/index"_lng, wxDATAVIEW_CELL_INERT, 60, wxALIGN_LEFT);
+	_fileList->AppendIconTextColumn("dialog/main_frame/menu/game/label"_lng, wxDATAVIEW_CELL_INERT, 50);
 
 	auto r = new mmDataViewMultipleIconsRenderer();
 	auto c = new wxDataViewColumn(
-		"Mods"_lng, r, 2, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxCOL_RESIZABLE | wxCOL_SORTABLE);
+		"dialog/main_frame/page_mods"_lng, r, 2, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxCOL_RESIZABLE | wxCOL_SORTABLE);
 
 	_fileList->AppendColumn(c);
-	_fileList->AppendTextColumn("Path"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
+	_fileList->AppendTextColumn("column/path"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT,
 		wxCOL_RESIZABLE | wxCOL_SORTABLE);
 }
 
@@ -368,8 +368,8 @@ void ShowFileListDialog::createDetailsList()
 {
 	_detailsList = new wxDataViewListCtrl(_resultGroup, wxID_ANY, wxDefaultPosition, { 400, 150 },
 		wxDV_HORIZ_RULES | wxDV_VERT_RULES | wxDV_ROW_LINES);
-	_detailsList->AppendIconTextColumn("Mod"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
-	_detailsList->AppendTextColumn("Path"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_DEFAULT);
+	_detailsList->AppendIconTextColumn("dialog/label/mod"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
+	_detailsList->AppendTextColumn("column/path"_lng, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_DEFAULT);
 }
 
 void ShowFileListDialog::createSelectModsList()
@@ -389,7 +389,7 @@ void ShowFileListDialog::createSelectModsList()
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 	auto column1 = new wxDataViewColumn(L" ", r1, static_cast<unsigned int>(ModListModelColumn::priority),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
-	auto column2 = new wxDataViewColumn("Mod"_lng, r2, static_cast<unsigned int>(ModListModelColumn::name),
+	auto column2 = new wxDataViewColumn("dialog/label/mod"_lng, r2, static_cast<unsigned int>(ModListModelColumn::name),
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER);
 
 	_selectModsList->AppendColumn(column0);

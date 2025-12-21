@@ -500,20 +500,20 @@ void ModListModel::reload()
 	if (managedCount)
 	{
 		_displayed.categories.emplace_back(ModListDsplayedData::ManagedGroupTag(),
-			wxString::Format(L"%s (%d)", "Managed"_lng, managedCount));
+			wxString::Format(L"%s (%d)", "column/managed"_lng, managedCount));
 	}
 
 	for (const auto& cat : cats)
 		_displayed.categories.emplace_back(cat.first,
 			wxString::Format(L"%s (%d)",
-				cat.first.empty() ? "Without category"_lng
+				cat.first.empty() ? "column/without_category"_lng
 								  : wxString::FromUTF8(wxGetApp().categoryTranslationString(cat.first)),
 				cat.second));
 
 	if (archivedCount)
 	{
 		_displayed.categories.emplace_back(ModListDsplayedData::ArchivedGroupTag(),
-			wxString::Format(L"%s (%d)", "Archived"_lng, archivedCount));
+			wxString::Format(L"%s (%d)", "column/archived"_lng, archivedCount));
 	}
 
 	std::sort(_displayed.categories.begin(), _displayed.categories.end(),
@@ -604,15 +604,13 @@ wxString ModListModel::status() const
 	const size_t displayed = _displayed.items.size();
 	const auto   hidden    = total - displayed;
 
-	wxString message;
+	wxString message = wxString::Format("message/status/mod_count"_lng, total);
 
 	if (!displayed && hidden)
-		message = wxString::Format("All %d mods hidden (change filter)"_lng, total);
-	else
-		message = wxString::Format("Mods: %d"_lng, total);
+		message += wxString::Format("message/status/all_mods_hidden"_lng, total);
 
 	if (displayed && displayed != total)
-		message += wxString::Format(", displayed: %d, hidden: %d"_lng, displayed, hidden);
+		message += wxString::Format("message/status/displayed_and_hidden"_lng, displayed, hidden);
 
 	return message;
 }

@@ -161,8 +161,7 @@ std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataPr
 			if (i == expandedRequirements.size())
 			{
 				wxLogWarning(
-					wxString::Format("No mods from (%s) can be placed above each other, "
-									 "%s placed at the top"_lng,
+					wxString::Format("message/warning/no_mods_can_be_placed_above_each_other"_lng,
 						wxString::FromUTF8(boost::join(expandedRequirements, ", ")),
 						wxString::FromUTF8(expandedRequirements.front())));
 				sortedActive.emplace_back(expandedRequirements.front());
