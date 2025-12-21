@@ -35,7 +35,7 @@ namespace mm
 		void save() override;
 
 		std::string currentLanguageCode() const override;
-		void        setCurrentLanguageCode(const std::string& lngCode) override;
+		bool        setCurrentLanguageCode(const std::string& value) override;
 
 		std::string selectedPlatform() const override;
 		void        setSelectedPlatformCode(const std::string& newPlatform) override;

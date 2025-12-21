@@ -37,6 +37,9 @@ namespace mm
 		wxWidgetsPtr<wxStaticText> _updateStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _updateChoice = nullptr;
 
+		wxWidgetsPtr<wxStaticText> _languageStatic = nullptr;
+		wxWidgetsPtr<wxChoice>     _languageChoice = nullptr;
+
 		wxWidgetsPtr<wxStaticText> _interfaceSizeStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _interfaceSizeChoice = nullptr;
 

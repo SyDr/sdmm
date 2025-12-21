@@ -134,16 +134,16 @@ namespace
 {
 	namespace Key
 	{
-		inline constexpr const auto MMVersion                 = "mm_version";
-		inline constexpr const auto UpdateCheckMode           = "update_check_mode";
-		inline constexpr const auto LastCheckForUpdateOn      = "last_check_for_update_on";
-		inline constexpr const auto ModDescriptionUsedControl = "mod_description_use_control";
-		inline constexpr const auto InterfaceSize             = "interface_size";
-		inline constexpr const auto InterfaceLabel            = "interface_label";
+		inline constexpr auto InterfaceLabel            = "interface_label";
+		inline constexpr auto InterfaceSize             = "interface_size";
+		inline constexpr auto LastCheckForUpdateOn      = "last_check_for_update_on";
+		inline constexpr auto LngCode                   = "language";
+		inline constexpr auto MMVersion                 = "mm_version";
+		inline constexpr auto ModDescriptionUsedControl = "mod_description_use_control";
+		inline constexpr auto UpdateCheckMode           = "update_check_mode";
 	}
 }
 
-#define SD_LNG_CODE "language"
 constexpr auto sd_game = "game";
 #define SD_KNOWN     "directories"
 #define SD_FAVS      "stars"
@@ -158,12 +158,17 @@ constexpr auto sd_game = "game";
 
 std::string AppConfig::currentLanguageCode() const
 {
-	return _data[SD_LNG_CODE].get<std::string>();
+	return _data[Key::LngCode].get<std::string>();
 }
 
-void AppConfig::setCurrentLanguageCode(const std::string& lngCode)
+bool AppConfig::setCurrentLanguageCode(const std::string& value)
 {
-	_data[SD_LNG_CODE] = lngCode;
+	if (value == currentLanguageCode())
+		return false;
+
+	_data[Key::LngCode] = value;
+
+	return true;
 }
 
 void AppConfig::save()
@@ -235,8 +240,8 @@ void AppConfig::validate()
 	if (_data.is_discarded())
 		_data = { { Key::MMVersion, PROGRAM_VERSION_BASE } };
 
-	if (!_data.count(SD_LNG_CODE) || !_data[SD_LNG_CODE].is_string())
-		_data[SD_LNG_CODE] = SystemInfo::DefaultLanguage;
+	if (!_data.count(Key::LngCode) || !_data[Key::LngCode].is_string())
+		_data[Key::LngCode] = SystemInfo::DefaultLanguage;
 
 	if (!_data.count(SD_WINDOW) || !_data[SD_WINDOW].is_object())
 		_data[SD_WINDOW] = {};

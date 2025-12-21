@@ -30,7 +30,7 @@ namespace mm
 		virtual void save() = 0;
 
 		[[nodiscard]] virtual std::string currentLanguageCode() const                        = 0;
-		virtual void                      setCurrentLanguageCode(const std::string& lngCode) = 0;
+		virtual bool                      setCurrentLanguageCode(const std::string& value) = 0;
 
 		[[nodiscard]] virtual std::string selectedPlatform() const                                = 0;
 		virtual void                      setSelectedPlatformCode(const std::string& newPlatform) = 0;

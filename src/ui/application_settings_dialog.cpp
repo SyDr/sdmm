@@ -49,11 +49,27 @@ void ApplicationSettingsDialog::createControls()
 {
 	_globalGroup = new wxStaticBox(this, wxID_ANY, "dialog/settings/program_options"_lng);
 
-	_updateStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/update_mode/label"_lng);
+	_languageStatic = new wxStaticText(this, wxID_ANY, "dialog/main_frame/menu/tools/language"_lng);
 	wxArrayString items;
 
+	int lng = 0;
+	for (const auto& lngCode : _app.i18nService().available())
+	{
+		if (_app.appConfig().currentLanguageCode() == lngCode)
+			lng = items.size();
+
+		items.push_back(wxString::FromUTF8(_app.i18nService().languageName(lngCode)));
+	}
+
+	_languageChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+	_languageChoice->SetSelection(lng);
+
+	_updateStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/update_mode/label"_lng);
+
+	items.clear();
 	for (const auto& item : UpdateCheckModeValues)
-		items.push_back(wxString::FromUTF8(wxGetApp().translationString("dialog/settings/update_mode/" + to_string(item))));
+		items.push_back(wxString::FromUTF8(
+			wxGetApp().translationString("dialog/settings/update_mode/" + to_string(item))));
 
 	_updateChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_updateChoice->SetSelection(static_cast<int>(_app.appConfig().updateCheckMode()));
@@ -62,8 +78,8 @@ void ApplicationSettingsDialog::createControls()
 	items.clear();
 
 	for (const auto& item : InterfaceSizeValues)
-		items.Add(wxString::FromUTF8(
-			wxGetApp().translationString("dialog/settings/interface_size/" + std::string(magic_enum::enum_name(item)))));
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"dialog/settings/interface_size/" + std::string(magic_enum::enum_name(item)))));
 
 	_interfaceSizeChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_interfaceSizeChoice->SetSelection(static_cast<int>(_app.appConfig().interfaceSize()));
@@ -72,13 +88,14 @@ void ApplicationSettingsDialog::createControls()
 	items.clear();
 
 	for (const auto& item : InterfaceLabelValues)
-		items.Add(wxString::FromUTF8(
-			wxGetApp().translationString("dialog/settings/interface_label/" + std::string(magic_enum::enum_name(item)))));
+		items.Add(wxString::FromUTF8(wxGetApp().translationString(
+			"dialog/settings/interface_label/" + std::string(magic_enum::enum_name(item)))));
 
 	_interfaceLabelChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_interfaceLabelChoice->SetSelection(static_cast<int>(_app.appConfig().interfaceLabel()));
 
-	_modDescriptionControlStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/mod_description_control/label"_lng);
+	_modDescriptionControlStatic =
+		new wxStaticText(this, wxID_ANY, "dialog/settings/mod_description_control/label"_lng);
 	items.clear();
 
 	for (const auto& item : ModDescriptionUsedControlValues)
@@ -97,7 +114,13 @@ void ApplicationSettingsDialog::bindEvents()
 {
 	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
 		bool restartRequired = false;  // TODO: make something better;
+
 		_app.appConfig().updateCheckMode(static_cast<UpdateCheckMode>(_updateChoice->GetSelection()));
+
+		restartRequired = _app.appConfig().setCurrentLanguageCode(
+							  _app.i18nService().available().at(_languageChoice->GetSelection())) ||
+						  restartRequired;
+
 		restartRequired = _app.appConfig().interfaceSize(
 							  static_cast<InterfaceSize>(_interfaceSizeChoice->GetSelection())) ||
 						  restartRequired;
@@ -118,6 +141,11 @@ void ApplicationSettingsDialog::bindEvents()
 void ApplicationSettingsDialog::buildLayout()
 {
 	auto comboSizer = new wxFlexGridSizer(2);
+
+	comboSizer->Add(_languageStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	comboSizer->Add(
+		_languageChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+
 	comboSizer->Add(_updateStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	comboSizer->Add(_updateChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
