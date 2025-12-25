@@ -168,6 +168,17 @@ void MainFrame::createMenuBar()
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
 	}
 
+	auto modMenu = new wxMenu();
+
+	auto createNewMod = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/create_new"_lng,
+		nullptr, "dialog/main_frame/menu/mod/create_new"_lng);
+	_menuItems[createNewMod->GetId()] = [&] { OnMenuModCreateNewMod(); };
+
+	auto listModFiles = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/list_files"_lng,
+		nullptr, "dialog/main_frame/menu/mod/list_files"_lng);
+	_menuItems[listModFiles->GetId()] = [&] { OnMenuModListModFiles(); };
+
+
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
 	{
@@ -181,21 +192,11 @@ void MainFrame::createMenuBar()
 		wxID_ANY, "dialog/main_frame/menu/tools/reload_data"_lng + L"\tF5", nullptr, "dialog/main_frame/menu/tools/reload_data"_lng);
 	_menuItems[reloadFromDisk->GetId()] = [&] { OnMenuToolsReloadDataFromDisk(); };
 
-	auto listModFiles = toolsMenu->Append(
-		wxID_ANY, "dialog/main_frame/menu/tools/list_mod_files"_lng, nullptr, "dialog/main_frame/menu/tools/list_mod_files"_lng);
-	_menuItems[listModFiles->GetId()] = [&] { OnMenuToolsListModFiles(); };
-
-	auto createNewMod = toolsMenu->Append(
-		wxID_ANY, "dialog/main_frame/menu/tools/create_new_mod"_lng, nullptr, "dialog/main_frame/menu/tools/create_new_mod"_lng);
-	_menuItems[createNewMod->GetId()] = [&] { OnMenuToolsCreateNewMod(); };
-
 	toolsMenu->AppendSeparator();
 
 	auto changeProgramSettings = toolsMenu->Append(
 		wxID_ANY, "dialog/main_frame/menu/tools/settings"_lng, nullptr, "dialog/main_frame/menu/tools/settings_tip"_lng);
 	_menuItems[changeProgramSettings->GetId()] = [&] { OnMenuToolsChangeSettings(); };
-
-	toolsMenu->AppendSeparator();
 
 	auto languageMenu = new wxMenu();
 
@@ -225,6 +226,7 @@ void MainFrame::createMenuBar()
 	_mainMenu = new wxMenuBar();
 	if (gameMenu)
 		_mainMenu->Append(gameMenu, "dialog/main_frame/menu/game/label"_lng);
+	_mainMenu->Append(modMenu, "dialog/main_frame/menu/mod/label"_lng);
 	_mainMenu->Append(toolsMenu, "dialog/main_frame/menu/tools/label"_lng);
 	_mainMenu->Append(helpMenu, L"?");
 	_mainMenu->Bind(wxEVT_MENU, &MainFrame::OnMenuItemSelected, this);
@@ -271,7 +273,7 @@ void MainFrame::OnMenuToolsChangeSettings()
 	EX_UNEXPECTED;
 }
 
-void MainFrame::OnMenuToolsListModFiles()
+void MainFrame::OnMenuModListModFiles()
 {
 	EX_TRY;
 
@@ -282,7 +284,7 @@ void MainFrame::OnMenuToolsListModFiles()
 	EX_UNEXPECTED;
 }
 
-void MainFrame::OnMenuToolsCreateNewMod()
+void MainFrame::OnMenuModCreateNewMod()
 {
 	EX_TRY;
 

@@ -40,8 +40,8 @@ namespace mm
 		void OnMenuToolsChangeSettings();
 		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
-		void OnMenuToolsListModFiles();
-		void OnMenuToolsCreateNewMod();
+		void OnMenuModListModFiles();
+		void OnMenuModCreateNewMod();
 		void OnCloseWindow(wxCloseEvent& event);
 
 		void saveWindowProperties();

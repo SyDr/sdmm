@@ -174,8 +174,6 @@
           "change_managed_directory": "Change managed directory",
           "change_managed_directory_tip": "Allows selecting other directory for management",
           "reload_data": "Reload data from disk",
-          "list_mod_files": "List active mod files",
-          "create_new_mod": "Create new mod",
           "settings": "Settings",
           "settings_tip": "Change program settings",
           "label": "Tools",
@@ -186,6 +184,11 @@
           "check_update": "Check for updates",
           "check_update_tip": "Check for program updates",
           "about": "About"
+        },
+        "mod": {
+          "create_new": "Create new mod",
+          "list_files": "List active mod files",
+          "label": "Mod"
         }
       },
       "new_mod_prompt": "Enter new mod name",
