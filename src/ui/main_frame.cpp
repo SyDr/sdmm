@@ -178,6 +178,9 @@ void MainFrame::createMenuBar()
 		nullptr, "dialog/main_frame/menu/mod/list_files"_lng);
 	_menuItems[listModFiles->GetId()] = [&] { OnMenuModListModFiles(); };
 
+	auto openModsFolder = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/open_directory"_lng,
+		nullptr, "dialog/main_frame/menu/mod/open_directory"_lng);
+	_menuItems[openModsFolder->GetId()] = [&] { OnMenuModOpenModFolder(); };
 
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
@@ -280,6 +283,15 @@ void MainFrame::OnMenuModListModFiles()
 	ShowFileListDialog sfld(this, *_iconStorage, *_currentPlatform->modDataProvider(),
 		_currentPlatform->modManager()->mods(), _currentPlatform->managedPath());
 	sfld.ShowModal();
+
+	EX_UNEXPECTED;
+}
+
+void MainFrame::OnMenuModOpenModFolder()
+{
+	EX_TRY;
+
+	wxLaunchDefaultApplication(wxString::FromUTF8(_currentPlatform->managedPath().string()));
 
 	EX_UNEXPECTED;
 }

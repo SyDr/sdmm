@@ -41,6 +41,7 @@ namespace mm
 		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
 		void OnMenuModListModFiles();
+		void OnMenuModOpenModFolder();
 		void OnMenuModCreateNewMod();
 		void OnCloseWindow(wxCloseEvent& event);
 

@@ -189,7 +189,8 @@
         "mod": {
           "create_new": "Create new mod",
           "list_files": "List active mod files",
-          "label": "Mod"
+          "label": "Mod",
+          "open_directory": "Open mods folder"
         }
       },
       "new_mod_prompt": "Enter new mod name",
