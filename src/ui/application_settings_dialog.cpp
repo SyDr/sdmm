@@ -110,23 +110,26 @@ void ApplicationSettingsDialog::createControls()
 	_modDescriptionControlChoice->SetSelection(
 		static_cast<int>(_app.appConfig().modDescriptionUsedControl()));
 
-	_platformGroup = new wxStaticBox(this, wxID_ANY, "dialog/settings/platform_options"_lng);
+	if (_localConfig)
+	{
+		_platformGroup = new wxStaticBox(this, wxID_ANY, "dialog/settings/platform_options"_lng);
 
-	_conflictResolveStatic =
-		new wxStaticText(this, wxID_ANY, "dialog/settings/conflict_resolve_mode/label"_lng);
-	items.clear();
+		_conflictResolveStatic =
+			new wxStaticText(this, wxID_ANY, "dialog/settings/conflict_resolve_mode/label"_lng);
+		items.clear();
 
-	for (const auto& item : ConflictResolveModeValues)
-		items.Add(wxString::FromUTF8(wxGetApp().translationString(
-			"dialog/settings/conflict_resolve_mode/" + std::string(magic_enum::enum_name(item)))));
+		for (const auto& item : ConflictResolveModeValues)
+			items.Add(wxString::FromUTF8(wxGetApp().translationString(
+				"dialog/settings/conflict_resolve_mode/" + std::string(magic_enum::enum_name(item)))));
 
-	_conflictResolveChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
-	_conflictResolveChoice->SetSelection(static_cast<int>(_localConfig->conflictResolveMode()));
+		_conflictResolveChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+		_conflictResolveChoice->SetSelection(static_cast<int>(_localConfig->conflictResolveMode()));
 
-	_warnAboutConflictsBeforeEnableCheckbox =
-		new wxCheckBox(this, wxID_ANY, "dialog/settings/warn_about_conflict_on_enable"_lng);
+		_warnAboutConflictsBeforeEnableCheckbox =
+			new wxCheckBox(this, wxID_ANY, "dialog/settings/warn_about_conflict_on_enable"_lng);
 
-	_warnAboutConflictsBeforeEnableCheckbox->SetValue(_localConfig->warnAboutConflictsBeforeEnabling());
+		_warnAboutConflictsBeforeEnableCheckbox->SetValue(_localConfig->warnAboutConflictsBeforeEnabling());
+	}
 
 	_save   = new wxButton(this, wxID_OK, "dialog/button/save"_lng);
 	_cancel = new wxButton(this, wxID_CANCEL, "dialog/cancel"_lng);
@@ -134,7 +137,7 @@ void ApplicationSettingsDialog::createControls()
 
 void ApplicationSettingsDialog::bindEvents()
 {
-	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+	_save->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
 		bool restartRequired = false;  // TODO: make something better;
 
 		_app.appConfig().updateCheckMode(static_cast<UpdateCheckMode>(_updateChoice->GetSelection()));
@@ -155,14 +158,19 @@ void ApplicationSettingsDialog::bindEvents()
 							  _modDescriptionControlChoice->GetSelection())) ||
 						  restartRequired;
 
-		_localConfig->conflictResolveMode(
-			static_cast<ConflictResolveMode>(_conflictResolveChoice->GetSelection()));
+		if (_localConfig)
+		{
+			_localConfig->conflictResolveMode(
+				static_cast<ConflictResolveMode>(_conflictResolveChoice->GetSelection()));
 
-		_localConfig->warnAboutConflictsBeforeEnabling(_warnAboutConflictsBeforeEnableCheckbox->IsChecked());
+			_localConfig->warnAboutConflictsBeforeEnabling(
+				_warnAboutConflictsBeforeEnableCheckbox->IsChecked());
+		}
 
 		EndModal(restartRequired ? wxID_APPLY : wxID_OK);
 	});
-	_cancel->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { EndModal(wxID_CANCEL); });
+
+	_cancel->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { EndModal(wxID_CANCEL); });
 }
 
 void ApplicationSettingsDialog::buildLayout()
@@ -192,19 +200,6 @@ void ApplicationSettingsDialog::buildLayout()
 	auto topSizer = new wxStaticBoxSizer(_globalGroup, wxVERTICAL);
 	topSizer->Add(comboSizer, wxSizerFlags(1).Expand());
 
-	auto sizer2 = new wxBoxSizer(wxHORIZONTAL);
-	sizer2->Add(_conflictResolveStatic, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
-	sizer2->AddStretchSpacer();
-	sizer2->Add(_conflictResolveChoice, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
-
-	auto sizer4 = new wxBoxSizer(wxHORIZONTAL);
-	sizer4->AddStretchSpacer();
-	sizer4->Add(_warnAboutConflictsBeforeEnableCheckbox, wxSizerFlags(0).Expand().Border(wxALL, 5));
-
-	auto sizer3 = new wxStaticBoxSizer(_platformGroup, wxVERTICAL);
-	sizer3->Add(sizer2, wxSizerFlags(0).Expand());
-	sizer3->Add(sizer4, wxSizerFlags(0).Expand());
-
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->AddStretchSpacer();
 	buttonSizer->Add(_save, wxSizerFlags(0).Expand().Border(wxALL, 5));
@@ -212,7 +207,25 @@ void ApplicationSettingsDialog::buildLayout()
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	mainSizer->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
-	mainSizer->Add(sizer3, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	if (_localConfig)
+	{
+		auto sizer2 = new wxBoxSizer(wxHORIZONTAL);
+		sizer2->Add(_conflictResolveStatic, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+		sizer2->AddStretchSpacer();
+		sizer2->Add(_conflictResolveChoice, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+
+		auto sizer4 = new wxBoxSizer(wxHORIZONTAL);
+		sizer4->AddStretchSpacer();
+		sizer4->Add(_warnAboutConflictsBeforeEnableCheckbox, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+		auto sizer3 = new wxStaticBoxSizer(_platformGroup, wxVERTICAL);
+		sizer3->Add(sizer2, wxSizerFlags(0).Expand());
+		sizer3->Add(sizer4, wxSizerFlags(0).Expand());
+
+		mainSizer->Add(sizer3, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	}
+
 	mainSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
 	this->SetSizer(mainSizer);

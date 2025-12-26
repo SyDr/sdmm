@@ -229,7 +229,7 @@
       "cannot_open_clipboard": "Не получилось открыть буфер обмена",
       "operation_exception_details": "Произошла ошибка при выполнении операции. Детали:\r\n\r\n%s",
       "directory_already_exist": "Каталог уже существует",
-      "path_not_exists": "Выбранный каталог не существует"
+      "path_not_exists": "Выбранный каталог (%s) не существует"
     },
     "warning": {
       "profile_already_exists": "Профиль \"%s\" уже существует.",

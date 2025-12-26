@@ -225,7 +225,7 @@
       "cannot_open_clipboard": "Cannot open clipboard",
       "operation_exception_details": "Error happened during execution of operation. Details:\n\n%s",
       "directory_already_exist": "Directory already exist",
-      "path_not_exists": "Selected path doesn't exists, please choose suitable one"
+      "path_not_exists": "Selected path (%s) doesn't exists, please choose suitable one"
     },
     "warning": {
       "profile_already_exists": "Profile \"%s\" already exists.",

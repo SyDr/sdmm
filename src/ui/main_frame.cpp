@@ -168,19 +168,24 @@ void MainFrame::createMenuBar()
 		_menuItems[launchManage->GetId()]    = [&] { selectExeToLaunch(); };
 	}
 
-	auto modMenu = new wxMenu();
+	wxMenu* modMenu = nullptr;
 
-	auto createNewMod = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/create_new"_lng,
-		nullptr, "dialog/main_frame/menu/mod/create_new"_lng);
-	_menuItems[createNewMod->GetId()] = [&] { OnMenuModCreateNewMod(); };
+	if (_currentPlatform)
+	{
+		modMenu = new wxMenu();
 
-	auto listModFiles = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/list_files"_lng,
-		nullptr, "dialog/main_frame/menu/mod/list_files"_lng);
-	_menuItems[listModFiles->GetId()] = [&] { OnMenuModListModFiles(); };
+		auto createNewMod = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/create_new"_lng, nullptr,
+			"dialog/main_frame/menu/mod/create_new"_lng);
+		_menuItems[createNewMod->GetId()] = [&] { OnMenuModCreateNewMod(); };
 
-	auto openModsFolder = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/open_directory"_lng,
-		nullptr, "dialog/main_frame/menu/mod/open_directory"_lng);
-	_menuItems[openModsFolder->GetId()] = [&] { OnMenuModOpenModFolder(); };
+		auto listModFiles = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/list_files"_lng, nullptr,
+			"dialog/main_frame/menu/mod/list_files"_lng);
+		_menuItems[listModFiles->GetId()] = [&] { OnMenuModListModFiles(); };
+
+		auto openModsFolder = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/open_directory"_lng,
+			nullptr, "dialog/main_frame/menu/mod/open_directory"_lng);
+		_menuItems[openModsFolder->GetId()] = [&] { OnMenuModOpenModFolder(); };
+	}
 
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
@@ -191,9 +196,13 @@ void MainFrame::createMenuBar()
 		_menuItems[changeDirectory->GetId()] = [&] { OnMenuToolsChangeDirectory(); };
 	}
 
-	auto reloadFromDisk = toolsMenu->Append(
-		wxID_ANY, "dialog/main_frame/menu/tools/reload_data"_lng + L"\tF5", nullptr, "dialog/main_frame/menu/tools/reload_data"_lng);
-	_menuItems[reloadFromDisk->GetId()] = [&] { OnMenuToolsReloadDataFromDisk(); };
+	if (_currentPlatform)
+	{
+		auto reloadFromDisk =
+			toolsMenu->Append(wxID_ANY, "dialog/main_frame/menu/tools/reload_data"_lng + L"\tF5", nullptr,
+				"dialog/main_frame/menu/tools/reload_data"_lng);
+		_menuItems[reloadFromDisk->GetId()] = [&] { OnMenuToolsReloadDataFromDisk(); };
+	}
 
 	toolsMenu->AppendSeparator();
 
@@ -229,7 +238,8 @@ void MainFrame::createMenuBar()
 	_mainMenu = new wxMenuBar();
 	if (gameMenu)
 		_mainMenu->Append(gameMenu, "dialog/main_frame/menu/game/label"_lng);
-	_mainMenu->Append(modMenu, "dialog/main_frame/menu/mod/label"_lng);
+	if (modMenu)
+		_mainMenu->Append(modMenu, "dialog/main_frame/menu/mod/label"_lng);
 	_mainMenu->Append(toolsMenu, "dialog/main_frame/menu/tools/label"_lng);
 	_mainMenu->Append(helpMenu, L"?");
 	_mainMenu->Bind(wxEVT_MENU, &MainFrame::OnMenuItemSelected, this);
@@ -269,7 +279,7 @@ void MainFrame::OnMenuToolsChangeSettings()
 {
 	EX_TRY;
 
-	ApplicationSettingsDialog asd(this, _app, _currentPlatform->localConfig());
+	ApplicationSettingsDialog asd(this, _app, _currentPlatform ? _currentPlatform->localConfig() : nullptr);
 	if (asd.ShowModal() == wxID_APPLY)
 		wxGetApp().scheduleRestart();
 
@@ -362,8 +372,9 @@ void MainFrame::reloadModel()
 	_currentPlatform = _app.platformService().create(_app.appConfig().selectedPlatform());
 
 	EX_ON_EXCEPTION(empty_path_error, SINK_EXCEPTION(OnMenuToolsChangeDirectory));
-	EX_ON_EXCEPTION(not_exist_path_error, [](const not_exist_path_error&) {
-		wxMessageOutputMessageBox().Printf("message/error/path_not_exists"_lng);
+	EX_ON_EXCEPTION(not_exist_path_error, [this](const not_exist_path_error&) {
+		wxMessageOutputMessageBox().Printf(
+			"message/error/path_not_exists"_lng, wxString::FromUTF8(_app.appConfig().getDataPath().string()));
 	});
 	EX_UNEXPECTED;
 }
