@@ -36,6 +36,9 @@ namespace mm
 		ConflictResolveMode conflictResolveMode() const override;
 		void                conflictResolveMode(ConflictResolveMode value) override;
 
+		bool warnAboutConflictsBeforeEnabling() const override;
+		void warnAboutConflictsBeforeEnabling(bool value) override;
+
 		std::vector<int> listColumns() const override;
 		void             listColumns(const std::vector<int>& value) override;
 

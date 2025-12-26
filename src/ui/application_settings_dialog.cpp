@@ -123,6 +123,11 @@ void ApplicationSettingsDialog::createControls()
 	_conflictResolveChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_conflictResolveChoice->SetSelection(static_cast<int>(_localConfig->conflictResolveMode()));
 
+	_warnAboutConflictsBeforeEnableCheckbox =
+		new wxCheckBox(this, wxID_ANY, "dialog/settings/warn_about_conflict_on_enable"_lng);
+
+	_warnAboutConflictsBeforeEnableCheckbox->SetValue(_localConfig->warnAboutConflictsBeforeEnabling());
+
 	_save   = new wxButton(this, wxID_OK, "dialog/button/save"_lng);
 	_cancel = new wxButton(this, wxID_CANCEL, "dialog/cancel"_lng);
 }
@@ -152,6 +157,8 @@ void ApplicationSettingsDialog::bindEvents()
 
 		_localConfig->conflictResolveMode(
 			static_cast<ConflictResolveMode>(_conflictResolveChoice->GetSelection()));
+
+		_localConfig->warnAboutConflictsBeforeEnabling(_warnAboutConflictsBeforeEnableCheckbox->IsChecked());
 
 		EndModal(restartRequired ? wxID_APPLY : wxID_OK);
 	});
@@ -183,15 +190,20 @@ void ApplicationSettingsDialog::buildLayout()
 		wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
 	auto topSizer = new wxStaticBoxSizer(_globalGroup, wxVERTICAL);
-	topSizer->Add(comboSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	topSizer->Add(comboSizer, wxSizerFlags(1).Expand());
 
 	auto sizer2 = new wxBoxSizer(wxHORIZONTAL);
 	sizer2->Add(_conflictResolveStatic, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	sizer2->AddStretchSpacer();
 	sizer2->Add(_conflictResolveChoice, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
+	auto sizer4 = new wxBoxSizer(wxHORIZONTAL);
+	sizer4->AddStretchSpacer();
+	sizer4->Add(_warnAboutConflictsBeforeEnableCheckbox, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
 	auto sizer3 = new wxStaticBoxSizer(_platformGroup, wxVERTICAL);
-	sizer3->Add(sizer2, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	sizer3->Add(sizer2, wxSizerFlags(0).Expand());
+	sizer3->Add(sizer4, wxSizerFlags(0).Expand());
 
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->AddStretchSpacer();

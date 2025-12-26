@@ -44,6 +44,8 @@ namespace
 	{
 		inline constexpr auto MMVersion   = "mm_version";
 		inline constexpr auto ListColumns = "list_columns";
+		inline constexpr auto WarnAboutConflictsBeforeEnablingMod =
+			"warn_about_conflicts_before_enabling_mod";
 	}
 }
 
@@ -134,6 +136,17 @@ ConflictResolveMode Era2Config::conflictResolveMode() const
 void Era2Config::conflictResolveMode(ConflictResolveMode value)
 {
 	_data[st_conflict_resolve_mode] = static_cast<int>(value);
+	save();
+}
+
+bool Era2Config::warnAboutConflictsBeforeEnabling() const
+{
+	return _data[Key::WarnAboutConflictsBeforeEnablingMod].get<bool>();
+}
+
+void Era2Config::warnAboutConflictsBeforeEnabling(bool value)
+{
+	_data[Key::WarnAboutConflictsBeforeEnablingMod] = value;
 	save();
 }
 
@@ -294,6 +307,10 @@ void Era2Config::validate()
 
 	if (!_data.count(st_screenshots_expanded) || !_data[st_screenshots_expanded].is_boolean())
 		_data[st_screenshots_expanded] = true;
+
+	if (!_data.count(Key::WarnAboutConflictsBeforeEnablingMod) ||
+		!_data[Key::WarnAboutConflictsBeforeEnablingMod].is_boolean())
+		_data[Key::WarnAboutConflictsBeforeEnablingMod] = true;
 
 	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
 		_data[Key::MMVersion] = "";

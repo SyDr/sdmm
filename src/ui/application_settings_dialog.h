@@ -56,6 +56,8 @@ namespace mm
 		wxWidgetsPtr<wxStaticText> _conflictResolveStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _conflictResolveChoice = nullptr;
 
+		wxWidgetsPtr<wxCheckBox>   _warnAboutConflictsBeforeEnableCheckbox = nullptr;
+
 		wxWidgetsPtr<wxButton> _save   = nullptr;
 		wxWidgetsPtr<wxButton> _cancel = nullptr;
 	};

@@ -51,6 +51,8 @@
 #include <wx/stattext.h>
 #include <wx/webview.h>
 
+#include <boost/range/algorithm.hpp>
+
 #include <algorithm>
 
 class mmCheckListBoxComboPopup : public wxCheckListBox, public wxComboPopup
@@ -948,25 +950,102 @@ void ModListView::onSwitchSelectedModStateRequested()
 	if (_selectedMod.empty())
 		return;
 
-	_modManager.switchState(_selectedMod);
+	const bool warnAboutConflicts = _managedPlatform.localConfig()->warnAboutConflictsBeforeEnabling();
+	const bool autoSort =
+		_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic;
 
-	if (_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic)
+	const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
+	const auto& disabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
+
+	if (warnAboutConflicts && !enabling.empty())
 	{
-		const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
-		const auto& disabling = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
-
-		onSortModsRequested(enabling, disabling);
-
-		static bool messageWasShown = false;
-		if (!messageWasShown)
+		if (!autoSort)
 		{
-			_infoBar->ShowMessage(wxString::Format("message/notification/automatic_resolve_mode_enabled"_lng));
-			_infoBarTimer.StartOnce(5000);
-			messageWasShown = true;
+			if (!warnBeforeEnabling(enabling)) // message: x incompatible with y, z
+				return;
+		}
+		else
+		{
+			if (!warnBeforeEnablingAndSort(enabling)) // message: enabling would disable y, z, a
+				return;
 		}
 	}
 
+	_modManager.switchState(_selectedMod);
+
+	if (!autoSort)
+		return;
+
+	onSortModsRequested(enabling, disabling);
+
+	static bool messageWasShown = false;
+	if (!messageWasShown)
+	{
+		_infoBar->ShowMessage(
+			wxString::Format("message/notification/automatic_resolve_mode_enabled"_lng));
+		_infoBarTimer.StartOnce(10000);
+		messageWasShown = true;
+	}
+
 	EX_UNEXPECTED;
+}
+
+bool ModListView::warnBeforeEnabling(const std::string& enablingMod)
+{
+	const auto& incompatible = _managedPlatform.modDataProvider()->modData(enablingMod).incompatible;
+
+	std::vector<std::string> activeIncompatible;
+	for (const auto& item : _modManager.mods().enabled())
+		if (incompatible.contains(item))
+			activeIncompatible.emplace_back(item);
+
+	if (!activeIncompatible.empty())
+	{
+		for (auto& item : activeIncompatible)
+			item = _managedPlatform.modDataProvider()->modData(item).name;
+
+		const auto message = wxString::Format("message/question/warn_about_conflicts_before_enabling"_lng,
+			wxString::FromUTF8(enablingMod), wxString::FromUTF8(boost::join(activeIncompatible, ", ")));
+
+		const int answer = wxMessageBox(message, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+
+		return answer == wxYES;
+	}
+
+	return true;
+}
+
+bool ModListView::warnBeforeEnablingAndSort(const std::string& enablingMod)
+{
+	auto wouldBe = _modManager.mods();
+	wouldBe.switchState(_selectedMod);
+
+	auto newEnabled = ResolveModConflicts(wouldBe, *_managedPlatform.modDataProvider(), enablingMod, {});
+
+	auto enabledSorted = newEnabled;
+	auto currentSorted = _modManager.mods().enabled();
+
+	boost::sort(enabledSorted);
+	boost::sort(currentSorted);
+
+	std::vector<std::string> wouldBeDisabled;
+	boost::set_difference(currentSorted, enabledSorted, std::back_inserter(wouldBeDisabled));
+
+	if (!wouldBeDisabled.empty())
+	{
+		for (auto& item : wouldBeDisabled)
+			item = _managedPlatform.modDataProvider()->modData(item).name;
+
+		const auto message =
+			wxString::Format("message/question/warn_about_conflicts_before_enabling_sort"_lng,
+				wxString::FromUTF8(boost::join(wouldBeDisabled, ", ")));
+
+		const int answer = wxMessageBox(message, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+
+		return answer == wxYES;
+	}
+
+	return true;
 }
 
 void ModListView::onResetSelectedModStateRequested()
@@ -1000,7 +1079,8 @@ void ModListView::onEditModRequested()
 	EX_UNEXPECTED;
 }
 
-void ModListView::onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod)
+void ModListView::onSortModsRequested(
+	const std::string& enablingMod, const std::string& disablingMod)
 {
 	wxBusyCursor bc;
 

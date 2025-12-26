@@ -120,10 +120,10 @@ void ModList::disable(const std::string& id)
 
 void ModList::switchState(const std::string& id)
 {
-	if (rest.contains(id))
-		enable(id);
-	else
+	if (enabled(id))
 		disable(id);
+	else
+		enable(id);
 }
 
 bool ModList::canMove(const std::string& from, const std::string& to) const

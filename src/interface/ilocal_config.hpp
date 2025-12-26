@@ -25,6 +25,9 @@ namespace mm
 		[[nodiscard]] virtual ConflictResolveMode conflictResolveMode() const                    = 0;
 		virtual void                              conflictResolveMode(ConflictResolveMode value) = 0;
 
+		[[nodiscard]] virtual bool warnAboutConflictsBeforeEnabling() const     = 0;
+		virtual void               warnAboutConflictsBeforeEnabling(bool value) = 0;
+
 		[[nodiscard]] virtual std::string getAcitvePreset() const                    = 0;
 		virtual void                      setActivePreset(const std::string& preset) = 0;
 

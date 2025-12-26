@@ -116,7 +116,8 @@
         "automatic": "automatically (on enable/disable)",
         "manual": "manually (by clicking on \"Sort\" button)"
       },
-      "platform_options": "Platform settings"
+      "platform_options": "Platform settings",
+      "warn_about_conflict_on_enable": "Warn about conflicts before enabling mod"
     },
     "edit_mod": {
       "caption": "Edit mod",
@@ -237,7 +238,9 @@
     "question": {
       "overwrite_existing_file": "'%s' already exists, overwrite?",
       "delete_mod": "Are you sure want to delete mod \"%s\"?\n\nIt will be deleted to recycle bin, if possible.",
-      "copy_already_running": "Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?"
+      "copy_already_running": "Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?",
+      "warn_about_conflicts_before_enabling": "Mod \"%s\" incompatible with \"%s\". Continue?",
+      "warn_about_conflicts_before_enabling_sort": "Mod(s) \"%s\" would be disabled. Continue?"
     },
     "status": {
       "displayed_and_hidden": ", displayed: %d, hidden: %d",
