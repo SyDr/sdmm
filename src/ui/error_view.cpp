@@ -35,7 +35,7 @@ void ErrorView::createControls()
 {
 	_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 	_text = new wxTextCtrl(_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
-	_ok = new wxButton(_panel, wxID_OK, "dialog/close"_lng);
+	_ok = new wxButton(_panel, wxID_OK, "dialog/button/close"_lng);
 	_label = new wxStaticText(_panel, wxID_ANY, "dialog/error/prompt"_lng);
 	_link = new wxHyperlinkCtrl(_panel, wxID_ANY, L"https://github.com/SyDr/sdmm/issues",
 		L"https://github.com/SyDr/sdmm/issues");

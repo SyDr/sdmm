@@ -50,6 +50,7 @@
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
+#include <wx/richmsgdlg.h>
 
 #include <boost/range/algorithm.hpp>
 
@@ -1007,9 +1008,7 @@ bool ModListView::warnBeforeEnabling(const std::string& enablingMod)
 		const auto message = wxString::Format("message/question/warn_about_conflicts_before_enabling"_lng,
 			wxString::FromUTF8(enablingMod), wxString::FromUTF8(boost::join(activeIncompatible, ", ")));
 
-		const int answer = wxMessageBox(message, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
-
-		return answer == wxYES;
+		return warnBeforeEnableImpl(message, L"");
 	}
 
 	return true;
@@ -1040,12 +1039,25 @@ bool ModListView::warnBeforeEnablingAndSort(const std::string& enablingMod)
 			wxString::Format("message/question/warn_about_conflicts_before_enabling_sort"_lng,
 				wxString::FromUTF8(boost::join(wouldBeDisabled, ", ")));
 
-		const int answer = wxMessageBox(message, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
-
-		return answer == wxYES;
+		return warnBeforeEnableImpl(message, L"");
 	}
 
 	return true;
+}
+
+bool ModListView::warnBeforeEnableImpl(const wxString& message, const wxString& detailed)
+{
+	wxRichMessageDialog rmd(this, message, wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT);
+	rmd.ShowCheckBox("message/info/dont_show_again"_lng);
+	if (!detailed.empty())
+		rmd.ShowDetailedText(detailed);
+
+	const int answer = rmd.ShowModal();
+
+	if (rmd.IsCheckBoxChecked())
+		_managedPlatform.localConfig()->warnAboutConflictsBeforeEnabling(false);
+
+	return answer == wxID_YES;
 }
 
 void ModListView::onResetSelectedModStateRequested()

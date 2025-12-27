@@ -238,7 +238,8 @@
     "info": {
       "virtual_mod": "Этот мод виртуальный, на диске нет соответствующего каталога",
       "profile_loaded": "Профиль \"%s\" загружен.",
-      "exe_not_selected": "не выбрано"
+      "exe_not_selected": "не выбрано",
+      "dont_show_again": "Не показывать больше это сообщение"
     },
     "question": {
       "overwrite_existing_file": "'%s' уже существует, перезаписать?",

@@ -60,6 +60,7 @@ namespace mm
 		void onSwitchSelectedModStateRequested();
 		bool warnBeforeEnabling(const std::string& enablingMod);
 		bool warnBeforeEnablingAndSort(const std::string& enablingMod);
+		bool warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
 		void onResetSelectedModStateRequested();
 		void onEditModRequested();
 
