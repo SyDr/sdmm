@@ -842,7 +842,8 @@ void ModListView::updateCategoryFilterContent()
 	}
 
 	_filterPopup->Clear();
-	_filterPopup->InsertItems(displayedItems, 0);
+	if (!displayedItems.empty())
+		_filterPopup->InsertItems(displayedItems, 0);
 
 	for (size_t i = 0; i < _categories.size(); ++i)
 		if (!_hiddenCategories.contains(_categories[i]))

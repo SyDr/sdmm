@@ -118,6 +118,8 @@ AppConfig::AppConfig()
 bool AppConfig::portableMode() const
 {
 	return std::visit(IsPortable(), _mode);
+
+	// return true; // for quick debug portable mode
 }
 
 fs::path AppConfig::dataPath() const
