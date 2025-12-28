@@ -85,6 +85,9 @@ bool ModManagerApp::OnInit()
 			_mainFrame->reloadModelIfNeeded();
 	});
 
+	if (_appConfig->portableMode())
+		return true;
+
 	bool autoCheckForUpdate = false;
 	if (auto ucm = _appConfig->updateCheckMode(); ucm != UpdateCheckMode::manual)
 	{

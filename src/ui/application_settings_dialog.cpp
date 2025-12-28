@@ -68,15 +68,18 @@ void ApplicationSettingsDialog::createControls()
 	_languageChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 	_languageChoice->SetSelection(lng);
 
-	_updateStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/update_mode/label"_lng);
+	if (!_app.appConfig().portableMode())
+	{
+		_updateStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/update_mode/label"_lng);
 
-	items.clear();
-	for (const auto& item : UpdateCheckModeValues)
-		items.push_back(wxString::FromUTF8(
-			wxGetApp().translationString("dialog/settings/update_mode/" + to_string(item))));
+		items.clear();
+		for (const auto& item : UpdateCheckModeValues)
+			items.push_back(wxString::FromUTF8(
+				wxGetApp().translationString("dialog/settings/update_mode/" + to_string(item))));
 
-	_updateChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
-	_updateChoice->SetSelection(static_cast<int>(_app.appConfig().updateCheckMode()));
+		_updateChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+		_updateChoice->SetSelection(static_cast<int>(_app.appConfig().updateCheckMode()));
+	}
 
 	_interfaceSizeStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/interface_size/label"_lng);
 	items.clear();
@@ -140,7 +143,10 @@ void ApplicationSettingsDialog::bindEvents()
 	_save->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
 		bool restartRequired = false;  // TODO: make something better;
 
-		_app.appConfig().updateCheckMode(static_cast<UpdateCheckMode>(_updateChoice->GetSelection()));
+		if (!_app.appConfig().portableMode())
+		{
+			_app.appConfig().updateCheckMode(static_cast<UpdateCheckMode>(_updateChoice->GetSelection()));
+		}
 
 		restartRequired = _app.appConfig().setCurrentLanguageCode(
 							  _app.i18nService().available().at(_languageChoice->GetSelection())) ||
@@ -181,8 +187,12 @@ void ApplicationSettingsDialog::buildLayout()
 	comboSizer->Add(
 		_languageChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 
-	comboSizer->Add(_updateStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
-	comboSizer->Add(_updateChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	if (!_app.appConfig().portableMode())
+	{
+		comboSizer->Add(_updateStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+		comboSizer->Add(
+			_updateChoice, wxSizerFlags(1).Expand().Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+	}
 
 	comboSizer->Add(_interfaceSizeStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	comboSizer->Add(
