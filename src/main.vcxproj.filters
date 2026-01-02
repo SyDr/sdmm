@@ -114,6 +114,7 @@
     <ClInclude Include="type\program_version.hpp" />
     <ClInclude Include="ui\edit_mod_dialog.hpp" />
     <ClInclude Include="ui\enter_file_name.hpp" />
+    <ClInclude Include="utility\string_util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

@@ -221,7 +221,7 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 
 	refreshListContent();
 
-	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
+	EX_ON_FILESYSTEM_EXCEPTION;
 	EX_UNEXPECTED;
 }
 
@@ -264,7 +264,7 @@ void ManagePresetListView::onLoadPresetRequested()
 	_infoBar->ShowMessage(wxString::Format("message/info/profile_loaded"_lng, wxString::FromUTF8(selected)));
 	_infoBarTimer.StartOnce(5000);
 
-	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
+	EX_ON_FILESYSTEM_EXCEPTION;
 	EX_UNEXPECTED;
 }
 
@@ -291,7 +291,7 @@ void ManagePresetListView::onRenamePreset()
 	_platform.getPresetManager()->rename(selected, newName);
 	_selected = newName;
 
-	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
+	EX_ON_FILESYSTEM_EXCEPTION;
 	EX_UNEXPECTED;
 }
 
@@ -317,7 +317,7 @@ void ManagePresetListView::onCopyPreset()
 
 	_platform.getPresetManager()->copy(selected, newName);
 
-	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
+	EX_ON_FILESYSTEM_EXCEPTION;
 	EX_UNEXPECTED;
 }
 
@@ -333,14 +333,8 @@ void ManagePresetListView::onDeletePreset()
 	if (answer == wxYES)
 		_platform.getPresetManager()->remove(selected);
 
-	EX_ON_EXCEPTION(fs::filesystem_error, onFilesystemError);
+	EX_ON_FILESYSTEM_EXCEPTION;
 	EX_UNEXPECTED;
-}
-
-void ManagePresetListView::onFilesystemError(const fs::filesystem_error& e)
-{
-	wxMessageOutputMessageBox().Printf(
-		"message/error/operation_exception_details"_lng, wxString::FromUTF8(e.what()));
 }
 
 void ManagePresetListView::updatePreview()

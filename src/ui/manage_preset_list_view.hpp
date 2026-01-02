@@ -54,7 +54,6 @@ namespace mm
 		void onSelectionChanged();
 
 		std::string getSelection() const;
-		void        onFilesystemError(const fs::filesystem_error& e);
 
 	private:
 		IModPlatform& _platform;

@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -8,7 +8,9 @@
 #include <stdexcept>
 #include <type_traits>
 #include <wx/cpp.h>
+#include <wx/string.h>
 
+#include "string_util.hpp"
 #include "ui/error_view.h"
 
 namespace mm
@@ -33,7 +35,7 @@ namespace mm
 		using std::runtime_error::runtime_error;
 	};
 
-	class condtion_error : public std::runtime_error
+	class precondition_error : public std::runtime_error
 	{
 		using std::runtime_error::runtime_error;
 	};
@@ -45,12 +47,11 @@ namespace mm
 
 #define MM_PRECONDTION(what) \
 	if (!(what))             \
-		throw_with_trace(mm::condtion_error(wxSTRINGIZE(what)));
+		throw_with_trace(mm::precondition_error(wxSTRINGIZE(what)));
 
 #define EX_TRY \
 	try        \
 	{
-
 #define EX_ON_EXCEPTION(type, handler) \
 	}                                  \
 	catch (const type& e)              \
@@ -66,3 +67,17 @@ namespace mm
 	};
 
 #define SINK_EXCEPTION(handler) [=](const auto&) { handler(); }
+
+namespace mm
+{
+	inline wxString what(const std::exception& ex)
+	{
+		return wxStringFromUnspecified(ex.what());
+	}
+}
+
+#define EX_ON_FILESYSTEM_EXCEPTION                      \
+	}                                                   \
+	catch (const std::filesystem::filesystem_error& ex) \
+	{                                                   \
+		wxMessageOutputMessageBox().Printf("message/error/operation_exception_details"_lng, what(ex));\

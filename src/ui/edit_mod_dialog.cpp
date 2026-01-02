@@ -124,7 +124,7 @@ void EditModDialog::OnDataEditTextChanged()
 	}
 	catch (const nlohmann::json::parse_error& pe)
 	{
-		_status->SetLabelText(wxString::FromUTF8(pe.what()));
+		_status->SetLabelText(what(pe));
 	}
 }
 

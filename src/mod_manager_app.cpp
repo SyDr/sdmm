@@ -123,7 +123,7 @@ void ModManagerApp::initView()
 
 void ModManagerApp::OnUnhandledException()
 {
-	wxString what;
+	wxString info;
 
 	try
 	{
@@ -131,18 +131,18 @@ void ModManagerApp::OnUnhandledException()
 	}
 	catch (const std::exception& e)
 	{
-		what = wxString::FromUTF8(e.what());
+		info = what(e);
 	}
 	catch (...)
 	{
-		what = L"Unknown exception";
+		info = L"Unknown exception";
 	}
 
 	wxMessageOutputBest().Printf(
 		L"There is no good unhandled exception handling for now. \n"
 		"Program will be closed now. Sorry :( \n\n"
 		"Exception info: \n%s",
-		what);
+		info);
 }
 
 void ModManagerApp::OnInitCmdLine(wxCmdLineParser& parser)

@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -18,6 +18,7 @@
 #include <wx/hyperlink.h>
 
 #include "application.h"
+#include "utility/sdlexcept.h"
 
 using namespace mm;
 
@@ -76,7 +77,7 @@ void ErrorView::fillData()
 		}
 		catch (const std::exception& e)
 		{
-			exceptionInfo = wxString::FromUTF8(e.what());
+			exceptionInfo = what(e);
 			const boost::stacktrace::stacktrace* st = boost::get_error_info<traced>(e);
 			if (st)
 				stacktrace << *st << '\n';
