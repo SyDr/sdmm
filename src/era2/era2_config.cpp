@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -44,8 +44,8 @@ namespace
 	{
 		inline constexpr auto MMVersion   = "mm_version";
 		inline constexpr auto ListColumns = "list_columns";
-		inline constexpr auto WarnAboutConflictsBeforeEnablingMod =
-			"warn_about_conflicts_before_enabling_mod";
+		inline constexpr auto WarnAboutConflictsMode =
+			"warn_about_conflicts_mode";
 	}
 }
 
@@ -139,14 +139,21 @@ void Era2Config::conflictResolveMode(ConflictResolveMode value)
 	save();
 }
 
-bool Era2Config::warnAboutConflictsBeforeEnabling() const
+WarnAboutConflictsMode Era2Config::warnAboutConflictsMode() const
 {
-	return _data[Key::WarnAboutConflictsBeforeEnablingMod].get<bool>();
+	switch (auto mode = static_cast<WarnAboutConflictsMode>(_data[Key::WarnAboutConflictsMode].get<int>()))
+	{
+	case WarnAboutConflictsMode::only_inform:
+	case WarnAboutConflictsMode::warn_before_enabling:
+	case WarnAboutConflictsMode::do_nothing: return mode;
+	}
+
+	return WarnAboutConflictsMode::only_inform;
 }
 
-void Era2Config::warnAboutConflictsBeforeEnabling(bool value)
+void Era2Config::warnAboutConflictsMode(WarnAboutConflictsMode value)
 {
-	_data[Key::WarnAboutConflictsBeforeEnablingMod] = value;
+	_data[Key::WarnAboutConflictsMode] = static_cast<int>(value);
 	save();
 }
 
@@ -265,6 +272,11 @@ void Era2Config::validate()
 		_data[st_conflict_resolve_mode] > static_cast<unsigned>(ConflictResolveMode::automatic))
 		_data[st_conflict_resolve_mode] = ConflictResolveMode::automatic;
 
+	if (!_data.count(Key::WarnAboutConflictsMode) ||
+		!_data[Key::WarnAboutConflictsMode].is_number_unsigned() ||
+		_data[Key::WarnAboutConflictsMode] > static_cast<unsigned>(WarnAboutConflictsMode::do_nothing))
+		_data[Key::WarnAboutConflictsMode] = WarnAboutConflictsMode::only_inform;
+
 	if (!_data.count(Key::ListColumns) || !_data[Key::ListColumns].is_array())
 		_data[Key::ListColumns] = nlohmann::json::array();
 
@@ -307,10 +319,6 @@ void Era2Config::validate()
 
 	if (!_data.count(st_screenshots_expanded) || !_data[st_screenshots_expanded].is_boolean())
 		_data[st_screenshots_expanded] = true;
-
-	if (!_data.count(Key::WarnAboutConflictsBeforeEnablingMod) ||
-		!_data[Key::WarnAboutConflictsBeforeEnablingMod].is_boolean())
-		_data[Key::WarnAboutConflictsBeforeEnablingMod] = true;
 
 	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
 		_data[Key::MMVersion] = "";

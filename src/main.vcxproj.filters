@@ -115,6 +115,7 @@
     <ClInclude Include="ui\edit_mod_dialog.hpp" />
     <ClInclude Include="ui\enter_file_name.hpp" />
     <ClInclude Include="utility\string_util.hpp" />
+    <ClInclude Include="type\warn_about_conflicts_mode.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

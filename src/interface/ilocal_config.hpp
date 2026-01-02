@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2024 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -8,6 +8,7 @@
 #include "type/conflict_resolve_mode.hpp"
 #include "type/filesystem.hpp"
 #include "type/mod_list_model_structs.hpp"
+#include "type/warn_about_conflicts_mode.hpp"
 
 #include <set>
 
@@ -25,8 +26,8 @@ namespace mm
 		[[nodiscard]] virtual ConflictResolveMode conflictResolveMode() const                    = 0;
 		virtual void                              conflictResolveMode(ConflictResolveMode value) = 0;
 
-		[[nodiscard]] virtual bool warnAboutConflictsBeforeEnabling() const     = 0;
-		virtual void               warnAboutConflictsBeforeEnabling(bool value) = 0;
+		[[nodiscard]] virtual WarnAboutConflictsMode warnAboutConflictsMode() const                       = 0;
+		virtual void                                 warnAboutConflictsMode(WarnAboutConflictsMode value) = 0;
 
 		[[nodiscard]] virtual std::string getAcitvePreset() const                    = 0;
 		virtual void                      setActivePreset(const std::string& preset) = 0;

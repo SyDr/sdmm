@@ -72,7 +72,6 @@
       "save_only": "Только сохранить",
       "apply_only": "Только применить"
     },
-    "close": "Закрыть",
     "settings": {
       "update_mode": {
         "manual": "только вручную",
@@ -121,7 +120,12 @@
         "manual": "вручную (по нажатию на кнопку \"Сортировать\")"
       },
       "platform_options": "Настройки платформы",
-      "warn_about_conflict_on_enable": "Предупреждать о конфликтах перед включением мода"
+      "warn_about_conflicts_mode": {
+        "label": "При конфликтах:",
+        "only_inform": "только уведомить",
+        "warn_before_enabling": "запросить потверждение",
+        "do_nothing": "ничего не делать"
+      }
     },
     "edit_mod": {
       "caption": "Редактирование мода",
@@ -239,7 +243,9 @@
       "virtual_mod": "Этот мод виртуальный, на диске нет соответствующего каталога",
       "profile_loaded": "Профиль \"%s\" загружен.",
       "exe_not_selected": "не выбрано",
-      "dont_show_again": "Не показывать больше это сообщение"
+      "dont_show_again": "Не показывать больше это сообщение",
+      "incompatible_mods": "Мод \"%s\" несовместим с \"%s\"",
+      "mods_were_disabled": "Следующие моды были отключены: %s"
     },
     "question": {
       "overwrite_existing_file": "'%s' уже существует, перезаписать?",

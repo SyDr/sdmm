@@ -57,6 +57,7 @@
     <ClCompile Include="ui\select_exe.cpp" />
     <ClCompile Include="ui\mod_list_view.cpp" />
     <ClCompile Include="ui\show_file_list_dialog.cpp" />
+    <ClInclude Include="type\warn_about_conflicts_mode.hpp" />
     <ClInclude Include="utility\string_util.hpp" />
     <ClCompile Include="utility\fs_util.cpp" />
     <ClCompile Include="utility\json_util.cpp" />

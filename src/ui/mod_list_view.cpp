@@ -114,6 +114,21 @@ wxBEGIN_EVENT_TABLE(mmCheckListBoxComboPopup, wxCheckListBox) EVT_KEY_UP(mmCheck
 
 using namespace mm;
 
+namespace
+{
+	wxString collectModNames(std::vector<std::string> mods, IModDataProvider& mdp)
+	{
+		if (mods.empty())
+			return {};
+
+		for (auto& item : mods)
+			item = mdp.modData(item).name;
+
+		return wxString::FromUTF8(boost::join(mods, ", "));
+	}
+
+}
+
 ModListView::ModListView(
 	wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage, wxStatusBar* statusBar)
 	: _managedPlatform(managedPlatform)
@@ -949,24 +964,64 @@ void ModListView::onSwitchSelectedModStateRequested()
 	if (_selectedMod.empty())
 		return;
 
-	const bool warnAboutConflicts = _managedPlatform.localConfig()->warnAboutConflictsBeforeEnabling();
+	const bool warnAboutConflicts =
+		_managedPlatform.localConfig()->warnAboutConflictsMode() != WarnAboutConflictsMode::do_nothing;
 	const bool autoSort =
 		_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic;
 
 	const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
 	const auto& disabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
 
+	static bool messageWasShown = false;
+
 	if (warnAboutConflicts && !enabling.empty())
 	{
-		if (!autoSort)
+		wxString modListForMessage = [&, this]() {
+			if (!autoSort)
+				return incompatibleMods(enabling);  // message: x incompatible with y, z
+
+			return wouldBeDisabledMods(enabling);  // message: enabling would disable y, z, a
+		}();
+
+		if (!modListForMessage.empty())
 		{
-			if (!warnBeforeEnabling(enabling)) // message: x incompatible with y, z
-				return;
-		}
-		else
-		{
-			if (!warnBeforeEnablingAndSort(enabling)) // message: enabling would disable y, z, a
-				return;
+			wxString formatMessage = [&]() {
+				if (_managedPlatform.localConfig()->warnAboutConflictsMode() ==
+					WarnAboutConflictsMode::warn_before_enabling)
+				{
+					if (!autoSort)
+						return "message/question/warn_about_conflicts_before_enabling"_lng;
+
+					return "message/question/warn_about_conflicts_before_enabling_sort"_lng;
+				}
+
+				// == WarnAboutConflictsMode::only_inform
+				if (!autoSort)
+					return "message/info/incompatible_mods"_lng;
+
+				return "message/info/mods_were_disabled"_lng;
+			}();
+
+			wxString message = [&]() {
+				if (!autoSort)
+					return wxString::Format(formatMessage,
+						wxString::FromUTF8(_managedPlatform.modDataProvider()->modData(enabling).name),
+						modListForMessage);
+
+				return wxString::Format(formatMessage, modListForMessage);
+			}();
+
+			if (_managedPlatform.localConfig()->warnAboutConflictsMode() ==
+				WarnAboutConflictsMode::warn_before_enabling)
+			{
+				if (!warnBeforeEnableImpl(message, L""))
+					return;
+			}
+			else
+			{
+				_infoBar->ShowMessage(message);
+				_infoBarTimer.StartOnce(5000);
+			}
 		}
 	}
 
@@ -977,7 +1032,6 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	onSortModsRequested(enabling, disabling);
 
-	static bool messageWasShown = false;
 	if (!messageWasShown)
 	{
 		_infoBar->ShowMessage(
@@ -989,7 +1043,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 	EX_UNEXPECTED;
 }
 
-bool ModListView::warnBeforeEnabling(const std::string& enablingMod)
+wxString ModListView::incompatibleMods(const std::string& enablingMod)
 {
 	const auto& incompatible = _managedPlatform.modDataProvider()->modData(enablingMod).incompatible;
 
@@ -998,21 +1052,10 @@ bool ModListView::warnBeforeEnabling(const std::string& enablingMod)
 		if (incompatible.contains(item))
 			activeIncompatible.emplace_back(item);
 
-	if (!activeIncompatible.empty())
-	{
-		for (auto& item : activeIncompatible)
-			item = _managedPlatform.modDataProvider()->modData(item).name;
-
-		const auto message = wxString::Format("message/question/warn_about_conflicts_before_enabling"_lng,
-			wxString::FromUTF8(enablingMod), wxString::FromUTF8(boost::join(activeIncompatible, ", ")));
-
-		return warnBeforeEnableImpl(message, L"");
-	}
-
-	return true;
+	return collectModNames(activeIncompatible, *_managedPlatform.modDataProvider());
 }
 
-bool ModListView::warnBeforeEnablingAndSort(const std::string& enablingMod)
+wxString ModListView::wouldBeDisabledMods(const std::string& enablingMod)
 {
 	auto wouldBe = _modManager.mods();
 	wouldBe.switchState(_selectedMod);
@@ -1028,19 +1071,7 @@ bool ModListView::warnBeforeEnablingAndSort(const std::string& enablingMod)
 	std::vector<std::string> wouldBeDisabled;
 	boost::set_difference(currentSorted, enabledSorted, std::back_inserter(wouldBeDisabled));
 
-	if (!wouldBeDisabled.empty())
-	{
-		for (auto& item : wouldBeDisabled)
-			item = _managedPlatform.modDataProvider()->modData(item).name;
-
-		const auto message =
-			wxString::Format("message/question/warn_about_conflicts_before_enabling_sort"_lng,
-				wxString::FromUTF8(boost::join(wouldBeDisabled, ", ")));
-
-		return warnBeforeEnableImpl(message, L"");
-	}
-
-	return true;
+	return collectModNames(wouldBeDisabled, *_managedPlatform.modDataProvider());
 }
 
 bool ModListView::warnBeforeEnableImpl(const wxString& message, const wxString& detailed)
@@ -1053,7 +1084,7 @@ bool ModListView::warnBeforeEnableImpl(const wxString& message, const wxString& 
 	const int answer = rmd.ShowModal();
 
 	if (rmd.IsCheckBoxChecked())
-		_managedPlatform.localConfig()->warnAboutConflictsBeforeEnabling(false);
+		_managedPlatform.localConfig()->warnAboutConflictsMode(WarnAboutConflictsMode::only_inform);
 
 	return answer == wxID_YES;
 }

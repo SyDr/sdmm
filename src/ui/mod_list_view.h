@@ -58,8 +58,8 @@ namespace mm
 		void OnWebViewNavigating(wxWebViewEvent& event);
 
 		void onSwitchSelectedModStateRequested();
-		bool warnBeforeEnabling(const std::string& enablingMod);
-		bool warnBeforeEnablingAndSort(const std::string& enablingMod);
+		wxString incompatibleMods(const std::string& enablingMod);
+		wxString wouldBeDisabledMods(const std::string& enablingMod);
 		bool warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
 		void onResetSelectedModStateRequested();
 		void onEditModRequested();

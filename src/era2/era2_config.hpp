@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2023 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -36,8 +36,8 @@ namespace mm
 		ConflictResolveMode conflictResolveMode() const override;
 		void                conflictResolveMode(ConflictResolveMode value) override;
 
-		bool warnAboutConflictsBeforeEnabling() const override;
-		void warnAboutConflictsBeforeEnabling(bool value) override;
+		WarnAboutConflictsMode warnAboutConflictsMode() const override;
+		void                   warnAboutConflictsMode(WarnAboutConflictsMode value) override;
 
 		std::vector<int> listColumns() const override;
 		void             listColumns(const std::vector<int>& value) override;

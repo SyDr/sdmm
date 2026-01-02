@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2025 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2025-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #include "stdafx.h"
@@ -20,6 +20,7 @@
 #include "type/interface_size.hpp"
 #include "type/mod_description_used_control.hpp"
 #include "type/update_check_mode.hpp"
+#include "type/warn_about_conflicts_mode.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <wx/app.h>
@@ -128,10 +129,16 @@ void ApplicationSettingsDialog::createControls()
 		_conflictResolveChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
 		_conflictResolveChoice->SetSelection(static_cast<int>(_localConfig->conflictResolveMode()));
 
-		_warnAboutConflictsBeforeEnableCheckbox =
-			new wxCheckBox(this, wxID_ANY, "dialog/settings/warn_about_conflict_on_enable"_lng);
+		_warnAboutConflictsStatic =
+			new wxStaticText(this, wxID_ANY, "dialog/settings/warn_about_conflicts_mode/label"_lng);
+		items.clear();
 
-		_warnAboutConflictsBeforeEnableCheckbox->SetValue(_localConfig->warnAboutConflictsBeforeEnabling());
+		for (const auto& item : WarnAboutConflictsModeValues)
+			items.Add(wxString::FromUTF8(wxGetApp().translationString(
+				"dialog/settings/warn_about_conflicts_mode/" + std::string(magic_enum::enum_name(item)))));
+
+		_warnAboutConflictsChoice = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, items);
+		_warnAboutConflictsChoice->SetSelection(static_cast<int>(_localConfig->warnAboutConflictsMode()));
 	}
 
 	_save   = new wxButton(this, wxID_OK, "dialog/button/save"_lng);
@@ -169,8 +176,8 @@ void ApplicationSettingsDialog::bindEvents()
 			_localConfig->conflictResolveMode(
 				static_cast<ConflictResolveMode>(_conflictResolveChoice->GetSelection()));
 
-			_localConfig->warnAboutConflictsBeforeEnabling(
-				_warnAboutConflictsBeforeEnableCheckbox->IsChecked());
+			_localConfig->warnAboutConflictsMode(
+				static_cast<WarnAboutConflictsMode>(_warnAboutConflictsChoice->GetSelection()));
 		}
 
 		EndModal(restartRequired ? wxID_APPLY : wxID_OK);
@@ -216,22 +223,24 @@ void ApplicationSettingsDialog::buildLayout()
 	buttonSizer->Add(_cancel, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
-	mainSizer->Add(topSizer, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	mainSizer->Add(topSizer, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	if (_localConfig)
 	{
-		auto sizer2 = new wxBoxSizer(wxHORIZONTAL);
-		sizer2->Add(_conflictResolveStatic, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
-		sizer2->AddStretchSpacer();
-		sizer2->Add(_conflictResolveChoice, wxSizerFlags(0).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+		auto comboSizer2 = new wxFlexGridSizer(2);
+		comboSizer2->AddGrowableCol(0, 1);
+		comboSizer2->AddGrowableCol(1, 1);
 
-		auto sizer4 = new wxBoxSizer(wxHORIZONTAL);
-		sizer4->AddStretchSpacer();
-		sizer4->Add(_warnAboutConflictsBeforeEnableCheckbox, wxSizerFlags(0).Expand().Border(wxALL, 5));
+		comboSizer2->Add(_conflictResolveStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+		comboSizer2->Add(
+			_conflictResolveChoice, wxSizerFlags(1).Border(wxALL, 5).Expand().Align(wxALIGN_CENTER_VERTICAL));
+
+		comboSizer2->Add(_warnAboutConflictsStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
+		comboSizer2->Add(_warnAboutConflictsChoice,
+			wxSizerFlags(1).Border(wxALL, 5).Expand().Align(wxALIGN_CENTER_VERTICAL));
 
 		auto sizer3 = new wxStaticBoxSizer(_platformGroup, wxVERTICAL);
-		sizer3->Add(sizer2, wxSizerFlags(0).Expand());
-		sizer3->Add(sizer4, wxSizerFlags(0).Expand());
+		sizer3->Add(comboSizer2, wxSizerFlags(0).Expand());
 
 		mainSizer->Add(sizer3, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	}
