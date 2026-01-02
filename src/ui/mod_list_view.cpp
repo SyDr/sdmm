@@ -777,10 +777,7 @@ void ModListView::updateControlsState()
 
 				desc = cnvt.get();
 
-				auto asString = wxString::FromUTF8(desc);
-
-				if (asString.empty())
-					asString = wxString(desc.c_str(), wxConvLocal, desc.size());
+				auto asString = wxStringFromUnspecified(desc);
 
 				if (!asString.empty())
 					std::swap(asString, description);
