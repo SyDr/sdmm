@@ -4,7 +4,7 @@
 #define MyAppName "SD Mod Manager"
 #define MyAppVersion "0.98"
 #define MyAppPublisher "Aliaksei SyDr Karalenka"
-#define MyAppURL "http://wforum.heroes35.net/"
+#define MyAppURL "https://github.com/SyDr/sdmm"
 #define MyAppExeName "Mod Manager.exe"
 
 [Setup]
