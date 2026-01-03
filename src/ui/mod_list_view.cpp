@@ -1021,6 +1021,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 			{
 				_infoBar->ShowMessage(message);
 				_infoBarTimer.StartOnce(5000);
+				messageWasShown = true;
 			}
 		}
 	}
