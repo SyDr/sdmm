@@ -32,6 +32,7 @@
 #include "type/main_window_properties.h"
 #include "utility/sdlexcept.h"
 #include "utility/wx_current_dir_helper.hpp"
+#include "type/program_version.hpp"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
@@ -461,11 +462,15 @@ void MainFrame::updateCheckCompleted(const nlohmann::json& value, bool automatic
 		return;
 	}
 
-	if (value["tag_name"] == PROGRAM_VERSION_TAG)
+	ProgramVersion pv(value["tag_name"].get<std::string>());
+
+	if (pv <= ProgramVersion::current())
 	{
 		if (!automatic)
+		{
 			_infoBar->ShowMessage("message/notification/you_have_latest_version"_lng);
-		_infoBarTimer.StartOnce(5000);
+			_infoBarTimer.StartOnce(5000);
+		}
 		return;
 	}
 
@@ -484,6 +489,7 @@ void MainFrame::updateCheckCompleted(const nlohmann::json& value, bool automatic
 	_infoBar->AddButton(wxID_DOWN, "dialog/button/download"_lng);
 	_infoBar->AddButton(wxID_OPEN, "dialog/button/open_page"_lng);
 	_infoBar->AddButton(wxID_CLOSE, "dialog/button/close"_lng);
+
 	_infoBar->ShowMessage("message/notification/new_version_available"_lng);
 }
 

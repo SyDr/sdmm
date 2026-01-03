@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2025 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2025-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -15,10 +15,12 @@ namespace mm
 		size_t minor = 0;
 		size_t patch = 0;
 
-		ProgramVersion(std::string_view version);
-		ProgramVersion(size_t major, size_t minor, size_t patch);
+		explicit ProgramVersion(std::string_view version);
+		explicit ProgramVersion(size_t major, size_t minor, size_t patch);
 
 		auto operator<=>(const ProgramVersion& r) const = default;
 		bool operator==(const ProgramVersion& r) const  = default;
+
+		static ProgramVersion current();
 	};
 }

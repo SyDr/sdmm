@@ -354,6 +354,6 @@ void Era2Config::validate()
 		}
 	}
 
-	if (ProgramVersion(PROGRAM_VERSION_BASE) > cfgVersion)
+	if (ProgramVersion::current() > cfgVersion)
 		_data[Key::MMVersion] = PROGRAM_VERSION_BASE;
 }
