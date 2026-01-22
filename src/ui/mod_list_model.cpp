@@ -19,6 +19,7 @@
 #include "utility/sdlexcept.h"
 
 #include <boost/locale.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <wx/app.h>
 #include <wx/msgdlg.h>
 
@@ -357,9 +358,13 @@ int ModListModel::Compare(
 {
 	const auto [type1, index1] = fromDataViewItem(item1);
 	const auto [type2, index2] = fromDataViewItem(item2);
+	const auto typedColumn     = static_cast<ModListModelColumn>(column);
 
-	auto compareRest = [&](ModListModelColumn col) {
-		return wxDataViewModel::Compare(item1, item2, static_cast<unsigned int>(col), ascending);
+	auto compareName = [&]() {
+		const auto& left  = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index1]).name);
+		const auto& right = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index2]).name);
+
+		return ascending ? left.CmpNoCase(right) : right.CmpNoCase(left);
 	};
 
 	if (type1 != type2)
@@ -392,20 +397,38 @@ int ModListModel::Compare(
 		return 1;
 	}
 
-	if (static_cast<ModListModelColumn>(column) == ModListModelColumn::category)
+	if (typedColumn == ModListModelColumn::name)
+		return compareName();
+
+	wxString left;
+	wxString right;
+
+	if (typedColumn == ModListModelColumn::category)
 	{
 		const auto& cat1 = _modDataProvider.modData(_displayed.items[index1]).category;
 		const auto& cat2 = _modDataProvider.modData(_displayed.items[index2]).category;
 
-		if (cat1.empty() != cat2.empty())
-			return ascending ? static_cast<ssize_t>(cat1.empty()) - static_cast<ssize_t>(cat2.empty())
-							 : static_cast<ssize_t>(cat2.empty()) - static_cast<ssize_t>(cat1.empty());
+		left  = wxString::FromUTF8(wxGetApp().categoryTranslationString(cat1));
+		right = wxString::FromUTF8(wxGetApp().categoryTranslationString(cat2));
 	}
+	else if (typedColumn == ModListModelColumn::author)
+	{
+		left = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index1]).author);
+		right = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index2]).author);
+	}
+	else if (typedColumn == ModListModelColumn::directory)
+	{
+		left = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index1]).dir);
+		right = wxString::FromUTF8(_modDataProvider.modData(_displayed.items[index2]).dir);
+	}
+
+	if (auto res = ascending ? left.CmpNoCase(right) : right.CmpNoCase(left); res != 0)
+		return res;
 
 	if (auto res = wxDataViewModel::Compare(item1, item2, column, ascending); res != 0)
 		return res;
 
-	return compareRest(ModListModelColumn::name);
+	return compareName();
 }
 
 void ModListModel::modList(const ModList& mods)
