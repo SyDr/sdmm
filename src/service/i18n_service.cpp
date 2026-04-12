@@ -31,25 +31,16 @@ namespace
 
 		return result;
 	}
-
-	std::string_view upgradeLanguageCode(std::string_view code)
-	{
-		if (boost::istarts_with(code, "en"))
-			return "en";
-
-		if (boost::istarts_with(code, "ru"))
-			return "ru";
-
-		return code;
-	}
 }
 
 I18nService::I18nService(const IAppConfig& config)
 	: _availableLanguages(loadAvailable(config.programPath() / "lng/_.json"))
 {
-	boost::nowide::ifstream datafile(
-		config.programPath() / "lng" /
-		(std::string(upgradeLanguageCode(config.currentLanguageCode())) + ".json"));
+	boost::nowide::ifstream datafile(config.programPath() / "lng" / (config.currentLanguageCode() + ".json"));
+
+	if (!datafile)
+		datafile = boost::nowide::ifstream { config.programPath() / "lng" /
+											 (std::string(SystemInfo::DefaultLanguage) + ".json") };
 
 	if (datafile)
 		build_cache(nlohmann::json::parse(datafile), "");
