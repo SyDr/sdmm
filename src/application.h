@@ -23,4 +23,4 @@ namespace mm
 	};
 }
 
-wxString operator"" _lng(const char* s, std::size_t);
+wxString operator""_lng(const char* s, std::size_t);
