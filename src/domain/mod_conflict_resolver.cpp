@@ -31,7 +31,8 @@ namespace
 
 	using CompatMap = std::unordered_map<std::string, CompatibilityInfo>;
 
-	void expandRequirements(std::vector<std::string>& where, CompatMap& cm, const std::string& currentId)
+	void expandRequirements(
+		std::vector<std::string>& where, CompatMap& cm, const std::string& currentId)
 	{
 		if (std::find(where.begin(), where.end(), currentId) == where.end())
 			where.emplace_back(currentId);
@@ -57,7 +58,8 @@ namespace
 		}
 	}
 
-	void reduceRequirementsTop(std::vector<std::string>& active, CompatMap& cm, const std::string& currentId)
+	void reduceRequirementsTop(
+		std::vector<std::string>& active, CompatMap& cm, const std::string& currentId)
 	{
 		if (currentId.empty())
 			return;
@@ -81,32 +83,46 @@ namespace
 		for (const auto& id : cm[currentId].requires_)
 			reduceIncompatibleChain(active, cm, id);
 	}
+
+	CompatMap prepareCompatibiltityMap(const ModList& mods, IModDataProvider& modDataProvider)
+	{
+		// copy compatibility info from data provider
+		CompatMap cm;
+
+		auto addCompat = [&](const std::string& id) {
+			auto [it, _] = cm.insert({ id, {} });
+
+			auto& data = modDataProvider.modData(id);
+
+			it->second.priority = data.priority;
+
+			it->second.incompatible = data.incompatible;
+			it->second.requires_    = data.requires_;
+			it->second.load_after   = data.load_after;
+		};
+
+
+		for (const auto& mod : mods.data)
+			addCompat(mod.id);
+
+		for (const auto& id : mods.rest)
+			addCompat(id);
+
+		// incompatibility info is viral
+		for (auto& [key, value] : cm)
+		{
+			for (const auto& item : value.incompatible)
+				cm[item].incompatible.insert(key);
+		}
+
+		return cm;
+	}
 }
 
 std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataProvider& modDataProvider,
 	const std::string& enablingMod, const std::string& disablingMod)
 {
-	// copy compatibility info from data provider
-	CompatMap cm;
-	for (const auto& mod : mods.data)
-	{
-		auto [it, _] = cm.insert({ mod.id, {} });
-
-		auto& data = modDataProvider.modData(mod.id);
-
-		it->second.priority = data.priority;
-
-		it->second.incompatible = data.incompatible;
-		it->second.requires_    = data.requires_;
-		it->second.load_after   = data.load_after;
-	}
-
-	// incompatibility info is viral
-	for (auto& [key, value] : cm)
-	{
-		for (const auto& item : value.incompatible)
-			cm[item].incompatible.insert(key);
-	}
+	auto cm = prepareCompatibiltityMap(mods, modDataProvider);
 
 	// expand current mod list to contain all mods, required by active mods
 	std::vector<std::string> expandedRequirements;
@@ -160,10 +176,9 @@ std::vector<std::string> mm::ResolveModConflicts(const ModList& mods, IModDataPr
 			++i;
 			if (i == expandedRequirements.size())
 			{
-				wxLogWarning(
-					wxString::Format("message/warning/no_mods_can_be_placed_above_each_other"_lng,
-						wxString::FromUTF8(boost::join(expandedRequirements, ", ")),
-						wxString::FromUTF8(expandedRequirements.front())));
+				wxLogWarning(wxString::Format("message/warning/no_mods_can_be_placed_above_each_other"_lng,
+					wxString::FromUTF8(boost::join(expandedRequirements, ", ")),
+					wxString::FromUTF8(expandedRequirements.front())));
 				sortedActive.emplace_back(expandedRequirements.front());
 				expandedRequirements.erase(expandedRequirements.begin());
 				i = 0;
