@@ -57,12 +57,13 @@ namespace mm
 		void OnMenuItemSelected(const wxCommandEvent& event);
 		void OnWebViewNavigating(wxWebViewEvent& event);
 
-		void onSwitchSelectedModStateRequested();
+		void     onSwitchSelectedModStateRequested();
+		void     switchSelectedModStateImpl(const std::string& enablingMod, const std::string& disablingMod);
 		wxString incompatibleMods(const std::string& enablingMod);
 		wxString wouldBeDisabledMods(const std::string& enablingMod);
-		bool warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
-		void onResetSelectedModStateRequested();
-		void onEditModRequested();
+		bool     warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
+		void     onResetSelectedModStateRequested();
+		void     onEditModRequested();
 
 		void expandChildren();
 		bool followSelection();
@@ -113,7 +114,7 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> openHomepage   = nullptr;
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> archive        = nullptr;
-			wxWidgetsPtr<wxMenuItem> edit        = nullptr;
+			wxWidgetsPtr<wxMenuItem> edit           = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 

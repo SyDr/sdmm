@@ -11,15 +11,16 @@
 #include "configure_main_list_view.h"
 #include "domain/mod_conflict_resolver.hpp"
 #include "domain/mod_data.hpp"
+#include "edit_mod_dialog.hpp"
 #include "image_gallery_view.hpp"
 #include "interface/iapp_config.hpp"
+#include "interface/ii18n_service.hpp"
 #include "interface/iicon_storage.hpp"
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/ipreset_manager.hpp"
-#include "interface/ii18n_service.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
 #include "mod_manager_app.h"
@@ -32,7 +33,6 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
-#include "edit_mod_dialog.hpp"
 
 #include <cmark.h>
 #include <wx/app.h>
@@ -45,12 +45,12 @@
 #include <wx/infobar.h>
 #include <wx/msgdlg.h>
 #include <wx/notifmsg.h>
+#include <wx/richmsgdlg.h>
 #include <wx/sizer.h>
 #include <wx/srchctrl.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
-#include <wx/richmsgdlg.h>
 
 #include <boost/range/algorithm.hpp>
 
@@ -78,7 +78,8 @@ public:
 		wxArrayInt selections;
 		GetCheckedItems(selections);
 
-		return "dialog/label/categories"_lng + wxString::FromUTF8(std::format(": {}/{}", selections.size(), GetCount()));
+		return "dialog/label/categories"_lng +
+			   wxString::FromUTF8(std::format(": {}/{}", selections.size(), GetCount()));
 	}
 
 	wxSize GetAdjustedSize(int minWidth, int, int) override
@@ -392,6 +393,7 @@ void ModListView::bindEvents()
 			!std::holds_alternative<ModListDsplayedData::ManagedGroupTag>(*moveTarget))
 		{
 			// i.e. hover over archived group
+			switchSelectedModStateImpl("", moveFrom);
 			_modManager.archive(moveFrom);
 			return;
 		}
@@ -514,7 +516,8 @@ void ModListView::createControls(const wxString& managedPath)
 	_filterText->SetDescriptiveText("dialog/label/filter"_lng);
 
 	_filterCategory = new wxComboCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
-		{ GetTextExtent("dialog/label/categories"_lng).x + GetTextExtent(wxString::FromUTF8(": 99/99")).x + FromDIP(32),
+		{ GetTextExtent("dialog/label/categories"_lng).x + GetTextExtent(wxString::FromUTF8(": 99/99")).x +
+				FromDIP(32),
 			-1 },
 		wxCB_READONLY);
 
@@ -580,7 +583,7 @@ void ModListView::createControls(const wxString& managedPath)
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	}
 
-	_configure->SetToolTip("dialog/settings/configure_main_view/caption"_lng); // TODO: own lng entry?
+	_configure->SetToolTip("dialog/settings/configure_main_view/caption"_lng);  // TODO: own lng entry?
 	_moveUp->SetToolTip("dialog/button/move_up"_lng);
 	_moveDown->SetToolTip("dialog/button/move_down"_lng);
 	_changeState->SetToolTip("dialog/button/enable"_lng);
@@ -767,10 +770,12 @@ void ModListView::updateControlsState()
 			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
 			Icon::Size::x16));
 
-		_changeState->SetLabelText(_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
+		_changeState->SetLabelText(
+			_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
 	}
 
-	_changeState->SetToolTip(_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
+	_changeState->SetToolTip(
+		_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
@@ -907,7 +912,8 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 	{
 		_menu.openHomepage->Enable(!mod->homepage.empty());
 		_menu.openDir->Enable(!mod->virtual_mod);
-		_menu.deleteOrRemove->SetItemLabel(mod->virtual_mod ? "dialog/button/remove_from_list"_lng : "dialog/button/delete"_lng);
+		_menu.deleteOrRemove->SetItemLabel(
+			mod->virtual_mod ? "dialog/button/remove_from_list"_lng : "dialog/button/delete"_lng);
 		_list->PopupMenu(&_menu.menu);
 	}
 }
@@ -964,23 +970,32 @@ void ModListView::onSwitchSelectedModStateRequested()
 	if (_selectedMod.empty())
 		return;
 
+	const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
+	const auto& disabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
+
+	switchSelectedModStateImpl(enabling, disabling);
+
+	EX_UNEXPECTED;
+}
+
+void ModListView::switchSelectedModStateImpl(const std::string& enablingMod, const std::string& disablingMod)
+{
+	EX_TRY;
+
 	const bool warnAboutConflicts =
 		_managedPlatform.localConfig()->warnAboutConflictsMode() != WarnAboutConflictsMode::do_nothing;
 	const bool autoSort =
 		_managedPlatform.localConfig()->conflictResolveMode() == ConflictResolveMode::automatic;
 
-	const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
-	const auto& disabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
-
 	static bool messageWasShown = false;
 
-	if (warnAboutConflicts && !enabling.empty())
+	if (warnAboutConflicts && !enablingMod.empty())
 	{
-		wxString modListForMessage = [&, this]() {
+		wxString modListForMessage = [autoSort, enablingMod, this]() {
 			if (!autoSort)
-				return incompatibleMods(enabling);  // message: x incompatible with y, z
+				return incompatibleMods(enablingMod);  // message: x incompatible with y, z
 
-			return wouldBeDisabledMods(enabling);  // message: enabling would disable y, z, a
+			return wouldBeDisabledMods(enablingMod);  // message: enabling would disable y, z, a
 		}();
 
 		if (!modListForMessage.empty())
@@ -1005,7 +1020,7 @@ void ModListView::onSwitchSelectedModStateRequested()
 			wxString message = [&]() {
 				if (!autoSort)
 					return wxString::Format(formatMessage,
-						wxString::FromUTF8(_managedPlatform.modDataProvider()->modData(enabling).name),
+						wxString::FromUTF8(_managedPlatform.modDataProvider()->modData(enablingMod).name),
 						modListForMessage);
 
 				return wxString::Format(formatMessage, modListForMessage);
@@ -1026,17 +1041,19 @@ void ModListView::onSwitchSelectedModStateRequested()
 		}
 	}
 
-	_modManager.switchState(_selectedMod);
+	if (!enablingMod.empty())
+		_modManager.enable(enablingMod);
+	else if (!disablingMod.empty())
+		_modManager.disable(disablingMod);
 
 	if (!autoSort)
 		return;
 
-	onSortModsRequested(enabling, disabling);
+	onSortModsRequested(enablingMod, disablingMod);
 
 	if (!messageWasShown)
 	{
-		_infoBar->ShowMessage(
-			wxString::Format("message/notification/automatic_resolve_mode_enabled"_lng));
+		_infoBar->ShowMessage(wxString::Format("message/notification/automatic_resolve_mode_enabled"_lng));
 		_infoBarTimer.StartOnce(10000);
 		messageWasShown = true;
 	}
@@ -1101,6 +1118,7 @@ void ModListView::onResetSelectedModStateRequested()
 
 	std::swap(next, _selectedMod);
 
+	switchSelectedModStateImpl("", next);
 	_modManager.archive(next);
 
 	updateControlsState();
@@ -1121,8 +1139,7 @@ void ModListView::onEditModRequested()
 	EX_UNEXPECTED;
 }
 
-void ModListView::onSortModsRequested(
-	const std::string& enablingMod, const std::string& disablingMod)
+void ModListView::onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod)
 {
 	wxBusyCursor bc;
 
