@@ -7,10 +7,8 @@
 
 #include "era2_launch_helper.hpp"
 
-#include <wx/icon.h>
 
 #include "application.h"
-#include "interface/iicon_storage.hpp"
 
 using namespace mm;
 

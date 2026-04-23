@@ -11,6 +11,8 @@
 #include "type/warn_about_conflicts_mode.hpp"
 
 #include <set>
+#include <string>
+#include <vector>
 
 namespace mm
 {

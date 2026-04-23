@@ -6,7 +6,6 @@
 #include "stdafx.h"
 
 #include "era2_mod_data_provider.hpp"
-// #include "domain/mod_data.hpp"
 
 #include "era2_mod_data_loader.hpp"
 #include "system_info.hpp"

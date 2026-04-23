@@ -10,7 +10,6 @@
 #include "era2/era2_platform.h"
 #include "interface/iapp_config.hpp"
 #include "application.h"
-#include "interface/ii18n_service.hpp"
 #include "utility/sdlexcept.h"
 
 using namespace mm;

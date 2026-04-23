@@ -5,11 +5,13 @@
 
 #pragma once
 
-#include <set>
-
-#include <sigslot/signal.hpp>
-
 #include "domain/preset_data.hpp"
+
+#include <set>
+#include <string>
+
+#include <nlohmann/json_fwd.hpp>
+#include <sigslot/signal.hpp>
 
 namespace mm
 {

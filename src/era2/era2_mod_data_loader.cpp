@@ -5,7 +5,6 @@
 
 #include "stdafx.h"
 
-#include "application.h"
 #include "era2_mod_data_loader.hpp"
 #include "system_info.hpp"
 #include "utility/json_util.h"

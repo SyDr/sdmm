@@ -7,6 +7,7 @@
 
 #include "type/icon.hpp"
 
+#include <optional>
 #include <string>
 
 class wxBitmap;
@@ -18,8 +19,7 @@ namespace mm
 	{
 		virtual ~IIconStorage() = default;
 
-		[[nodiscard]] virtual wxBitmap get(
-			Icon::Stock icon, std::optional<Icon::Size> targetSize = {}) = 0;
+		[[nodiscard]] virtual wxBitmap get(Icon::Stock icon, std::optional<Icon::Size> targetSize = {}) = 0;
 		[[nodiscard]] virtual wxBitmap get(
 			const std::string& name, std::optional<Icon::Size> resizeTo = {}) = 0;
 	};

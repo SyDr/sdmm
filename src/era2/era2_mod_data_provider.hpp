@@ -8,7 +8,6 @@
 #include "interface/imod_data_provider.hpp"
 
 #include "type/filesystem.hpp"
-#include "wx/string.h"
 
 #include <map>
 #include <set>

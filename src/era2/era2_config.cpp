@@ -12,17 +12,8 @@
 #include "type/program_version.hpp"
 #include "utility/fs_util.h"
 #include "utility/json_util.h"
-#include "utility/sdlexcept.h"
 
 #include <fstream>
-#include <ranges>
-#include <sstream>
-#include <unordered_set>
-
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/log.h>
-#include <wx/stdpaths.h>
 
 using namespace mm;
 

@@ -7,15 +7,6 @@
 
 #include "era2_mod_manager.hpp"
 
-#include "application.h"
-#include "domain/mod_data.hpp"
-#include "era2_config.hpp"
-#include "utility/fs_util.h"
-#include "utility/json_util.h"
-#include "utility/sdlexcept.h"
-
-#include <unordered_set>
-
 using namespace mm;
 
 Era2ModManager::Era2ModManager(ModList& mods)

@@ -7,6 +7,9 @@
 
 #include "type/filesystem.hpp"
 
+#include <string>
+#include <vector>
+
 namespace mm
 {
 	struct ILaunchHelper;

@@ -6,28 +6,19 @@
 #include "stdafx.h"
 
 #include "era2_platform.h"
-
-#include <fstream>
-#include <unordered_set>
-
-#include <boost/range/adaptor/reversed.hpp>
-#include <boost/range/algorithm_ext/erase.hpp>
-
 #include "application.h"
-#include "domain/mod_data.hpp"
 #include "era2_config.hpp"
-#include "era2_directory_structure.hpp"
 #include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.hpp"
 #include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
-#include "system_info.hpp"
 #include "utility/fs_util.h"
-#include "utility/json_util.h"
-#include "utility/sdlexcept.h"
+
+#include <fstream>
 
 #include <boost/locale/conversion.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 
 using namespace mm;
 

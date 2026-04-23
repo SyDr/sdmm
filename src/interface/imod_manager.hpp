@@ -8,6 +8,8 @@
 #include <sigslot/signal.hpp>
 
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace mm
 {

@@ -7,17 +7,8 @@
 
 #include "era2_preset_manager.hpp"
 
-#include "application.h"
-#include "era2_config.hpp"
-#include "era2_mod_manager.hpp"
-#include "era2_platform.h"
 #include "system_info.hpp"
-#include "utility/fs_util.h"
 #include "utility/json_util.h"
-#include "utility/sdlexcept.h"
-
-#include <wx/dir.h>
-#include <wx/file.h>
 
 using namespace mm;
 
