@@ -64,6 +64,7 @@ const std::string& mm::Era2ModDataProvider::description(const std::string& id)
 void Era2ModDataProvider::clear()
 {
 	_data.clear();
+	_description.clear();
 }
 
 void Era2ModDataProvider::loadDefaults()
