@@ -227,10 +227,11 @@
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
     <VcpkgManifestInstall>true</VcpkgManifestInstall>
     <VcpkgAutoLink>true</VcpkgAutoLink>
+    <VcpkgAutoBootstrap>false</VcpkgAutoBootstrap>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
-    <VcpkgTriplet>x86-windows</VcpkgTriplet>
+    <VcpkgTriplet>mm-x86-windows</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug-asan|Win32'" Label="Vcpkg">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
@@ -240,7 +241,7 @@
     <VcpkgTriplet>x86-windows</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-static|Win32'" Label="Vcpkg">
-    <VcpkgTriplet>x86-windows</VcpkgTriplet>
+    <VcpkgTriplet>mm-x86-windows</VcpkgTriplet>
     <VcpkgUseStatic>true</VcpkgUseStatic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

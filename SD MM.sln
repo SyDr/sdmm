@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32929.385
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11822.322 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "main", "src\main.vcxproj", "{D022CE6F-72CB-437C-8242-34EE53F96812}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mod Manager", "src\main.vcxproj", "{D022CE6F-72CB-437C-8242-34EE53F96812}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vcpkg", "vcpkg", "{FB314301-6944-4DF8-A54C-44C47F38CF9B}"
 	ProjectSection(SolutionItems) = preProject
 		vcpkg\overlay-triplets\mm-asan.cmake = vcpkg\overlay-triplets\mm-asan.cmake
+		vcpkg\overlay-triplets\mm-x86-windows-static-md.cmake = vcpkg\overlay-triplets\mm-x86-windows-static-md.cmake
+		vcpkg\overlay-triplets\mm-x86-windows-static.cmake = vcpkg\overlay-triplets\mm-x86-windows-static.cmake
+		vcpkg\overlay-triplets\mm-x86-windows.cmake = vcpkg\overlay-triplets\mm-x86-windows.cmake
 		vcpkg-configuration.json = vcpkg-configuration.json
 		vcpkg.json = vcpkg.json
 	EndProjectSection
