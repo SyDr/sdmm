@@ -10,6 +10,8 @@
 #include "system_info.hpp"
 #include "utility/json_util.h"
 
+#include <boost/locale/conversion.hpp>
+
 using namespace mm;
 
 namespace
@@ -91,7 +93,7 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 
 	if (auto list = data.find("list"); list != data.end() && list->is_array())
 		for (const auto& item : *list)
-			result.mods.emplace_back(item.get<std::string>());
+			result.mods.emplace_back(boost::locale::fold_case(item.get<std::string>()));
 
 	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
 		result.executable = exe->get<std::string>();
