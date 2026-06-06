@@ -22,7 +22,7 @@ namespace mm
 
 		[[nodiscard]] virtual ModList const& mods() const = 0;
 
-		virtual void apply(const std::vector<std::string>& items) = 0;
+		virtual void apply(const std::vector<std::string>& items, bool archiveOnDisable) = 0;
 
 		virtual void enable(const std::string& item)  = 0;
 		virtual void disable(const std::string& item) = 0;

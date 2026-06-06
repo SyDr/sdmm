@@ -202,12 +202,14 @@ void ModList::archive(const std::string& id)
 	data.erase(data.begin() + *pos);
 }
 
-void ModList::apply(const std::vector<std::string>& ids)
+void ModList::apply(const std::vector<std::string>& ids, bool archiveOnDisable)
 {
 	const std::unordered_set<std::string> active(ids.cbegin(), ids.cend());
 
 	size_t i    = 0;
 	size_t skip = 0;
+
+	std::unordered_set<std::string> toArchive;
 
 	while (i < ids.size())
 	{
@@ -220,6 +222,9 @@ void ModList::apply(const std::vector<std::string>& ids)
 		}
 		else if (!active.count(data[i + skip].id))
 		{
+			if (archiveOnDisable)
+				toArchive.emplace(data[i + skip].id);
+
 			disable(data[i + skip].id);
 			++skip;
 		}
@@ -241,9 +246,15 @@ void ModList::apply(const std::vector<std::string>& ids)
 
 	while (i + skip < data.size())
 	{
+		if (archiveOnDisable)
+			toArchive.emplace(data[i + skip].id);
+
 		disable(data[i + skip].id);
 		++skip;
 	}
+
+	for (const auto& id : toArchive)
+		archive(id);
 }
 
 void ModList::remove(const std::string& id)

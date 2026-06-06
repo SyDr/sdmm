@@ -26,7 +26,7 @@ namespace mm
 
 		ModList const& mods() const override;
 
-		void apply(const std::vector<std::string>& items) override;
+		void apply(const std::vector<std::string>& items, bool archiveOnDisable) override;
 
 		void enable(const std::string& item) override;
 		void disable(const std::string& item) override;

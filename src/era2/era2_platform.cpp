@@ -159,7 +159,7 @@ void Era2Platform::apply(const std::vector<std::string>& active)
 {
 	auto block1 = _modListChanged.blocker();
 
-	_modManager->apply(active);
+	_modManager->apply(active, _localConfig->useLegacyArchiving());
 	_modManager->onListChanged()();
 
 	save();

@@ -51,5 +51,8 @@ namespace mm
 
 		[[nodiscard]] virtual bool screenshotsExpanded() const     = 0;
 		virtual void               screenshotsExpanded(bool value) = 0;
+
+		[[nodiscard]] virtual bool useLegacyArchiving() const     = 0;
+		virtual void               useLegacyArchiving(bool value) = 0;
 	};
 }

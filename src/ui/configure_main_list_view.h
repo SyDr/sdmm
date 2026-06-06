@@ -23,12 +23,15 @@ namespace mm
 	{
 	public:
 		ConfigureMainListView(wxWindow* parent, IIconStorage& iconStorage, const std::vector<int>& columns,
-			ModListModelManagedMode initialManagedMode, ModListModelArchivedMode initialArchivedMode);
+			ModListModelManagedMode initialManagedMode, ModListModelArchivedMode initialArchivedMode,
+			bool initialUseLegacyArchving);
 
 		std::vector<int> getColumns() const;
 
 		ModListModelManagedMode  getManagedMode() const;
 		ModListModelArchivedMode getArchivedMode() const;
+
+		bool useLegacyArchiving() const;
 
 	private:
 		void createControls();
@@ -49,12 +52,16 @@ namespace mm
 
 		const ModListModelManagedMode  _initialManagedMode;
 		const ModListModelArchivedMode _initialArchivedMode;
+		const bool                     _initialUseLegacyArchving;
 
 		wxWidgetsPtr<wxStaticText> _managedStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _managedChoice = nullptr;
 
 		wxWidgetsPtr<wxStaticText> _archivedStatic = nullptr;
 		wxWidgetsPtr<wxChoice>     _archivedChoice = nullptr;
+
+		wxWidgetsPtr<wxCheckBox> _useLegacyArchivingCheckbox = nullptr;
+		wxWidgetsPtr<wxButton>   _useLegacyArchivingButton   = nullptr;
 
 		wxObjectDataPtr<ModListModel> _listModel;
 		ModList                       _mods;

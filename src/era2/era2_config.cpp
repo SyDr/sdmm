@@ -37,6 +37,8 @@ namespace
 		inline constexpr auto ListColumns = "list_columns";
 		inline constexpr auto WarnAboutConflictsMode =
 			"warn_about_conflicts_mode";
+		inline constexpr auto UseLegacyArchiving =
+			"use_legacy_archiving";
 	}
 }
 
@@ -248,6 +250,17 @@ void Era2Config::screenshotsExpanded(bool value)
 	save();
 }
 
+bool Era2Config::useLegacyArchiving() const
+{
+	return _data[Key::UseLegacyArchiving].get<bool>();
+}
+
+void Era2Config::useLegacyArchiving(bool value)
+{
+	_data[Key::UseLegacyArchiving] = value;
+	save();
+}
+
 void Era2Config::validate()
 {
 	if (_data.is_discarded())
@@ -310,6 +323,9 @@ void Era2Config::validate()
 
 	if (!_data.count(st_screenshots_expanded) || !_data[st_screenshots_expanded].is_boolean())
 		_data[st_screenshots_expanded] = true;
+
+	if (!_data.count(Key::UseLegacyArchiving) || !_data[Key::UseLegacyArchiving].is_boolean())
+		_data[Key::UseLegacyArchiving] = false;
 
 	if (!_data.count(Key::MMVersion) || !_data[Key::MMVersion].is_string())
 		_data[Key::MMVersion] = "";

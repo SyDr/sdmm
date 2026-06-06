@@ -57,6 +57,9 @@ namespace mm
 		bool screenshotsExpanded() const override;
 		void screenshotsExpanded(bool value) override;
 
+		bool useLegacyArchiving() const override;
+		void useLegacyArchiving(bool value) override;
+
 	private:
 		fs::path getConfigFilePath() const;
 		void     createDirectories() const;

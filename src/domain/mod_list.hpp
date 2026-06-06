@@ -66,7 +66,7 @@ namespace mm
 		void disable(const std::string& id);
 		void archive(const std::string& id);
 
-		void apply(const std::vector<std::string>& ids);
+		void apply(const std::vector<std::string>& ids, bool archiveOnDisable);
 
 		void switchState(const std::string& id);
 

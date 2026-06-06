@@ -50,9 +50,9 @@ void Era2ModManager::switchState(const std::string& item)
 		disable(item);
 }
 
-void Era2ModManager::apply(const std::vector<std::string>& items)
+void Era2ModManager::apply(const std::vector<std::string>& items, bool archiveOnDisable)
 {
-	_list.apply(items);
+	_list.apply(items, archiveOnDisable);
 
 	_listChanged();
 }

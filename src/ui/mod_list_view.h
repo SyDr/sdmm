@@ -100,6 +100,7 @@ namespace mm
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;
 		wxWidgetsPtr<wxButton> _changeState = nullptr;
+		wxWidgetsPtr<wxButton> _archive     = nullptr;
 
 		wxWidgetsPtr<wxButton> _sort = nullptr;
 

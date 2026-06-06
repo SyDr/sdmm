@@ -254,7 +254,7 @@ void ManagePresetListView::onLoadPresetRequested()
 	auto selected = getSelection();
 	auto preset   = _platform.getPresetManager()->loadPreset(selected);
 
-	_platform.modManager()->apply(preset.mods);
+	_platform.apply(preset.mods);
 	_platform.localConfig()->setActivePreset(selected);
 
 	_selected = selected;

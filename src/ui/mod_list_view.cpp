@@ -172,6 +172,8 @@ void ModListView::buildLayout()
 	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4).Expand());
+	if (_archive)
+		buttonSizer->Add(_archive, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->AddStretchSpacer(1);
 	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4).Expand());
 
@@ -423,18 +425,20 @@ void ModListView::bindEvents()
 	});
 
 	_configure->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) {
-		const auto columns  = _managedPlatform.localConfig()->listColumns();
-		const auto managed  = _managedPlatform.localConfig()->managedModsDisplay();
-		const auto archived = _managedPlatform.localConfig()->archivedModsDisplay();
+		const auto columns        = _managedPlatform.localConfig()->listColumns();
+		const auto managed        = _managedPlatform.localConfig()->managedModsDisplay();
+		const auto archived       = _managedPlatform.localConfig()->archivedModsDisplay();
+		const auto legacyArchving = _managedPlatform.localConfig()->useLegacyArchiving();
 
-		ConfigureMainListView dialog(this, _iconStorage, columns, managed, archived);
+		ConfigureMainListView dialog(this, _iconStorage, columns, managed, archived, legacyArchving);
 
 		if (dialog.ShowModal() != wxID_OK)
 			return;
 
-		const auto newColumns  = dialog.getColumns();
-		const auto newManaged  = dialog.getManagedMode();
-		const auto newArchived = dialog.getArchivedMode();
+		const auto newColumns        = dialog.getColumns();
+		const auto newManaged        = dialog.getManagedMode();
+		const auto newArchived       = dialog.getArchivedMode();
+		const auto newlegacyArchving = dialog.useLegacyArchiving();
 
 		if (columns != newColumns)
 		{
@@ -454,11 +458,19 @@ void ModListView::bindEvents()
 			if (!followSelection())
 				updateControlsState();
 		}
+
+		if (newlegacyArchving != legacyArchving)
+		{
+			_managedPlatform.localConfig()->useLegacyArchiving(newlegacyArchving);
+			wxGetApp().scheduleRestart();
+		}
 	});
 
 	_moveUp->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { _modManager.moveUp(_selectedMod); });
 	_moveDown->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { _modManager.moveDown(_selectedMod); });
 	_changeState->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { onSwitchSelectedModStateRequested(); });
+	if (_archive)
+		_archive->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { onResetSelectedModStateRequested(); });
 
 	_sort->Bind(wxEVT_BUTTON, [&](wxCommandEvent&) { onSortModsRequested({}, {}); });
 
@@ -560,7 +572,16 @@ void ModListView::createControls(const wxString& managedPath)
 		_moveUp      = new wxButton(_group, wxID_ANY, "dialog/button/move_up"_lng);
 		_moveDown    = new wxButton(_group, wxID_ANY, "dialog/button/move_down"_lng);
 		_changeState = new wxButton(_group, wxID_ANY, "dialog/button/enable"_lng);
-		_sort        = new wxButton(_group, wxID_ANY, "dialog/button/sort"_lng);
+
+		if (!_managedPlatform.localConfig()->useLegacyArchiving())
+		{
+			_archive = new wxButton(_group, wxID_ANY, "dialog/button/archive"_lng);
+			_archive->SetBitmap(_iconStorage.get(Icon::Stock::box, Icon::Size::x16));
+			_archive->SetToolTip("dialog/button/archive"_lng);
+			_archive->Disable();
+		}
+
+		_sort = new wxButton(_group, wxID_ANY, "dialog/button/sort"_lng);
 
 		_configure->SetBitmap(_iconStorage.get(Icon::Stock::cog, Icon::Size::x16));
 		_moveUp->SetBitmap(_iconStorage.get(Icon::Stock::up, Icon::Size::x16));
@@ -579,6 +600,16 @@ void ModListView::createControls(const wxString& managedPath)
 		_changeState = new wxBitmapButton(_group, wxID_ANY,
 			_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16), wxDefaultPosition,
 			{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+
+		if (!_managedPlatform.localConfig()->useLegacyArchiving())
+		{
+			_archive =
+				new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::box, Icon::Size::x16),
+					wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+			_archive->SetToolTip("dialog/button/archive"_lng);
+			_archive->Disable();
+		}
+
 		_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	}
@@ -745,6 +776,8 @@ void ModListView::updateControlsState()
 		_moveUp->Disable();
 		_moveDown->Disable();
 		_changeState->Disable();
+		if (_archive)
+			_archive->Disable();
 		setDescription(L"");
 		_openGallery->Disable();
 		_galleryView->Reset();
@@ -756,26 +789,29 @@ void ModListView::updateControlsState()
 
 	_changeState->Enable();
 
-	if (wxGetApp().appConfig().interfaceLabel() == InterfaceLabel::dont_show)
 	{
-		_changeState->SetBitmap(wxNullBitmap);
-		_changeState->SetBitmap(_iconStorage.get(
-			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
-			Icon::Size::x16));
-	}
-	else
-	{
-		_changeState->SetBitmap(wxNullBitmap);
-		_changeState->SetBitmap(_iconStorage.get(
-			_modManager.mods().enabled(mod.id) ? Icon::Stock::cross_gray : Icon::Stock::checkmark_green,
-			Icon::Size::x16));
+		Icon::Stock changeStateIcon  = Icon::Stock::checkmark_green;
+		wxString    changeStateLabel = "dialog/button/enable"_lng;
 
-		_changeState->SetLabelText(
-			_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
-	}
+		if (_modManager.mods().enabled(mod.id))
+		{
+			changeStateIcon  = _managedPlatform.localConfig()->useLegacyArchiving() ? Icon::Stock::box
+																					: Icon::Stock::cross_gray;
+			changeStateLabel = _managedPlatform.localConfig()->useLegacyArchiving()
+								   ? "dialog/button/archive"_lng
+								   : "dialog/button/disable"_lng;
+		}
 
-	_changeState->SetToolTip(
-		_modManager.mods().enabled(mod.id) ? "dialog/button/disable"_lng : "dialog/button/enable"_lng);
+		_changeState->SetBitmap(wxNullBitmap);
+		_changeState->SetBitmap(_iconStorage.get(changeStateIcon, Icon::Size::x16));
+
+		if (wxGetApp().appConfig().interfaceLabel() == InterfaceLabel::show)
+		{
+			_changeState->SetLabelText(changeStateLabel);
+		}
+
+		_changeState->SetToolTip(changeStateLabel);
+	}
 
 	_moveUp->Enable(_modManager.mods().canMoveUp(mod.id));
 	_moveDown->Enable(_modManager.mods().canMoveDown(mod.id));
@@ -972,6 +1008,12 @@ void ModListView::onSwitchSelectedModStateRequested()
 
 	const auto& enabling  = _modManager.mods().enabled(_selectedMod) ? std::string() : _selectedMod;
 	const auto& disabling = _modManager.mods().enabled(_selectedMod) ? _selectedMod : std::string();
+
+	if (!_archive && !disabling.empty())
+	{
+		onResetSelectedModStateRequested();
+		return;
+	}
 
 	switchSelectedModStateImpl(enabling, disabling);
 

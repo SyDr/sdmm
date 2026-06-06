@@ -29,12 +29,13 @@ using namespace mm;
 
 ConfigureMainListView::ConfigureMainListView(wxWindow* parent, IIconStorage& iconStorage,
 	const std::vector<int>& columns, ModListModelManagedMode initialManagedMode,
-	ModListModelArchivedMode initialArchivedMode)
+	ModListModelArchivedMode initialArchivedMode, bool initialUseLegacyArchving)
 	: wxDialog(parent, wxID_ANY, "dialog/settings/configure_main_view/caption"_lng, wxDefaultPosition, wxSize(500, 600))
 	, _listModel(new ModListModel(*this, iconStorage, ModListModelManagedMode::as_flat_list,
 		  ModListModelArchivedMode::as_single_group, Icon::Size::x16))
 	, _initialManagedMode(initialManagedMode)
 	, _initialArchivedMode(initialArchivedMode)
+	, _initialUseLegacyArchving(initialUseLegacyArchving)
 {
 	createControls();
 	buildLayout();
@@ -86,6 +87,11 @@ ModListModelArchivedMode ConfigureMainListView::getArchivedMode() const
 	return static_cast<ModListModelArchivedMode>(_archivedChoice->GetSelection());
 }
 
+bool ConfigureMainListView::useLegacyArchiving() const
+{
+	return _useLegacyArchivingCheckbox->IsChecked();
+}
+
 void ConfigureMainListView::createControls()
 {
 	_managedStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/configure_main_view/managed_mods"_lng);
@@ -93,6 +99,12 @@ void ConfigureMainListView::createControls()
 
 	_archivedStatic = new wxStaticText(this, wxID_ANY, "dialog/settings/configure_main_view/archived_mods"_lng);
 	createArchivedControl();
+
+	_useLegacyArchivingCheckbox = new wxCheckBox(this, wxID_ANY, "dialog/settings/configure_main_view/use_legacy_archiving"_lng);
+	_useLegacyArchivingCheckbox->SetValue(_initialUseLegacyArchving);
+	_useLegacyArchivingButton = new wxButton(this, wxID_ANY, L"?",
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+	_useLegacyArchivingButton->SetToolTip("dialog/settings/configure_main_view/use_legacy_archiving_hint"_lng);
 
 	createListControl();
 
@@ -189,6 +201,10 @@ void ConfigureMainListView::createListColumns()
 
 void ConfigureMainListView::bindEvents()
 {
+	_useLegacyArchivingButton->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
+		wxMessageOutputBest().Output("dialog/settings/configure_main_view/use_legacy_archiving_hint"_lng);
+	});
+
 	_save->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { EndModal(wxID_OK); });
 	_cancel->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { EndModal(wxID_CANCEL); });
 }
@@ -201,8 +217,12 @@ void ConfigureMainListView::buildLayout()
 	comboSizer->Add(_archivedStatic, wxSizerFlags(1).Border(wxALL, 5).Align(wxALIGN_CENTER_VERTICAL));
 	comboSizer->Add(_archivedChoice, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
-	auto topSizer = new wxBoxSizer(wxHORIZONTAL);
-	topSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	auto legacySizer = new wxBoxSizer(wxHORIZONTAL);
+	legacySizer->Add(_useLegacyArchivingCheckbox, wxSizerFlags(1).Expand().Border(wxALL, 5));
+	legacySizer->Add(_useLegacyArchivingButton, wxSizerFlags(0).Expand().Border(wxALL, 5));
+
+	auto listSizer = new wxBoxSizer(wxHORIZONTAL);
+	listSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	auto buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonSizer->AddStretchSpacer();
@@ -211,7 +231,8 @@ void ConfigureMainListView::buildLayout()
 
 	auto mainSizer = new wxBoxSizer(wxVERTICAL);
 	mainSizer->Add(comboSizer, wxSizerFlags(0).Expand());
-	mainSizer->Add(topSizer, wxSizerFlags(1).Expand());
+	mainSizer->Add(legacySizer, wxSizerFlags(0).Expand());
+	mainSizer->Add(listSizer, wxSizerFlags(1).Expand());
 	mainSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
 
 	this->SetSizer(mainSizer);

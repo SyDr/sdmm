@@ -32,6 +32,7 @@ namespace mm
 			sort,
 			up,
 			heart,
+			box,
 		};
 
 		enum class Size
