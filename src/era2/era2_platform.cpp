@@ -126,12 +126,12 @@ Era2Platform::Era2Platform(const Application& app)
 	, _rootDir(app.appConfig().getDataPath())
 {
 	_localConfig     = std::make_unique<Era2Config>(_rootDir);
-	_presetManager   = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), getModsDirPath());
+	_presetManager   = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), modsDirPath());
 	_launchHelper    = std::make_unique<Era2LaunchHelper>(*_localConfig);
-	_modDataProvider = std::make_unique<Era2ModDataProvider>(getModsDirPath(),
-		loadFsMapNames(getModsDirPath()), _app.appConfig().currentLanguageCode(), _app.i18nService());
+	_modDataProvider = std::make_unique<Era2ModDataProvider>(modsDirPath(),
+		loadFsMapNames(modsDirPath()), _app.appConfig().currentLanguageCode(), _app.i18nService());
 
-	_modList    = loadMods(getActiveListPath(), getModsDirPath());
+	_modList    = loadMods(getActiveListPath(), modsDirPath());
 	_modManager = std::make_unique<Era2ModManager>(_modList);
 
 	_modListChanged = _modManager->onListChanged().connect([this] { save(); });
@@ -144,7 +144,7 @@ fs::path Era2Platform::managedPath() const
 
 void Era2Platform::reload(bool force)
 {
-	auto mods = loadMods(getActiveListPath(), getModsDirPath());
+	auto mods = loadMods(getActiveListPath(), modsDirPath());
 	if (!force && mods == _modManager->mods())
 		return;
 
@@ -165,7 +165,7 @@ void Era2Platform::apply(const std::vector<std::string>& active)
 	save();
 }
 
-fs::path Era2Platform::getModsDirPath() const
+fs::path Era2Platform::modsDirPath() const
 {
 	return _rootDir / "Mods";
 }
@@ -197,7 +197,7 @@ IModDataProvider* Era2Platform::modDataProvider() const
 
 fs::path Era2Platform::getActiveListPath() const
 {
-	return getModsDirPath() / "list.txt";
+	return modsDirPath() / "list.txt";
 }
 
 fs::path Era2Platform::getPluginListPath() const
@@ -207,5 +207,5 @@ fs::path Era2Platform::getPluginListPath() const
 
 void Era2Platform::save()
 {
-	saveMods(getActiveListPath(), getModsDirPath(), _modManager->mods());
+	saveMods(getActiveListPath(), modsDirPath(), _modManager->mods());
 }

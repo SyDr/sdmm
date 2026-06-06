@@ -28,6 +28,7 @@ namespace mm
 		explicit Era2Platform(Application const& app);
 
 		fs::path managedPath() const override;
+		fs::path modsDirPath() const override;
 
 		void reload(bool force) override;
 		void apply(const std::vector<std::string>& active) override;
@@ -39,7 +40,6 @@ namespace mm
 		IModDataProvider* modDataProvider() const override;
 
 	private:
-		fs::path getModsDirPath() const;
 		fs::path getActiveListPath() const;
 		fs::path getPluginListPath() const;
 

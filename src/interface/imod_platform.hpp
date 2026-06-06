@@ -28,6 +28,7 @@ namespace mm
 		virtual void apply(const std::vector<std::string>& active) = 0;
 
 		[[nodiscard]] virtual fs::path managedPath() const = 0;
+		[[nodiscard]] virtual fs::path modsDirPath() const = 0;
 
 		[[nodiscard]] virtual ILaunchHelper*    launchHelper() const     = 0;
 		[[nodiscard]] virtual ILocalConfig*     localConfig() const      = 0;

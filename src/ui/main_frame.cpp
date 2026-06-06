@@ -302,7 +302,7 @@ void MainFrame::OnMenuModOpenModFolder()
 {
 	EX_TRY;
 
-	wxLaunchDefaultApplication(wxString::FromUTF8(_currentPlatform->managedPath().string()));
+	wxLaunchDefaultApplication(wxString::FromUTF8(_currentPlatform->modsDirPath().string()));
 
 	EX_UNEXPECTED;
 }
