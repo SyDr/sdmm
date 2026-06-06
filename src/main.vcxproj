@@ -238,7 +238,7 @@
     <VcpkgTriplet>mm-asan</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgTriplet>x86-windows</VcpkgTriplet>
+    <VcpkgTriplet>mm-x86-windows</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-static|Win32'" Label="Vcpkg">
     <VcpkgTriplet>mm-x86-windows</VcpkgTriplet>
