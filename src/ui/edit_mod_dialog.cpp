@@ -157,14 +157,27 @@ void EditModDialog::buildLayout()
 
 void EditModDialog::loadData()
 {
-	auto str = readFile(wxGetApp().appConfig().programPath() / SystemInfo::DocDir / SystemInfo::ModInfoDoc);
+	std::string help;
+
+	if (auto curLng = wxGetApp().appConfig().currentLanguageCode(); curLng != SystemInfo::DefaultLanguage)
+	{
+		const auto filename = fs::path(SystemInfo::ModInfoDoc)
+								  .stem()
+								  .concat("." + curLng)
+								  .concat(fs::path(SystemInfo::ModInfoDoc).extension());
+
+		help = readFile(wxGetApp().appConfig().programPath() / SystemInfo::DocDir / filename);
+	}
+
+	if (help.empty())
+		help = readFile(wxGetApp().appConfig().programPath() / SystemInfo::DocDir / SystemInfo::ModInfoDoc);
 
 	auto cnvt = std::unique_ptr<char, decltype(&std::free)>(
-		cmark_markdown_to_html(str.c_str(), str.size(), CMARK_OPT_DEFAULT), &std::free);
+		cmark_markdown_to_html(help.c_str(), help.size(), CMARK_OPT_DEFAULT), &std::free);
 
-	str = cnvt.get();
+	help = cnvt.get();
 
-	_docHtmlWindow->SetPage(wxString::FromUTF8(str));
+	_docHtmlWindow->SetPage(wxString::FromUTF8(help));
 	_docHtmlWindow->Scroll(0, 0);
 	_docHtmlWindow->SetHTMLBackgroundColour(_docsGroup->GetBackgroundColour());
 
