@@ -7,6 +7,8 @@
 
 #include "interface/ii18n_service.hpp"
 
+#include "type/filesystem.hpp"
+
 #include <nlohmann/json.hpp>
 #include <unordered_map>
 #include <wx/string.h>
@@ -29,10 +31,20 @@ namespace mm
 		std::string legacyCode(const std::string& code) const override;
 
 	private:
-		void build_cache(const nlohmann::json& data, const std::string& prefix);
+		struct LngMetadata
+		{
+			std::string              name;
+			std::string              author;
+			std::vector<std::string> legacyCodes;
+		};
+
+		using AvailableLngMetadata = std::unordered_map<std::string, LngMetadata>;
+
+		AvailableLngMetadata loadAvailableLngMetadata(const fs::path& path) const;
+		void                 build_cache(const nlohmann::json& data, const std::string& prefix);
 
 	private:
-		std::vector<std::pair<std::string, std::string>> _availableLanguages;
+		std::unordered_map<std::string, LngMetadata> _availableLanguages;
 
 		std::map<std::string, std::string> _data;
 	};

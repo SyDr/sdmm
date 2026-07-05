@@ -13,28 +13,15 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/nowide/fstream.hpp>
-#include <wx/stdpaths.h>
 
 #include <fstream>
 #include <string>
 
 using namespace mm;
 
-namespace
-{
-	std::vector<std::pair<std::string, std::string>> loadAvailable(const fs::path& path)
-	{
-		std::vector<std::pair<std::string, std::string>> result;
-
-		for (const auto& item : loadJsonFromFile(path, false))
-			result.emplace_back(item["code"], item["name"]);
-
-		return result;
-	}
-}
 
 I18nService::I18nService(const IAppConfig& config)
-	: _availableLanguages(loadAvailable(config.programPath() / "lng/_.json"))
+	: _availableLanguages(loadAvailableLngMetadata(config.programPath() / "lng/_.json"))
 {
 	boost::nowide::ifstream datafile(config.programPath() / "lng" / (config.currentLanguageCode() + ".json"));
 
@@ -46,12 +33,31 @@ I18nService::I18nService(const IAppConfig& config)
 		build_cache(nlohmann::json::parse(datafile), "");
 }
 
-std::vector<std::string> mm::I18nService::available() const
+std::vector<std::string> I18nService::available() const
 {
 	std::vector<std::string> result;
 
 	for (const auto& [code, value] : _availableLanguages)
 		result.emplace_back(code);
+
+	return result;
+}
+
+auto I18nService::loadAvailableLngMetadata(const fs::path& path) const -> AvailableLngMetadata
+{
+	AvailableLngMetadata result;
+
+	auto json = loadJsonFromFile(path, false);
+
+	for (const auto& [key, value] : json.items())
+	{
+		LngMetadata lm;
+		lm.name   = value["name"].get<std::string>();
+		lm.author = value["author"].get<std::string>();
+		lm.legacyCodes.emplace_back(value["legacy_code"].get<std::string>());
+
+		result[key] = lm;
+	}
 
 	return result;
 }
@@ -107,20 +113,16 @@ std::string I18nService::get(const std::string& key) const
 
 std::string I18nService::languageName(const std::string& code) const
 {
-	for (const auto& [code_, value] : _availableLanguages)
-		if (code_ == code)
-			return value;
+	if (auto it = _availableLanguages.find(code); it != _availableLanguages.end())
+		return it->second.name;
 
 	return code;
 }
 
 std::string I18nService::legacyCode(const std::string& code) const
 {
-	if (code == "en")
-		return "en_US";
-
-	if (code == "ru")
-		return "ru_RU";
+	if (auto it = _availableLanguages.find(code); it != _availableLanguages.end() && !it->second.legacyCodes.empty())
+		return it->second.name;
 
 	return {};
 }
