@@ -19,6 +19,7 @@
 #include "wx/data_view_multiple_icons_renderer.h"
 #include "wx/priority_data_renderer.h"
 
+#include <boost/locale.hpp>
 #include <boost/algorithm/string.hpp>
 #include <wx/button.h>
 #include <wx/checkbox.h>
@@ -56,7 +57,9 @@ namespace
 		result.mods = mods;
 
 		auto fileIndex = [&](const fs::path& path, bool createNew = true) {
-			auto it = temp.find(path);
+			const auto folded = boost::locale::fold_case(path.string());
+
+			auto it = temp.find(folded);
 			if (it == temp.cend())
 			{
 				if (!createNew)
@@ -68,7 +71,7 @@ namespace
 				entry.filePath = path;
 				entry.modPaths.resize(result.mods.size());
 
-				std::tie(it, std::ignore) = temp.emplace(path, result.entries.size() - 1);
+				std::tie(it, std::ignore) = temp.emplace(folded, result.entries.size() - 1);
 			}
 
 			return it->second;
