@@ -122,7 +122,7 @@ std::string I18nService::languageName(const std::string& code) const
 std::string I18nService::legacyCode(const std::string& code) const
 {
 	if (auto it = _availableLanguages.find(code); it != _availableLanguages.end() && !it->second.legacyCodes.empty())
-		return it->second.name;
+		return it->second.legacyCodes.front();
 
 	return {};
 }
