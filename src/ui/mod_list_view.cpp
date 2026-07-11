@@ -79,7 +79,7 @@ public:
 		GetCheckedItems(selections);
 
 		return "dialog/label/categories"_lng +
-			   wxString::FromUTF8(std::format(": {}/{}", selections.size(), GetCount()));
+			   wxString::FromUTF8(std::format(" {}/{}", selections.size(), GetCount()));
 	}
 
 	wxSize GetAdjustedSize(int minWidth, int, int) override
@@ -168,7 +168,6 @@ void ModListView::buildLayout()
 	listGroupSizer->Add(_list, wxSizerFlags(1).Expand().Border(wxALL, 4));
 
 	auto buttonSizer = new wxBoxSizer(wxVERTICAL);
-	buttonSizer->Add(_configure, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->Add(_moveUp, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->Add(_moveDown, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->Add(_changeState, wxSizerFlags(0).Border(wxALL, 4).Expand());
@@ -176,6 +175,8 @@ void ModListView::buildLayout()
 		buttonSizer->Add(_archive, wxSizerFlags(0).Border(wxALL, 4).Expand());
 	buttonSizer->AddStretchSpacer(1);
 	buttonSizer->Add(_sort, wxSizerFlags(0).Border(wxALL, 4).Expand());
+	buttonSizer->AddSpacer(4);
+	buttonSizer->Add(_configure, wxSizerFlags(0).Border(wxALL, 4).Expand());
 
 	auto leftGroupSizer = new wxStaticBoxSizer(_group, wxHORIZONTAL);
 	leftGroupSizer->Add(buttonSizer, wxSizerFlags(0).Expand());
@@ -568,7 +569,6 @@ void ModListView::createControls(const wxString& managedPath)
 
 	if (useLabels)
 	{
-		_configure   = new wxButton(_group, wxID_ANY, "dialog/button/configure"_lng);
 		_moveUp      = new wxButton(_group, wxID_ANY, "dialog/button/move_up"_lng);
 		_moveDown    = new wxButton(_group, wxID_ANY, "dialog/button/move_down"_lng);
 		_changeState = new wxButton(_group, wxID_ANY, "dialog/button/enable"_lng);
@@ -581,7 +581,8 @@ void ModListView::createControls(const wxString& managedPath)
 			_archive->Disable();
 		}
 
-		_sort = new wxButton(_group, wxID_ANY, "dialog/button/sort"_lng);
+		_sort      = new wxButton(_group, wxID_ANY, "dialog/button/sort"_lng);
+		_configure = new wxButton(_group, wxID_ANY, "dialog/button/configure"_lng);
 
 		_configure->SetBitmap(_iconStorage.get(Icon::Stock::cog, Icon::Size::x16));
 		_moveUp->SetBitmap(_iconStorage.get(Icon::Stock::up, Icon::Size::x16));
@@ -591,8 +592,6 @@ void ModListView::createControls(const wxString& managedPath)
 	}
 	else
 	{
-		_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
-			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_moveUp    = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
 			   wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
@@ -611,6 +610,8 @@ void ModListView::createControls(const wxString& managedPath)
 		}
 
 		_sort = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::sort, Icon::Size::x16),
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_configure = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::cog, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 	}
 

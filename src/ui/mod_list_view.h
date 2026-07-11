@@ -95,14 +95,13 @@ namespace mm
 		std::vector<std::string>               _categories;
 		wxWidgetsPtr<wxDataViewCtrl>           _list = nullptr;
 
-		wxWidgetsPtr<wxButton> _configure = nullptr;
-
 		wxWidgetsPtr<wxButton> _moveUp      = nullptr;
 		wxWidgetsPtr<wxButton> _moveDown    = nullptr;
 		wxWidgetsPtr<wxButton> _changeState = nullptr;
 		wxWidgetsPtr<wxButton> _archive     = nullptr;
 
-		wxWidgetsPtr<wxButton> _sort = nullptr;
+		wxWidgetsPtr<wxButton> _sort      = nullptr;
+		wxWidgetsPtr<wxButton> _configure = nullptr;
 
 		wxWidgetsPtr<wxStaticBox>  _modDescriptionGroup      = nullptr;
 		wxWidgetsPtr<wxWebView>    _modDescriptionWebView    = nullptr;
