@@ -214,8 +214,8 @@
     },
     "mod_file_list": {
       "caption": "Список файлов модов",
-      "include_game_files": "Включая файлы игра",
-      "include_not_overridden": "и включая неперезаписанные",
+      "include_game_files": "Включить файлы игры",
+      "include_not_overridden": "и неперезаписанные",
       "skip_not_overriden": "Пропустить неперезаписанные",
       "include_from_root": "Включить файлы из корневого каталога"
     }
