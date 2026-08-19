@@ -160,7 +160,8 @@
       "remove_from_favs": "从收藏移除",
       "ok": "关闭",
       "continue": "继续",
-      "disable": "禁用"
+      "disable": "禁用",
+      "create_package": "Create package"
     },
     "error": {
       "caption": "发生意外错误",
@@ -215,7 +216,14 @@
       "include_not_overridden": "并包含未被覆盖的文件",
       "skip_not_overriden": "跳过未覆盖文件",
       "include_from_root": "包含根目录文件"
-    }
+    },
+	"create_mod_package": {
+      "caption": "Create mod package",
+	  "target_directory": "Save to:",
+	  "pack_into_single_archive": "Pack into single archive",
+	  "pack_in_background": "Pack in the background",
+	  "7z_switches": "7-Zip command-line switches:"
+	}
   },
   "message": {
     "notification": {
@@ -251,7 +259,8 @@
       "delete_mod": "确定要删除Mod \"%s\"吗？\n\n如果可行，它会被移入回收站。",
       "copy_already_running": "程序的另一个副本正在运行。运行多个副本可能导致数据或配置管理出错。仍要继续运行吗？",
       "warn_about_conflicts_before_enabling": "Mod \"%s\"与 \"%s\"不兼容。继续？",
-      "warn_about_conflicts_before_enabling_sort": "Mod \"%s\"将被禁用。继续？"
+      "warn_about_conflicts_before_enabling_sort": "Mod \"%s\"将被禁用。继续？",
+      "some_of_targets_exists": "Some of target files already exist (removed from disk files would be not deleted from archive).\n\nContinue?"
     },
     "status": {
       "displayed_and_hidden": "，显示：%d，隐藏：%d",

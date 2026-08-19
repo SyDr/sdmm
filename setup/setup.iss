@@ -49,6 +49,7 @@ Source: "..\lng\*.json"; DestDir: "{app}\lng"
 Source: "..\icons\*.svg"; DestDir: "{app}\icons"
 Source: "..\data\*.*"; DestDir: "{app}\data"
 Source: "..\docs\*.*"; DestDir: "{app}\docs"
+Source: "..\7z\*.*"; DestDir: "{app}\7z"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

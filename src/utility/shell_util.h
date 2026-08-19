@@ -9,5 +9,6 @@
 
 namespace mm
 {
+	void refreshIcons();
 	bool shellRemove(const wxString& path);
 }

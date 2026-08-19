@@ -14,6 +14,7 @@ namespace mm::SystemInfo
 	inline constexpr auto SettingsFile     = "settings.json";
 
 	inline constexpr auto DataDir         = "data";
+	inline constexpr auto SevenZipDir     = "7z";
 	inline constexpr auto ModInfoFilename = "mod.json";
 	inline constexpr auto DefaultLanguage = "en";
 

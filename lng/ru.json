@@ -163,7 +163,8 @@
       "remove_from_favs": "Удалить из избранного",
       "ok": "ОК",
       "continue": "Продолжить",
-      "disable": "Отключить"
+      "disable": "Отключить",
+      "create_package": "Создать пакет установки"
     },
     "error": {
       "caption": "Произошла непредвиденная ошибка",
@@ -218,7 +219,14 @@
       "include_not_overridden": "и неперезаписанные",
       "skip_not_overriden": "Пропустить неперезаписанные",
       "include_from_root": "Включить файлы из корневого каталога"
-    }
+    },
+	"create_mod_package": {
+      "caption": "Создать установочный архив",
+	  "target_directory": "Сохранить в:",
+	  "pack_into_single_archive": "Сохранить все в один архив",
+	  "pack_in_background": "Выполнить в фоне",
+	  "7z_switches": "7-Zip command-line switches:"
+	}
   },
   "message": {
     "notification": {
@@ -252,9 +260,10 @@
     "question": {
       "overwrite_existing_file": "'%s' уже существует, перезаписать?",
       "delete_mod": "Вы действительно хотите удалить мод \"%s\"?\n\nМод будет удалён в корзину, если возможно.",
-      "copy_already_running": "Другая копия программы уже запущена. Запуск более одной копии может привести к неправильном управлению модами/конфигурации. Запустить всё равно?",
-      "warn_about_conflicts_before_enabling": "Мод \"%s\" несовместим с \"%s\". Продолжить?",
-      "warn_about_conflicts_before_enabling_sort": "Мод(ы) \"%s\" будут выключены. Продолжить?"
+      "copy_already_running": "Другая копия программы уже запущена. Запуск более одной копии может привести к неправильном управлению модами/конфигурации.\n\nЗапустить всё равно?",
+      "warn_about_conflicts_before_enabling": "Мод \"%s\" несовместим с \"%s\".\n\nПродолжить?",
+      "warn_about_conflicts_before_enabling_sort": "Мод(ы) \"%s\" будут выключены.\n\nПродолжить?",
+      "some_of_targets_exists": "Некоторые из целевых файлов уже существуют (удалённые на диске файлы не будут удалены из архива).\n\nПродолжить?"
     },
     "status": {
       "displayed_and_hidden": ", показано: %d, скрыто: %d",

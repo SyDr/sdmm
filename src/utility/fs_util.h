@@ -15,6 +15,7 @@
 namespace mm
 {
 	std::string readFile(const fs::path& path);
+	std::vector<unsigned char> readBinary(const fs::path& path);
 
 	void overwriteFile(const fs::path& path, const std::string& content);
 	void overwriteFileIfNeeded(const fs::path& path, const std::string& content);

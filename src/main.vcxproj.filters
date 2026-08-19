@@ -41,6 +41,8 @@
     <ClCompile Include="type\program_version.cpp" />
     <ClCompile Include="ui\edit_mod_dialog.cpp" />
     <ClCompile Include="ui\enter_file_name.cpp" />
+    <ClCompile Include="ui\create_mod_package_dialog.cpp" />
+    <ClCompile Include="utility\sfx_util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -116,6 +118,8 @@
     <ClInclude Include="ui\enter_file_name.hpp" />
     <ClInclude Include="utility\string_util.hpp" />
     <ClInclude Include="type\warn_about_conflicts_mode.hpp" />
+    <ClInclude Include="ui\create_mod_package_dialog.hpp" />
+    <ClInclude Include="utility\sfx_util.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="main.rc" />

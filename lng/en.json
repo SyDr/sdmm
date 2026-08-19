@@ -102,7 +102,7 @@
         "managed_mods": "Show managed mods",
         "archived_mods": "Show archived mods",
         "use_legacy_archiving": "Use legacy mod disabling",
-        "use_legacy_archiving_hint": "When option enabled, MM will send mods into archive, instead of disabling them.\n\n(this bring classic program behavior, when disabling mod results in it's loss of priority in list)",
+        "use_legacy_archiving_hint": "When enabled, MM moves mods into archive, instead of disabling them.\n\nThis replicates classic program behavior: disabling a mod removes it from list.",
         "managed_mods_value": {
           "as_flat_list": "as a flat list",
           "as_group": "as a group"
@@ -160,7 +160,8 @@
       "remove_from_favs": "Remove from favorites",
       "ok": "OK",
       "continue": "Continue",
-      "disable": "Disable"
+      "disable": "Disable",
+      "create_package": "Create package"
     },
     "error": {
       "caption": "Unexpected error occurred",
@@ -213,9 +214,16 @@
       "caption": "Mod file list",
       "include_game_files": "Include game files",
       "include_not_overridden": "and include not overridden",
-      "skip_not_overriden": "Skip non overridden files",
+      "skip_not_overriden": "Skip non-overridden files",
       "include_from_root": "Include files from root directory"
-    }
+    },
+	"create_mod_package": {
+      "caption": "Create mod package",
+	  "target_directory": "Save to:",
+	  "pack_into_single_archive": "Pack into single archive",
+	  "pack_in_background": "Pack in the background",
+	  "7z_switches": "7-Zip command-line switches:"
+	}
   },
   "message": {
     "notification": {
@@ -225,33 +233,34 @@
       "loaded_from_file": "Loaded from file",
       "automatic_resolve_mode_enabled": "Automatic mod conflict resolve mode selected",
       "new_version_available": "New program version is available",
-      "cannot_check_for_update": "Cannot check for program update",
-      "you_have_latest_version": "You have latest program version"
+      "cannot_check_for_update": "Could not check for program updates",
+      "you_have_latest_version": "You have the latest program version"
     },
     "error": {
       "cannot_open_clipboard": "Cannot open clipboard",
       "operation_exception_details": "Error happened during execution of operation. Details:\n\n%s",
       "directory_already_exist": "Directory already exist",
-      "path_not_exists": "Selected path (%s) doesn't exists, please choose suitable one"
+      "path_not_exists": "The selected path (%s) does not exist. Please select a valid path."
     },
     "warning": {
-      "profile_already_exists": "Profile \"%s\" already exists.",
+      "profile_already_exists": "Profile '%s' already exists.",
       "no_mods_can_be_placed_above_each_other": "No mods from (%s) can be placed above each other, %s placed at the top"
     },
     "info": {
-      "virtual_mod": "This mod is virtual, there is no corresponding directory on disk",
-      "profile_loaded": "Profile \"%s\" loaded.",
+      "virtual_mod": "This mod is virtual - it has no corresponding directory on disk.",
+      "profile_loaded": "Profile '%s' loaded.",
       "exe_not_selected": "not selected",
-      "dont_show_again": "Don't show this message again",
-      "incompatible_mods": "Mod \"%s\" is incompatible with \"%s\"",
+      "dont_show_again": "Don't show this message again.",
+      "incompatible_mods": "Mod '%s' is incompatible with '%s'.",
       "mods_were_disabled": "The following mod(s) were disabled: %s"
     },
     "question": {
       "overwrite_existing_file": "'%s' already exists, overwrite?",
-      "delete_mod": "Are you sure want to delete mod \"%s\"?\n\nIt will be deleted to recycle bin, if possible.",
-      "copy_already_running": "Another copy of program is running. Running more than one copy may result in incorrect data/configuration management. Do you want to run program anyway?",
-      "warn_about_conflicts_before_enabling": "Mod \"%s\" is incompatible with \"%s\". Continue?",
-      "warn_about_conflicts_before_enabling_sort": "Mod(s) \"%s\" would be disabled. Continue?"
+      "delete_mod": "Are you sure want to delete mod '%s'?\n\nIt will be deleted to recycle bin, if possible.",
+      "copy_already_running": "Another copy of program is running. Running more than one copy may result in incorrect data/configuration management.\n\nDo you want to run program anyway?",
+      "warn_about_conflicts_before_enabling": "Mod '%s' is incompatible with '%s'.\n\nContinue?",
+      "warn_about_conflicts_before_enabling_sort": "Mod(s) '%s' would be disabled.\n\nContinue?",
+      "some_of_targets_exists": "Some of target files already exist (removed from disk files would be not deleted from archive).\n\nContinue?"
     },
     "status": {
       "displayed_and_hidden": ", displayed: %d, hidden: %d",

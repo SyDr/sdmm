@@ -33,6 +33,7 @@
 #include "utility/sdlexcept.h"
 #include "utility/shell_util.h"
 #include "wx/priority_data_renderer.h"
+#include "create_mod_package_dialog.hpp"
 
 #include <cmark.h>
 #include <wx/app.h>
@@ -625,10 +626,11 @@ void ModListView::createControls(const wxString& managedPath)
 	_moveDown->Disable();
 	_changeState->Disable();
 
-	_menu.openHomepage = _menu.menu.Append(wxID_ANY, "dialog/button/open_homepage"_lng);
-	_menu.openDir      = _menu.menu.Append(wxID_ANY, "dialog/button/open_directory"_lng);
-	_menu.archive      = _menu.menu.Append(wxID_ANY, "dialog/button/archive"_lng);
-	_menu.edit         = _menu.menu.Append(wxID_ANY, "dialog/button/edit"_lng);
+	_menu.openHomepage  = _menu.menu.Append(wxID_ANY, "dialog/button/open_homepage"_lng);
+	_menu.openDir       = _menu.menu.Append(wxID_ANY, "dialog/button/open_directory"_lng);
+	_menu.archive       = _menu.menu.Append(wxID_ANY, "dialog/button/archive"_lng);
+	_menu.edit          = _menu.menu.Append(wxID_ANY, "dialog/button/edit"_lng);
+	_menu.createPackage = _menu.menu.Append(wxID_ANY, "dialog/button/create_package"_lng);
 	_menu.menu.AppendSeparator();
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
@@ -971,6 +973,8 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 			onResetSelectedModStateRequested();
 		else if (itemId == _menu.edit->GetId())
 			onEditModRequested();
+		else if (itemId == _menu.createPackage->GetId())
+			onCreateModPackageRequested();
 		else if (itemId == _menu.deleteOrRemove->GetId())
 			onRemoveModRequested();
 
@@ -1177,6 +1181,21 @@ void ModListView::onEditModRequested()
 		return;
 
 	EditModDialog cnmd(this, _managedPlatform, _selectedMod);
+	cnmd.ShowModal();
+
+	EX_UNEXPECTED;
+}
+
+void ModListView::onCreateModPackageRequested()
+{
+	EX_TRY;
+
+	if (_selectedMod.empty())
+		return;
+
+	CreateModPackageDialog cnmd(this, _iconStorage, *_managedPlatform.modDataProvider(),
+		_managedPlatform.modManager()->mods(), _managedPlatform.managedPath(),
+		_managedPlatform.localConfig()->getTempPath(), _selectedMod);
 	cnmd.ShowModal();
 
 	EX_UNEXPECTED;

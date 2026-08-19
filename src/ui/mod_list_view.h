@@ -64,6 +64,7 @@ namespace mm
 		bool     warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
 		void     onResetSelectedModStateRequested();
 		void     onEditModRequested();
+		void     onCreateModPackageRequested();
 
 		void expandChildren();
 		bool followSelection();
@@ -115,6 +116,7 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> archive        = nullptr;
 			wxWidgetsPtr<wxMenuItem> edit           = nullptr;
+			wxWidgetsPtr<wxMenuItem> createPackage  = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 

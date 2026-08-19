@@ -30,6 +30,26 @@ std::string mm::readFile(const mm::fs::path& path)
 	return s.str();
 }
 
+std::vector<unsigned char> mm::readBinary(const mm::fs::path& path)
+{
+	boost::nowide::ifstream f(path, std::ios::binary | std::ios::ate);
+
+	if (!f)
+		return {};
+
+	const auto size = f.tellg();
+	if (size <= 0)
+		return {};
+
+	std::vector<unsigned char> r(static_cast<std::size_t>(size));
+	f.seekg(0);
+	f.read(reinterpret_cast<char*>(r.data()), static_cast<std::streamsize>(size));
+	if (!f)
+		return {};
+
+	return r;
+}
+
 void mm::overwriteFileIfNeeded(const fs::path& path, const std::string& content)
 {
 	const auto current = readFile(path);

@@ -11,6 +11,7 @@
 #include <wx/app.h>
 #include <wx/window.h>
 #include <wtypes.h>
+#include <shlobj_core.h>
 
 namespace
 {
@@ -36,6 +37,11 @@ namespace
 
 		return result;
 	}
+}
+
+void mm::refreshIcons()
+{
+	SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST | SHCNF_FLUSH, nullptr, nullptr);
 }
 
 bool mm::shellRemove(const wxString& path)
