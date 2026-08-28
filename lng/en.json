@@ -130,12 +130,73 @@
       "caption": "Edit mod",
       "docs": "Docs"
     },
+    "plugin_manager": {
+      "caption": "Plugins",
+      "page_caption": "Plugins (%s)",
+      "plugins": "Installed plugins",
+      "description": "Description"
+    },
+    "package_builder": {
+      "save_caption": "Create self-extracting package",
+      "exe_filter": "Executable files (*.exe)|*.exe"
+    },
+    "package_installer": {
+      "caption": "Add new mod(s)",
+      "select_caption": "Select mod packages",
+      "file_filter": "Mod packages (*.exe;*.rar;*.zip;*.7z)|*.exe;*.rar;*.zip;*.7z",
+      "diagnostics": "Invalid packages",
+      "install_selected": "Install Selected",
+      "column": {
+        "selected": "Install",
+        "mod": "Mod",
+        "directory": "Directory",
+        "package": "Package",
+        "package_version": "Package version",
+        "installed_version": "Installed version",
+        "action": "Status"
+      },
+      "action": {
+        "install": "Install",
+        "reinstall": "Reinstall",
+        "invalid": "Invalid"
+      },
+      "progress": {
+        "caption": "Add new mod(s)",
+        "preparing": "Preparing package operation...",
+        "scanning": "Inspecting %s",
+        "extracting": "Extracting %s to a safe staging directory",
+        "validating": "Validating %s",
+        "staging": "Preparing %s for installation",
+        "committing": "Installing selected mods...",
+        "rolling_back": "Restoring the previous mod installation..."
+      },
+      "diagnostic": {
+        "package": "%s: %s",
+        "unsupported_type": "Unsupported package type.",
+        "missing_file": "The package file no longer exists.",
+        "cannot_read": "The package could not be read.",
+        "corrupt_archive": "The archive is corrupt or is not a supported archive.",
+        "encrypted_content": "Password-protected content is unsupported: %s",
+        "unsafe_path": "Unsafe absolute or traversal path: %s",
+        "outside_mods": "Content is outside the Mods folder: %s",
+        "direct_mods_file": "Files must be inside a Mods\\<mod directory> folder: %s",
+        "link_entry": "Links and reparse points are unsupported: %s",
+        "invalid_windows_name": "Invalid Windows path name: %s",
+        "no_mods": "No mod directories were found.",
+        "duplicate_target": "More than one selected package targets the same mod directory: %s",
+        "target_collision": "A non-directory item already occupies the target: %s",
+        "extraction_failed": "The package could not be extracted.",
+        "invalid_extracted_content": "Extracted content failed filesystem validation: %s"
+      }
+    },
     "button": {
       "open_directory": "Open folder",
       "reload_from_disk": "Reload from disk",
       "copy": "Copy",
       "save_to_file": "Save to file",
       "close": "Close",
+      "back": "Back",
+      "cancel": "Cancel",
       "paste": "Paste",
       "load_from_file": "Load from file",
       "download": "Download",
@@ -153,6 +214,8 @@
       "open_homepage": "Go to homepage",
       "archive": "Archive",
       "edit": "Edit",
+      "plugins": "Plugins",
+      "create_self_extracting_package": "Create self-extracting package",
       "screenshots": "Screenshots",
       "remove_from_list": "Remove from list",
       "accept": "Accept",
@@ -195,6 +258,8 @@
         },
         "mod": {
           "create_new": "Create new mod",
+          "add_new_mods": "Add new mod(s)",
+          "add_new_mods_tip": "Install one or more mod packages",
           "list_files": "List active mod files",
           "label": "Mod",
           "open_directory": "Open mods folder"
@@ -232,7 +297,13 @@
       "cannot_open_clipboard": "Cannot open clipboard",
       "operation_exception_details": "Error happened during execution of operation. Details:\n\n%s",
       "directory_already_exist": "Directory already exist",
-      "path_not_exists": "Selected path (%s) doesn't exists, please choose suitable one"
+      "path_not_exists": "Selected path (%s) doesn't exists, please choose suitable one",
+      "plugin_collision": "Both '%s' and '%s.off' exist. Neither file was changed.",
+      "plugin_missing": "Plugin '%s' changed or disappeared. No file was changed; reload and try again.",
+      "plugin_toggle_failed": "Could not rename plugin '%s'. No file was changed.\n\n%s",
+      "package_start_failed": "Could not start package creation.\n\n%s",
+      "no_supported_mod_packages": "No supported .exe, .rar, .zip, or .7z mod packages were dropped.",
+      "package_install_failed": "Could not install the selected mod packages. No partial installation was kept.\n\n%s"
     },
     "warning": {
       "profile_already_exists": "Profile \"%s\" already exists.",
@@ -244,7 +315,9 @@
       "exe_not_selected": "not selected",
       "dont_show_again": "Don't show this message again",
       "incompatible_mods": "Mod \"%s\" is incompatible with \"%s\"",
-      "mods_were_disabled": "The following mod(s) were disabled: %s"
+      "mods_were_disabled": "The following mod(s) were disabled: %s",
+      "package_background_guidance": "The package is being created in the background. You can continue using Mod Manager or close it.\n\nTo cancel, close the minimized 7-Zip console and delete the incomplete output file. When the 7-Zip window disappears, the package is ready to use.",
+      "mod_packages_installed": "%d mod(s) installed successfully: %s"
     },
     "question": {
       "overwrite_existing_file": "'%s' already exists, overwrite?",

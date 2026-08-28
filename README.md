@@ -21,6 +21,18 @@ Install InnoSetup if you want to make builds (`winget install -e --id JRSoftware
 
 Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
+Feature regression tests can be built from `tests/feature_tests.vcxproj` (`Release|Win32`). Run
+`tests/bin/feature_tests.exe <repository-root>` to exercise plugin renames, SFX package generation,
+archive inspection, transactional installation, rollback, and recovery against temporary fixtures.
+
+Mod packages
+------------
+Use **Mod → Add new mod(s)** or drag package files onto the main window to review and install one or
+more `.exe`, `.rar`, `.zip`, or `.7z` packages. Packages are inspected with the bundled 7-Zip and are
+never executed. For safety, every archive entry must be inside a `Mods/<mod directory>` root. Selected
+mods are installed as one transaction; existing enabled states and priorities are restored if any part
+of the batch fails.
+
 TODO (In no particular order)
 -----------------------------
 - Allow sent disabled mods into archive on loading preset.
@@ -29,12 +41,10 @@ TODO (In no particular order)
 - Write memory dump on crash (and include debug symbols?).
 - Use FromDIP instead of fixed sizes.
 - Use cmark-gfm instead of cmark (tables).
-- Implement mod installtion from archives.
 - Add settings dialog and move/copy all settings here.
 - Implement auto update.
 - Implement mod editor (or not?).
 - WebPreview check width.
 - Navigate in mod list via keys?
 - On first launch, ask some important settings.
-- Would be nice to have at least the possibiliy to see what plugins are tied to a mod - for users helpful when its about bugfixing/testing
 - Add wiki with usage information (or video?)

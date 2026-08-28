@@ -16,8 +16,11 @@
 /StructLayoutSettings.json
 /CompileScoreSettings.json
 /release-static/
+/src/release-static/
 /setup/log*.txt
 /setup/Portable/
 /enc_temp_folder/
 /debug-asan/
 /vcpkg_installed/
+/tests/bin/
+/tests/obj/

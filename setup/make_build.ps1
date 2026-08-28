@@ -15,11 +15,12 @@ Remove-Item -Path "Output\sdmm_v$MMVersion.zip" -ErrorAction Ignore
 New-Item -ItemType Directory -Path "$StaticDirBuild" | Out-Null
 New-Item -ItemType File -Path "$StaticDirBuild\base_dir.txt" -Value "../../" | Out-Null
 Copy-Item -Path "..\release-static\Mod Manager.exe" -Destination "$StaticDirBuild" -Recurse
-Copy-Item -Path "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll" -Destination "$StaticDirBuild" -Recurse
+Copy-Item -Path "..\Release\WebView2Loader.dll" -Destination "$StaticDirBuild" -Recurse
 Copy-Item -Path "..\LICENSE.txt" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\THIRD_PARTY.txt" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\lng\" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\icons\" -Filter "*.svg" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\data\" -Destination "$StaticDirBuild\" -Recurse -Container
 Copy-Item -Path "..\docs\" -Destination "$StaticDirBuild\" -Recurse -Container
+Copy-Item -Path "..\7z\" -Destination "$StaticDirBuild\" -Recurse -Container
 Compress-Archive -Path $StaticDirBuild -DestinationPath "Output\sdmm_v$MMVersion.zip"

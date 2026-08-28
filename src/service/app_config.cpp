@@ -327,6 +327,10 @@ void AppConfig::validate()
 			setCurrentLanguageCode("ru");
 	}
 
+	// The Chinese catalog now follows the same short-code naming as English and Russian.
+	if (currentLanguageCode() == "zh_CN")
+		setCurrentLanguageCode("zh");
+
 	if (ProgramVersion::current() > cfgVersion)
 		_data[Key::MMVersion] = PROGRAM_VERSION_BASE;
 }

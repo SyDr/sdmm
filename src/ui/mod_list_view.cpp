@@ -19,11 +19,14 @@
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
+#include "interface/imod_package_builder.hpp"
 #include "interface/imod_platform.hpp"
+#include "interface/iplugin_manager.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_model.h"
 #include "mod_manager_app.h"
+#include "plugin_list_dialog.hpp"
 #include "select_exe.h"
 #include "type/icon.hpp"
 #include "type/interface_label.hpp"
@@ -41,16 +44,20 @@
 #include <wx/collpane.h>
 #include <wx/combo.h>
 #include <wx/dataview.h>
+#include <wx/filedlg.h>
 #include <wx/html/htmlwin.h>
 #include <wx/infobar.h>
 #include <wx/msgdlg.h>
 #include <wx/notifmsg.h>
+#include <wx/panel.h>
 #include <wx/richmsgdlg.h>
+#include <wx/simplebook.h>
 #include <wx/sizer.h>
 #include <wx/srchctrl.h>
 #include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/webview.h>
+#include <wx/wupdlock.h>
 
 #include <boost/range/algorithm.hpp>
 
@@ -117,6 +124,9 @@ using namespace mm;
 
 namespace
 {
+	constexpr int modListPage    = 0;
+	constexpr int pluginListPage = 1;
+
 	wxString collectModNames(std::vector<std::string> mods, IModDataProvider& mdp)
 	{
 		if (mods.empty())
@@ -147,11 +157,30 @@ ModListView::ModListView(
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL);
 
+	_pages    = new wxSimplebook(this, wxID_ANY);
+	_modsPage = new wxPanel(_pages, wxID_ANY);
+
 	createControls(wxString::FromUTF8(_managedPlatform.managedPath().string()));
+
 	_listModel->modList(_modManager.mods());
 	_listModel->applyCategoryFilter(_hiddenCategories);
 	expandChildren();
 	buildLayout();
+
+	const auto actionSizer = _moveUp->GetContainingSizer();
+	wxASSERT(actionSizer);
+	const auto actionColumnWidth = actionSizer->GetMinSize().GetWidth();
+	const auto actionSlotHeight  = [actionSizer](wxWindow* control) {
+		const auto item = actionSizer->GetItem(control);
+		wxASSERT(item);
+		return item->GetMinSizeWithBorder().GetHeight();
+	};
+
+	_pluginsPage = new PluginListView(_pages, *_managedPlatform.pluginManager(), _iconStorage,
+		actionColumnWidth, std::array { actionSlotHeight(_moveUp), actionSlotHeight(_moveDown) },
+		[this] { showModList(); });
+	_pages->AddPage(_pluginsPage, wxEmptyString);
+
 	bindEvents();
 	updateCategoryFilterContent();
 	updateControlsState();
@@ -208,11 +237,16 @@ void ModListView::buildLayout()
 	contentSizer->Add(leftGroupSizer, wxSizerFlags(168).Expand());
 	contentSizer->Add(rightSizer, wxSizerFlags(100).Expand().Border(wxLEFT, 4));
 
-	auto vertSizer = new wxBoxSizer(wxVERTICAL);
-	vertSizer->Add(contentSizer, wxSizerFlags(1).Expand());
-	vertSizer->Add(_infoBar, wxSizerFlags(0).Expand());
+	auto modsPageSizer = new wxBoxSizer(wxVERTICAL);
+	modsPageSizer->Add(contentSizer, wxSizerFlags(1).Expand());
+	_modsPage->SetSizer(modsPageSizer);
 
-	this->SetSizer(vertSizer);
+	_pages->AddPage(_modsPage, wxEmptyString, true);
+
+	auto mainSizer = new wxBoxSizer(wxVERTICAL);
+	mainSizer->Add(_pages, wxSizerFlags(1).Expand());
+	mainSizer->Add(_infoBar, wxSizerFlags(0).Expand());
+	this->SetSizer(mainSizer);
 }
 
 void ModListView::bindEvents()
@@ -523,12 +557,12 @@ void ModListView::bindEvents()
 
 void ModListView::createControls(const wxString& managedPath)
 {
-	_group = new wxStaticBox(this, wxID_ANY, managedPath);
+	_group = new wxStaticBox(_modsPage, wxID_ANY, managedPath);
 
-	_filterText = new wxSearchCtrl(this, wxID_ANY);
+	_filterText = new wxSearchCtrl(_modsPage, wxID_ANY);
 	_filterText->SetDescriptiveText("dialog/label/filter"_lng);
 
-	_filterCategory = new wxComboCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition,
+	_filterCategory = new wxComboCtrl(_modsPage, wxID_ANY, wxEmptyString, wxDefaultPosition,
 		{ GetTextExtent("dialog/label/categories"_lng).x + GetTextExtent(wxString::FromUTF8(": 99/99")).x +
 				FromDIP(32),
 			-1 },
@@ -539,7 +573,7 @@ void ModListView::createControls(const wxString& managedPath)
 
 	createListControl();
 
-	_modDescriptionGroup = new wxStaticBox(this, wxID_ANY, L"");
+	_modDescriptionGroup = new wxStaticBox(_modsPage, wxID_ANY, L"");
 
 	// TODO: create separate method (and use variant for control itself?)
 	const auto descriptionControl = wxGetApp().appConfig().modDescriptionUsedControl();
@@ -592,8 +626,8 @@ void ModListView::createControls(const wxString& managedPath)
 	}
 	else
 	{
-		_moveUp    = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
-			   wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_moveUp   = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
+			  wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_changeState = new wxBitmapButton(_group, wxID_ANY,
@@ -625,26 +659,29 @@ void ModListView::createControls(const wxString& managedPath)
 	_moveDown->Disable();
 	_changeState->Disable();
 
-	_menu.openHomepage = _menu.menu.Append(wxID_ANY, "dialog/button/open_homepage"_lng);
-	_menu.openDir      = _menu.menu.Append(wxID_ANY, "dialog/button/open_directory"_lng);
-	_menu.archive      = _menu.menu.Append(wxID_ANY, "dialog/button/archive"_lng);
-	_menu.edit         = _menu.menu.Append(wxID_ANY, "dialog/button/edit"_lng);
+	_menu.openHomepage  = _menu.menu.Append(wxID_ANY, "dialog/button/open_homepage"_lng);
+	_menu.openDir       = _menu.menu.Append(wxID_ANY, "dialog/button/open_directory"_lng);
+	_menu.archive       = _menu.menu.Append(wxID_ANY, "dialog/button/archive"_lng);
+	_menu.edit          = _menu.menu.Append(wxID_ANY, "dialog/button/edit"_lng);
+	_menu.plugins       = _menu.menu.Append(wxID_ANY, "dialog/button/plugins"_lng);
+	_menu.createPackage = _menu.menu.Append(wxID_ANY, "dialog/button/create_self_extracting_package"_lng);
 	_menu.menu.AppendSeparator();
 	_menu.deleteOrRemove = _menu.menu.Append(wxID_ANY, L"placeholder");
 
 	_galleryShown = _managedPlatform.localConfig()->screenshotsExpanded();
-	_showGallery  = new wxButton(this, wxID_ANY, "dialog/button/screenshots"_lng);
+	_showGallery  = new wxButton(_modsPage, wxID_ANY, "dialog/button/screenshots"_lng);
 	_showGallery->SetBitmap(
 		_iconStorage.get(_galleryShown ? Icon::Stock::double_down : Icon::Stock::double_up, Icon::Size::x16));
 
 	wxSize goodSize = _showGallery->GetBestSize();
 	goodSize.SetWidth(goodSize.GetHeight());
 
-	_openGallery = new wxButton(this, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
+	_openGallery =
+		new wxButton(_modsPage, wxID_ANY, wxEmptyString, wxDefaultPosition, goodSize, wxBU_EXACTFIT);
 	_openGallery->Disable();
 	_openGallery->SetBitmap(_iconStorage.get(Icon::Stock::folder, Icon::Size::x16));
 
-	_gallery = new wxStaticBox(this, wxID_ANY, L"");
+	_gallery = new wxStaticBox(_modsPage, wxID_ANY, L"");
 
 	_galleryView = new ImageGalleryView(_gallery, wxID_ANY);
 	_galleryView->Show(_galleryShown);
@@ -853,7 +890,7 @@ void ModListView::updateControlsState()
 		_selectedModCached = _selectedMod;
 	}
 
-	Layout();
+	_modsPage->Layout();
 
 	EX_UNEXPECTED;
 }
@@ -905,7 +942,7 @@ void ModListView::updateCategoryFilterContent()
 
 	_filterCategory->SetText(_filterPopup->GetStringValue());
 
-	Layout();
+	_modsPage->Layout();
 }
 
 void ModListView::expandChildren()
@@ -947,8 +984,23 @@ void ModListView::OnListItemContextMenu(const wxDataViewItem& item)
 {
 	if (const auto mod = _listModel->findMod(item))
 	{
+		_list->Select(item);
+		_selectedMod = mod->id;
 		_menu.openHomepage->Enable(!mod->homepage.empty());
 		_menu.openDir->Enable(!mod->virtual_mod);
+		_menu.createPackage->Enable(!mod->virtual_mod);
+
+		bool hasPlugins = false;
+		if (!mod->virtual_mod)
+		{
+			try
+			{
+				hasPlugins = !_managedPlatform.pluginManager()->list(*mod).empty();
+			}
+			catch (...)
+			{}
+		}
+		_menu.plugins->Enable(hasPlugins);
 		_menu.deleteOrRemove->SetItemLabel(
 			mod->virtual_mod ? "dialog/button/remove_from_list"_lng : "dialog/button/delete"_lng);
 		_list->PopupMenu(&_menu.menu);
@@ -971,6 +1023,10 @@ void ModListView::OnMenuItemSelected(const wxCommandEvent& event)
 			onResetSelectedModStateRequested();
 		else if (itemId == _menu.edit->GetId())
 			onEditModRequested();
+		else if (itemId == _menu.plugins->GetId())
+			onManagePluginsRequested();
+		else if (itemId == _menu.createPackage->GetId())
+			onCreatePackageRequested();
 		else if (itemId == _menu.deleteOrRemove->GetId())
 			onRemoveModRequested();
 
@@ -1182,6 +1238,126 @@ void ModListView::onEditModRequested()
 	EX_UNEXPECTED;
 }
 
+void ModListView::onManagePluginsRequested()
+{
+	EX_TRY;
+
+	if (_selectedMod.empty())
+		return;
+
+	const auto& mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	if (!_pluginsPage->load(mod))
+		return;
+
+	{
+		wxWindowUpdateLocker updateLocker(this);
+		_pages->ChangeSelection(pluginListPage);
+		_pluginsPage->focusSelectedPlugin();
+	}
+
+	EX_UNEXPECTED;
+}
+
+void ModListView::showModList()
+{
+	wxWindowUpdateLocker updateLocker(this);
+	_pages->ChangeSelection(modListPage);
+	_list->SetFocus();
+}
+
+void ModListView::selectMod(const std::string& id)
+{
+	showModList();
+	_selectedMod = id;
+
+	if (!_filterText->GetValue().empty())
+		_filterText->Clear();
+
+	const auto& mod = _managedPlatform.modDataProvider()->modData(id);
+	if (_hiddenCategories.erase(mod.category) != 0)
+	{
+		_managedPlatform.localConfig()->hiddenCategories(_hiddenCategories);
+		_listModel->applyCategoryFilter(_hiddenCategories);
+		updateCategoryFilterContent();
+		expandChildren();
+	}
+
+	followSelection();
+	updateControlsState();
+}
+
+void ModListView::onCreatePackageRequested()
+{
+	EX_TRY;
+
+	if (_selectedMod.empty())
+		return;
+
+	const auto& mod = _managedPlatform.modDataProvider()->modData(_selectedMod);
+	if (mod.virtual_mod)
+		return;
+
+	auto filenameValue = wxString::FromUTF8(mod.name.empty() ? mod.dir : mod.name).ToStdWstring();
+	const std::wstring invalidCharacters = L"\\/:*?\"<>|";
+	for (auto& character : filenameValue)
+		if (character < 32 || invalidCharacters.find(character) != std::wstring::npos)
+			character = L'_';
+	while (!filenameValue.empty() && (filenameValue.back() == L'.' || filenameValue.back() == L' '))
+		filenameValue.pop_back();
+	if (filenameValue.empty())
+		filenameValue = L"mod";
+	const wxString filename(filenameValue + L".exe");
+
+	wxFileDialog saveDialog(this, "dialog/package_builder/save_caption"_lng, wxEmptyString, filename,
+		"dialog/package_builder/exe_filter"_lng, wxFD_SAVE);
+	if (saveDialog.ShowModal() != wxID_OK)
+		return;
+
+	fs::path output(saveDialog.GetPath().ToStdWstring());
+	if (!boost::iequals(output.extension().string(), ".exe"))
+		output += ".exe";
+
+	boost::system::error_code pathError;
+	const bool                outputExists = pathExists(output, pathError);
+	if (pathError)
+	{
+		wxMessageBox(wxString::Format("message/error/package_start_failed"_lng,
+						 wxStringFromUnspecified(pathError.message())),
+			wxTheApp->GetAppName(), wxOK | wxICON_ERROR, this);
+		return;
+	}
+
+	if (outputExists)
+	{
+		const auto answer = wxMessageBox(
+			wxString::Format("message/question/overwrite_existing_file"_lng, wxString(output.wstring())),
+			wxTheApp->GetAppName(), wxYES_NO | wxNO_DEFAULT | wxICON_WARNING, this);
+		if (answer != wxYES)
+			return;
+	}
+
+	try
+	{
+		static_cast<void>(_managedPlatform.modPackageBuilder()->start(mod, output));
+
+		static bool guidanceShown = false;
+		if (!guidanceShown)
+		{
+			wxMessageBox("message/info/package_background_guidance"_lng, wxTheApp->GetAppName(),
+				wxOK | wxICON_INFORMATION, this);
+			guidanceShown = true;
+		}
+	}
+	catch (const std::exception& error)
+	{
+		wxMessageBox(
+			wxString::Format("message/error/package_start_failed"_lng, wxStringFromUnspecified(error.what())),
+			wxTheApp->GetAppName(), wxOK | wxICON_ERROR, this);
+	}
+
+	EX_UNEXPECTED;
+}
+
 void ModListView::onSortModsRequested(const std::string& enablingMod, const std::string& disablingMod)
 {
 	wxBusyCursor bc;
@@ -1243,7 +1419,7 @@ void ModListView::updateGalleryState(bool show)
 	_galleryView->Show(show);
 	_gallery->Show(show);
 
-	Layout();
+	_modsPage->Layout();
 
 	EX_UNEXPECTED;
 }

@@ -25,6 +25,7 @@ class wxStaticText;
 class wxWebView;
 class wxComboCtrl;
 class wxSearchCtrl;
+class wxSimplebook;
 class mmCheckListBoxComboPopup;
 class wxWebViewEvent;
 class wxHtmlWindow;
@@ -36,6 +37,7 @@ namespace mm
 	struct IIconStorage;
 
 	class ModListModel;
+	class PluginListView;
 	struct ImageGalleryView;
 
 	class ModListView : public wxPanel
@@ -43,6 +45,8 @@ namespace mm
 	public:
 		explicit ModListView(wxWindow* parent, IModPlatform& managedPlatform, IIconStorage& iconStorage,
 			wxStatusBar* statusBar);
+
+		void selectMod(const std::string& id);
 
 	private:
 		void createControls(const wxString& managedPath);
@@ -64,6 +68,9 @@ namespace mm
 		bool     warnBeforeEnableImpl(const wxString& message, const wxString& detailed);
 		void     onResetSelectedModStateRequested();
 		void     onEditModRequested();
+		void     onManagePluginsRequested();
+		void     onCreatePackageRequested();
+		void     showModList();
 
 		void expandChildren();
 		bool followSelection();
@@ -82,6 +89,10 @@ namespace mm
 
 		std::string _selectedMod;
 		std::string _selectedModCached;
+
+		wxWidgetsPtr<wxSimplebook>   _pages       = nullptr;
+		wxWidgetsPtr<wxPanel>        _modsPage    = nullptr;
+		wxWidgetsPtr<PluginListView> _pluginsPage = nullptr;
 
 	private:
 		wxObjectDataPtr<ModListModel>               _listModel;
@@ -115,6 +126,8 @@ namespace mm
 			wxWidgetsPtr<wxMenuItem> openDir        = nullptr;
 			wxWidgetsPtr<wxMenuItem> archive        = nullptr;
 			wxWidgetsPtr<wxMenuItem> edit           = nullptr;
+			wxWidgetsPtr<wxMenuItem> plugins        = nullptr;
+			wxWidgetsPtr<wxMenuItem> createPackage  = nullptr;
 			wxWidgetsPtr<wxMenuItem> deleteOrRemove = nullptr;
 		} _menu;
 

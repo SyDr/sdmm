@@ -16,6 +16,9 @@ namespace mm
 	struct ILocalConfig;
 	struct IModDataProvider;
 	struct IModManager;
+	struct IModPackageBuilder;
+	struct IModPackageInstaller;
+	struct IPluginManager;
 	struct IPresetManager;
 
 	struct ModList;
@@ -30,10 +33,13 @@ namespace mm
 		[[nodiscard]] virtual fs::path managedPath() const = 0;
 		[[nodiscard]] virtual fs::path modsDirPath() const = 0;
 
-		[[nodiscard]] virtual ILaunchHelper*    launchHelper() const     = 0;
-		[[nodiscard]] virtual ILocalConfig*     localConfig() const      = 0;
-		[[nodiscard]] virtual IModManager*      modManager() const       = 0;
-		[[nodiscard]] virtual IPresetManager*   getPresetManager() const = 0;
-		[[nodiscard]] virtual IModDataProvider* modDataProvider() const  = 0;
+		[[nodiscard]] virtual ILaunchHelper*      launchHelper() const      = 0;
+		[[nodiscard]] virtual ILocalConfig*       localConfig() const       = 0;
+		[[nodiscard]] virtual IModManager*        modManager() const        = 0;
+		[[nodiscard]] virtual IPluginManager*     pluginManager() const     = 0;
+		[[nodiscard]] virtual IModPackageBuilder* modPackageBuilder() const = 0;
+		[[nodiscard]] virtual IModPackageInstaller* modPackageInstaller() const = 0;
+		[[nodiscard]] virtual IPresetManager*     getPresetManager() const  = 0;
+		[[nodiscard]] virtual IModDataProvider*   modDataProvider() const   = 0;
 	};
 }

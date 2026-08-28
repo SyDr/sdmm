@@ -11,6 +11,7 @@
   "homepage": "http://wforum.heroes35.net/",
   "icon": "icon.png",
   "version": "1.0",
+  "plugins": {},
   "compatibility": {
     "requires" : [ "WoG" ],
     "load_after" : [ "WoG" ],

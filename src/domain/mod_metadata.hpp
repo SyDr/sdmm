@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "mod_plugin.hpp"
 #include "type/filesystem.hpp"
 
 #include <set>
@@ -30,5 +31,7 @@ namespace mm
 		std::set<std::string> incompatible;
 		std::set<std::string> requires_;
 		std::set<std::string> load_after;
+
+		std::unordered_map<std::string, PluginMetadata> plugins;
 	};
 }

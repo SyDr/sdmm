@@ -11,20 +11,25 @@
 
 #include <wx/frame.h>
 
+#include "type/filesystem.hpp"
 #include "utility/wx_widgets_ptr.hpp"
 
 class wxInfoBarGeneric;
+class wxDropFilesEvent;
+class wxNotebook;
 
 namespace mm
 {
 	struct Application;
 	struct IModPlatform;
 	struct IIconStorage;
+	class ModListView;
 
 	class MainFrame : public wxFrame
 	{
 	public:
 		explicit MainFrame(Application& app);
+		~MainFrame() override;
 
 		void reloadModelIfNeeded();
 		void updateCheckCompleted(const nlohmann::json& value, bool automatic);
@@ -40,10 +45,13 @@ namespace mm
 		void OnMenuToolsChangeSettings();
 		void OnMenuToolsLanguageSelected(const std::string& value);
 		void OnMenuCheckForUpdates();
+		void OnMenuModAddNewMods();
 		void OnMenuModListModFiles();
 		void OnMenuModOpenModFolder();
 		void OnMenuModCreateNewMod();
 		void OnCloseWindow(wxCloseEvent& event);
+		void OnFilesDropped(wxDropFilesEvent& event);
+		void importModPackages(const std::vector<fs::path>& packages);
 
 		void saveWindowProperties();
 
@@ -56,6 +64,8 @@ namespace mm
 		std::unique_ptr<IIconStorage> _iconStorage;
 
 		std::unique_ptr<IModPlatform> _currentPlatform;
+		wxWidgetsPtr<ModListView>     _modListView = nullptr;
+		wxWidgetsPtr<wxNotebook>      _mainPages   = nullptr;
 
 		wxWidgetsPtr<wxInfoBarGeneric> _infoBar = nullptr;
 		wxTimer                        _infoBarTimer;

@@ -28,7 +28,7 @@ namespace mm
 		std::string column(const std::string& key) const override;
 
 		std::string languageName(const std::string& code) const override;
-		std::string legacyCode(const std::string& code) const override;
+		std::vector<std::string> legacyCodes(const std::string& code) const override;
 
 	private:
 		struct LngMetadata
