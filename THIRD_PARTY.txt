@@ -385,3 +385,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+10. 7-Zip 22.01
+
+Copyright (C) 1999-2022 Igor Pavlov.
+
+The bundled 32-bit 7z.exe and 7z.dll are distributed under the GNU LGPL;
+7z.dll also contains code covered by the unRAR restriction and BSD 3-clause
+license. The complete upstream license notice is shipped as 7z/License.txt.
+
+The bundled 7z.sfx is built from the ERA-specific SFXWinEraMod source:
+https://github.com/SyDr/SFXWinEraMod

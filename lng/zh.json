@@ -130,12 +130,73 @@
       "caption": "编辑Mod",
       "docs": "说明"
     },
+    "plugin_manager": {
+      "caption": "插件",
+      "page_caption": "插件（%s）",
+      "plugins": "已安装的插件",
+      "description": "说明"
+    },
+    "package_builder": {
+      "save_caption": "创建自解压安装包",
+      "exe_filter": "可执行文件 (*.exe)|*.exe"
+    },
+    "package_installer": {
+      "caption": "添加新Mod",
+      "select_caption": "选择Mod安装包",
+      "file_filter": "Mod安装包 (*.exe;*.rar;*.zip;*.7z)|*.exe;*.rar;*.zip;*.7z",
+      "diagnostics": "无效安装包",
+      "install_selected": "安装所选Mod",
+      "column": {
+        "selected": "安装",
+        "mod": "Mod",
+        "directory": "目录",
+        "package": "安装包",
+        "package_version": "安装包版本",
+        "installed_version": "已安装版本",
+        "action": "状态"
+      },
+      "action": {
+        "install": "安装",
+        "reinstall": "重新安装",
+        "invalid": "无效"
+      },
+      "progress": {
+        "caption": "添加新Mod",
+        "preparing": "正在准备操作……",
+        "scanning": "正在检查 %s",
+        "extracting": "正在将 %s 解压到安全的临时目录",
+        "validating": "正在验证 %s",
+        "staging": "正在准备安装 %s",
+        "committing": "正在安装所选Mod……",
+        "rolling_back": "正在恢复原有Mod安装……"
+      },
+      "diagnostic": {
+        "package": "%s：%s",
+        "unsupported_type": "不支持此安装包类型。",
+        "missing_file": "安装包文件已不存在。",
+        "cannot_read": "无法读取安装包。",
+        "corrupt_archive": "压缩包已损坏或格式不受支持。",
+        "encrypted_content": "不支持密码保护的内容：%s",
+        "unsafe_path": "不安全的绝对路径或目录穿越路径：%s",
+        "outside_mods": "内容位于Mods目录之外：%s",
+        "direct_mods_file": "文件必须位于Mods\\<Mod目录>中：%s",
+        "link_entry": "不支持链接或重解析点：%s",
+        "invalid_windows_name": "Windows路径名称无效：%s",
+        "no_mods": "未找到Mod目录。",
+        "duplicate_target": "多个所选安装包使用了同一个Mod目录：%s",
+        "target_collision": "目标路径已被非目录项目占用：%s",
+        "extraction_failed": "无法解压安装包。",
+        "invalid_extracted_content": "解压后的内容未通过文件系统验证：%s"
+      }
+    },
     "button": {
       "open_directory": "打开文件夹",
       "reload_from_disk": "从磁盘重新加载",
       "copy": "复制",
       "save_to_file": "保存到文件",
       "close": "关闭",
+      "back": "返回",
+      "cancel": "取消",
       "paste": "粘贴",
       "load_from_file": "从文件加载",
       "download": "下载",
@@ -153,6 +214,8 @@
       "open_homepage": "访问主页",
       "archive": "归档",
       "edit": "编辑",
+      "plugins": "插件",
+      "create_self_extracting_package": "创建自解压安装包",
       "screenshots": "截图",
       "remove_from_list": "从列表中移除",
       "accept": "接受",
@@ -195,6 +258,8 @@
         },
         "mod": {
           "create_new": "创建新Mod",
+          "add_new_mods": "添加新Mod",
+          "add_new_mods_tip": "安装一个或多个Mod安装包",
           "list_files": "列出已启用Mod文件",
           "label": "Mod",
           "open_directory": "打开Mods文件夹"
@@ -232,7 +297,13 @@
       "cannot_open_clipboard": "无法打开剪贴板",
       "operation_exception_details": "执行操作时发生错误。详情：\n\n%s",
       "directory_already_exist": "目录已存在",
-      "path_not_exists": "所选路径（%s）不存在，请选择合适的路径"
+      "path_not_exists": "所选路径（%s）不存在，请选择合适的路径",
+      "plugin_collision": "'%s' 和 '%s.off' 同时存在。文件均未更改。",
+      "plugin_missing": "插件 '%s' 已更改或消失。文件未更改；请刷新后重试。",
+      "plugin_toggle_failed": "无法重命名插件 '%s'。文件未更改。\n\n%s",
+      "package_start_failed": "无法启动安装包创建。\n\n%s",
+      "no_supported_mod_packages": "拖放的文件中没有受支持的.exe、.rar、.zip或.7z Mod安装包。",
+      "package_install_failed": "无法安装所选Mod安装包。未保留任何不完整的安装。\n\n%s"
     },
     "warning": {
       "profile_already_exists": "配置 \"%s\"已存在。",
@@ -244,7 +315,9 @@
       "exe_not_selected": "未选择",
       "dont_show_again": "不再显示此消息",
       "incompatible_mods": "Mod \"%s\"与 \"%s\"不兼容",
-      "mods_were_disabled": "以下Mod已被禁用：%s"
+      "mods_were_disabled": "以下Mod已被禁用：%s",
+      "package_background_guidance": "安装包正在后台创建。你可以继续使用 Mod Manager，也可以关闭它。\n\n如需取消，请关闭最小化的 7-Zip 控制台并删除未完成的输出文件。7-Zip 窗口消失后，安装包即可使用。",
+      "mod_packages_installed": "已成功安装%d个Mod：%s"
     },
     "question": {
       "overwrite_existing_file": "'%s' 已存在，是否覆盖？",

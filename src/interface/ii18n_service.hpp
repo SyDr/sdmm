@@ -22,6 +22,6 @@ namespace mm
 
 		[[nodiscard]] virtual std::string languageName(const std::string& code) const = 0;
 
-		[[nodiscard]] virtual std::string legacyCode(const std::string& code) const = 0;
+		[[nodiscard]] virtual std::vector<std::string> legacyCodes(const std::string& code) const = 0;
 	};
 }

@@ -25,7 +25,10 @@
     <ClCompile Include="era2\era2_mod_data_loader.cpp" />
     <ClCompile Include="era2\era2_launch_helper.cpp" />
     <ClCompile Include="era2\era2_mod_manager.cpp" />
+    <ClCompile Include="era2\era2_mod_package_builder.cpp" />
+    <ClCompile Include="era2\era2_mod_package_installer.cpp" />
     <ClCompile Include="era2\era2_preset_manager.cpp" />
+    <ClCompile Include="era2\era2_plugin_manager.cpp" />
     <ClCompile Include="service\app_config.cpp" />
     <ClCompile Include="service\i18n_service.cpp" />
     <ClCompile Include="service\icon_storage.cpp" />
@@ -56,6 +59,8 @@
     <ClCompile Include="ui\select_directory_view.cpp" />
     <ClCompile Include="ui\select_exe.cpp" />
     <ClCompile Include="ui\mod_list_view.cpp" />
+    <ClCompile Include="ui\mod_package_install_dialog.cpp" />
+    <ClCompile Include="ui\plugin_list_dialog.cpp" />
     <ClCompile Include="ui\show_file_list_dialog.cpp" />
     <ClInclude Include="type\warn_about_conflicts_mode.hpp" />
     <ClInclude Include="utility\string_util.hpp" />
@@ -74,17 +79,26 @@
     <ClInclude Include="interface\imod_data_provider.hpp" />
     <ClInclude Include="domain\mod_list.hpp" />
     <ClInclude Include="domain\mod_metadata.hpp" />
+    <ClInclude Include="domain\mod_package_job.hpp" />
+    <ClInclude Include="domain\mod_package_install.hpp" />
+    <ClInclude Include="domain\mod_plugin.hpp" />
     <ClInclude Include="era2\era2_mod_data_provider.hpp" />
     <ClInclude Include="era2\era2_mod_data_loader.hpp" />
     <ClInclude Include="era2\era2_directory_structure.hpp" />
     <ClInclude Include="era2\era2_launch_helper.hpp" />
     <ClInclude Include="era2\era2_mod_manager.hpp" />
+    <ClInclude Include="era2\era2_mod_package_builder.hpp" />
+    <ClInclude Include="era2\era2_mod_package_installer.hpp" />
     <ClInclude Include="era2\era2_preset_manager.hpp" />
+    <ClInclude Include="era2\era2_plugin_manager.hpp" />
     <ClInclude Include="service\app_config.hpp" />
     <ClInclude Include="service\i18n_service.h" />
     <ClInclude Include="service\icon_storage.hpp" />
     <ClInclude Include="interface\ilaunch_helper.hpp" />
     <ClInclude Include="interface\imod_manager.hpp" />
+    <ClInclude Include="interface\imod_package_builder.hpp" />
+    <ClInclude Include="interface\imod_package_installer.hpp" />
+    <ClInclude Include="interface\iplugin_manager.hpp" />
     <ClInclude Include="interface\iapp_config.hpp" />
     <ClInclude Include="license.hpp" />
     <ClInclude Include="interface\ii18n_service.hpp" />
@@ -128,6 +142,8 @@
     <ClInclude Include="ui\select_directory_view.h" />
     <ClInclude Include="ui\select_exe.h" />
     <ClInclude Include="ui\mod_list_view.h" />
+    <ClInclude Include="ui\mod_package_install_dialog.hpp" />
+    <ClInclude Include="ui\plugin_list_dialog.hpp" />
     <ClInclude Include="ui\show_file_list_dialog.hpp" />
     <ClInclude Include="utility\program_update_helper.hpp" />
     <ClInclude Include="utility\sdlexcept.h" />
@@ -181,6 +197,10 @@
     <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <VcpkgRoot Condition="'$(VcpkgRoot)' == '' and Exists('$(VCInstallDir)vcpkg\vcpkg.exe')">$(VCInstallDir)vcpkg</VcpkgRoot>
+  </PropertyGroup>
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.props')" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
@@ -228,6 +248,7 @@
     <VcpkgManifestInstall>true</VcpkgManifestInstall>
     <VcpkgAutoLink>true</VcpkgAutoLink>
     <VcpkgAutoBootstrap>false</VcpkgAutoBootstrap>
+    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed\</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgConfiguration>Debug</VcpkgConfiguration>
@@ -257,8 +278,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;wxNO_IMPLICIT_WXSTRING_ENCODING;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <ShowIncludes>false</ShowIncludes>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -313,8 +333,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;__WXMSW__;wxUSE_GUI;wxNO_IMPLICIT_WXSTRING_ENCODING;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_UNICODE;WXUSINGDLL;GSL_THROW_ON_CONTRACT_VIOLATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <ShowIncludes>false</ShowIncludes>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -372,8 +391,7 @@
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
       <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -433,8 +451,7 @@
       <PrecompiledHeaderOutputFile>$(SolutionDir)$(Configuration)\$(ProjectName)\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\</ObjectFileName>
       <ProgramDataBaseFileName>$(SolutionDir)$(Configuration)\$(ProjectName)\$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
@@ -477,7 +494,11 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
+  <Import Project="$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.targets" Condition="Exists('$(VcpkgRoot)\scripts\buildsystems\msbuild\vcpkg.targets')" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopyWebView2Loader" AfterTargets="Build" Condition="'$(Configuration)|$(Platform)'=='Release|Win32' and Exists('$(VcpkgInstalledDir)$(VcpkgTriplet)\bin\WebView2Loader.dll')">
+    <Copy SourceFiles="$(VcpkgInstalledDir)$(VcpkgTriplet)\bin\WebView2Loader.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

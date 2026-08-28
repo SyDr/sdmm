@@ -54,7 +54,10 @@ auto I18nService::loadAvailableLngMetadata(const fs::path& path) const -> Availa
 		LngMetadata lm;
 		lm.name   = value["name"].get<std::string>();
 		lm.author = value["author"].get<std::string>();
-		lm.legacyCodes.emplace_back(value["legacy_code"].get<std::string>());
+		if (const auto aliases = value.find("legacy_codes"); aliases != value.end())
+			lm.legacyCodes = aliases->get<std::vector<std::string>>();
+		else if (const auto alias = value.find("legacy_code"); alias != value.end())
+			lm.legacyCodes.emplace_back(alias->get<std::string>());
 
 		result[key] = lm;
 	}
@@ -119,10 +122,10 @@ std::string I18nService::languageName(const std::string& code) const
 	return code;
 }
 
-std::string I18nService::legacyCode(const std::string& code) const
+std::vector<std::string> I18nService::legacyCodes(const std::string& code) const
 {
-	if (auto it = _availableLanguages.find(code); it != _availableLanguages.end() && !it->second.legacyCodes.empty())
-		return it->second.legacyCodes.front();
+	if (auto it = _availableLanguages.find(code); it != _availableLanguages.end())
+		return it->second.legacyCodes;
 
 	return {};
 }

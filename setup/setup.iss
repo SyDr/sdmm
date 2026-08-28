@@ -39,16 +39,19 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[InstallDelete]
+Type: files; Name: "{app}\lng\zh_CN.json"
+
 [Files]
 Source: "..\Release\Mod Manager.exe"; DestDir: "{app}"
 Source: "..\LICENSE.txt"; DestDir: "{app}"
 Source: "..\THIRD_PARTY.txt"; DestDir: "{app}"
-Source: "..\vcpkg_installed\x86-windows\x86-windows\bin\WebView2Loader.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\lng\*.json"; DestDir: "{app}\lng"
 Source: "..\icons\*.svg"; DestDir: "{app}\icons"
 Source: "..\data\*.*"; DestDir: "{app}\data"
 Source: "..\docs\*.*"; DestDir: "{app}\docs"
+Source: "..\7z\*.*"; DestDir: "{app}\7z"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

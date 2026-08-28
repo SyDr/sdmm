@@ -16,12 +16,15 @@
 #include "interface/iicon_storage.hpp"
 #include "interface/ilaunch_helper.hpp"
 #include "interface/ilocal_config.hpp"
+#include "interface/imod_data_provider.hpp"
 #include "interface/imod_manager.hpp"
+#include "interface/imod_package_installer.hpp"
 #include "interface/imod_platform.hpp"
 #include "interface/iplatform_service.hpp"
 #include "license.hpp"
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
+#include "mod_package_install_dialog.hpp"
 #include "mod_manager_app.h"
 #include "select_directory_view.h"
 #include "select_exe.h"
@@ -37,9 +40,12 @@
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
 #include <wx/busyinfo.h>
+#include <wx/dnd.h>
+#include <wx/filedlg.h>
 #include <wx/infobar.h>
 #include <wx/menu.h>
 #include <wx/notifmsg.h>
+#include <wx/progdlg.h>
 #include <wx/sizer.h>
 
 using namespace mm;
@@ -47,6 +53,34 @@ using namespace mm;
 namespace
 {
 	const wxSize minFrameSize(1240, 760);
+
+	bool supportedModPackage(const fs::path& path)
+	{
+		auto extension = boost::nowide::narrow(path.extension().wstring());
+		boost::algorithm::to_lower(extension);
+		return extension == ".exe" || extension == ".rar" || extension == ".zip" || extension == ".7z";
+	}
+
+	wxString packageProgressMessage(const ModPackageProgress& progress)
+	{
+		const auto item = wxString::FromUTF8(progress.item);
+		switch (progress.phase)
+		{
+		case ModPackageProgressPhase::scanning:
+			return wxString::Format("dialog/package_installer/progress/scanning"_lng, item);
+		case ModPackageProgressPhase::extracting:
+			return wxString::Format("dialog/package_installer/progress/extracting"_lng, item);
+		case ModPackageProgressPhase::validating:
+			return wxString::Format("dialog/package_installer/progress/validating"_lng, item);
+		case ModPackageProgressPhase::staging:
+			return wxString::Format("dialog/package_installer/progress/staging"_lng, item);
+		case ModPackageProgressPhase::committing:
+			return "dialog/package_installer/progress/committing"_lng;
+		case ModPackageProgressPhase::rolling_back:
+			return "dialog/package_installer/progress/rolling_back"_lng;
+		}
+		return {};
+	}
 }
 
 MainFrame::MainFrame(Application& app)
@@ -67,25 +101,25 @@ MainFrame::MainFrame(Application& app)
 	_infoBarTimer.SetOwner(this);
 
 	auto panel = new wxPanel(this);
-	auto pages = new wxNotebook(panel, wxID_ANY);
+	_mainPages = new wxNotebook(panel, wxID_ANY);
 
 	if (_currentPlatform)
 	{
-		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage, _statusBar);
-		pages->AddPage(modListView, "dialog/main_frame/page_mods"_lng);
+		_modListView = new ModListView(_mainPages, *_currentPlatform, *_iconStorage, _statusBar);
+		_mainPages->AddPage(_modListView, "dialog/main_frame/page_mods"_lng);
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{
-			auto presetManagerView = new ManagePresetListView(pages, *_currentPlatform, *_iconStorage);
-			pages->AddPage(presetManagerView, "dialog/main_frame/page_profiles"_lng);
+			auto presetManagerView = new ManagePresetListView(_mainPages, *_currentPlatform, *_iconStorage);
+			_mainPages->AddPage(presetManagerView, "dialog/main_frame/page_profiles"_lng);
 		}
 
-		modListView->SetFocus();
+		_modListView->SetFocus();
 	}
 
 	auto layout = new wxBoxSizer(wxVERTICAL);
 
-	layout->Add(pages, wxSizerFlags(1).Expand());
+	layout->Add(_mainPages, wxSizerFlags(1).Expand());
 	panel->SetSizer(layout);
 
 	auto mainLayout = new wxBoxSizer(wxVERTICAL);
@@ -98,6 +132,8 @@ MainFrame::MainFrame(Application& app)
 	Maximize(app.appConfig().mainWindow().maximized);
 
 	Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnCloseWindow, this);
+	Bind(wxEVT_DROP_FILES, &MainFrame::OnFilesDropped, this);
+	DragAcceptFiles(true);
 	Bind(wxEVT_TIMER, [=](wxTimerEvent&) { _infoBar->Dismiss(); });
 
 	_infoBar->Bind(wxEVT_BUTTON, [=](wxCommandEvent& event) {
@@ -117,6 +153,18 @@ MainFrame::MainFrame(Application& app)
 		}
 	}
 }
+
+MainFrame::~MainFrame()
+{
+	// The pages reference the platform and icon services owned by this frame. Destroy them
+	// while those services are still alive so native control teardown cannot call into stale data.
+	if (_mainPages)
+	{
+		_mainPages->DeleteAllPages();
+		_modListView = nullptr;
+	}
+}
+
 void MainFrame::reloadModelIfNeeded()
 {
 	EX_TRY;
@@ -175,9 +223,16 @@ void MainFrame::createMenuBar()
 	{
 		modMenu = new wxMenu();
 
+		auto addNewMods = modMenu->Append(wxID_ANY,
+			"dialog/main_frame/menu/mod/add_new_mods"_lng, nullptr,
+			"dialog/main_frame/menu/mod/add_new_mods_tip"_lng);
+		_menuItems[addNewMods->GetId()] = [&] { OnMenuModAddNewMods(); };
+
 		auto createNewMod = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/create_new"_lng, nullptr,
 			"dialog/main_frame/menu/mod/create_new"_lng);
 		_menuItems[createNewMod->GetId()] = [&] { OnMenuModCreateNewMod(); };
+
+		modMenu->AppendSeparator();
 
 		auto listModFiles = modMenu->Append(wxID_ANY, "dialog/main_frame/menu/mod/list_files"_lng, nullptr,
 			"dialog/main_frame/menu/mod/list_files"_lng);
@@ -285,6 +340,131 @@ void MainFrame::OnMenuToolsChangeSettings()
 		wxGetApp().scheduleRestart();
 
 	EX_UNEXPECTED;
+}
+
+void MainFrame::OnMenuModAddNewMods()
+{
+	if (!_currentPlatform || !_currentPlatform->modPackageInstaller())
+		return;
+
+	wxFileDialog dialog(this, "dialog/package_installer/select_caption"_lng, wxEmptyString,
+		wxEmptyString, "dialog/package_installer/file_filter"_lng,
+		wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE);
+	if (dialog.ShowModal() != wxID_OK)
+		return;
+
+	wxArrayString selected;
+	dialog.GetPaths(selected);
+	std::vector<fs::path> packages;
+	packages.reserve(selected.size());
+	for (const auto& path : selected)
+		packages.emplace_back(path.ToStdWstring());
+
+	importModPackages(packages);
+}
+
+void MainFrame::OnFilesDropped(wxDropFilesEvent& event)
+{
+	if (!_currentPlatform || !_currentPlatform->modPackageInstaller())
+		return;
+
+	std::vector<fs::path> packages;
+	packages.reserve(event.GetNumberOfFiles());
+	for (int index = 0; index < event.GetNumberOfFiles(); ++index)
+	{
+		fs::path path(event.GetFiles()[index].ToStdWstring());
+		if (supportedModPackage(path))
+			packages.emplace_back(std::move(path));
+	}
+
+	if (packages.empty())
+	{
+		wxMessageBox("message/error/no_supported_mod_packages"_lng, wxTheApp->GetAppName(),
+			wxOK | wxICON_ERROR, this);
+		return;
+	}
+
+	importModPackages(packages);
+}
+
+void MainFrame::importModPackages(const std::vector<fs::path>& packages)
+{
+	auto installer = _currentPlatform ? _currentPlatform->modPackageInstaller() : nullptr;
+	if (!installer || packages.empty())
+		return;
+
+	try
+	{
+		ModPackageInspection inspection;
+		{
+			wxProgressDialog progress("dialog/package_installer/progress/caption"_lng,
+				"dialog/package_installer/progress/preparing"_lng, 100, this,
+				wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_AUTO_HIDE);
+			auto callback = [&](const ModPackageProgress& state) {
+				if (auto cancel = progress.FindWindow(wxID_CANCEL))
+					cancel->Enable(state.cancellable);
+				bool skip = false;
+				return progress.Pulse(packageProgressMessage(state), &skip);
+			};
+			inspection = installer->inspect(packages, callback);
+		}
+
+		try
+		{
+			ModPackageInstallDialog review(this, inspection);
+			if (review.ShowModal() != wxID_OK)
+			{
+				installer->discard(inspection);
+				return;
+			}
+
+			const auto selected = review.selectedMods();
+			if (selected.empty())
+			{
+				installer->discard(inspection);
+				return;
+			}
+
+			ModPackageInstallResult result;
+			{
+				wxProgressDialog progress("dialog/package_installer/progress/caption"_lng,
+					"dialog/package_installer/progress/preparing"_lng, 100, this,
+					wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_AUTO_HIDE);
+				auto callback = [&](const ModPackageProgress& state) {
+					if (auto cancel = progress.FindWindow(wxID_CANCEL))
+						cancel->Enable(state.cancellable);
+					bool skip = false;
+					return progress.Pulse(packageProgressMessage(state), &skip);
+				};
+				result = installer->install(inspection, selected, callback);
+			}
+
+			if (!result.installed_mod_ids.empty() && _modListView)
+			{
+				_mainPages->SetSelection(0);
+				_modListView->selectMod(result.installed_mod_ids.front());
+			}
+
+			std::vector<std::string> names;
+			for (const auto& id : result.installed_mod_ids)
+				names.emplace_back(_currentPlatform->modDataProvider()->modData(id).name);
+			wxMessageBox(wxString::Format("message/info/mod_packages_installed"_lng,
+				static_cast<int>(names.size()), wxString::FromUTF8(boost::join(names, ", "))),
+				wxTheApp->GetAppName(), wxOK | wxICON_INFORMATION, this);
+		}
+		catch (...)
+		{
+			installer->discard(inspection);
+			throw;
+		}
+	}
+	catch (const ModPackageOperationCancelled&)
+	{}
+	catch (const std::exception& error)
+	{
+		wxMessageBox(wxString::Format("message/error/package_install_failed"_lng,
+			wxStringFromUnspecified(error.what())), wxTheApp->GetAppName(), wxOK | wxICON_ERROR, this);
+	}
 }
 
 void MainFrame::OnMenuModListModFiles()

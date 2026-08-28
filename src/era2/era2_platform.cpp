@@ -5,14 +5,18 @@
 
 #include "stdafx.h"
 
-#include "era2_platform.h"
 #include "application.h"
 #include "era2_config.hpp"
 #include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.hpp"
+#include "era2_mod_package_builder.hpp"
+#include "era2_mod_package_installer.hpp"
+#include "era2_platform.h"
+#include "era2_plugin_manager.hpp"
 #include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
+#include "interface/ii18n_service.hpp"
 #include "utility/fs_util.h"
 
 #include <fstream>
@@ -128,13 +132,19 @@ Era2Platform::Era2Platform(const Application& app)
 	_localConfig     = std::make_unique<Era2Config>(_rootDir);
 	_presetManager   = std::make_unique<Era2PresetManager>(_localConfig->getPresetsPath(), modsDirPath());
 	_launchHelper    = std::make_unique<Era2LaunchHelper>(*_localConfig);
-	_modDataProvider = std::make_unique<Era2ModDataProvider>(modsDirPath(),
-		loadFsMapNames(modsDirPath()), _app.appConfig().currentLanguageCode(), _app.i18nService());
+	_modDataProvider = std::make_unique<Era2ModDataProvider>(modsDirPath(), loadFsMapNames(modsDirPath()),
+		_app.appConfig().currentLanguageCode(), _app.i18nService());
 
-	_modList    = loadMods(getActiveListPath(), modsDirPath());
-	_modManager = std::make_unique<Era2ModManager>(_modList);
+	_modList       = loadMods(getActiveListPath(), modsDirPath());
+	_modManager    = std::make_unique<Era2ModManager>(_modList);
+	_pluginManager = std::make_unique<Era2PluginManager>(
+		_app.i18nService().get("message/status/no_description_available"));
+	_modPackageBuilder = std::make_unique<Era2ModPackageBuilder>(_rootDir, _app.appConfig().programPath());
 
 	_modListChanged = _modManager->onListChanged().connect([this] { save(); });
+	_modPackageInstaller = std::make_unique<Era2ModPackageInstaller>(_rootDir,
+		_app.appConfig().programPath(), _app.appConfig().currentLanguageCode(), _app.i18nService(),
+		*_modManager, [this] { reload(true); });
 }
 
 fs::path Era2Platform::managedPath() const
@@ -185,6 +195,21 @@ IModManager* Era2Platform::modManager() const
 	return _modManager.get();
 }
 
+IPluginManager* Era2Platform::pluginManager() const
+{
+	return _pluginManager.get();
+}
+
+IModPackageBuilder* Era2Platform::modPackageBuilder() const
+{
+	return _modPackageBuilder.get();
+}
+
+IModPackageInstaller* Era2Platform::modPackageInstaller() const
+{
+	return _modPackageInstaller.get();
+}
+
 ILaunchHelper* Era2Platform::launchHelper() const
 {
 	return _launchHelper.get();
@@ -198,11 +223,6 @@ IModDataProvider* Era2Platform::modDataProvider() const
 fs::path Era2Platform::getActiveListPath() const
 {
 	return modsDirPath() / "list.txt";
-}
-
-fs::path Era2Platform::getPluginListPath() const
-{
-	return _localConfig->getProgramDataPath() / "plugins.json";
 }
 
 void Era2Platform::save()

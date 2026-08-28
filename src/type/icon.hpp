@@ -15,6 +15,7 @@ namespace mm
 		{
 			blank, // gradient to denote invalid icon
 			empty,
+			back,
 			bookmark,
 			checkmark,
 			checkmark_green,
@@ -23,6 +24,7 @@ namespace mm
 			cog,
 			copy,
 			cross_gray,
+			cross_red,
 			double_down,
 			double_up,
 			down,

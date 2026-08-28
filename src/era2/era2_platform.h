@@ -19,6 +19,9 @@ namespace mm
 	struct Application;
 	struct Era2LaunchHelper;
 	struct Era2ModManager;
+	struct Era2ModPackageBuilder;
+	struct Era2ModPackageInstaller;
+	struct Era2PluginManager;
 	struct Era2PresetManager;
 	struct Era2ModDataProvider;
 	struct ModList;
@@ -33,15 +36,17 @@ namespace mm
 		void reload(bool force) override;
 		void apply(const std::vector<std::string>& active) override;
 
-		IPresetManager*   getPresetManager() const override;
-		ILocalConfig*     localConfig() const override;
-		IModManager*      modManager() const override;
-		ILaunchHelper*    launchHelper() const override;
-		IModDataProvider* modDataProvider() const override;
+		IPresetManager*     getPresetManager() const override;
+		ILocalConfig*       localConfig() const override;
+		IModManager*        modManager() const override;
+		IPluginManager*     pluginManager() const override;
+		IModPackageBuilder* modPackageBuilder() const override;
+		IModPackageInstaller* modPackageInstaller() const override;
+		ILaunchHelper*      launchHelper() const override;
+		IModDataProvider*   modDataProvider() const override;
 
 	private:
 		fs::path getActiveListPath() const;
-		fs::path getPluginListPath() const;
 
 		void save();
 
@@ -49,11 +54,14 @@ namespace mm
 		const Application& _app;
 		const fs::path     _rootDir;
 
-		std::unique_ptr<Era2Config>          _localConfig;
-		std::unique_ptr<Era2LaunchHelper>    _launchHelper;
-		std::unique_ptr<Era2ModDataProvider> _modDataProvider;
-		std::unique_ptr<Era2ModManager>      _modManager;
-		std::unique_ptr<Era2PresetManager>   _presetManager;
+		std::unique_ptr<Era2Config>            _localConfig;
+		std::unique_ptr<Era2LaunchHelper>      _launchHelper;
+		std::unique_ptr<Era2ModDataProvider>   _modDataProvider;
+		std::unique_ptr<Era2ModManager>        _modManager;
+		std::unique_ptr<Era2PluginManager>     _pluginManager;
+		std::unique_ptr<Era2ModPackageBuilder> _modPackageBuilder;
+		std::unique_ptr<Era2ModPackageInstaller> _modPackageInstaller;
+		std::unique_ptr<Era2PresetManager>     _presetManager;
 
 		ModList _modList;
 

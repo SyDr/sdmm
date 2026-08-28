@@ -14,6 +14,15 @@
 
 namespace mm
 {
+	inline bool pathExists(const fs::path& path, boost::system::error_code& error) noexcept
+	{
+		const auto fileStatus = fs::status(path, error);
+		if (fileStatus.type() == fs::file_not_found)
+			error.clear();
+
+		return fs::exists(fileStatus);
+	}
+
 	std::string readFile(const fs::path& path);
 
 	void overwriteFile(const fs::path& path, const std::string& content);
