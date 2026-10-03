@@ -12,6 +12,7 @@
 
 class wxBitmap;
 class wxSize;
+class wxColour;
 
 namespace mm
 {
@@ -19,7 +20,8 @@ namespace mm
 	{
 		virtual ~IIconStorage() = default;
 
-		[[nodiscard]] virtual wxBitmap get(Icon::Stock icon, std::optional<Icon::Size> targetSize = {}) = 0;
+		[[nodiscard]] virtual wxBitmap get(Icon::Stock icon, std::optional<Icon::Size> targetSize = {},
+			std::optional<wxColour> targetColor = {}) = 0;
 		[[nodiscard]] virtual wxBitmap get(
 			const std::string& name, std::optional<Icon::Size> resizeTo = {}) = 0;
 	};

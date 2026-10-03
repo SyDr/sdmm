@@ -244,14 +244,14 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 			const auto& icon_ = [&]() {
 				switch (*_list.state(id))
 				{
-				case ModList::ModState::enabled: return Icon::Stock::checkmark_green;
-				case ModList::ModState::disabled: return Icon::Stock::cross_gray;
+				case ModList::ModState::enabled: return std::make_pair(Icon::Stock::checkmark, Icon::MM_GREEN);
+				case ModList::ModState::disabled: return std::make_pair(Icon::Stock::cross, *wxLIGHT_GREY);
 				}
 
-				return Icon::Stock::blank;
+				return std::make_pair(Icon::Stock::blank, *wxWHITE);
 			}();
 
-			icon = _iconStorage.get(icon_, _iconSize);
+			icon = _iconStorage.get(icon_.first, _iconSize, icon_.second);
 		}
 
 		variant = wxVariant(wxDataViewIconText(text, icon));
@@ -299,9 +299,16 @@ void ModListModel::GetValue(wxVariant& variant, const wxDataViewItem& item, unsi
 	}
 	case ModListModelColumn::status:
 	{
-		variant = wxVariant(wxDataViewIconText(
-			L"", _iconStorage.get(
-					 position ? Icon::Stock::checkmark_green : Icon::Stock::cross_gray, _iconSize)));
+		Icon::Stock icon = Icon::Stock::checkmark;
+		wxColour    color = Icon::MM_GREEN;
+
+		if (!position)
+		{
+			icon = Icon::Stock::cross;
+			color = *wxLIGHT_GREY;
+		}
+
+		variant = wxVariant(wxDataViewIconText(L"", _iconStorage.get(icon, _iconSize, color)));
 		break;
 	}
 	case ModListModelColumn::load_order:

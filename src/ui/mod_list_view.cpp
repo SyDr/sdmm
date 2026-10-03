@@ -588,17 +588,17 @@ void ModListView::createControls(const wxString& managedPath)
 		_configure->SetBitmap(_iconStorage.get(Icon::Stock::cog, Icon::Size::x16));
 		_moveUp->SetBitmap(_iconStorage.get(Icon::Stock::up, Icon::Size::x16));
 		_moveDown->SetBitmap(_iconStorage.get(Icon::Stock::down, Icon::Size::x16));
-		_changeState->SetBitmap(_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16));
+		_changeState->SetBitmap(_iconStorage.get(Icon::Stock::checkmark, Icon::Size::x16, Icon::MM_GREEN));
 		_sort->SetBitmap(_iconStorage.get(Icon::Stock::sort, Icon::Size::x16));
 	}
 	else
 	{
-		_moveUp    = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
-			   wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
+		_moveUp   = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::up, Icon::Size::x16),
+			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_moveDown = new wxBitmapButton(_group, wxID_ANY, _iconStorage.get(Icon::Stock::down, Icon::Size::x16),
 			wxDefaultPosition, { FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 		_changeState = new wxBitmapButton(_group, wxID_ANY,
-			_iconStorage.get(Icon::Stock::checkmark_green, Icon::Size::x16), wxDefaultPosition,
+			_iconStorage.get(Icon::Stock::checkmark, Icon::Size::x16, Icon::MM_GREEN), wxDefaultPosition,
 			{ FromDIP(24), FromDIP(24) }, wxBU_EXACTFIT);
 
 		if (!_managedPlatform.localConfig()->useLegacyArchiving())
@@ -793,16 +793,26 @@ void ModListView::updateControlsState()
 	_changeState->Enable();
 
 	{
-		Icon::Stock changeStateIcon  = Icon::Stock::checkmark_green;
+		const bool useLegacyArchiving = _managedPlatform.localConfig()->useLegacyArchiving();
+
+		Icon::Stock changeStateIcon  = Icon::Stock::checkmark;
+		wxColour    changeStateColor = Icon::MM_GREEN;
 		wxString    changeStateLabel = "dialog/button/enable"_lng;
 
 		if (_modManager.mods().enabled(mod.id))
 		{
-			changeStateIcon  = _managedPlatform.localConfig()->useLegacyArchiving() ? Icon::Stock::box
-																					: Icon::Stock::cross_gray;
-			changeStateLabel = _managedPlatform.localConfig()->useLegacyArchiving()
-								   ? "dialog/button/archive"_lng
-								   : "dialog/button/disable"_lng;
+			if (useLegacyArchiving)
+			{
+				changeStateIcon = Icon::Stock::box;
+				changeStateColor = *wxBLUE;
+				changeStateLabel = "dialog/button/archive"_lng;
+			}
+			else
+			{
+				changeStateIcon  = Icon::Stock::cross;
+				changeStateColor = *wxLIGHT_GREY;
+				changeStateLabel = "dialog/button/disable"_lng;
+			}
 		}
 
 		_changeState->SetBitmap(wxNullBitmap);

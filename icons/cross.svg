@@ -2,7 +2,7 @@
   <path 
     d="M60,60 L196,196 M196,60 L60,196" 
     fill="none" 
-    stroke="#808080" 
+    stroke="#0000FF" 
     stroke-width="32" 
     stroke-linecap="round"
   />

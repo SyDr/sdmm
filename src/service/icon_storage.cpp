@@ -11,8 +11,12 @@
 #include <wx/icon.h>
 #include <wx/log.h>
 
+#include "type/filesystem.hpp"
 #include "type/icon.hpp"
 #include "type/interface_size.hpp"
+#include "utility/fs_util.h"
+
+#include <format>
 
 using namespace mm;
 
@@ -27,17 +31,42 @@ std::size_t hash_value(const wxSize& v)
 	return r;
 }
 
+std::size_t hash_value(const wxColour& v)
+{
+	boost::hash<int> hasher;
+
+	auto r = hasher(v.Red());
+
+	boost::hash_combine(r, hasher(v.Green()));
+	boost::hash_combine(r, hasher(v.Blue()));
+
+	return r;
+}
+
 namespace
 {
-	wxString toPath(Icon::Stock value)
+	wxIcon loadSvgIcon(Icon::Stock location, const wxSize& targetSize, std::optional<wxColour> targetColor)
 	{
-		return wxString(L"icons/") + wxString::FromUTF8(std::string(magic_enum::enum_name(value))) + L".svg";
-	}
+		const auto path = fs::path("icons") / (std::string(magic_enum::enum_name(location)) + ".svg");
 
-	wxIcon loadSvgIcon(Icon::Stock location, const wxSize& targetSize)
-	{
+		std::vector<unsigned char> data = readBinary(path);
+		if (targetColor)
+		{
+			const std::string from = "stroke=\"#0000FF\"";
+			const std::string to = "stroke=\"" +
+								   std::format("#{:02X}{:02X}{:02X}", targetColor->Red(), targetColor->Green(),
+									   targetColor->Blue()) +
+								   "\"";
+
+			if (auto pos = std::search(data.begin(), data.end(), from.begin(), from.end()); pos != data.end())
+			{
+				std::copy(to.begin(), to.end(), pos);
+			}
+		}
+
 		wxIcon icon;
-		icon.CopyFromBitmap(wxBitmapBundle::FromSVGFile(toPath(location), targetSize).GetBitmap(targetSize));
+		icon.CopyFromBitmap(
+			wxBitmapBundle::FromSVG(data.data(), data.size(), targetSize).GetBitmap(targetSize));
 
 		return icon;
 	}
@@ -52,10 +81,10 @@ namespace
 		return icon;
 	}
 
-	wxBitmap loadImpl(
-		IconStorage::IconCache& cache, const IconStorage::IconLocation& location, const wxSize& targetSize)
+	wxBitmap loadImpl(IconStorage::IconCache& cache, const IconStorage::IconLocation& location,
+		const wxSize& targetSize, std::optional<wxColour> targetColor = {})
 	{
-		const auto it = cache.find({ location, targetSize });
+		const auto it = cache.find({ location, targetSize, targetColor ? *targetColor : *wxWHITE });
 
 		if (it != std::end(cache))
 			return it->second;
@@ -75,7 +104,7 @@ namespace
 			}
 			else
 			{
-				icon = loadSvgIcon(*stock, targetSize);
+				icon = loadSvgIcon(*stock, targetSize, targetColor);
 			}
 		}
 		else
@@ -91,7 +120,7 @@ namespace
 			icon.CopyFromBitmap(wxBitmap(wxBitmap(icon).ConvertToImage().Rescale(
 				targetSize.GetWidth(), targetSize.GetHeight(), wxIMAGE_QUALITY_NEAREST)));
 
-		return cache[{ location, targetSize }] = icon;
+		return cache[{ location, targetSize, targetColor ? *targetColor : *wxWHITE }] = icon;
 	}
 }
 
@@ -99,9 +128,10 @@ mm::IconStorage::IconStorage(InterfaceSize interfaceSize)
 	: _defaultSize(toIconPredefinedSize(interfaceSize))
 {}
 
-wxBitmap IconStorage::get(Icon::Stock icon, std::optional<Icon::Size> targetSize)
+wxBitmap IconStorage::get(
+	Icon::Stock icon, std::optional<Icon::Size> targetSize, std::optional<wxColour> targetColor)
 {
-	return loadImpl(_iconCache, icon, iconSize(targetSize.value_or(_defaultSize)));
+	return loadImpl(_iconCache, icon, iconSize(targetSize.value_or(_defaultSize)), targetColor);
 }
 
 wxBitmap IconStorage::get(const std::string& name, std::optional<Icon::Size> resizeTo)

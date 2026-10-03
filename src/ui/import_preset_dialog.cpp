@@ -66,7 +66,7 @@ void ImportPresetDialog::createControls()
 	_importNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "dialog/import_preset/name"_lng);
 	_importName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 	_clearName       = new wxBitmapButton(
-        _optionsBox, wxID_ANY, _iconStorage.get(Icon::Stock::cross_gray, Icon::Size::x16));
+        _optionsBox, wxID_ANY, _iconStorage.get(Icon::Stock::cross, Icon::Size::x16, *wxLIGHT_GREY));
 	_loadNow         = new wxCheckBox(_optionsBox, wxID_ANY, "dialog/import_preset/apply_now"_lng);
 	_loadNow->SetValue(true);
 

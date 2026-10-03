@@ -584,14 +584,26 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 	{
 		const auto& entry = _data.entries[i];
 
+		Icon::Stock icon  = Icon::Stock::question;
+		wxColour    color = *wxBLUE;
+
+		if (gameFiles != ShowFileListDialog::ShowGameFiles::none)
+		{
+			if (!entry.gamePath.empty())
+			{
+				icon = Icon::Stock::checkmark;
+				color = *wxGREEN;
+			}
+			else
+			{
+				icon  = Icon::Stock::cross;
+				color = *wxLIGHT_GREY;
+			}
+		}
+
 		wxVector<wxVariant> data;
 		data.push_back(wxVariant(wxString(std::to_wstring(++index))));
-		data.push_back(wxVariant(wxDataViewIconText(L"",
-			_iconStorage.get(
-				gameFiles != ShowGameFiles::none
-					? !entry.gamePath.empty() ? Icon::Stock::checkmark_green : Icon::Stock::cross_gray
-					: Icon::Stock::question,
-				Icon::Size::x16))));
+		data.push_back(wxVariant(wxDataViewIconText(L"", _iconStorage.get(icon, Icon::Size::x16, color))));
 		wxVariant v;
 		v.NullList();
 
@@ -605,7 +617,7 @@ void ShowFileListDialog::fillData(ShowGameFiles gameFiles)
 					wxVariant(loadModIcon(_iconStorage, mod.data_path, mod.icon, Icon::Size::x16)));
 			}
 			else
-				v.Append(wxVariant(_iconStorage.get(Icon::Stock::cross_gray, Icon::Size::x16)));
+				v.Append(wxVariant(_iconStorage.get(Icon::Stock::cross, Icon::Size::x16, *wxLIGHT_GREY)));
 		}
 
 		data.push_back(v);
