@@ -1,5 +1,7 @@
 SD Mod Manager
 ==============
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)](https://windows.microsoft.com)
 
 `SD Mod Manager` is a mod manager for [ERA](http://wforum.heroes35.net/showthread.php?tid=5830) mod platform.  
 TODO: write more information.
@@ -10,14 +12,14 @@ Download and install from [releases](./releases) page.
 
 Development
 -----------
-Install Visual Studio (2022) with C++ support.
-Install Git for Windows (`winget install --id Git.Git -e --source winget`)
-Install InnoSetup if you want to make builds (`winget install -e --id JRSoftware.InnoSetup')
+Install Visual Studio 2026 with C++ support and latest v143 toolset.  
+Install Git for Windows (`winget install --id Git.Git -e --source winget`)  
+Install InnoSetup if you want to make builds (`winget install -e --id JRSoftware.InnoSetup')  
 
 `git clone https://github.com/microsoft/vcpkg/`  
-`setx VCPKG_ROOT <vcpkg_root>`
-`bootstrap-vcpkg.bat`
-`vcpkg.exe integrate install`
+`setx VCPKG_ROOT <vcpkg_root>`  
+`bootstrap-vcpkg.bat`  
+`vcpkg.exe integrate install`  
 
 Open SD MM.sln via Visual Studio. Press Start Debugging (F5).
 
@@ -36,5 +38,4 @@ TODO (In no particular order)
 - WebPreview check width.
 - Navigate in mod list via keys?
 - On first launch, ask some important settings.
-- Would be nice to have at least the possibiliy to see what plugins are tied to a mod - for users helpful when its about bugfixing/testing
 - Add wiki with usage information (or video?)
