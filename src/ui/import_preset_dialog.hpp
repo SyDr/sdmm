@@ -26,6 +26,7 @@ namespace mm
 {
 	struct IModPlatform;
 	class ModListModel;
+	class PluginListModel;
 	struct IIconStorage;
 
 	class ImportPresetDialog : public wxDialog

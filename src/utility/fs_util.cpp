@@ -30,6 +30,14 @@ std::string mm::readFile(const mm::fs::path& path)
 	return s.str();
 }
 
+std::vector<std::string>   mm::readText(const mm::fs::path& path)
+{
+	std::vector<std::string> r;
+	boost::split(r, readFile(path), boost::is_any_of("\r\n"));
+
+	return r;
+}
+
 std::vector<unsigned char> mm::readBinary(const mm::fs::path& path)
 {
 	boost::nowide::ifstream f(path, std::ios::binary | std::ios::ate);

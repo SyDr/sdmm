@@ -22,3 +22,4 @@
 /debug-asan/
 /vcpkg_installed/
 /7z/7z.*
+*.orig

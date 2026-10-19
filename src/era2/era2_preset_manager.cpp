@@ -7,6 +7,7 @@
 
 #include "era2_preset_manager.hpp"
 
+#include "era2_plugin_manager.hpp"
 #include "system_info.hpp"
 #include "utility/json_util.h"
 
@@ -93,7 +94,15 @@ PresetData Era2PresetManager::loadPreset(const nlohmann::json& data)
 
 	if (auto list = data.find("list"); list != data.end() && list->is_array())
 		for (const auto& item : *list)
-			result.mods.emplace_back(boost::locale::fold_case(item.get<std::string>()));
+			result.mods.data.emplace_back(
+				ModList::Mod(boost::locale::fold_case(item.get<std::string>()), ModList::ModState::enabled));
+
+//	result.plugins.available = Era2PluginManager::loadAvailablePlugins(_modsPath, result.mods);
+//	if (auto plugins = data.find("plugins"); plugins != data.end())
+//		result.plugins.managed = Era2PluginManager::loadManagedState(plugins->get<std::string>());
+
+//	erase_if(result.plugins.available,
+//		[&](const Plugin& item) { return !result.plugins.managed.contains(item); });
 
 	if (auto exe = data.find("exe"); exe != data.end() && exe->is_string())
 		result.executable = exe->get<std::string>();
@@ -109,10 +118,21 @@ nlohmann::json Era2PresetManager::savePreset(const PresetData& preset)
 	if (!preset.executable.empty())
 		data["exe"] = preset.executable;
 
-	auto& ref = data["list"] = nlohmann::json::array();
+	auto& list = data["list"] = nlohmann::json::array();
+	for (const auto& item : preset.mods.data)
+		if (item.state == ModList::ModState::enabled)
+			list.emplace_back(item.id);
 
-	for (const auto& item : preset.mods)
-		ref.emplace_back(item);
+//	if (!preset.plugins.managed.empty())
+//	{
+//		auto& plugins = data["plugins"] = nlohmann::json::array();
+//		for (const auto& source : preset.plugins.managed)
+//		{
+//			const auto path =
+//				(fs::path(source.mod) / source.id.name).lexically_normal();
+//			plugins.emplace_back(path.string());
+//		}
+//	}
 
 	return data;
 }

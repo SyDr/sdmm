@@ -20,7 +20,7 @@ namespace mm
 	{
 		virtual ~IModManager() = default;
 
-		[[nodiscard]] virtual ModList const& mods() const = 0;
+		[[nodiscard]] virtual const ModList& mods() const = 0;
 
 		virtual void apply(const std::vector<std::string>& items, bool archiveOnDisable) = 0;
 

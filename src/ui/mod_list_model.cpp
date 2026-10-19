@@ -17,6 +17,7 @@
 #include "mod_manager_app.h"
 #include "type/icon.hpp"
 #include "utility/sdlexcept.h"
+#include "system_info.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -470,6 +471,9 @@ void ModListModel::applyCategoryFilter(const std::set<std::string>& value)
 bool ModListModel::passFilter(const std::string& id) const
 {
 	// TODO: move into mod itself?
+
+	if (id == SystemInfo::ManagedMod)
+		return false;
 
 	if (_filter.empty() && _categoryFilter.empty())
 		return true;

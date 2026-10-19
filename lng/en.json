@@ -48,7 +48,10 @@
       "explorer": "Explorer",
       "recent": "Recent",
       "options": "Options",
-      "filter": "Filter"
+      "filter": "Filter",
+      "plugin": "Plugin",
+      "show_hidden": "Show hidden",
+      "show_from_all_mods": "Show from all mods"
     },
     "cancel": "Cancel",
     "export_preset": {
@@ -161,7 +164,8 @@
       "ok": "OK",
       "continue": "Continue",
       "disable": "Disable",
-      "create_package": "Create package"
+      "create_package": "Create package",
+      "reset": "Reset"
     },
     "error": {
       "caption": "Unexpected error occurred",
@@ -170,6 +174,7 @@
     },
     "main_frame": {
       "page_mods": "Mods",
+      "page_plugins": "Plugins",
       "page_profiles": "Profiles",
       "about_description": "A mod manager for ERA platform",
       "menu": {

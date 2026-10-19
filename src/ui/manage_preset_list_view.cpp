@@ -18,9 +18,11 @@
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
+#include "interface/iplugin_manager.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
 #include "type/icon.hpp"
+#include "plugin_list_model.hpp"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
 #include "type/interface_size.hpp"
@@ -49,6 +51,7 @@ ManagePresetListView::ManagePresetListView(
 	, _platform(platform)
 	, _selected(platform.localConfig()->getAcitvePreset())
 	, _listModel(new ModListModel(*platform.modDataProvider(), iconStorage))
+	, _pluginListModel(new PluginListModel(*platform.modDataProvider(), iconStorage))
 	, _iconStorage(iconStorage)
 {
 	MM_EXPECTS(parent, mm::unexpected_error);
@@ -110,10 +113,15 @@ void ManagePresetListView::createControls()
 	if (auto interfaceSize = wxGetApp().appConfig().interfaceSize(); interfaceSize != InterfaceSize::standard)
 		_mods->SetRowHeight(FromDIP(toBaseSize(interfaceSize)));
 
+	_plugins = new wxDataViewCtrl(_preview, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+		wxDV_ROW_LINES | wxDV_VERT_RULES | wxDV_NO_HEADER);
+	_plugins->AssociateModel(_pluginListModel.get());
+
 	_infoBar = new wxInfoBar(this);
 	_infoBarTimer.SetOwner(this);
 
 	createListColumns();
+	createPluginsListColumns();
 }
 
 void ManagePresetListView::createListColumns()
@@ -138,6 +146,36 @@ void ManagePresetListView::createListColumns()
 	column0->SetSortOrder(true);
 }
 
+void ManagePresetListView::createPluginsListColumns()
+{
+	auto r0 = new mmPriorityDataRenderer();
+	auto r1 = new wxDataViewTextRenderer();
+	auto r2 = new wxDataViewIconTextRenderer();
+
+	r0->SetAlignment(wxALIGN_CENTER_VERTICAL);
+	r1->SetAlignment(wxALIGN_CENTER_VERTICAL);
+
+	constexpr auto columnFlags =
+		wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE | wxDATAVIEW_COL_REORDERABLE;
+
+	auto column0 = new wxDataViewColumn(L"", r0, static_cast<unsigned int>(PluginListModel::Column::state),
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
+	auto column1 =
+		new wxDataViewColumn("Plugin"_lng, r1, static_cast<unsigned int>(PluginListModel::Column::caption),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_CENTER, columnFlags);
+
+	auto column2 =
+		new wxDataViewColumn("Mod"_lng, r2, static_cast<unsigned int>(PluginListModel::Column::mod),
+			wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, columnFlags);
+
+	_plugins->AppendColumn(column0);
+	_plugins->AppendColumn(column1);
+	_plugins->AppendColumn(column2);
+
+	column1->SetSortOrder(true);
+}
+
 void ManagePresetListView::updateLayout()
 {
 	auto manageControls = new wxBoxSizer(wxVERTICAL);
@@ -158,6 +196,7 @@ void ManagePresetListView::updateLayout()
 
 	auto previewGroup = new wxStaticBoxSizer(_preview, wxVERTICAL);
 	previewGroup->Add(_mods, wxSizerFlags(3).Expand().Border(wxALL, 5));
+	previewGroup->Add(_plugins, wxSizerFlags(1).Expand().Border(wxALL, 5));
 
 	auto mainSizer = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(midControls, wxSizerFlags(2).Expand().Border(wxALL, 5));
@@ -215,7 +254,8 @@ void ManagePresetListView::onSavePresetRequested(std::string baseName)
 	}
 
 	_platform.getPresetManager()->savePreset(
-		baseName, { _platform.modManager()->mods().enabled(), _platform.launchHelper()->getExecutable() });
+		baseName, { _platform.modManager()->mods(), _platform.pluginManager()->plugins(),
+					  _platform.launchHelper()->getExecutable() });
 	_platform.localConfig()->setActivePreset(baseName);
 	_selected = baseName;
 
@@ -254,7 +294,9 @@ void ManagePresetListView::onLoadPresetRequested()
 	auto selected = getSelection();
 	auto preset   = _platform.getPresetManager()->loadPreset(selected);
 
-	_platform.apply(preset.mods);
+//	preset.plugins.available = _platform.pluginManager()->plugins().available;
+
+	_platform.apply(&preset.mods, &preset.plugins);
 	_platform.localConfig()->setActivePreset(selected);
 
 	_selected = selected;
@@ -353,6 +395,10 @@ void ManagePresetListView::updatePreview()
 	}
 
 	_listModel->modList(ModList(preset.mods));
+	_pluginListModel->setList(preset.plugins);
+
+	_plugins->Show(!preset.plugins.managed.empty());
+	Layout();
 
 	EX_UNEXPECTED;
 }

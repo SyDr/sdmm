@@ -1221,7 +1221,9 @@ void ModListView::onSortModsRequested(const std::string& enablingMod, const std:
 		_modManager.mods(), *_managedPlatform.modDataProvider(), enablingMod, disablingMod);
 
 	if (enabled != _modManager.mods().enabled())
-		_managedPlatform.apply(enabled);
+	{
+		//_managedPlatform.apply(&mods, nullptr);
+	}
 
 	EX_UNEXPECTED;
 }

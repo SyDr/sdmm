@@ -51,7 +51,10 @@
       "explorer": "Проводник",
       "recent": "Недавние",
       "options": "Опции",
-      "filter": "Фильтр"
+      "filter": "Фильтр",
+      "plugin": "Плагин",
+      "show_hidden": "Показать скрытые",
+      "show_from_all_mods": "Показать из всех модов"
     },
     "cancel": "Отмена",
     "export_preset": {
@@ -164,7 +167,8 @@
       "ok": "ОК",
       "continue": "Продолжить",
       "disable": "Отключить",
-      "create_package": "Создать пакет установки"
+      "create_package": "Создать пакет установки",
+      "reset": "Сбросить"
     },
     "error": {
       "caption": "Произошла непредвиденная ошибка",
@@ -173,6 +177,7 @@
     },
     "main_frame": {
       "page_mods": "Моды",
+      "page_plugins": "Плагины",
       "page_profiles": "Профили",
       "about_description": "Менеджер модов для платформы ERA",
       "menu": {

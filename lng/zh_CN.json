@@ -48,7 +48,10 @@
       "explorer": "资源管理器",
       "recent": "最近",
       "options": "选项",
-      "filter": "筛选"
+      "filter": "筛选",
+      "plugin": "Plugin",
+      "show_hidden": "Show hidden",
+      "show_from_all_mods": "Show from all mods"
     },
     "cancel": "取消",
     "export_preset": {
@@ -161,7 +164,8 @@
       "ok": "关闭",
       "continue": "继续",
       "disable": "禁用",
-      "create_package": "Create package"
+      "create_package": "Create package",
+      "reset": "Reset"
     },
     "error": {
       "caption": "发生意外错误",
@@ -170,6 +174,7 @@
     },
     "main_frame": {
       "page_mods": "Mod",
+      "page_plugins": "Plugins",
       "page_profiles": "配置",
       "about_description": "ERA平台的Mod管理器",
       "menu": {

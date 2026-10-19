@@ -11,9 +11,11 @@
 #include "era2_launch_helper.hpp"
 #include "era2_mod_data_provider.hpp"
 #include "era2_mod_manager.hpp"
+#include "era2_plugin_manager.hpp"
 #include "era2_preset_manager.hpp"
 #include "interface/iapp_config.hpp"
 #include "utility/fs_util.h"
+#include "system_info.hpp"
 
 #include <fstream>
 
@@ -57,6 +59,9 @@ namespace
 			id    = id.substr(1);
 			state = ModList::ModState::disabled;
 		}
+
+		if (id == boost::locale::fold_case(SystemInfo::ManagedMod))
+			return false;
 
 		return true;
 	}
@@ -117,6 +122,8 @@ namespace
 			}
 		}
 
+		toSave.emplace_back(SystemInfo::ManagedMod);
+
 		overwriteFileFromContainer(activePath, toSave);
 	}
 }
@@ -133,8 +140,10 @@ Era2Platform::Era2Platform(const Application& app)
 
 	_modList    = loadMods(getActiveListPath(), modsDirPath());
 	_modManager = std::make_unique<Era2ModManager>(_modList);
+	_pluginManager = std::make_unique<Era2PluginManager>(*_modManager, modsDirPath());
 
 	_modListChanged = _modManager->onListChanged().connect([this] { save(); });
+	_pluginListChanged = _pluginManager->onListChanged().connect([this] { _pluginManager->save(); });
 }
 
 fs::path Era2Platform::managedPath() const
@@ -155,14 +164,31 @@ void Era2Platform::reload(bool force)
 	_modManager->onListChanged()();
 }
 
-void Era2Platform::apply(const std::vector<std::string>& active)
+void Era2Platform::apply(ModList* mods, PluginList* plugins)
 {
 	auto block1 = _modListChanged.blocker();
+	auto block2 = _pluginListChanged.blocker();
 
-	_modManager->apply(active, _localConfig->useLegacyArchiving());
-	_modManager->onListChanged()();
+	if (mods)
+	{
+		std::vector<std::string> items;
 
-	save();
+		for (const auto& item : mods->data)
+			if (item.state == ModList::ModState::enabled)
+				items.emplace_back(item.id);
+
+		_modManager->apply(items, _localConfig->useLegacyArchiving());
+		_modManager->onListChanged()();
+	}
+
+	if (plugins)
+	{
+		_pluginManager->plugins(*plugins);
+		_pluginManager->onListChanged()();
+	}
+
+	if (mods || plugins)
+		save();
 }
 
 fs::path Era2Platform::modsDirPath() const
@@ -200,12 +226,13 @@ fs::path Era2Platform::getActiveListPath() const
 	return modsDirPath() / "list.txt";
 }
 
-fs::path Era2Platform::getPluginListPath() const
+IPluginManager* Era2Platform::pluginManager() const
 {
-	return _localConfig->getProgramDataPath() / "plugins.json";
+	return _pluginManager.get();
 }
 
 void Era2Platform::save()
 {
 	saveMods(getActiveListPath(), modsDirPath(), _modManager->mods());
+	_pluginManager->save();
 }

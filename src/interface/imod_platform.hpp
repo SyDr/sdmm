@@ -16,16 +16,19 @@ namespace mm
 	struct ILocalConfig;
 	struct IModDataProvider;
 	struct IModManager;
+	struct IPluginManager;
 	struct IPresetManager;
 
 	struct ModList;
+	struct PluginList;
 
 	struct IModPlatform
 	{
 		virtual ~IModPlatform() = default;
 
-		virtual void reload(bool force = false)                    = 0;
-		virtual void apply(const std::vector<std::string>& active) = 0;
+		virtual void reload(bool force = false)                = 0;
+
+		virtual void apply(ModList* mods, PluginList* plugins) = 0;
 
 		[[nodiscard]] virtual fs::path managedPath() const = 0;
 		[[nodiscard]] virtual fs::path modsDirPath() const = 0;
@@ -33,6 +36,7 @@ namespace mm
 		[[nodiscard]] virtual ILaunchHelper*    launchHelper() const     = 0;
 		[[nodiscard]] virtual ILocalConfig*     localConfig() const      = 0;
 		[[nodiscard]] virtual IModManager*      modManager() const       = 0;
+		[[nodiscard]] virtual IPluginManager*   pluginManager() const    = 0;
 		[[nodiscard]] virtual IPresetManager*   getPresetManager() const = 0;
 		[[nodiscard]] virtual IModDataProvider* modDataProvider() const  = 0;
 	};

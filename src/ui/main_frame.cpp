@@ -23,6 +23,7 @@
 #include "manage_preset_list_view.hpp"
 #include "mod_list_view.h"
 #include "mod_manager_app.h"
+#include "plugin_list_view.hpp"
 #include "select_directory_view.h"
 #include "select_exe.h"
 #include "service/icon_storage.hpp"
@@ -30,9 +31,9 @@
 #include "system_info.hpp"
 #include "type/icon.hpp"
 #include "type/main_window_properties.h"
+#include "type/program_version.hpp"
 #include "utility/sdlexcept.h"
 #include "utility/wx_current_dir_helper.hpp"
-#include "type/program_version.hpp"
 
 #include <wx/aboutdlg.h>
 #include <wx/aui/auibook.h>
@@ -67,12 +68,19 @@ MainFrame::MainFrame(Application& app)
 	_infoBarTimer.SetOwner(this);
 
 	auto panel = new wxPanel(this);
-	auto pages = new wxNotebook(panel, wxID_ANY);
+	auto pages = new wxAuiNotebook(panel, wxID_ANY);
 
 	if (_currentPlatform)
 	{
 		auto modListView = new ModListView(pages, *_currentPlatform, *_iconStorage, _statusBar);
 		pages->AddPage(modListView, "dialog/main_frame/page_mods"_lng);
+
+		if (auto pluginManager = _currentPlatform->pluginManager())
+		{
+			auto pluginListView = new PluginListView(pages, *pluginManager, *_currentPlatform->modManager(), 
+				*_currentPlatform->modDataProvider(), *_iconStorage);
+			pages->AddPage(pluginListView, "dialog/main_frame/page_plugins"_lng);
+		}
 
 		if (auto presetManager = _currentPlatform->getPresetManager())
 		{
@@ -150,8 +158,8 @@ void MainFrame::createMenuBar()
 		gameMenu = new wxMenu();
 
 		_launchMenuItem = gameMenu->Append(wxID_ANY,
-			wxString::Format(
-				wxString("dialog/main_frame/menu/game/launch"_lng), wxString::FromUTF8(launchHelper->getCaption())),
+			wxString::Format(wxString("dialog/main_frame/menu/game/launch"_lng),
+				wxString::FromUTF8(launchHelper->getCaption())),
 			nullptr, "dialog/main_frame/menu/game/launch_tip"_lng);
 
 		_launchMenuItem->SetBitmap(_iconStorage->get(launchHelper->getLaunchString(), Icon::Size::x16));
@@ -191,8 +199,9 @@ void MainFrame::createMenuBar()
 	auto toolsMenu = new wxMenu();
 	if (!_app.appConfig().portableMode())
 	{
-		auto changeDirectory = toolsMenu->Append(wxID_ANY, "dialog/main_frame/menu/tools/change_managed_directory"_lng,
-			nullptr, "dialog/main_frame/menu/tools/change_managed_directory_tip"_lng);
+		auto changeDirectory =
+			toolsMenu->Append(wxID_ANY, "dialog/main_frame/menu/tools/change_managed_directory"_lng, nullptr,
+				"dialog/main_frame/menu/tools/change_managed_directory_tip"_lng);
 
 		_menuItems[changeDirectory->GetId()] = [&] { OnMenuToolsChangeDirectory(); };
 	}
@@ -207,8 +216,8 @@ void MainFrame::createMenuBar()
 
 	toolsMenu->AppendSeparator();
 
-	auto changeProgramSettings = toolsMenu->Append(
-		wxID_ANY, "dialog/main_frame/menu/tools/settings"_lng, nullptr, "dialog/main_frame/menu/tools/settings_tip"_lng);
+	auto changeProgramSettings = toolsMenu->Append(wxID_ANY, "dialog/main_frame/menu/tools/settings"_lng,
+		nullptr, "dialog/main_frame/menu/tools/settings_tip"_lng);
 	_menuItems[changeProgramSettings->GetId()] = [&] { OnMenuToolsChangeSettings(); };
 
 	auto languageMenu = new wxMenu();
@@ -223,17 +232,17 @@ void MainFrame::createMenuBar()
 		_menuItems[lngItem->GetId()] = [=] { OnMenuToolsLanguageSelected(lngCode); };
 	}
 
-	toolsMenu->AppendSubMenu(
-		languageMenu, "dialog/main_frame/menu/tools/language"_lng, "dialog/main_frame/menu/tools/language_tip"_lng);
+	toolsMenu->AppendSubMenu(languageMenu, "dialog/main_frame/menu/tools/language"_lng,
+		"dialog/main_frame/menu/tools/language_tip"_lng);
 
 	auto helpMenu = new wxMenu();
 
-	auto updateCheck = helpMenu->Append(
-		wxID_ANY, "dialog/main_frame/menu/about/check_update"_lng, nullptr, "dialog/main_frame/menu/about/check_update_tip"_lng);
+	auto updateCheck = helpMenu->Append(wxID_ANY, "dialog/main_frame/menu/about/check_update"_lng, nullptr,
+		"dialog/main_frame/menu/about/check_update_tip"_lng);
 	_menuItems[updateCheck->GetId()] = [&] { OnMenuCheckForUpdates(); };
 
-	auto about =
-		helpMenu->Append(wxID_ABOUT, "dialog/main_frame/menu/about/about"_lng, nullptr, "dialog/main_frame/menu/about/about"_lng);
+	auto about = helpMenu->Append(wxID_ABOUT, "dialog/main_frame/menu/about/about"_lng, nullptr,
+		"dialog/main_frame/menu/about/about"_lng);
 	_menuItems[about->GetId()] = [&] { OnAbout(); };
 
 	_mainMenu = new wxMenuBar();
@@ -314,7 +323,8 @@ void MainFrame::OnMenuModCreateNewMod()
 	wxString modName;
 	while (true)
 	{
-		modName = enterFileName(this, "dialog/main_frame/new_mod_prompt"_lng, "dialog/main_frame/new_mod_prompt_label"_lng, modName);
+		modName = enterFileName(this, "dialog/main_frame/new_mod_prompt"_lng,
+			"dialog/main_frame/new_mod_prompt_label"_lng, modName);
 		if (modName.empty())
 			return;
 
@@ -500,8 +510,8 @@ void MainFrame::updateExecutableRelatedData()
 
 	if (auto helper = _currentPlatform->launchHelper())
 	{
-		auto text =
-			wxString::Format(wxString("dialog/main_frame/menu/game/launch"_lng), wxString::FromUTF8(helper->getCaption()));
+		auto text = wxString::Format(
+			wxString("dialog/main_frame/menu/game/launch"_lng), wxString::FromUTF8(helper->getCaption()));
 		auto icon = _iconStorage->get(helper->getLaunchString(), Icon::Size::x16);
 
 		_launchMenuItem->SetItemLabel(text);

@@ -15,9 +15,11 @@
 #include "interface/ilocal_config.hpp"
 #include "interface/imod_manager.hpp"
 #include "interface/imod_platform.hpp"
+#include "interface/iplugin_manager.hpp"
 #include "interface/ipreset_manager.hpp"
 #include "mod_list_model.h"
 #include "type/icon.hpp"
+#include "plugin_list_model.hpp"
 #include "utility/fs_util.h"
 #include "utility/sdlexcept.h"
 #include "wx/priority_data_renderer.h"
@@ -69,6 +71,8 @@ void ExportPresetDialog::createControls()
 	_saveExecutable = new wxCheckBox(_optionsBox, wxID_ANY, "dialog/export_preset/save_exe_option"_lng);
 	_saveExecutable->SetValue(true);
 	_exportNameLabel = new wxStaticText(_optionsBox, wxID_ANY, "dialog/label/profile_name"_lng);
+	_savePlugins = new wxCheckBox(_optionsBox, wxID_ANY, "Save selected plugins"_lng);
+	_savePlugins->SetValue(true);
 	_exportName      = new wxTextCtrl(_optionsBox, wxID_ANY);
 
 	_copyToClipboard = new wxButton(this, wxID_ANY, "dialog/button/copy"_lng);
@@ -93,6 +97,7 @@ void ExportPresetDialog::updateLayout()
 
 	auto optionGroup = new wxStaticBoxSizer(_optionsBox, wxVERTICAL);
 	optionGroup->Add(_saveExecutable, wxSizerFlags(0).Expand().Border(wxALL, 5));
+	optionGroup->Add(_savePlugins, wxSizerFlags(0).Expand().Border(wxALL, 5));
 	optionGroup->Add(exportName, wxSizerFlags(0).Expand().Border(wxALL, 5));
 
 	auto bottomControls = new wxBoxSizer(wxHORIZONTAL);
@@ -114,6 +119,7 @@ void ExportPresetDialog::updateLayout()
 void ExportPresetDialog::bindEvents()
 {
 	_saveExecutable->Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { updatePreview(); });
+	_savePlugins->Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&) { updatePreview(); });
 	_exportName->Bind(wxEVT_TEXT, [=](wxCommandEvent&) { updatePreview(); });
 
 	_copyToClipboard->Bind(wxEVT_BUTTON, [=](wxCommandEvent&) { onCopyToClipboardRequested(); });
@@ -136,12 +142,16 @@ void ExportPresetDialog::updatePreview()
 	}
 	else
 	{
-		preset.mods       = _platform.modManager()->mods().enabled();
+		preset.mods       = _platform.modManager()->mods();
+		preset.plugins    = _platform.pluginManager()->plugins();
 		preset.executable = _platform.launchHelper()->getExecutable();
 	}
 
 	if (!_saveExecutable->IsChecked())
 		preset.executable.clear();
+
+	if (!_savePlugins->IsChecked())
+		preset.plugins.managed.clear();
 
 	auto data = _platform.getPresetManager()->savePreset(preset);
 

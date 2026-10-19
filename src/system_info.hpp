@@ -10,6 +10,7 @@
 namespace mm::SystemInfo
 {
 	inline constexpr auto AppDataDirectory = "_MM_Data";
+	inline constexpr auto ManagedMod       = "_MM_Managed";
 	inline constexpr auto BaseDirFile      = "base_dir.txt";
 	inline constexpr auto SettingsFile     = "settings.json";
 

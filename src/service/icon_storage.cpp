@@ -52,8 +52,8 @@ namespace
 		std::vector<unsigned char> data = readBinary(path);
 		if (targetColor)
 		{
-			const std::string from = "stroke=\"#0000FF\"";
-			const std::string to = "stroke=\"" +
+			const std::string from = "\"#0000FF\"";
+			const std::string to = "\"" +
 								   std::format("#{:02X}{:02X}{:02X}", targetColor->Red(), targetColor->Green(),
 									   targetColor->Blue()) +
 								   "\"";

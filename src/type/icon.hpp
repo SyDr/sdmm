@@ -1,6 +1,6 @@
 // SD Mod Manager
 
-// Copyright (c) 2020-2025 Aliaksei Karalenka <sydr1991@gmail.com>.
+// Copyright (c) 2020-2026 Aliaksei Karalenka <sydr1991@gmail.com>.
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 
 #pragma once
@@ -17,12 +17,11 @@ namespace mm
 			empty,
 			bookmark,
 			checkmark,
-			checkmark_green,
 			circle,
 			clear,
 			cog,
 			copy,
-			cross_gray,
+			cross,
 			double_down,
 			double_up,
 			down,
@@ -43,6 +42,8 @@ namespace mm
 			x48,
 			x64,
 		};
+
+		static inline wxColour MM_GREEN(0x67, 0xCC, 0x4A);
 	}
 
 	inline wxSize iconSize(Icon::Size value)
